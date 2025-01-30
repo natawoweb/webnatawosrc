@@ -33,10 +33,6 @@ type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
 type AppRole = Database["public"]["Enums"]["app_role"];
 
-type ProfileWithRoles = Profile & {
-  user_roles: Pick<UserRole, "role">[] | null;
-};
-
 type UserWithRole = Profile & {
   role: AppRole;
 };
@@ -49,22 +45,28 @@ export function UserManagement() {
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get all profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          user_roles (
-            role
-          )
-        `);
+        .select('*');
       
-      if (error) throw error;
+      if (profilesError) throw profilesError;
 
-      // Transform the data to match our UserWithRole type
-      const usersWithRoles: UserWithRole[] = (data as ProfileWithRoles[]).map(profile => ({
-        ...profile,
-        role: profile.user_roles?.[0]?.role || "reader"
-      }));
+      // Then get all user roles
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('*');
+      
+      if (rolesError) throw rolesError;
+
+      // Combine the data
+      const usersWithRoles: UserWithRole[] = profiles.map(profile => {
+        const userRole = userRoles.find(role => role.user_id === profile.id);
+        return {
+          ...profile,
+          role: userRole?.role || "reader"
+        };
+      });
 
       console.log("Users with roles:", usersWithRoles); // Debug log
       return usersWithRoles;
