@@ -11,68 +11,84 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CheckCircle, XCircle, FileText } from "lucide-react";
+import { Loader2, UserCog, Trash2, User, Users } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
-type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
 
-type BlogWithProfile = Blog & {
-  author_name: string | null;
+type UserWithRole = Profile & {
+  role: string;
 };
 
 export function ContentManagement() {
   const { toast } = useToast();
 
-  const { data: blogs, isLoading } = useQuery({
-    queryKey: ["admin-blogs"],
+  const { data: users, isLoading } = useQuery({
+    queryKey: ["admin-users"],
     queryFn: async () => {
-      // First, get all blogs
-      const { data: blogs, error: blogsError } = await supabase
-        .from("blogs")
-        .select("*")
-        .returns<Blog[]>();
-
-      if (blogsError) throw blogsError;
-
-      // Then get all unique author profiles
-      const uniqueAuthorIds = [...new Set(blogs.map(blog => blog.author_id))];
+      // First get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, full_name")
-        .in("id", uniqueAuthorIds)
+        .select("*")
         .returns<Profile[]>();
 
       if (profilesError) throw profilesError;
 
-      // Combine blogs with author names
-      const blogsWithProfiles: BlogWithProfile[] = blogs.map(blog => ({
-        ...blog,
-        author_name: profiles.find(profile => profile.id === blog.author_id)?.full_name || "Unknown"
+      // Then get all user roles
+      const { data: userRoles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("*")
+        .returns<UserRole[]>();
+
+      if (rolesError) throw rolesError;
+
+      // Combine profiles with roles
+      const usersWithRoles: UserWithRole[] = profiles.map(profile => ({
+        ...profile,
+        role: userRoles.find(ur => ur.user_id === profile.id)?.role || "reader"
       }));
 
-      return blogsWithProfiles;
+      return usersWithRoles;
     },
   });
 
-  const updateBlogStatus = async (blogId: string, status: string) => {
+  const handleDeleteUser = async (userId: string) => {
     try {
-      const { error } = await supabase
-        .from("blogs")
-        .update({ status })
-        .eq("id", blogId);
-
+      const { error } = await supabase.auth.admin.deleteUser(userId);
       if (error) throw error;
 
       toast({
-        title: "Blog updated",
-        description: `Blog has been ${status}.`,
+        title: "User deleted",
+        description: "User has been successfully deleted.",
       });
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update blog status.",
+        description: "Failed to delete user. Only admins can delete users.",
+      });
+    }
+  };
+
+  const handleUpdateRole = async (userId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from("user_roles")
+        .update({ role: newRole })
+        .eq("user_id", userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Role updated",
+        description: "User role has been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update user role.",
       });
     }
   };
@@ -88,58 +104,50 @@ export function ContentManagement() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Content Management</h2>
+        <h2 className="text-2xl font-bold">User Management</h2>
         <Button>
-          <FileText className="mr-2 h-4 w-4" />
-          View All Content
+          <Users className="mr-2 h-4 w-4" />
+          View All Users
         </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>Author</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Created</TableHead>
+            <TableHead>Full Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Created At</TableHead>
+            <TableHead>Role</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {blogs?.map((blog) => (
-            <TableRow key={blog.id}>
-              <TableCell className="font-medium">{blog.title}</TableCell>
-              <TableCell>{blog.author_name}</TableCell>
+          {users?.map((user) => (
+            <TableRow key={user.id}>
+              <TableCell className="font-medium">{user.full_name}</TableCell>
+              <TableCell>{user.email}</TableCell>
               <TableCell>
-                <Badge
-                  variant={
-                    blog.status === "approved"
-                      ? "default"
-                      : blog.status === "pending"
-                      ? "secondary"
-                      : "destructive"
-                  }
-                >
-                  {blog.status}
-                </Badge>
+                {new Date(user.created_at || "").toLocaleDateString()}
               </TableCell>
               <TableCell>
-                {new Date(blog.created_at || "").toLocaleDateString()}
+                <Badge variant="outline" className="capitalize">
+                  {user.role}
+                </Badge>
               </TableCell>
               <TableCell className="space-x-2">
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => updateBlogStatus(blog.id, "approved")}
+                  onClick={() => handleUpdateRole(user.id, "admin")}
                 >
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <UserCog className="h-4 w-4 text-blue-500" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => updateBlogStatus(blog.id, "rejected")}
+                  onClick={() => handleDeleteUser(user.id)}
                 >
-                  <XCircle className="h-4 w-4 text-red-500" />
+                  <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
               </TableCell>
             </TableRow>
