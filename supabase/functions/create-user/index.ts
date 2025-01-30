@@ -1,79 +1,101 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from '@supabase/supabase-js'
+import { corsHeaders } from '../_shared/cors.ts'
 
 interface CreateUserPayload {
   email: string
   fullName: string
-  role: string
+  role: 'reader' | 'writer' | 'manager' | 'admin'
 }
 
-interface ErrorResponse {
-  error: string
-  message: string
-  details?: unknown
+// Utility function to generate a secure password
+function generateSecurePassword(): string {
+  const generateRandomString = () => crypto.randomUUID().slice(0, 8);
+  return `${generateRandomString()}#Aa1!${generateRandomString().slice(0, 4)}`;
 }
 
-const createErrorResponse = (status: number, error: string, message: string, details?: unknown): Response => {
-  const errorResponse: ErrorResponse = {
-    error,
-    message,
-    details
+// Utility function to validate email format
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Utility function to validate role
+function isValidRole(role: string): role is CreateUserPayload['role'] {
+  return ['reader', 'writer', 'manager', 'admin'].includes(role);
+}
+
+// Utility function to validate the payload
+function validatePayload(payload: any): { isValid: boolean; error?: string } {
+  if (!payload) {
+    return { isValid: false, error: 'Payload is required' };
   }
-  console.error('Error response:', errorResponse)
+
+  if (!payload.email || !isValidEmail(payload.email)) {
+    return { isValid: false, error: 'Valid email is required' };
+  }
+
+  if (!payload.fullName || payload.fullName.trim().length < 2) {
+    return { isValid: false, error: 'Full name is required (minimum 2 characters)' };
+  }
+
+  if (!payload.role || !isValidRole(payload.role)) {
+    return { isValid: false, error: 'Valid role is required (reader, writer, manager, or admin)' };
+  }
+
+  return { isValid: true };
+}
+
+// Utility function to create error response
+function createErrorResponse(status: number, message: string, details?: any): Response {
   return new Response(
-    JSON.stringify(errorResponse),
+    JSON.stringify({
+      error: "Auth Error",
+      message,
+      details
+    }),
     {
       status,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
     }
-  )
+  );
 }
 
-const validateFields = (payload: CreateUserPayload): string[] => {
-  console.log('Validating fields:', payload)
-  const errors: string[] = []
-  if (!payload.email) errors.push('Email is required')
-  if (!payload.fullName) errors.push('Full name is required')
-  if (!payload.role) errors.push('Role is required')
-  if (payload.email && !payload.email.includes('@')) errors.push('Invalid email format')
-  return errors
+// Utility function to create success response
+function createSuccessResponse(data: any): Response {
+  return new Response(
+    JSON.stringify(data),
+    {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
 }
 
-const verifyAdmin = async (supabaseAdmin: any, userId: string): Promise<void> => {
-  console.log('Verifying admin status for user:', userId)
-  const { data: isAdmin, error: roleError } = await supabaseAdmin.rpc('has_role', {
-    user_id: userId,
-    required_role: 'admin'
-  })
-
-  if (roleError) {
-    console.error('Role verification error:', roleError)
-    throw new Error(`Role verification failed: ${roleError.message}`)
-  }
-
-  if (!isAdmin) {
-    throw new Error('User is not authorized to create users')
-  }
-}
-
-Deno.serve(async (req) => {
+// Main handler function
+async function handleCreateUser(req: Request): Promise<Response> {
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    console.log('Received create user request')
+    const payload: CreateUserPayload = await req.json();
     
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return createErrorResponse(401, 'Unauthorized', 'Missing Authorization header')
+    // Validate payload
+    const validation = validatePayload(payload);
+    if (!validation.isValid) {
+      return createErrorResponse(400, validation.error!);
     }
 
-    const supabaseAdmin = createClient(
+    // Initialize Supabase client
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
@@ -82,131 +104,43 @@ Deno.serve(async (req) => {
           persistSession: false,
         },
       }
-    )
+    );
 
-    const payload: CreateUserPayload = await req.json()
-    console.log('Request payload:', payload)
+    // Generate secure password
+    const tempPassword = generateSecurePassword();
 
-    const validationErrors = validateFields(payload)
-    if (validationErrors.length > 0) {
-      return createErrorResponse(400, 'Validation Error', 'Invalid input data', validationErrors)
+    // Create auth user with all required data
+    console.log('Creating auth user with email:', payload.email);
+    const { data: authUser, error: createUserError } = await supabaseClient.auth.admin.createUser({
+      email: payload.email,
+      password: tempPassword,
+      email_confirm: true,
+      user_metadata: {
+        full_name: payload.fullName,
+        avatar_url: null,
+      },
+    });
+
+    if (createUserError) {
+      console.error('Error creating auth user:', createUserError);
+      return createErrorResponse(500, `Failed to create auth user: ${createUserError.message}`);
     }
 
-    const jwt = authHeader.replace('Bearer ', '')
-    const { data: { user: adminUser }, error: verifyError } = await supabaseAdmin.auth.getUser(jwt)
-    
-    if (verifyError || !adminUser) {
-      console.error('Auth verification error:', verifyError)
-      return createErrorResponse(401, 'Unauthorized', 'Invalid authentication token')
+    if (!authUser.user) {
+      console.error('No user returned from auth user creation');
+      return createErrorResponse(500, 'Failed to create auth user: No user returned');
     }
 
-    try {
-      await verifyAdmin(supabaseAdmin, adminUser.id)
-    } catch (error) {
-      return createErrorResponse(403, 'Forbidden', error.message)
-    }
-
-    console.log('Creating new user...')
-    
-    try {
-      // Check if user already exists using listUsers and filtering
-      const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers()
-      
-      if (listError) {
-        console.error('Error checking existing users:', listError)
-        return createErrorResponse(500, 'Database Error', 'Failed to check existing users')
-      }
-
-      const existingUser = users.users.find(user => user.email === payload.email)
-      if (existingUser) {
-        return createErrorResponse(400, 'User Error', 'User with this email already exists')
-      }
-
-      // Generate a strong password that meets requirements
-      const tempPassword = `${Math.random().toString(36).slice(2)}#Aa1!${Math.random().toString(36).slice(2)}`
-      
-      // Create auth user with all required data upfront
-      console.log('Creating auth user with email:', payload.email)
-      const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email: payload.email,
-        password: tempPassword,
-        email_confirm: true,
-        user_metadata: { 
-          full_name: payload.fullName,
-          avatar_url: null
-        }
-      })
-
-      if (createError) {
-        console.error('Error creating auth user:', createError)
-        return createErrorResponse(500, 'Auth Error', `Failed to create auth user: ${createError.message}`)
-      }
-
-      if (!userData.user) {
-        return createErrorResponse(500, 'Auth Error', 'No user data returned from auth creation')
-      }
-
-      console.log('Auth user created successfully:', userData.user.id)
-
-      // Create profile
-      const { error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .insert({
-          id: userData.user.id,
-          full_name: payload.fullName,
-          email: payload.email
-        })
-
-      if (profileError) {
-        console.error('Error creating profile:', profileError)
-        await supabaseAdmin.auth.admin.deleteUser(userData.user.id)
-        return createErrorResponse(500, 'Database Error', `Failed to create profile: ${profileError.message}`)
-      }
-
-      // Assign role
-      const { error: roleError } = await supabaseAdmin
-        .from('user_roles')
-        .insert({
-          user_id: userData.user.id,
-          role: payload.role
-        })
-
-      if (roleError) {
-        console.error('Error setting user role:', roleError)
-        await supabaseAdmin.from('profiles').delete().eq('id', userData.user.id)
-        await supabaseAdmin.auth.admin.deleteUser(userData.user.id)
-        return createErrorResponse(500, 'Database Error', `Failed to assign role: ${roleError.message}`)
-      }
-
-      return new Response(
-        JSON.stringify({ 
-          success: true,
-          user: userData.user,
-          message: 'User created successfully'
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
-
-    } catch (error) {
-      console.error('Error in user creation process:', error)
-      return createErrorResponse(
-        500,
-        'Server Error',
-        'Failed to complete user creation process',
-        error
-      )
-    }
+    console.log('Auth user created successfully');
+    return createSuccessResponse({
+      user: authUser.user,
+      tempPassword,
+    });
 
   } catch (error) {
-    console.error('Unexpected error:', error)
-    return createErrorResponse(
-      500,
-      'Server Error',
-      error.message || 'An unexpected error occurred',
-      error
-    )
+    console.error('Unexpected error:', error);
+    return createErrorResponse(500, 'An unexpected error occurred', error);
   }
-})
+}
+
+serve(handleCreateUser);
