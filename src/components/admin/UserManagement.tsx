@@ -22,20 +22,20 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, 
   UserPlus, 
-  Shield,
   Search,
   Filter,
   UserCog,
   User,
-  Users,
-  UserCheck,
-  BadgeCheck
+  Trash2,
+  ShieldCheck,
+  UserCheck2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface User {
   id: string;
   email: string;
+  full_name: string | null;
   created_at: string;
   role: "reader" | "writer" | "manager" | "admin";
 }
@@ -49,10 +49,10 @@ export function UserManagement() {
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
-      // First get all profiles
+      // First get all profiles with full names
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, email, created_at");
+        .select("id, email, full_name, created_at");
       
       if (profilesError) throw profilesError;
 
@@ -67,6 +67,7 @@ export function UserManagement() {
       const usersWithRoles = profiles.map((profile) => ({
         id: profile.id,
         email: profile.email || "No email",
+        full_name: profile.full_name,
         created_at: profile.created_at,
         role: userRoles?.find((ur) => ur.user_id === profile.id)?.role || "reader",
       }));
@@ -103,13 +104,33 @@ export function UserManagement() {
     setUpdatingUserId(null);
   };
 
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      const { error } = await supabase.auth.admin.deleteUser(userId);
+      if (error) throw error;
+
+      await refetch();
+      
+      toast({
+        title: "User deleted",
+        description: "User has been successfully deleted.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete user. Only admins can delete users.",
+      });
+    }
+  };
+
   const getRoleBadge = (role: string) => {
     const baseClasses = "inline-flex items-center gap-1";
     switch (role) {
       case "admin":
         return (
           <Badge variant="destructive" className={baseClasses}>
-            <Shield className="h-3 w-3" />
+            <ShieldCheck className="h-3 w-3" />
             Admin
           </Badge>
         );
@@ -123,7 +144,7 @@ export function UserManagement() {
       case "writer":
         return (
           <Badge variant="secondary" className={baseClasses}>
-            <UserCheck className="h-3 w-3" />
+            <UserCheck2 className="h-3 w-3" />
             Writer
           </Badge>
         );
@@ -195,6 +216,7 @@ export function UserManagement() {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Full Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Role</TableHead>
@@ -204,6 +226,7 @@ export function UserManagement() {
         <TableBody>
           {filteredUsers?.map((user) => (
             <TableRow key={user.id}>
+              <TableCell>{user.full_name || 'N/A'}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 {new Date(user.created_at).toLocaleDateString()}
@@ -212,20 +235,30 @@ export function UserManagement() {
                 {getRoleBadge(user.role)}
               </TableCell>
               <TableCell>
-                <Select
-                  value={user.role}
-                  onValueChange={(value) => updateUserRole(user.id, value as "reader" | "writer" | "manager" | "admin")}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="reader">Reader</SelectItem>
-                    <SelectItem value="writer">Writer</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const nextRole: Record<typeof user.role, typeof user.role> = {
+                        reader: "writer",
+                        writer: "manager",
+                        manager: "admin",
+                        admin: "reader"
+                      };
+                      updateUserRole(user.id, nextRole[user.role]);
+                    }}
+                  >
+                    <UserCog className="h-4 w-4 text-blue-500" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteUser(user.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
