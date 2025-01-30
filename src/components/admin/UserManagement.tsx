@@ -30,7 +30,7 @@ interface User {
 
 export function UserManagement() {
   const { toast } = useToast();
-  const [selectedRole, setSelectedRole] = useState<string>("");
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
@@ -113,13 +113,13 @@ export function UserManagement() {
           </div>
         </div>
         <div className="w-[200px]">
-          <Select value={selectedRole} onValueChange={setSelectedRole}>
+          <Select value={selectedRole || undefined} onValueChange={setSelectedRole}>
             <SelectTrigger>
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Filter by role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Roles</SelectItem>
+              <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="reader">Reader</SelectItem>
               <SelectItem value="writer">Writer</SelectItem>
               <SelectItem value="manager">Manager</SelectItem>
