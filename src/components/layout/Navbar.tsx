@@ -1,16 +1,12 @@
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe, LogOut } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { DesktopNav } from "./nav/DesktopNav";
+import { MobileNav } from "./nav/MobileNav";
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -67,47 +63,13 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-4">
-            <Link to="/writers" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
-              Writers
-            </Link>
-            <Link to="/events" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
-              Events
-            </Link>
-            <Link to="/blogs" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
-              Blogs
-            </Link>
-            
-            {/* Language Picker */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="w-auto px-3 gap-2">
-                  <Globe className="h-4 w-4" />
-                  <span>{currentLanguage}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setCurrentLanguage("English")}>
-                  English
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setCurrentLanguage("தமிழ்")}>
-                  தமிழ் (Tamil)
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {session ? (
-              <Button variant="outline" onClick={handleSignOut} className="ml-4">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            ) : (
-              <Button variant="outline" onClick={() => navigate("/auth")} className="ml-4">
-                Sign In
-              </Button>
-            )}
-          </div>
+          <DesktopNav
+            currentLanguage={currentLanguage}
+            setCurrentLanguage={setCurrentLanguage}
+            session={session}
+            handleSignOut={handleSignOut}
+            navigate={navigate}
+          />
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
@@ -118,60 +80,14 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
-      <div className={cn("md:hidden", isOpen ? "block" : "hidden")}>
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          <Link
-            to="/writers"
-            className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
-          >
-            Writers
-          </Link>
-          <Link
-            to="/events"
-            className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
-          >
-            Events
-          </Link>
-          <Link
-            to="/blogs"
-            className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
-          >
-            Blogs
-          </Link>
-          
-          {/* Mobile Language Picker */}
-          <div className="px-3 py-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
-                  <Globe className="h-4 w-4" />
-                  <span>{currentLanguage}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setCurrentLanguage("English")}>
-                  English
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setCurrentLanguage("தமிழ்")}>
-                  தமிழ் (Tamil)
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          {session ? (
-            <Button variant="outline" onClick={handleSignOut} className="w-full mt-4">
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          ) : (
-            <Button variant="outline" onClick={() => navigate("/auth")} className="w-full mt-4">
-              Sign In
-            </Button>
-          )}
-        </div>
-      </div>
+      <MobileNav
+        isOpen={isOpen}
+        currentLanguage={currentLanguage}
+        setCurrentLanguage={setCurrentLanguage}
+        session={session}
+        handleSignOut={handleSignOut}
+        navigate={navigate}
+      />
     </nav>
   );
 };
