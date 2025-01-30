@@ -89,7 +89,8 @@ function createSuccessResponse(data: any): Response {
   );
 }
 
-async function handleCreateUser(req: Request): Promise<Response> {
+serve(async (req: Request) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -112,12 +113,7 @@ async function handleCreateUser(req: Request): Promise<Response> {
       return createErrorResponse(500, 'Server configuration error');
     }
 
-    const supabaseAdmin = createClient(supabaseUrl, supabaseKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    });
+    const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
 
     // Check if user already exists
     const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
@@ -167,6 +163,4 @@ async function handleCreateUser(req: Request): Promise<Response> {
     console.error('Unexpected error:', error);
     return createErrorResponse(500, 'An unexpected error occurred', error);
   }
-}
-
-serve(handleCreateUser);
+});
