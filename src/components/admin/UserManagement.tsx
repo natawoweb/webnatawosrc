@@ -43,7 +43,6 @@ import {
   Filter,
   Pencil,
   Trash2,
-  AlertCircle,
 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
@@ -61,8 +60,12 @@ export function UserManagement() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [editRole, setEditRole] = useState<AppRole>("reader");
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserFullName, setNewUserFullName] = useState("");
+  const [newUserRole, setNewUserRole] = useState<AppRole>("reader");
 
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
@@ -144,6 +147,50 @@ export function UserManagement() {
     }
   };
 
+  const handleAddUser = async () => {
+    try {
+      // Create auth user
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: newUserEmail,
+        password: "tempPassword123", // You might want to generate this randomly
+        email_confirm: true,
+        user_metadata: { full_name: newUserFullName }
+      });
+
+      if (authError) throw authError;
+
+      // Add user role
+      if (authData.user) {
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ 
+            user_id: authData.user.id, 
+            role: newUserRole 
+          });
+
+        if (roleError) throw roleError;
+      }
+
+      await refetch();
+      
+      toast({
+        title: "User added",
+        description: "New user has been successfully created.",
+      });
+      
+      setAddUserDialogOpen(false);
+      setNewUserEmail("");
+      setNewUserFullName("");
+      setNewUserRole("reader");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add user. Please try again.",
+      });
+    }
+  };
+
   const filteredUsers = users?.filter((user) => {
     const matchesRole = selectedRole === "all" || !selectedRole ? true : user.role === selectedRole;
     const matchesSearch = searchQuery
@@ -164,9 +211,9 @@ export function UserManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">User Management</h2>
-        <Button>
+        <Button onClick={() => setAddUserDialogOpen(true)}>
           <UserPlus className="mr-2 h-4 w-4" />
-          Invite User
+          Add User
         </Button>
       </div>
 
@@ -231,7 +278,7 @@ export function UserManagement() {
                       setEditDialogOpen(true);
                     }}
                   >
-                    <Pencil className="h-4 w-4 text-blue-500" />
+                    <Pencil className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -305,6 +352,57 @@ export function UserManagement() {
               onClick={() => selectedUser && updateUserRole(selectedUser.id, editRole)}
             >
               Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={addUserDialogOpen} onOpenChange={setAddUserDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New User</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Full Name</label>
+                <Input
+                  value={newUserFullName}
+                  onChange={(e) => setNewUserFullName(e.target.value)}
+                  placeholder="Enter full name"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Email</label>
+                <Input
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  placeholder="Enter email address"
+                  type="email"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Role</label>
+                <Select value={newUserRole} onValueChange={(value) => setNewUserRole(value as AppRole)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="reader">Reader</SelectItem>
+                    <SelectItem value="writer">Writer</SelectItem>
+                    <SelectItem value="manager">Manager</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddUserDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddUser}>
+              Add User
             </Button>
           </DialogFooter>
         </DialogContent>
