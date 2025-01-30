@@ -16,9 +16,10 @@ import { Database } from "@/integrations/supabase/types";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
+type AppRole = Database["public"]["Enums"]["app_role"];
 
 type UserWithRole = Profile & {
-  role: string;
+  role: AppRole;
 };
 
 export function ContentManagement() {
@@ -71,7 +72,7 @@ export function ContentManagement() {
     }
   };
 
-  const handleUpdateRole = async (userId: string, newRole: string) => {
+  const handleUpdateRole = async (userId: string, newRole: AppRole) => {
     try {
       const { error } = await supabase
         .from("user_roles")
