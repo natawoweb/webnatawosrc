@@ -64,13 +64,16 @@ export function UserManagement() {
       if (rolesError) throw rolesError;
 
       // Combine the data
-      const usersWithRoles = profiles.map((profile) => ({
-        id: profile.id,
-        email: profile.email || "No email",
-        full_name: profile.full_name,
-        created_at: profile.created_at,
-        role: userRoles?.find((ur) => ur.user_id === profile.id)?.role || "reader",
-      }));
+      const usersWithRoles = profiles.map((profile) => {
+        const userRole = userRoles?.find((ur) => ur.user_id === profile.id);
+        return {
+          id: profile.id,
+          email: profile.email || "No email",
+          full_name: profile.full_name,
+          created_at: profile.created_at,
+          role: userRole?.role || "reader",
+        };
+      });
 
       return usersWithRoles;
     },
