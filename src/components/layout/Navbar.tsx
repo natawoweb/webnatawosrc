@@ -12,7 +12,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-export function Navbar() {
+export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [currentLanguage, setCurrentLanguage] = React.useState("English");
   const [session, setSession] = React.useState<any>(null);
@@ -174,4 +174,4 @@ export function Navbar() {
       </div>
     </nav>
   );
-}
+};

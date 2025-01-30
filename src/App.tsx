@@ -16,7 +16,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
-function App() {
+const App: React.FC = () => {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -40,6 +40,6 @@ function App() {
       </QueryClientProvider>
     </React.StrictMode>
   );
-}
+};
 
 export default App;
