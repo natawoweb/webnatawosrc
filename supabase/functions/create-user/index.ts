@@ -122,15 +122,14 @@ Deno.serve(async (req) => {
       }
 
       // Generate a secure random password
-      const tempPassword = crypto.randomUUID().slice(0, 12)
+      const tempPassword = crypto.randomUUID().slice(0, 12) + 'Aa1!'
       
-      // Create auth user
+      // Create auth user with minimal data first
       console.log('Creating auth user with email:', payload.email)
       const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: payload.email,
         password: tempPassword,
-        email_confirm: true,
-        user_metadata: { full_name: payload.fullName }
+        email_confirm: true
       })
 
       if (createError) {
@@ -143,6 +142,18 @@ Deno.serve(async (req) => {
       }
 
       console.log('Auth user created successfully:', userData.user.id)
+
+      // Update user metadata after successful creation
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+        userData.user.id,
+        { user_metadata: { full_name: payload.fullName } }
+      )
+
+      if (updateError) {
+        console.error('Error updating user metadata:', updateError)
+        await supabaseAdmin.auth.admin.deleteUser(userData.user.id)
+        return createErrorResponse(500, 'Auth Error', `Failed to update user metadata: ${updateError.message}`)
+      }
 
       // Create profile
       const { error: profileError } = await supabaseAdmin
