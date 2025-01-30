@@ -106,21 +106,27 @@ Deno.serve(async (req) => {
       return createErrorResponse(403, 'Forbidden', error.message)
     }
 
-    console.log('Creating new user with auth.admin.createUser...')
+    console.log('Creating new user...')
     
     try {
       // Generate a random password
       const tempPassword = Math.random().toString(36).slice(-8)
       console.log('Attempting to create auth user for email:', payload.email)
 
-      // First check if user already exists
-      const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers()
-      const userExists = existingUser?.users.some(user => user.email === payload.email)
+      // Check if user already exists
+      const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers()
       
+      if (listError) {
+        console.error('Error checking existing users:', listError)
+        return createErrorResponse(500, 'Database Error', 'Failed to check existing users')
+      }
+
+      const userExists = existingUsers?.users.some(user => user.email === payload.email)
       if (userExists) {
         return createErrorResponse(400, 'User Error', 'User with this email already exists')
       }
 
+      // Create auth user with admin.createUser
       const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: payload.email,
         password: tempPassword,
@@ -140,7 +146,6 @@ Deno.serve(async (req) => {
       console.log('Auth user created successfully:', userData.user.id)
 
       // Create profile
-      console.log('Creating user profile...')
       const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .insert({
@@ -151,13 +156,12 @@ Deno.serve(async (req) => {
 
       if (profileError) {
         console.error('Error creating profile:', profileError)
-        // Clean up the auth user if profile creation fails
+        // Clean up auth user if profile creation fails
         await supabaseAdmin.auth.admin.deleteUser(userData.user.id)
         return createErrorResponse(500, 'Database Error', `Failed to create profile: ${profileError.message}`)
       }
 
       // Assign role
-      console.log('Setting user role...')
       const { error: roleError } = await supabaseAdmin
         .from('user_roles')
         .insert({
@@ -167,7 +171,7 @@ Deno.serve(async (req) => {
 
       if (roleError) {
         console.error('Error setting user role:', roleError)
-        // Clean up both profile and auth user if role assignment fails
+        // Clean up both profile and auth user
         await supabaseAdmin.from('profiles').delete().eq('id', userData.user.id)
         await supabaseAdmin.auth.admin.deleteUser(userData.user.id)
         return createErrorResponse(500, 'Database Error', `Failed to assign role: ${roleError.message}`)
