@@ -21,8 +21,13 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link to="/" className="flex items-center">
-              <span className="text-xl font-semibold">Writers Hub</span>
+            <Link to="/" className="flex items-center gap-2">
+              <img 
+                src="/lovable-uploads/2e998827-54b8-4981-b796-0eaa5c1cd8e2.png" 
+                alt="NATAWO Logo" 
+                className="h-10 w-10"
+              />
+              <span className="text-xl font-semibold">NATAWO</span>
             </Link>
           </div>
 
