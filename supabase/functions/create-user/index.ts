@@ -6,10 +6,15 @@ const corsHeaders = {
 }
 
 // Utility function to create error responses
-const createErrorResponse = (status: number, error: string, message: string) => {
-  console.error(`Error: ${error}, Message: ${message}`);
+const createErrorResponse = (status: number, error: string, message: string, details?: any) => {
+  const errorResponse = {
+    error,
+    message,
+    details: details || undefined
+  };
+  console.error('Error details:', errorResponse);
   return new Response(
-    JSON.stringify({ error, message }),
+    JSON.stringify(errorResponse),
     {
       status,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -19,13 +24,12 @@ const createErrorResponse = (status: number, error: string, message: string) => 
 
 // Validate required fields
 const validateFields = (email: string, fullName: string, role: string) => {
-  if (!email || !fullName || !role) {
-    throw new Error('Missing required fields');
-  }
-  
-  if (!email.includes('@')) {
-    throw new Error('Invalid email format');
-  }
+  const errors = [];
+  if (!email) errors.push('Email is required');
+  if (!fullName) errors.push('Full name is required');
+  if (!role) errors.push('Role is required');
+  if (email && !email.includes('@')) errors.push('Invalid email format');
+  return errors;
 };
 
 // Verify admin status
@@ -36,67 +40,82 @@ const verifyAdmin = async (supabaseAdmin: any, userId: string) => {
     required_role: 'admin'
   });
 
-  if (roleError || !isAdmin) {
+  if (roleError) {
+    console.error('Role verification error:', roleError);
+    throw new Error(`Role verification failed: ${roleError.message}`);
+  }
+
+  if (!isAdmin) {
     throw new Error('User is not authorized to create users');
   }
 };
 
 // Create user and profile
 const createUserAndProfile = async (supabaseAdmin: any, email: string, fullName: string, role: string) => {
-  console.log('Creating user with email:', email);
+  console.log('Starting user creation process for:', email);
   
-  // Generate a random password
-  const tempPassword = Math.random().toString(36).slice(-8);
+  try {
+    // Generate a random password
+    const tempPassword = Math.random().toString(36).slice(-8);
 
-  // Create the user
-  const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-    email,
-    password: tempPassword,
-    email_confirm: true,
-    user_metadata: { full_name: fullName }
-  });
-
-  if (createError) {
-    console.error('Error creating user:', createError);
-    throw new Error(`Failed to create user: ${createError.message}`);
-  }
-
-  if (!userData.user) {
-    throw new Error('User creation failed - no user data returned');
-  }
-
-  console.log('User created successfully, creating profile...');
-
-  // Create profile
-  const { error: profileError } = await supabaseAdmin
-    .from('profiles')
-    .insert({
-      id: userData.user.id,
-      full_name: fullName,
-      email: email
+    // Create the user
+    const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: tempPassword,
+      email_confirm: true,
+      user_metadata: { full_name: fullName }
     });
 
-  if (profileError) {
-    console.error('Error creating profile:', profileError);
-    throw new Error(`Failed to create profile: ${profileError.message}`);
+    if (createError) {
+      console.error('Error creating auth user:', createError);
+      throw new Error(`Auth user creation failed: ${createError.message}`);
+    }
+
+    if (!userData.user) {
+      throw new Error('User creation failed - no user data returned');
+    }
+
+    console.log('Auth user created successfully, creating profile...');
+
+    // Create profile
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        id: userData.user.id,
+        full_name: fullName,
+        email: email
+      });
+
+    if (profileError) {
+      console.error('Error creating profile:', profileError);
+      // If profile creation fails, attempt to clean up the auth user
+      await supabaseAdmin.auth.admin.deleteUser(userData.user.id);
+      throw new Error(`Profile creation failed: ${profileError.message}`);
+    }
+
+    console.log('Profile created successfully, setting user role...');
+
+    // Set user role
+    const { error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .insert({
+        user_id: userData.user.id,
+        role: role
+      });
+
+    if (roleError) {
+      console.error('Error setting user role:', roleError);
+      // If role assignment fails, clean up both profile and auth user
+      await supabaseAdmin.from('profiles').delete().eq('id', userData.user.id);
+      await supabaseAdmin.auth.admin.deleteUser(userData.user.id);
+      throw new Error(`Role assignment failed: ${roleError.message}`);
+    }
+
+    return userData.user;
+  } catch (error) {
+    console.error('Error in createUserAndProfile:', error);
+    throw error;
   }
-
-  console.log('Profile created successfully, setting user role...');
-
-  // Set user role
-  const { error: roleError } = await supabaseAdmin
-    .from('user_roles')
-    .insert({
-      user_id: userData.user.id,
-      role: role
-    });
-
-  if (roleError) {
-    console.error('Error setting user role:', roleError);
-    throw new Error(`Failed to set user role: ${roleError.message}`);
-  }
-
-  return userData.user;
 };
 
 // Main handler
@@ -107,6 +126,8 @@ Deno.serve(async (req) => {
   }
 
   try {
+    console.log('Received create user request');
+    
     // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -127,13 +148,12 @@ Deno.serve(async (req) => {
 
     // Get request body
     const { email, fullName, role } = await req.json();
-    console.log('Received request to create user:', { email, fullName, role });
+    console.log('Request payload:', { email, fullName, role });
 
     // Validate fields
-    try {
-      validateFields(email, fullName, role);
-    } catch (error) {
-      return createErrorResponse(400, 'Validation Error', error.message);
+    const validationErrors = validateFields(email, fullName, role);
+    if (validationErrors.length > 0) {
+      return createErrorResponse(400, 'Validation Error', 'Invalid input data', validationErrors);
     }
 
     // Verify admin status
@@ -141,6 +161,7 @@ Deno.serve(async (req) => {
     const { data: { user: adminUser }, error: verifyError } = await supabaseAdmin.auth.getUser(jwt);
     
     if (verifyError || !adminUser) {
+      console.error('Auth verification error:', verifyError);
       return createErrorResponse(401, 'Unauthorized', 'Invalid authentication token');
     }
 
@@ -170,7 +191,8 @@ Deno.serve(async (req) => {
     return createErrorResponse(
       500,
       'Server Error',
-      error.message || 'An unexpected error occurred'
+      error.message || 'An unexpected error occurred',
+      error
     );
   }
 });
