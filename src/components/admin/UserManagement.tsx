@@ -37,19 +37,19 @@ export function UserManagement() {
   const { data: users, isLoading } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
+      // Get all profiles with email
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email, created_at");
+      
+      if (profilesError) throw profilesError;
+
       // Get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
-        .select("*");
+        .select("user_id, role");
       
       if (rolesError) throw rolesError;
-
-      // Get all profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("*");
-      
-      if (profilesError) throw profilesError;
 
       // Combine the data
       const usersWithRoles = profiles.map((profile) => ({
@@ -125,7 +125,7 @@ export function UserManagement() {
           </div>
         </div>
         <div className="w-[200px]">
-          <Select value={selectedRole || undefined} onValueChange={setSelectedRole}>
+          <Select value={selectedRole || "all"} onValueChange={setSelectedRole}>
             <SelectTrigger>
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Filter by role" />
