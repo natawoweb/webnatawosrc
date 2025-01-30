@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { BookPlus } from "lucide-react";
 import {
   Dialog,
@@ -13,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { RichTextEditor } from "./RichTextEditor";
 
 export function CreateBlogDialog() {
   const { toast } = useToast();
@@ -31,7 +31,7 @@ export function CreateBlogDialog() {
         .insert([
           {
             title: blogData.title,
-            content: blogData.content,
+            content: JSON.parse(blogData.content),
             author_id: user.id,
             status: "draft"
           }
@@ -66,7 +66,7 @@ export function CreateBlogDialog() {
           Create Blog
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Create New Blog</DialogTitle>
         </DialogHeader>
@@ -82,12 +82,9 @@ export function CreateBlogDialog() {
           </div>
           <div>
             <label htmlFor="content" className="text-sm font-medium">Content</label>
-            <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Enter blog content"
-              rows={5}
+            <RichTextEditor
+              content={content}
+              onChange={setContent}
             />
           </div>
           <Button

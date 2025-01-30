@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Pencil } from "lucide-react";
 import {
   Dialog,
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
+import { RichTextEditor } from "./RichTextEditor";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -26,7 +26,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState(blog.title);
-  const [content, setContent] = useState(blog.content);
+  const [content, setContent] = useState(JSON.stringify(blog.content));
 
   const updateBlogMutation = useMutation({
     mutationFn: async (blogData: { title: string; content: string }) => {
@@ -34,7 +34,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
         .from("blogs")
         .update({
           title: blogData.title,
-          content: blogData.content,
+          content: JSON.parse(blogData.content),
           updated_at: new Date().toISOString(),
         })
         .eq("id", blog.id);
@@ -65,7 +65,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
           <Pencil className="h-4 w-4 text-blue-500" />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Edit Blog</DialogTitle>
         </DialogHeader>
@@ -81,12 +81,9 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
           </div>
           <div>
             <label htmlFor="content" className="text-sm font-medium">Content</label>
-            <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Enter blog content"
-              rows={5}
+            <RichTextEditor
+              content={content}
+              onChange={setContent}
             />
           </div>
           <Button
