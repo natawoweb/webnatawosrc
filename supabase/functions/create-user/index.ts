@@ -122,16 +122,19 @@ Deno.serve(async (req) => {
         return createErrorResponse(400, 'User Error', 'User with this email already exists')
       }
 
-      // Generate a secure random password with special characters
-      const tempPassword = `${crypto.randomUUID().slice(0, 12)}#Aa1!`
+      // Generate a strong password that meets requirements
+      const tempPassword = `${crypto.randomUUID().slice(0, 8)}#Aa1!${crypto.randomUUID().slice(0, 4)}`
       
-      // Create auth user with minimal data first
+      // Create auth user with all required data upfront
       console.log('Creating auth user with email:', payload.email)
       const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: payload.email,
         password: tempPassword,
         email_confirm: true,
-        user_metadata: { full_name: payload.fullName }
+        user_metadata: { 
+          full_name: payload.fullName,
+          avatar_url: null
+        }
       })
 
       if (createError) {
