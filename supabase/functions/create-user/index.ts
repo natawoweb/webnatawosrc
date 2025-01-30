@@ -110,8 +110,8 @@ async function handleCreateUser(req: Request): Promise<Response> {
       return createErrorResponse(400, validation.error!);
     }
 
-    // Initialize Supabase client
-    const supabaseClient = createClient(
+    // Initialize Supabase client with service role key
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
@@ -125,15 +125,15 @@ async function handleCreateUser(req: Request): Promise<Response> {
     // Generate secure password
     const tempPassword = generateSecurePassword();
 
-    // Create auth user with all required data
     console.log('Creating auth user with email:', payload.email);
-    const { data: authUser, error: createUserError } = await supabaseClient.auth.admin.createUser({
+    
+    // Create auth user with all required data
+    const { data: authUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
       email: payload.email,
       password: tempPassword,
       email_confirm: true,
       user_metadata: {
         full_name: payload.fullName,
-        avatar_url: null,
       },
     });
 
@@ -148,6 +148,22 @@ async function handleCreateUser(req: Request): Promise<Response> {
     }
 
     console.log('Auth user created successfully');
+    
+    // Insert into user_roles table
+    const { error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .insert({
+        user_id: authUser.user.id,
+        role: payload.role,
+      });
+
+    if (roleError) {
+      console.error('Error setting user role:', roleError);
+      // If role assignment fails, we should delete the created user
+      await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
+      return createErrorResponse(500, `Failed to set user role: ${roleError.message}`);
+    }
+
     return createSuccessResponse({
       user: authUser.user,
       tempPassword,
