@@ -1,22 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Users, BookText, Calendar, Settings } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserManagement } from "@/components/admin/UserManagement";
+import { ContentManagement } from "@/components/admin/ContentManagement";
+import { EventManagement } from "@/components/admin/EventManagement";
+import { SettingsManagement } from "@/components/admin/SettingsManagement";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2, Users, BookText, Calendar, Settings } from "lucide-react";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("users");
 
-  // Fetch current user and check if they're an admin
+  // Check if user is admin
   const { data: isAdmin, isLoading: checkingAdmin } = useQuery({
     queryKey: ["checkAdminRole"],
     queryFn: async () => {
@@ -64,71 +63,42 @@ export default function AdminDashboard() {
     <div className="container mx-auto py-8">
       <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Users Management Card */}
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/admin/users")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Users
-            </CardTitle>
-            <CardDescription>Manage user accounts and roles</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              View, edit, and manage user permissions
-            </p>
-          </CardContent>
-        </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-4 w-full mb-8">
+          <TabsTrigger value="users" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Users
+          </TabsTrigger>
+          <TabsTrigger value="content" className="flex items-center gap-2">
+            <BookText className="h-4 w-4" />
+            Content
+          </TabsTrigger>
+          <TabsTrigger value="events" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Events
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Settings
+          </TabsTrigger>
+        </TabsList>
 
-        {/* Content Management Card */}
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/admin/content")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookText className="h-5 w-5" />
-              Content
-            </CardTitle>
-            <CardDescription>Manage blogs and writers</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Review and moderate content
-            </p>
-          </CardContent>
-        </Card>
+        <TabsContent value="users">
+          <UserManagement />
+        </TabsContent>
 
-        {/* Events Management Card */}
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/admin/events")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Events
-            </CardTitle>
-            <CardDescription>Manage upcoming events</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Create and manage events
-            </p>
-          </CardContent>
-        </Card>
+        <TabsContent value="content">
+          <ContentManagement />
+        </TabsContent>
 
-        {/* Settings Card */}
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/admin/settings")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Settings
-            </CardTitle>
-            <CardDescription>Application settings</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Configure application settings
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+        <TabsContent value="events">
+          <EventManagement />
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <SettingsManagement />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
