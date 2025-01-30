@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -49,6 +50,9 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New User</DialogTitle>
+          <DialogDescription>
+            Create a new user account with specified role and permissions.
+          </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <div className="space-y-4">

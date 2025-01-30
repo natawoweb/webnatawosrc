@@ -108,65 +108,78 @@ Deno.serve(async (req) => {
 
     console.log('Creating new user with auth.admin.createUser...')
     
-    const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: payload.email,
-      password: Math.random().toString(36).slice(-8),
-      email_confirm: true,
-      user_metadata: { full_name: payload.fullName }
-    })
-
-    if (createError) {
-      console.error('Error creating auth user:', createError)
-      return createErrorResponse(500, 'Auth Error', `Failed to create auth user: ${createError.message}`)
-    }
-
-    if (!userData.user) {
-      return createErrorResponse(500, 'Auth Error', 'No user data returned from auth creation')
-    }
-
-    console.log('Auth user created successfully:', userData.user.id)
-
-    console.log('Creating user profile...')
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .insert({
-        id: userData.user.id,
-        full_name: payload.fullName,
-        email: payload.email
+    try {
+      const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email: payload.email,
+        password: Math.random().toString(36).slice(-8),
+        email_confirm: true,
+        user_metadata: { full_name: payload.fullName }
       })
 
-    if (profileError) {
-      console.error('Error creating profile:', profileError)
-      await supabaseAdmin.auth.admin.deleteUser(userData.user.id)
-      return createErrorResponse(500, 'Database Error', `Failed to create profile: ${profileError.message}`)
-    }
-
-    console.log('Setting user role...')
-    const { error: roleError } = await supabaseAdmin
-      .from('user_roles')
-      .insert({
-        user_id: userData.user.id,
-        role: payload.role
-      })
-
-    if (roleError) {
-      console.error('Error setting user role:', roleError)
-      await supabaseAdmin.from('profiles').delete().eq('id', userData.user.id)
-      await supabaseAdmin.auth.admin.deleteUser(userData.user.id)
-      return createErrorResponse(500, 'Database Error', `Failed to assign role: ${roleError.message}`)
-    }
-
-    return new Response(
-      JSON.stringify({ 
-        success: true,
-        user: userData.user,
-        message: 'User created successfully'
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      if (createError) {
+        console.error('Error creating auth user:', createError)
+        return createErrorResponse(500, 'Auth Error', `Failed to create auth user: ${createError.message}`)
       }
-    )
+
+      if (!userData.user) {
+        return createErrorResponse(500, 'Auth Error', 'No user data returned from auth creation')
+      }
+
+      console.log('Auth user created successfully:', userData.user.id)
+
+      console.log('Creating user profile...')
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          id: userData.user.id,
+          full_name: payload.fullName,
+          email: payload.email
+        })
+
+      if (profileError) {
+        console.error('Error creating profile:', profileError)
+        // Clean up the auth user if profile creation fails
+        await supabaseAdmin.auth.admin.deleteUser(userData.user.id)
+        return createErrorResponse(500, 'Database Error', `Failed to create profile: ${profileError.message}`)
+      }
+
+      console.log('Setting user role...')
+      const { error: roleError } = await supabaseAdmin
+        .from('user_roles')
+        .insert({
+          user_id: userData.user.id,
+          role: payload.role
+        })
+
+      if (roleError) {
+        console.error('Error setting user role:', roleError)
+        // Clean up both profile and auth user if role assignment fails
+        await supabaseAdmin.from('profiles').delete().eq('id', userData.user.id)
+        await supabaseAdmin.auth.admin.deleteUser(userData.user.id)
+        return createErrorResponse(500, 'Database Error', `Failed to assign role: ${roleError.message}`)
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          user: userData.user,
+          message: 'User created successfully'
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+
+    } catch (error) {
+      console.error('Error in user creation process:', error)
+      return createErrorResponse(
+        500,
+        'Server Error',
+        'Failed to complete user creation process',
+        error
+      )
+    }
 
   } catch (error) {
     console.error('Unexpected error:', error)
