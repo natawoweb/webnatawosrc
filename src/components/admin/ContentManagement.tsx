@@ -21,12 +21,7 @@ export function ContentManagement() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("blogs")
-        .select(`
-          *,
-          profiles:author_id (
-            full_name
-          )
-        `)
+        .select("*, author:author_id(full_name)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -88,14 +83,14 @@ export function ContentManagement() {
           {blogs?.map((blog) => (
             <TableRow key={blog.id}>
               <TableCell className="font-medium">{blog.title}</TableCell>
-              <TableCell>{blog.profiles?.full_name}</TableCell>
+              <TableCell>{blog.author?.full_name}</TableCell>
               <TableCell>
                 <Badge
                   variant={
                     blog.status === "approved"
-                      ? "success"
+                      ? "default"
                       : blog.status === "pending"
-                      ? "warning"
+                      ? "secondary"
                       : "destructive"
                   }
                 >

@@ -49,21 +49,18 @@ export function UserManagement() {
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
-      // Get all profiles with email
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("id, email, created_at");
       
       if (profilesError) throw profilesError;
 
-      // Get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("user_id, role");
       
       if (rolesError) throw rolesError;
 
-      // Combine the data
       const usersWithRoles = profiles.map((profile) => ({
         id: profile.id,
         email: profile.email || "No email",
@@ -75,12 +72,15 @@ export function UserManagement() {
     },
   });
 
-  const updateUserRole = async (userId: string, newRole: string) => {
+  const updateUserRole = async (userId: string, newRole: "reader" | "writer" | "manager" | "admin") => {
     setUpdatingUserId(userId);
     try {
       const { error } = await supabase
         .from("user_roles")
-        .upsert({ user_id: userId, role: newRole }, { onConflict: "user_id" });
+        .upsert({ 
+          user_id: userId, 
+          role: newRole 
+        });
 
       if (error) throw error;
 
@@ -209,7 +209,7 @@ export function UserManagement() {
                 {getRoleBadge(user.role)}
                 <Select
                   value={user.role}
-                  onValueChange={(value) => updateUserRole(user.id, value)}
+                  onValueChange={(value) => updateUserRole(user.id, value as "reader" | "writer" | "manager" | "admin")}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />
