@@ -33,6 +33,16 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
   const [role, setRole] = useState<AppRole>("reader");
 
   const handleSubmit = async () => {
+    if (!email || !fullName || !role) {
+      console.error("All fields are required");
+      return;
+    }
+
+    if (fullName.length < 2) {
+      console.error("Full name must be at least 2 characters long");
+      return;
+    }
+
     try {
       await onSubmit(email, fullName, role);
       // Only clear the form if the submission was successful
@@ -62,6 +72,8 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Enter full name"
+                required
+                minLength={2}
               />
             </div>
             <div>
@@ -71,6 +83,7 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter email address"
                 type="email"
+                required
               />
             </div>
             <div>
