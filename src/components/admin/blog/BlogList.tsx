@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { EditBlogDialog } from "./EditBlogDialog";
@@ -71,9 +71,6 @@ export function BlogList({ blogs }: BlogListProps) {
     const profile = profiles?.find(p => p.id === authorId);
     return profile?.full_name || 'Unknown Author';
   };
-
-  // Add console log to debug status
-  console.log("Blogs with statuses:", blogs.map(blog => ({ id: blog.id, status: blog.status })));
 
   return (
     <>

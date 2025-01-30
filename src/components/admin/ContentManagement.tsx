@@ -17,12 +17,18 @@ export function ContentManagement() {
   const { data: blogs, isLoading } = useQuery({
     queryKey: ["admin-blogs"],
     queryFn: async () => {
+      console.log("Fetching blogs...");
       const { data, error } = await supabase
         .from("blogs")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching blogs:", error);
+        throw error;
+      }
+      
+      console.log("Fetched blogs:", data);
       return data as Blog[];
     },
   });
