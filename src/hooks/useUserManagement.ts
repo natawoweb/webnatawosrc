@@ -6,6 +6,7 @@ import { type Database } from "@/integrations/supabase/types";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
+type UserRole = Database['public']['Tables']['user_roles']['Row'];
 
 type UserWithRole = Profile & {
   role: AppRole;
@@ -56,7 +57,12 @@ export function useUserManagement() {
     mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
       const { error } = await supabase
         .from('user_roles')
-        .upsert({ user_id: userId, role }, { onConflict: 'user_id' });
+        .upsert({ 
+          user_id: userId, 
+          role 
+        }, { 
+          onConflict: 'user_id'
+        });
 
       if (error) throw error;
     },
@@ -93,7 +99,10 @@ export function useUserManagement() {
         // Set user role
         const { error: roleError } = await supabase
           .from('user_roles')
-          .insert({ user_id: authData.user.id, role });
+          .upsert({ 
+            user_id: authData.user.id, 
+            role 
+          });
 
         if (roleError) throw roleError;
       }
