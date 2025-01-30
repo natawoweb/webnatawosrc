@@ -36,7 +36,6 @@ export function ContentManagement() {
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      // First get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("*")
@@ -44,7 +43,6 @@ export function ContentManagement() {
 
       if (profilesError) throw profilesError;
 
-      // Then get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("*")
@@ -52,7 +50,6 @@ export function ContentManagement() {
 
       if (rolesError) throw rolesError;
 
-      // Combine profiles with roles
       const usersWithRoles: UserWithRole[] = profiles.map(profile => ({
         ...profile,
         role: userRoles.find(ur => ur.user_id === profile.id)?.role || "reader"
@@ -117,16 +114,36 @@ export function ContentManagement() {
   }
 
   const getRoleBadge = (role: AppRole) => {
-    const baseClasses = "capitalize";
+    const baseClasses = "inline-flex items-center gap-1";
     switch (role) {
       case "admin":
-        return <Badge variant="destructive" className={baseClasses}>Admin</Badge>;
+        return (
+          <Badge variant="destructive" className={baseClasses}>
+            <Shield className="h-3 w-3" />
+            Admin
+          </Badge>
+        );
       case "manager":
-        return <Badge variant="default" className={baseClasses}>Manager</Badge>;
+        return (
+          <Badge variant="default" className={baseClasses}>
+            <UserCog className="h-3 w-3" />
+            Manager
+          </Badge>
+        );
       case "writer":
-        return <Badge variant="secondary" className={baseClasses}>Writer</Badge>;
+        return (
+          <Badge variant="secondary" className={baseClasses}>
+            <UserCheck className="h-3 w-3" />
+            Writer
+          </Badge>
+        );
       default:
-        return <Badge variant="outline" className={baseClasses}>Reader</Badge>;
+        return (
+          <Badge variant="outline" className={baseClasses}>
+            <User className="h-3 w-3" />
+            Reader
+          </Badge>
+        );
     }
   };
 
