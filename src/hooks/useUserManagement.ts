@@ -27,7 +27,6 @@ export function useUserManagement() {
   const { data: users, isLoading } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
-      // First get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -35,14 +34,12 @@ export function useUserManagement() {
       
       if (profilesError) throw profilesError;
 
-      // Then get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
       
       if (rolesError) throw rolesError;
 
-      // Combine profiles with their roles
       return profiles.map(profile => {
         const userRole = userRoles.find(role => role.user_id === profile.id);
         return {
@@ -61,8 +58,6 @@ export function useUserManagement() {
         .upsert({ 
           user_id: userId, 
           role 
-        }, { 
-          onConflict: 'user_id'
         });
 
       if (error) throw error;
@@ -84,36 +79,27 @@ export function useUserManagement() {
     },
   });
 
-  // Add new user mutation
+  // Add new user mutation using the Edge Function
   const addUserMutation = useMutation({
     mutationFn: async ({ email, fullName, role }: { email: string; fullName: string; role: AppRole }) => {
-      // Create user in auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email,
-        email_confirm: true,
-        user_metadata: { full_name: fullName }
-      });
+      const response = await fetch(
+        'https://yqqfxpvptgcczumqowpc.supabase.co/functions/v1/create-user',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ email, fullName, role }),
+        }
+      );
 
-      if (authError) throw authError;
-
-      if (!authData.user) {
-        throw new Error("Failed to create user");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create user');
       }
 
-      // Wait for the trigger to create the profile
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Set user role explicitly
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .upsert({ 
-          user_id: authData.user.id, 
-          role 
-        });
-
-      if (roleError) throw roleError;
-
-      return authData.user;
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
@@ -132,7 +118,6 @@ export function useUserManagement() {
     },
   });
 
-  // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
       const { error } = await supabase.auth.admin.deleteUser(userId);
