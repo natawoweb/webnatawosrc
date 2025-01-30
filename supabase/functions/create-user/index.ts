@@ -59,8 +59,7 @@ function createErrorResponse(status: number, message: string, details?: any): Re
   console.error(`Error: ${message}`, details);
   return new Response(
     JSON.stringify({
-      error: "Auth Error",
-      message,
+      error: message,
       details
     }),
     {
@@ -111,25 +110,27 @@ async function handleCreateUser(req: Request): Promise<Response> {
       }
     );
 
-    const tempPassword = generateSecurePassword();
-    console.log('Creating auth user for email:', payload.email);
-
     // First, check if user already exists
-    const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers();
-    const userExists = existingUser.users.some(user => user.email === payload.email);
+    const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
     
+    if (listError) {
+      console.error('Error checking existing users:', listError);
+      return createErrorResponse(500, 'Failed to check existing users');
+    }
+
+    const userExists = existingUsers.users.some(user => user.email === payload.email);
     if (userExists) {
       return createErrorResponse(400, 'User with this email already exists');
     }
 
-    // Create auth user
+    const tempPassword = generateSecurePassword();
+    console.log('Creating auth user for email:', payload.email);
+
+    // Create auth user with minimal metadata
     const { data: authUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
       email: payload.email,
       password: tempPassword,
       email_confirm: true,
-      user_metadata: {
-        full_name: payload.fullName,
-      },
     });
 
     if (createUserError) {
@@ -144,39 +145,7 @@ async function handleCreateUser(req: Request): Promise<Response> {
 
     console.log('Auth user created successfully:', authUser.user.id);
 
-    // Insert into profiles table
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .insert({
-        id: authUser.user.id,
-        full_name: `${payload.role.charAt(0).toUpperCase() + payload.role.slice(1)} Profile`,
-        email: payload.email,
-      });
-
-    if (profileError) {
-      console.error('Error creating profile:', profileError);
-      await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
-      return createErrorResponse(500, `Failed to create profile: ${profileError.message}`);
-    }
-
-    console.log('Profile created successfully');
-    
-    // Insert into user_roles table
-    const { error: roleError } = await supabaseAdmin
-      .from('user_roles')
-      .insert({
-        user_id: authUser.user.id,
-        role: payload.role,
-      });
-
-    if (roleError) {
-      console.error('Error setting user role:', roleError);
-      await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
-      return createErrorResponse(500, `Failed to set user role: ${roleError.message}`);
-    }
-
-    console.log('User role set successfully');
-
+    // The trigger function will handle creating the profile and role
     return createSuccessResponse({
       user: authUser.user,
       tempPassword,
