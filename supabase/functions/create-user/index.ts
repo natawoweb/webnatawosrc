@@ -17,13 +17,25 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify authorization header
+    // Get the authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      throw new Error('Missing authorization header')
+      console.error('Missing Authorization header')
+      return new Response(
+        JSON.stringify({ 
+          error: 'Missing Authorization header',
+          code: 401,
+          message: 'Authorization header is required'
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
     }
 
-    const supabaseClient = createClient(
+    // Initialize Supabase client with service role key
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
@@ -38,8 +50,13 @@ Deno.serve(async (req) => {
     const { email, fullName, role } = await req.json()
 
     if (!email || !fullName || !role) {
+      console.error('Missing required fields:', { email, fullName, role })
       return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
+        JSON.stringify({ 
+          error: 'Missing required fields',
+          code: 400,
+          message: 'Email, full name, and role are required'
+        }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -50,7 +67,7 @@ Deno.serve(async (req) => {
     console.log('Creating user:', { email, fullName, role })
 
     // Create the user
-    const { data: userData, error: createError } = await supabaseClient.auth.admin.createUser({
+    const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       email_confirm: true,
       user_metadata: { full_name: fullName },
@@ -60,7 +77,11 @@ Deno.serve(async (req) => {
     if (createError) {
       console.error('Error creating user:', createError)
       return new Response(
-        JSON.stringify({ error: createError.message }),
+        JSON.stringify({ 
+          error: createError.message,
+          code: 400,
+          message: createError.message
+        }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -72,7 +93,7 @@ Deno.serve(async (req) => {
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     // Update the user's role
-    const { error: roleError } = await supabaseClient
+    const { error: roleError } = await supabaseAdmin
       .from('user_roles')
       .upsert({
         user_id: userData.user.id,
@@ -82,7 +103,11 @@ Deno.serve(async (req) => {
     if (roleError) {
       console.error('Error setting user role:', roleError)
       return new Response(
-        JSON.stringify({ error: roleError.message }),
+        JSON.stringify({ 
+          error: roleError.message,
+          code: 400,
+          message: roleError.message
+        }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -93,7 +118,11 @@ Deno.serve(async (req) => {
     console.log('User created successfully:', userData.user.id)
 
     return new Response(
-      JSON.stringify({ success: true, user: userData.user }),
+      JSON.stringify({ 
+        success: true, 
+        user: userData.user,
+        message: 'User created successfully'
+      }),
       {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -102,9 +131,13 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Error in create-user function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        code: 500,
+        message: 'Internal server error'
+      }),
       {
-        status: error.message === 'Missing authorization header' ? 401 : 500,
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     )

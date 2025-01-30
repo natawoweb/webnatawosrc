@@ -82,6 +82,8 @@ export function useUserManagement() {
   // Add new user mutation using the Edge Function
   const addUserMutation = useMutation({
     mutationFn: async ({ email, fullName, role }: { email: string; fullName: string; role: AppRole }) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const response = await fetch(
         'https://yqqfxpvptgcczumqowpc.supabase.co/functions/v1/create-user',
         {
