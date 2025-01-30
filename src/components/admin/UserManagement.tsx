@@ -19,13 +19,31 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { 
   Loader2, 
   UserPlus, 
   Search,
   Filter,
-  UserCog,
+  Pencil,
   Trash2,
+  AlertCircle,
 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
@@ -41,18 +59,22 @@ export function UserManagement() {
   const { toast } = useToast();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
+  const [editRole, setEditRole] = useState<AppRole>("reader");
 
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
-      // First get all profiles
+      // Get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
       
       if (profilesError) throw profilesError;
 
-      // Then get all user roles
+      // Get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
@@ -68,7 +90,6 @@ export function UserManagement() {
         };
       });
 
-      console.log("Users with roles:", usersWithRoles); // Debug log
       return usersWithRoles;
     },
   });
@@ -90,6 +111,8 @@ export function UserManagement() {
         title: "Role updated",
         description: "User role has been successfully updated.",
       });
+      
+      setEditDialogOpen(false);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -110,6 +133,8 @@ export function UserManagement() {
         title: "User deleted",
         description: "User has been successfully deleted.",
       });
+      
+      setDeleteDialogOpen(false);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -201,21 +226,20 @@ export function UserManagement() {
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      const nextRole: Record<AppRole, AppRole> = {
-                        reader: "writer",
-                        writer: "manager",
-                        manager: "admin",
-                        admin: "reader"
-                      };
-                      updateUserRole(user.id, nextRole[user.role]);
+                      setSelectedUser(user);
+                      setEditRole(user.role);
+                      setEditDialogOpen(true);
                     }}
                   >
-                    <UserCog className="h-4 w-4 text-blue-500" />
+                    <Pencil className="h-4 w-4 text-blue-500" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDeleteUser(user.id)}
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setDeleteDialogOpen(true);
+                    }}
                   >
                     <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
@@ -225,6 +249,66 @@ export function UserManagement() {
           ))}
         </TableBody>
       </Table>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the user account
+              and remove their data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => selectedUser && handleDeleteUser(selectedUser.id)}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Email</label>
+                <p className="text-sm text-muted-foreground">{selectedUser?.email}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Role</label>
+                <Select value={editRole} onValueChange={(value) => setEditRole(value as AppRole)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="reader">Reader</SelectItem>
+                    <SelectItem value="writer">Writer</SelectItem>
+                    <SelectItem value="manager">Manager</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => selectedUser && updateUserRole(selectedUser.id, editRole)}
+            >
+              Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
