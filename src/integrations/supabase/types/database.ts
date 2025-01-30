@@ -71,7 +71,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "blogs"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       events: {
@@ -100,7 +100,7 @@ export interface Database {
           is_upcoming?: boolean | null
           location: string
           max_participants?: number | null
-          time?: string
+          time: string
           title: string
         }
         Update: {
@@ -121,55 +121,55 @@ export interface Database {
       }
       profiles: {
         Row: {
-          id: string
-          full_name: string | null
-          bio: string | null
           avatar_url: string | null
+          bio: string | null
           created_at: string | null
-          updated_at: string | null
           email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
         }
         Insert: {
-          id: string
-          full_name?: string | null
-          bio?: string | null
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
-          updated_at?: string | null
           email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
         }
         Update: {
-          id?: string
-          full_name?: string | null
-          bio?: string | null
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
-          updated_at?: string | null
           email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
       ratings: {
         Row: {
-          id: string
           blog_id: string
-          user_id: string
-          rating: number
           created_at: string | null
+          id: string
+          rating: number
+          user_id: string
         }
         Insert: {
-          id?: string
           blog_id: string
-          user_id: string
-          rating: number
           created_at?: string | null
+          id?: string
+          rating: number
+          user_id: string
         }
         Update: {
-          id?: string
           blog_id?: string
-          user_id?: string
-          rating?: number
           created_at?: string | null
+          id?: string
+          rating?: number
+          user_id?: string
         }
         Relationships: [
           {
@@ -178,69 +178,69 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "blogs"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       user_roles: {
         Row: {
-          id: string
-          user_id: string
-          role: Database["public"]["Enums"]["app_role"]
           created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          role?: Database["public"]["Enums"]["app_role"]
           created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          role?: Database["public"]["Enums"]["app_role"]
           created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
       writers: {
         Row: {
-          id: string
-          name: string
+          accomplishments: Json | null
           bio: string
-          genre: string
-          image_url: string | null
-          social_links: Json | null
+          created_at: string
           featured: boolean | null
           featured_month: string | null
-          created_at: string
-          accomplishments: Json | null
+          genre: string
+          id: string
+          image_url: string | null
+          name: string
           published_works: Json | null
+          social_links: Json | null
         }
         Insert: {
-          id?: string
-          name: string
+          accomplishments?: Json | null
           bio: string
-          genre: string
-          image_url?: string | null
-          social_links?: Json | null
+          created_at?: string
           featured?: boolean | null
           featured_month?: string | null
-          created_at?: string
-          accomplishments?: Json | null
+          genre: string
+          id?: string
+          image_url?: string | null
+          name: string
           published_works?: Json | null
+          social_links?: Json | null
         }
         Update: {
-          id?: string
-          name?: string
+          accomplishments?: Json | null
           bio?: string
-          genre?: string
-          image_url?: string | null
-          social_links?: Json | null
+          created_at?: string
           featured?: boolean | null
           featured_month?: string | null
-          created_at?: string
-          accomplishments?: Json | null
+          genre?: string
+          id?: string
+          image_url?: string | null
+          name?: string
           published_works?: Json | null
+          social_links?: Json | null
         }
         Relationships: []
       }

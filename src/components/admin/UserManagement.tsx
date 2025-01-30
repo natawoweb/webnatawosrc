@@ -4,13 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UserPlus } from "lucide-react";
-import { type AppRole } from "@/integrations/supabase/types";
+import { type AppRole, type Profile } from "@/integrations/supabase/types";
 import { UserTable } from "./UserTable";
 import { UserFilters } from "./UserFilters";
 import { AddUserDialog } from "./AddUserDialog";
 import { EditUserDialog } from "./EditUserDialog";
 import { DeleteUserDialog } from "./DeleteUserDialog";
-import { type Profile } from "@/integrations/supabase/types";
 
 type UserWithRole = Profile & {
   role: AppRole;
