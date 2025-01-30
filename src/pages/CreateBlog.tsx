@@ -3,17 +3,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { RichTextEditor } from "@/components/admin/blog/RichTextEditor";
-import { Globe, Save, ArrowLeft, Folder } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Save, ArrowLeft } from "lucide-react";
+import { BlogContentSection } from "@/components/admin/blog/BlogContentSection";
+import { CategoryManagement } from "@/components/admin/blog/CategoryManagement";
 import {
   Select,
   SelectContent,
@@ -21,13 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 export default function CreateBlog() {
   const { toast } = useToast();
@@ -38,9 +24,7 @@ export default function CreateBlog() {
   const [titleTamil, setTitleTamil] = useState("");
   const [contentTamil, setContentTamil] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [newCategoryName, setNewCategoryName] = useState("");
 
-  // Fetch categories
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -50,30 +34,6 @@ export default function CreateBlog() {
         .order("name");
       if (error) throw error;
       return data;
-    },
-  });
-
-  const createCategoryMutation = useMutation({
-    mutationFn: async (name: string) => {
-      const { error } = await supabase
-        .from("blog_categories")
-        .insert([{ name }]);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      toast({
-        title: "Success",
-        description: "Category created successfully",
-      });
-      setNewCategoryName("");
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to create category: " + error.message,
-      });
     },
   });
 
@@ -151,41 +111,7 @@ export default function CreateBlog() {
             <h2 className="text-2xl font-bold">Create New Blog</h2>
           </div>
           <div className="flex items-center gap-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <Folder className="mr-2 h-4 w-4" />
-                  Manage Categories
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Blog Categories</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="New category name"
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                    />
-                    <Button
-                      onClick={() => createCategoryMutation.mutate(newCategoryName)}
-                      disabled={!newCategoryName}
-                    >
-                      Add
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    {categories?.map((category) => (
-                      <div key={category.id} className="flex items-center justify-between p-2 border rounded">
-                        <span>{category.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <CategoryManagement categories={categories || []} />
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select category" />
@@ -216,71 +142,20 @@ export default function CreateBlog() {
         </div>
 
         <div className="grid grid-cols-2 gap-6">
-          {/* English Section */}
-          <Card className="h-[800px] flex flex-col">
-            <CardHeader>
-              <CardTitle>English Content</CardTitle>
-              <CardDescription>Write your blog post in English</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 flex-grow">
-              <div className="space-y-2">
-                <label htmlFor="title" className="text-sm font-medium">
-                  Title
-                </label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter blog title"
-                />
-              </div>
-              <div className="space-y-2 flex-grow h-full">
-                <label htmlFor="content" className="text-sm font-medium">
-                  Content
-                </label>
-                <div className="h-[650px]">
-                  <RichTextEditor content={content} onChange={setContent} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Tamil Section */}
-          <Card className="h-[800px] flex flex-col">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Tamil Content</CardTitle>
-                  <CardDescription>தமிழில் உங்கள் வலைப்பதிவை எழுதுங்கள்</CardDescription>
-                </div>
-                <Button variant="ghost" size="sm">
-                  <Globe className="mr-2 h-4 w-4" />
-                  Translate
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4 flex-grow">
-              <div className="space-y-2">
-                <label htmlFor="title-tamil" className="text-sm font-medium">
-                  Title
-                </label>
-                <Input
-                  id="title-tamil"
-                  value={titleTamil}
-                  onChange={(e) => setTitleTamil(e.target.value)}
-                  placeholder="தலைப்பை உள்ளிடவும்"
-                />
-              </div>
-              <div className="space-y-2 flex-grow h-full">
-                <label htmlFor="content-tamil" className="text-sm font-medium">
-                  Content
-                </label>
-                <div className="h-[650px]">
-                  <RichTextEditor content={contentTamil} onChange={setContentTamil} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <BlogContentSection
+            language="english"
+            title={title}
+            content={content}
+            onTitleChange={setTitle}
+            onContentChange={setContent}
+          />
+          <BlogContentSection
+            language="tamil"
+            title={titleTamil}
+            content={contentTamil}
+            onTitleChange={setTitleTamil}
+            onContentChange={setContentTamil}
+          />
         </div>
       </div>
     </div>
