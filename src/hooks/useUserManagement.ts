@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { type Database } from "@/integrations/supabase/types";
@@ -13,6 +13,7 @@ type UserWithRole = Profile & {
 
 export function useUserManagement() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -21,21 +22,25 @@ export function useUserManagement() {
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [editRole, setEditRole] = useState<AppRole>("reader");
 
-  const { data: users, isLoading, refetch } = useQuery({
+  // Fetch users with their roles
+  const { data: users, isLoading } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
+      // First get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
       
       if (profilesError) throw profilesError;
 
+      // Then get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
       
       if (rolesError) throw rolesError;
 
+      // Combine profiles with their roles
       return profiles.map(profile => {
         const userRole = userRoles.find(role => role.user_id === profile.id);
         return {
@@ -46,61 +51,38 @@ export function useUserManagement() {
     },
   });
 
-  const updateUserRole = async (userId: string, newRole: AppRole) => {
-    try {
+  // Update user role mutation
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
       const { error } = await supabase
-        .from("user_roles")
-        .upsert({ 
-          user_id: userId, 
-          role: newRole 
-        });
+        .from('user_roles')
+        .upsert({ user_id: userId, role }, { onConflict: 'user_id' });
 
       if (error) throw error;
-
-      await refetch();
-      
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
       toast({
-        title: "Role updated",
-        description: "User role has been successfully updated.",
+        title: "Success",
+        description: "User role updated successfully",
       });
-      
       setEditDialogOpen(false);
-    } catch (error) {
+    },
+    onError: (error) => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update user role.",
+        description: "Failed to update user role: " + error.message,
       });
-    }
-  };
+    },
+  });
 
-  const handleDeleteUser = async (userId: string) => {
-    try {
-      const { error } = await supabase.auth.admin.deleteUser(userId);
-      if (error) throw error;
-
-      await refetch();
-      
-      toast({
-        title: "User deleted",
-        description: "User has been successfully deleted.",
-      });
-      
-      setDeleteDialogOpen(false);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete user. Only admins can delete users.",
-      });
-    }
-  };
-
-  const handleAddUser = async (email: string, fullName: string, role: AppRole) => {
-    try {
+  // Add new user mutation
+  const addUserMutation = useMutation({
+    mutationFn: async ({ email, fullName, role }: { email: string; fullName: string; role: AppRole }) => {
+      // Create user in auth
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email,
-        password: "tempPassword123",
         email_confirm: true,
         user_metadata: { full_name: fullName }
       });
@@ -108,31 +90,64 @@ export function useUserManagement() {
       if (authError) throw authError;
 
       if (authData.user) {
+        // Set user role
         const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({ 
-            user_id: authData.user.id, 
-            role
-          });
+          .from('user_roles')
+          .insert({ user_id: authData.user.id, role });
 
         if (roleError) throw roleError;
       }
-
-      await refetch();
-      
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
       toast({
-        title: "User added",
-        description: "New user has been successfully created.",
+        title: "Success",
+        description: "User added successfully",
       });
-      
       setAddUserDialogOpen(false);
-    } catch (error) {
+    },
+    onError: (error) => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add user. Please try again.",
+        description: "Failed to add user: " + error.message,
       });
-    }
+    },
+  });
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase.auth.admin.deleteUser(userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      });
+      setDeleteDialogOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete user: " + error.message,
+      });
+    },
+  });
+
+  const updateUserRole = (userId: string, role: AppRole) => {
+    updateRoleMutation.mutate({ userId, role });
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    deleteUserMutation.mutate(userId);
+  };
+
+  const handleAddUser = (email: string, fullName: string, role: AppRole) => {
+    addUserMutation.mutate({ email, fullName, role });
   };
 
   const filteredUsers = users?.filter((user) => {
