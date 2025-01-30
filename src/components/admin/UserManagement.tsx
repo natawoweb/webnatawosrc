@@ -40,21 +40,21 @@ export function UserManagement() {
       // Get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
-        .select("user_id, role");
+        .select("*");
       
       if (rolesError) throw rolesError;
 
-      // Get all profiles (which are created for each user)
+      // Get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, email:auth.users!profiles_id_fkey(email), created_at:auth.users!profiles_id_fkey(created_at)");
+        .select("*");
       
       if (profilesError) throw profilesError;
 
       // Combine the data
       const usersWithRoles = profiles.map((profile) => ({
         id: profile.id,
-        email: profile.email,
+        email: profile.email || "No email",
         created_at: profile.created_at,
         role: userRoles?.find((ur) => ur.user_id === profile.id)?.role || "reader",
       }));
