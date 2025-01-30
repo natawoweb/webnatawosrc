@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BlogStatusBadge } from "./BlogStatusBadge";
+import { EditBlogDialog } from "./EditBlogDialog";
 import { Database } from "@/integrations/supabase/types";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
@@ -113,6 +114,7 @@ export function BlogList({ blogs }: BlogListProps) {
             </TableCell>
             <TableCell>{new Date(blog.updated_at || "").toLocaleDateString()}</TableCell>
             <TableCell className="space-x-2">
+              <EditBlogDialog blog={blog} />
               <Button
                 variant="ghost"
                 size="sm"
