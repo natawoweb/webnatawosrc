@@ -30,10 +30,9 @@ export function ContentManagement() {
         .from("blogs")
         .select(`
           *,
-          profiles:author_id(
-            full_name
-          )
-        `);
+          profiles(full_name)
+        `)
+        .eq('profiles.id', 'author_id');
 
       if (error) throw error;
       return data as BlogWithProfile[];
