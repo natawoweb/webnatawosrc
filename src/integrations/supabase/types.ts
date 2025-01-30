@@ -9,9 +9,31 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      blog_categories: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       blogs: {
         Row: {
           author_id: string
+          category_id: string | null
           content: Json
           content_tamil: Json | null
           cover_image: string | null
@@ -24,6 +46,7 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          category_id?: string | null
           content: Json
           content_tamil?: Json | null
           cover_image?: string | null
@@ -36,6 +59,7 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          category_id?: string | null
           content?: Json
           content_tamil?: Json | null
           cover_image?: string | null
@@ -46,7 +70,15 @@ export type Database = {
           title_tamil?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "blogs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       comments: {
         Row: {

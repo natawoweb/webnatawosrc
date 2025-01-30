@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/admin/blog/RichTextEditor";
-import { Globe, Save, ArrowLeft } from "lucide-react";
+import { Globe, Save, ArrowLeft, Folder } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -14,7 +14,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function CreateBlog() {
   const { toast } = useToast();
@@ -24,6 +37,45 @@ export default function CreateBlog() {
   const [content, setContent] = useState("");
   const [titleTamil, setTitleTamil] = useState("");
   const [contentTamil, setContentTamil] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [newCategoryName, setNewCategoryName] = useState("");
+
+  // Fetch categories
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("blog_categories")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const createCategoryMutation = useMutation({
+    mutationFn: async (name: string) => {
+      const { error } = await supabase
+        .from("blog_categories")
+        .insert([{ name }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast({
+        title: "Success",
+        description: "Category created successfully",
+      });
+      setNewCategoryName("");
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create category: " + error.message,
+      });
+    },
+  });
 
   const createBlogMutation = useMutation({
     mutationFn: async (blogData: {
@@ -32,6 +84,7 @@ export default function CreateBlog() {
       title_tamil?: string;
       content_tamil?: string;
       status: string;
+      category_id?: string;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
@@ -44,7 +97,8 @@ export default function CreateBlog() {
           title_tamil: blogData.title_tamil || null,
           content_tamil: blogData.content_tamil ? JSON.parse(blogData.content_tamil) : {},
           author_id: user.id,
-          status: blogData.status
+          status: blogData.status,
+          category_id: blogData.category_id || null
         });
 
       if (error) throw error;
@@ -81,12 +135,13 @@ export default function CreateBlog() {
       content,
       title_tamil: titleTamil,
       content_tamil: contentTamil,
-      status
+      status,
+      category_id: selectedCategory
     });
   };
 
   return (
-    <div className="container max-w-7xl py-8">
+    <div className="container max-w-[1400px] py-8">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -96,6 +151,53 @@ export default function CreateBlog() {
             <h2 className="text-2xl font-bold">Create New Blog</h2>
           </div>
           <div className="flex items-center gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Folder className="mr-2 h-4 w-4" />
+                  Manage Categories
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Blog Categories</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="New category name"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                    />
+                    <Button
+                      onClick={() => createCategoryMutation.mutate(newCategoryName)}
+                      disabled={!newCategoryName}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {categories?.map((category) => (
+                      <div key={category.id} className="flex items-center justify-between p-2 border rounded">
+                        <span>{category.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories?.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button
               variant="outline"
               onClick={() => handleCreate("draft")}
@@ -136,7 +238,9 @@ export default function CreateBlog() {
                 <label htmlFor="content" className="text-sm font-medium">
                   Content
                 </label>
-                <RichTextEditor content={content} onChange={setContent} />
+                <div className="min-h-[500px]">
+                  <RichTextEditor content={content} onChange={setContent} />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -171,7 +275,9 @@ export default function CreateBlog() {
                 <label htmlFor="content-tamil" className="text-sm font-medium">
                   Content
                 </label>
-                <RichTextEditor content={contentTamil} onChange={setContentTamil} />
+                <div className="min-h-[500px]">
+                  <RichTextEditor content={contentTamil} onChange={setContentTamil} />
+                </div>
               </div>
             </CardContent>
           </Card>
