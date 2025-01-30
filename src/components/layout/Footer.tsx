@@ -23,7 +23,7 @@ export function Footer() {
   return (
     <footer className="bg-background border-t">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <img 
@@ -54,6 +54,32 @@ export function Footer() {
               <li>
                 <Link to="/blogs" className="text-sm text-muted-foreground hover:text-foreground">
                   Blogs
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Community</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/forums" className="text-sm text-muted-foreground hover:text-foreground">
+                  Forums
+                </Link>
+              </li>
+              <li>
+                <Link to="/workshops" className="text-sm text-muted-foreground hover:text-foreground">
+                  Writing Workshops
+                </Link>
+              </li>
+              <li>
+                <Link to="/mentorship" className="text-sm text-muted-foreground hover:text-foreground">
+                  Mentorship Program
+                </Link>
+              </li>
+              <li>
+                <Link to="/book-clubs" className="text-sm text-muted-foreground hover:text-foreground">
+                  Book Clubs
                 </Link>
               </li>
             </ul>
