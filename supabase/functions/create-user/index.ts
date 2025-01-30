@@ -8,40 +8,33 @@ interface CreateUserPayload {
   role: 'reader' | 'writer' | 'manager' | 'admin'
 }
 
-// Utility function to generate a secure password
 function generateSecurePassword(): string {
   const length = 16;
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
   let password = '';
   
-  // Ensure at least one of each required character type
   password += 'A'; // Uppercase
   password += 'a'; // Lowercase
   password += '1'; // Number
   password += '!'; // Special character
   
-  // Fill the rest with random characters
   for (let i = password.length; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * charset.length);
     password += charset[randomIndex];
   }
   
-  // Shuffle the password
   return password.split('').sort(() => Math.random() - 0.5).join('');
 }
 
-// Utility function to validate email format
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
-// Utility function to validate role
 function isValidRole(role: string): role is CreateUserPayload['role'] {
   return ['reader', 'writer', 'manager', 'admin'].includes(role);
 }
 
-// Utility function to validate the payload
 function validatePayload(payload: any): { isValid: boolean; error?: string } {
   if (!payload) {
     return { isValid: false, error: 'Payload is required' };
@@ -62,8 +55,8 @@ function validatePayload(payload: any): { isValid: boolean; error?: string } {
   return { isValid: true };
 }
 
-// Utility function to create error response
 function createErrorResponse(status: number, message: string, details?: any): Response {
+  console.error(`Error: ${message}`, details);
   return new Response(
     JSON.stringify({
       error: "Auth Error",
@@ -80,7 +73,6 @@ function createErrorResponse(status: number, message: string, details?: any): Re
   );
 }
 
-// Utility function to create success response
 function createSuccessResponse(data: any): Response {
   return new Response(
     JSON.stringify(data),
@@ -94,23 +86,20 @@ function createSuccessResponse(data: any): Response {
   );
 }
 
-// Main handler function
 async function handleCreateUser(req: Request): Promise<Response> {
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const payload: CreateUserPayload = await req.json();
+    console.log('Received payload:', payload);
     
-    // Validate payload
     const validation = validatePayload(payload);
     if (!validation.isValid) {
       return createErrorResponse(400, validation.error!);
     }
 
-    // Initialize Supabase client with service role key
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -122,12 +111,18 @@ async function handleCreateUser(req: Request): Promise<Response> {
       }
     );
 
-    // Generate secure password
     const tempPassword = generateSecurePassword();
+    console.log('Creating auth user for email:', payload.email);
 
-    console.log('Creating auth user with email:', payload.email);
+    // First, check if user already exists
+    const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers();
+    const userExists = existingUser.users.some(user => user.email === payload.email);
     
-    // Create auth user with all required data
+    if (userExists) {
+      return createErrorResponse(400, 'User with this email already exists');
+    }
+
+    // Create auth user
     const { data: authUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
       email: payload.email,
       password: tempPassword,
@@ -147,23 +142,24 @@ async function handleCreateUser(req: Request): Promise<Response> {
       return createErrorResponse(500, 'Failed to create auth user: No user returned');
     }
 
-    console.log('Auth user created successfully');
+    console.log('Auth user created successfully:', authUser.user.id);
 
-    // Insert into profiles table first
+    // Insert into profiles table
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .insert({
         id: authUser.user.id,
-        full_name: payload.fullName,
+        full_name: `${payload.role.charAt(0).toUpperCase() + payload.role.slice(1)} Profile`,
         email: payload.email,
       });
 
     if (profileError) {
       console.error('Error creating profile:', profileError);
-      // Clean up: delete the auth user if profile creation fails
       await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
       return createErrorResponse(500, `Failed to create profile: ${profileError.message}`);
     }
+
+    console.log('Profile created successfully');
     
     // Insert into user_roles table
     const { error: roleError } = await supabaseAdmin
@@ -175,10 +171,11 @@ async function handleCreateUser(req: Request): Promise<Response> {
 
     if (roleError) {
       console.error('Error setting user role:', roleError);
-      // Clean up: delete the auth user and profile if role assignment fails
       await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
       return createErrorResponse(500, `Failed to set user role: ${roleError.message}`);
     }
+
+    console.log('User role set successfully');
 
     return createSuccessResponse({
       user: authUser.user,
