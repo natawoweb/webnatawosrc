@@ -11,7 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserCog, Trash2, User } from "lucide-react";
+import { 
+  Loader2, 
+  UserCog, 
+  Trash2, 
+  User,
+  ShieldCheck, // Changed from Shield
+  UserCheck2, // Changed from UserCheck
+} from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 import {
   Select,
@@ -119,7 +126,7 @@ export function ContentManagement() {
       case "admin":
         return (
           <Badge variant="destructive" className={baseClasses}>
-            <Shield className="h-3 w-3" />
+            <ShieldCheck className="h-3 w-3" />
             Admin
           </Badge>
         );
@@ -133,7 +140,7 @@ export function ContentManagement() {
       case "writer":
         return (
           <Badge variant="secondary" className={baseClasses}>
-            <UserCheck className="h-3 w-3" />
+            <UserCheck2 className="h-3 w-3" />
             Writer
           </Badge>
         );
