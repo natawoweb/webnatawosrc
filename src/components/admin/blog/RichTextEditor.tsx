@@ -22,7 +22,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   }
 
   return (
-    <div className="border rounded-lg">
+    <div className="border rounded-lg h-full flex flex-col">
       <div className="border-b p-2 flex gap-2">
         <Button
           variant="ghost"
@@ -57,7 +57,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           <ListOrdered className="h-4 w-4" />
         </Button>
       </div>
-      <EditorContent editor={editor} className="prose max-w-none p-4" />
+      <EditorContent editor={editor} className="prose max-w-none p-4 flex-grow min-h-[600px]" />
     </div>
   );
 }

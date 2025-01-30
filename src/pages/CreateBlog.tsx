@@ -217,12 +217,12 @@ export default function CreateBlog() {
 
         <div className="grid grid-cols-2 gap-6">
           {/* English Section */}
-          <Card>
+          <Card className="h-[800px] flex flex-col">
             <CardHeader>
               <CardTitle>English Content</CardTitle>
               <CardDescription>Write your blog post in English</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 flex-grow">
               <div className="space-y-2">
                 <label htmlFor="title" className="text-sm font-medium">
                   Title
@@ -234,11 +234,11 @@ export default function CreateBlog() {
                   placeholder="Enter blog title"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 flex-grow h-full">
                 <label htmlFor="content" className="text-sm font-medium">
                   Content
                 </label>
-                <div className="min-h-[500px]">
+                <div className="h-[650px]">
                   <RichTextEditor content={content} onChange={setContent} />
                 </div>
               </div>
@@ -246,7 +246,7 @@ export default function CreateBlog() {
           </Card>
 
           {/* Tamil Section */}
-          <Card>
+          <Card className="h-[800px] flex flex-col">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -259,7 +259,7 @@ export default function CreateBlog() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 flex-grow">
               <div className="space-y-2">
                 <label htmlFor="title-tamil" className="text-sm font-medium">
                   Title
@@ -271,11 +271,11 @@ export default function CreateBlog() {
                   placeholder="தலைப்பை உள்ளிடவும்"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 flex-grow h-full">
                 <label htmlFor="content-tamil" className="text-sm font-medium">
                   Content
                 </label>
-                <div className="min-h-[500px]">
+                <div className="h-[650px]">
                   <RichTextEditor content={contentTamil} onChange={setContentTamil} />
                 </div>
               </div>
