@@ -51,7 +51,9 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
       category_id?: string;
       status: string;
     }) => {
-      const { error } = await supabase
+      console.log("Updating blog with status:", blogData.status); // Debug log
+      
+      const { data, error } = await supabase
         .from("blogs")
         .update({
           title: blogData.title,
@@ -62,9 +64,11 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
           status: blogData.status,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", blog.id);
+        .eq("id", blog.id)
+        .select();
 
       if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
@@ -92,6 +96,8 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
       });
       return;
     }
+
+    console.log("Handling update with status:", status); // Debug log
 
     updateBlogMutation.mutate({
       title,
