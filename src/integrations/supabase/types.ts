@@ -18,9 +18,6 @@ export type Database = {
           status: string | null
           title: string
           updated_at: string | null
-          profiles?: {
-            full_name: string | null
-          } | null
         }
         Insert: {
           author_id: string
@@ -40,14 +37,7 @@ export type Database = {
           title?: string
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "blogs_author_id_fkey"
-            columns: ["author_id"]
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
       comments: {
         Row: {
@@ -372,4 +362,3 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-

@@ -37,7 +37,7 @@ interface User {
   id: string;
   email: string;
   created_at: string;
-  role: string;
+  role: "reader" | "writer" | "manager" | "admin";
 }
 
 export function UserManagement() {
@@ -49,18 +49,21 @@ export function UserManagement() {
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
+      // First get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("id, email, created_at");
       
       if (profilesError) throw profilesError;
 
+      // Then get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("user_id, role");
       
       if (rolesError) throw rolesError;
 
+      // Combine the data
       const usersWithRoles = profiles.map((profile) => ({
         id: profile.id,
         email: profile.email || "No email",
@@ -205,8 +208,10 @@ export function UserManagement() {
               <TableCell>
                 {new Date(user.created_at).toLocaleDateString()}
               </TableCell>
-              <TableCell className="flex items-center gap-4">
+              <TableCell>
                 {getRoleBadge(user.role)}
+              </TableCell>
+              <TableCell>
                 <Select
                   value={user.role}
                   onValueChange={(value) => updateUserRole(user.id, value as "reader" | "writer" | "manager" | "admin")}
@@ -221,15 +226,6 @@ export function UserManagement() {
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
-              </TableCell>
-              <TableCell>
-                {updatingUserId === user.id ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Button variant="ghost" size="sm">
-                    <Shield className="h-4 w-4" />
-                  </Button>
-                )}
               </TableCell>
             </TableRow>
           ))}
