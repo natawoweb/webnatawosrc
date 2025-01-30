@@ -9,10 +9,7 @@ Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, {
-      headers: {
-        ...corsHeaders,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      },
+      headers: corsHeaders,
     })
   }
 
@@ -47,6 +44,7 @@ Deno.serve(async (req) => {
 
     // Get the request body
     const { email, fullName, role } = await req.json()
+    console.log('Received request to create user:', { email, fullName, role })
 
     if (!email || !fullName || !role) {
       console.error('Missing required fields:', { email, fullName, role })
@@ -100,47 +98,24 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log('Creating user:', { email, fullName, role })
+    // Generate a random password
+    const tempPassword = Math.random().toString(36).slice(-8)
+    console.log('Creating user with email:', email)
 
     // Create the user
     const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
+      password: tempPassword,
       email_confirm: true,
-      user_metadata: { full_name: fullName },
-      password: Math.random().toString(36).slice(-8), // Generate a random password
+      user_metadata: { full_name: fullName }
     })
 
     if (createError) {
       console.error('Error creating user:', createError)
       return new Response(
         JSON.stringify({ 
-          error: createError.message,
-          message: 'Failed to create user'
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
-    }
-
-    // Wait a bit for the trigger to create the profile
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // Update the user's role
-    const { error: roleError } = await supabaseAdmin
-      .from('user_roles')
-      .upsert({
-        user_id: userData.user.id,
-        role: role,
-      })
-
-    if (roleError) {
-      console.error('Error setting user role:', roleError)
-      return new Response(
-        JSON.stringify({ 
-          error: roleError.message,
-          message: 'Failed to set user role'
+          error: 'Database error creating new user',
+          message: createError.message
         }),
         {
           status: 400,
@@ -151,9 +126,34 @@ Deno.serve(async (req) => {
 
     console.log('User created successfully:', userData.user.id)
 
+    // Wait for the trigger to create the profile
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    // Set the user's role
+    const { error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .upsert({
+        user_id: userData.user.id,
+        role: role
+      })
+
+    if (roleError) {
+      console.error('Error setting user role:', roleError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Database error setting user role',
+          message: roleError.message
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
     return new Response(
       JSON.stringify({ 
-        success: true, 
+        success: true,
         user: userData.user,
         message: 'User created successfully'
       }),
@@ -162,12 +162,13 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     )
+
   } catch (error) {
     console.error('Error in create-user function:', error)
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        message: 'Internal server error'
+        error: 'Server error',
+        message: error.message
       }),
       {
         status: 500,
