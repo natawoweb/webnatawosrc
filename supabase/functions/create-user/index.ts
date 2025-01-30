@@ -109,9 +109,13 @@ Deno.serve(async (req) => {
     console.log('Creating new user with auth.admin.createUser...')
     
     try {
+      // Generate a random password
+      const tempPassword = Math.random().toString(36).slice(-8)
+      console.log('Attempting to create auth user for email:', payload.email)
+
       const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: payload.email,
-        password: Math.random().toString(36).slice(-8),
+        password: tempPassword,
         email_confirm: true,
         user_metadata: { full_name: payload.fullName }
       })
@@ -127,6 +131,7 @@ Deno.serve(async (req) => {
 
       console.log('Auth user created successfully:', userData.user.id)
 
+      // Create profile
       console.log('Creating user profile...')
       const { error: profileError } = await supabaseAdmin
         .from('profiles')
@@ -143,6 +148,7 @@ Deno.serve(async (req) => {
         return createErrorResponse(500, 'Database Error', `Failed to create profile: ${profileError.message}`)
       }
 
+      // Assign role
       console.log('Setting user role...')
       const { error: roleError } = await supabaseAdmin
         .from('user_roles')
