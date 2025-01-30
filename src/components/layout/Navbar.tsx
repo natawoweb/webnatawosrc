@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Globe, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -9,10 +9,46 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [currentLanguage, setCurrentLanguage] = React.useState("English");
+  const [session, setSession] = React.useState<any>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been signed out of your account.",
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: "Please try again later.",
+      });
+    }
+  };
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -61,9 +97,16 @@ export function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button variant="outline" className="ml-4">
-              Sign In
-            </Button>
+            {session ? (
+              <Button variant="outline" onClick={handleSignOut} className="ml-4">
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            ) : (
+              <Button variant="outline" onClick={() => navigate("/auth")} className="ml-4">
+                Sign In
+              </Button>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -117,9 +160,16 @@ export function Navbar() {
             </DropdownMenu>
           </div>
 
-          <Button variant="outline" className="w-full mt-4">
-            Sign In
-          </Button>
+          {session ? (
+            <Button variant="outline" onClick={handleSignOut} className="w-full mt-4">
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          ) : (
+            <Button variant="outline" onClick={() => navigate("/auth")} className="w-full mt-4">
+              Sign In
+            </Button>
+          )}
         </div>
       </div>
     </nav>
