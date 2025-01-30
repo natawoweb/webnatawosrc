@@ -27,7 +27,6 @@ import {
   UserCog,
   Trash2,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Database } from "@/integrations/supabase/types";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -115,21 +114,6 @@ export function UserManagement() {
     }
   };
 
-  const getRoleBadge = (role: AppRole) => {
-    const variants = {
-      admin: "destructive",
-      manager: "default",
-      writer: "secondary",
-      reader: "outline"
-    } as const;
-
-    return (
-      <Badge variant={variants[role]} className="capitalize">
-        {role}
-      </Badge>
-    );
-  };
-
   const filteredUsers = users?.filter((user) => {
     const matchesRole = selectedRole === "all" || !selectedRole ? true : user.role === selectedRole;
     const matchesSearch = searchQuery
@@ -203,8 +187,8 @@ export function UserManagement() {
               <TableCell>
                 {new Date(user.created_at || "").toLocaleDateString()}
               </TableCell>
-              <TableCell>
-                {getRoleBadge(user.role)}
+              <TableCell className="capitalize">
+                {user.role}
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
