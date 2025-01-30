@@ -11,8 +11,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserCog, Trash2, User, Users } from "lucide-react";
+import { Loader2, UserCog, Trash2, User } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
@@ -25,7 +33,7 @@ type UserWithRole = Profile & {
 export function ContentManagement() {
   const { toast } = useToast();
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
       // First get all profiles
@@ -59,6 +67,8 @@ export function ContentManagement() {
       const { error } = await supabase.auth.admin.deleteUser(userId);
       if (error) throw error;
 
+      await refetch();
+      
       toast({
         title: "User deleted",
         description: "User has been successfully deleted.",
@@ -76,11 +86,15 @@ export function ContentManagement() {
     try {
       const { error } = await supabase
         .from("user_roles")
-        .update({ role: newRole })
-        .eq("user_id", userId);
+        .upsert({ 
+          user_id: userId, 
+          role: newRole 
+        });
 
       if (error) throw error;
 
+      await refetch();
+      
       toast({
         title: "Role updated",
         description: "User role has been successfully updated.",
@@ -107,15 +121,35 @@ export function ContentManagement() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">User Management</h2>
         <Button>
-          <Users className="mr-2 h-4 w-4" />
-          View All Users
+          <User className="mr-2 h-4 w-4" />
+          Invite User
         </Button>
+      </div>
+
+      <div className="flex gap-4 items-center">
+        <div className="flex-1">
+          <Input
+            placeholder="Search users by email..."
+            className="w-full"
+          />
+        </div>
+        <Select defaultValue="all">
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="All Roles" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Roles</SelectItem>
+            <SelectItem value="reader">Reader</SelectItem>
+            <SelectItem value="writer">Writer</SelectItem>
+            <SelectItem value="manager">Manager</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Full Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Role</TableHead>
@@ -125,7 +159,6 @@ export function ContentManagement() {
         <TableBody>
           {users?.map((user) => (
             <TableRow key={user.id}>
-              <TableCell className="font-medium">{user.full_name}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 {new Date(user.created_at || "").toLocaleDateString()}
@@ -136,13 +169,20 @@ export function ContentManagement() {
                 </Badge>
               </TableCell>
               <TableCell className="space-x-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleUpdateRole(user.id, "admin")}
+                <Select
+                  value={user.role}
+                  onValueChange={(value) => handleUpdateRole(user.id, value as AppRole)}
                 >
-                  <UserCog className="h-4 w-4 text-blue-500" />
-                </Button>
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="reader">Reader</SelectItem>
+                    <SelectItem value="writer">Writer</SelectItem>
+                    <SelectItem value="manager">Manager</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Button
                   variant="ghost"
                   size="sm"
