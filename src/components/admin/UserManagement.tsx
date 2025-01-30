@@ -19,7 +19,19 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, Search, Filter } from "lucide-react";
+import { 
+  Loader2, 
+  UserPlus, 
+  Shield,
+  Search,
+  Filter,
+  UserCog,
+  User,
+  Users,
+  UserCheck,
+  BadgeCheck
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface User {
   id: string;
@@ -34,7 +46,7 @@ export function UserManagement() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
       // Get all profiles with email
@@ -72,6 +84,8 @@ export function UserManagement() {
 
       if (error) throw error;
 
+      await refetch();
+
       toast({
         title: "Role updated",
         description: "User role has been successfully updated.",
@@ -84,6 +98,40 @@ export function UserManagement() {
       });
     }
     setUpdatingUserId(null);
+  };
+
+  const getRoleBadge = (role: string) => {
+    const baseClasses = "inline-flex items-center gap-1";
+    switch (role) {
+      case "admin":
+        return (
+          <Badge variant="destructive" className={baseClasses}>
+            <Shield className="h-3 w-3" />
+            Admin
+          </Badge>
+        );
+      case "manager":
+        return (
+          <Badge variant="default" className={baseClasses}>
+            <UserCog className="h-3 w-3" />
+            Manager
+          </Badge>
+        );
+      case "writer":
+        return (
+          <Badge variant="secondary" className={baseClasses}>
+            <UserCheck className="h-3 w-3" />
+            Writer
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" className={baseClasses}>
+            <User className="h-3 w-3" />
+            Reader
+          </Badge>
+        );
+    }
   };
 
   const filteredUsers = users?.filter((user) => {
@@ -157,7 +205,8 @@ export function UserManagement() {
               <TableCell>
                 {new Date(user.created_at).toLocaleDateString()}
               </TableCell>
-              <TableCell>
+              <TableCell className="flex items-center gap-4">
+                {getRoleBadge(user.role)}
                 <Select
                   value={user.role}
                   onValueChange={(value) => updateUserRole(user.id, value)}
