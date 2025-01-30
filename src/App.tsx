@@ -8,6 +8,9 @@ import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import WriterProfile from "./pages/WriterProfile";
+import Auth from "./pages/Auth";
+import SearchWriters from "./pages/SearchWriters";
+import Events from "./pages/Events";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +26,9 @@ function App() {
             <Route path="privacy" element={<Privacy />} />
             <Route path="terms" element={<Terms />} />
             <Route path="writer/:id" element={<WriterProfile />} />
+            <Route path="auth" element={<Auth />} />
+            <Route path="search" element={<SearchWriters />} />
+            <Route path="events" element={<Events />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
