@@ -202,48 +202,6 @@ export type Database = {
         }
         Relationships: []
       }
-      writers: {
-        Row: {
-          accomplishments: Json | null
-          bio: string
-          created_at: string
-          featured: boolean | null
-          featured_month: string | null
-          genre: string
-          id: string
-          image_url: string | null
-          name: string
-          published_works: Json | null
-          social_links: Json | null
-        }
-        Insert: {
-          accomplishments?: Json | null
-          bio: string
-          created_at?: string
-          featured?: boolean | null
-          featured_month?: string | null
-          genre: string
-          id?: string
-          image_url?: string | null
-          name: string
-          published_works?: Json | null
-          social_links?: Json | null
-        }
-        Update: {
-          accomplishments?: Json | null
-          bio?: string
-          created_at?: string
-          featured?: boolean | null
-          featured_month?: string | null
-          genre?: string
-          id?: string
-          image_url?: string | null
-          name?: string
-          published_works?: Json | null
-          social_links?: Json | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
@@ -275,7 +233,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -362,3 +320,7 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export type AppRole = Database["public"]["Enums"]["app_role"]
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
+export type { Database }
