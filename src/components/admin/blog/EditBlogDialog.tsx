@@ -2,25 +2,17 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Pencil, Save, SendHorizontal } from "lucide-react";
+import { Pencil } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
 import { BlogContentSection } from "./BlogContentSection";
-import { CategoryManagement } from "./CategoryManagement";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { BlogDialogHeader } from "./BlogDialogHeader";
+import { BlogDialogActions } from "./BlogDialogActions";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -119,43 +111,18 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[1400px] w-[90vw]">
-        <DialogHeader>
-          <DialogTitle>Edit Blog</DialogTitle>
-        </DialogHeader>
+        <BlogDialogHeader
+          categories={categories || []}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+        />
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CategoryManagement categories={categories || []} />
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories?.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => handleUpdate("draft")}
-                disabled={updateBlogMutation.isPending}
-              >
-                <Save className="mr-2 h-4 w-4" />
-                Save as Draft
-              </Button>
-              <Button
-                onClick={() => handleUpdate("submitted")}
-                disabled={updateBlogMutation.isPending}
-              >
-                <SendHorizontal className="mr-2 h-4 w-4" />
-                Submit for Review
-              </Button>
-            </div>
+            <BlogDialogActions
+              onSaveDraft={() => handleUpdate("draft")}
+              onSubmit={() => handleUpdate("submitted")}
+              isLoading={updateBlogMutation.isPending}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-6">
