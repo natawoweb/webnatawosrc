@@ -1,11 +1,18 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState("English");
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -30,6 +37,25 @@ export function Navbar() {
             <Link to="/blogs" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
               Blogs
             </Link>
+            
+            {/* Language Picker */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-auto px-3 gap-2">
+                  <Globe className="h-4 w-4" />
+                  <span>{currentLanguage}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setCurrentLanguage("English")}>
+                  English
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setCurrentLanguage("தமிழ்")}>
+                  தமிழ் (Tamil)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button variant="outline" className="ml-4">
               Sign In
             </Button>
@@ -65,6 +91,27 @@ export function Navbar() {
           >
             Blogs
           </Link>
+          
+          {/* Mobile Language Picker */}
+          <div className="px-3 py-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
+                  <Globe className="h-4 w-4" />
+                  <span>{currentLanguage}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setCurrentLanguage("English")}>
+                  English
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setCurrentLanguage("தமிழ்")}>
+                  தமிழ் (Tamil)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
           <Button variant="outline" className="w-full mt-4">
             Sign In
           </Button>
