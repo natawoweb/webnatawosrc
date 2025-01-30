@@ -24,7 +24,6 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Missing Authorization header',
-          code: 401,
           message: 'Authorization header is required'
         }),
         {
@@ -54,11 +53,48 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Missing required fields',
-          code: 400,
           message: 'Email, full name, and role are required'
         }),
         {
           status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    // Verify the caller is an admin
+    const jwt = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: verifyError } = await supabaseAdmin.auth.getUser(jwt)
+    
+    if (verifyError || !user) {
+      console.error('Invalid JWT or user not found:', verifyError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Unauthorized',
+          message: 'Only admins can create users'
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    // Verify admin role
+    const { data: isAdmin } = await supabaseAdmin.rpc('has_role', {
+      user_id: user.id,
+      required_role: 'admin'
+    })
+
+    if (!isAdmin) {
+      console.error('User is not an admin:', user.id)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Unauthorized',
+          message: 'Only admins can create users'
+        }),
+        {
+          status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       )
@@ -79,8 +115,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: createError.message,
-          code: 400,
-          message: createError.message
+          message: 'Failed to create user'
         }),
         {
           status: 400,
@@ -105,8 +140,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: roleError.message,
-          code: 400,
-          message: roleError.message
+          message: 'Failed to set user role'
         }),
         {
           status: 400,
@@ -133,7 +167,6 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        code: 500,
         message: 'Internal server error'
       }),
       {

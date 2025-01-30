@@ -84,13 +84,17 @@ export function useUserManagement() {
     mutationFn: async ({ email, fullName, role }: { email: string; fullName: string; role: AppRole }) => {
       const { data: { session } } = await supabase.auth.getSession();
       
+      if (!session?.access_token) {
+        throw new Error('No active session');
+      }
+
       const response = await fetch(
         'https://yqqfxpvptgcczumqowpc.supabase.co/functions/v1/create-user',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            'Authorization': `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({ email, fullName, role }),
         }
@@ -117,7 +121,7 @@ export function useUserManagement() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add user: " + error.message,
+        description: error.message || "Failed to add user",
       });
     },
   });
