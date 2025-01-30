@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Unauthorized',
-          message: 'Only admins can create users'
+          message: 'Invalid authentication token'
         }),
         {
           status: 401,
@@ -138,7 +138,19 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log('User created successfully:', userData.user.id)
+    // Create profile for the new user
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        id: userData.user.id,
+        full_name: fullName,
+        email: email
+      })
+
+    if (profileError) {
+      console.error('Error creating profile:', profileError)
+      // Continue with role creation even if profile creation fails
+    }
 
     // Set the user's role
     const { error: roleSetError } = await supabaseAdmin
