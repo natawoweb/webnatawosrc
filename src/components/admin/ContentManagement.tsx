@@ -14,14 +14,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, XCircle, FileText } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
-type BlogWithProfile = {
-  id: string;
-  title: string;
-  content: string;
-  author_id: string;
-  status: string | null;
-  created_at: string | null;
-  updated_at: string | null;
+type Blog = Database["public"]["Tables"]["blogs"]["Row"];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+
+type BlogWithProfile = Blog & {
   author_name: string | null;
 };
 
@@ -31,25 +27,28 @@ export function ContentManagement() {
   const { data: blogs, isLoading } = useQuery({
     queryKey: ["admin-blogs"],
     queryFn: async () => {
-      const { data: blogsData, error: blogsError } = await supabase
+      // First, get all blogs
+      const { data: blogs, error: blogsError } = await supabase
         .from("blogs")
-        .select("*");
+        .select("*")
+        .returns<Blog[]>();
 
       if (blogsError) throw blogsError;
 
-      // Fetch author names separately
-      const authorIds = blogsData?.map(blog => blog.author_id) || [];
-      const { data: profilesData, error: profilesError } = await supabase
+      // Then get all unique author profiles
+      const uniqueAuthorIds = [...new Set(blogs.map(blog => blog.author_id))];
+      const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("id, full_name")
-        .in("id", authorIds);
+        .in("id", uniqueAuthorIds)
+        .returns<Profile[]>();
 
       if (profilesError) throw profilesError;
 
-      // Map profiles to blogs
-      const blogsWithProfiles: BlogWithProfile[] = blogsData.map(blog => ({
+      // Combine blogs with author names
+      const blogsWithProfiles: BlogWithProfile[] = blogs.map(blog => ({
         ...blog,
-        author_name: profilesData?.find(profile => profile.id === blog.author_id)?.full_name || "Unknown"
+        author_name: profiles.find(profile => profile.id === blog.author_id)?.full_name || "Unknown"
       }));
 
       return blogsWithProfiles;
