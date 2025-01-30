@@ -110,20 +110,19 @@ Deno.serve(async (req) => {
     
     try {
       // Check if user already exists
-      const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers()
+      const { data: existingUser, error: getUserError } = await supabaseAdmin.auth.admin.getUserByEmail(payload.email)
       
-      if (listError) {
-        console.error('Error checking existing users:', listError)
-        return createErrorResponse(500, 'Database Error', 'Failed to check existing users')
+      if (getUserError && getUserError.message !== 'User not found') {
+        console.error('Error checking existing user:', getUserError)
+        return createErrorResponse(500, 'Database Error', 'Failed to check existing user')
       }
 
-      const userExists = existingUsers?.users.some(user => user.email === payload.email)
-      if (userExists) {
+      if (existingUser) {
         return createErrorResponse(400, 'User Error', 'User with this email already exists')
       }
 
-      // Generate a random password
-      const tempPassword = Math.random().toString(36).slice(-8)
+      // Generate a secure random password
+      const tempPassword = crypto.randomUUID().slice(0, 12)
       
       // Create auth user
       console.log('Creating auth user with email:', payload.email)
