@@ -1,4 +1,4 @@
-import { useState } from "react";
+import * as React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Globe } from "lucide-react";
@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState("English");
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [currentLanguage, setCurrentLanguage] = React.useState("English");
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
