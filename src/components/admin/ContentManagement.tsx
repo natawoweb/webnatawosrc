@@ -13,17 +13,29 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, XCircle, FileText } from "lucide-react";
 
+interface Blog {
+  id: string;
+  title: string;
+  content: string;
+  status: string;
+  created_at: string;
+  author_id: string;
+  profiles: {
+    full_name: string | null;
+  } | null;
+}
+
 export function ContentManagement() {
   const { toast } = useToast();
 
-  const { data: blogs, isLoading } = useQuery({
+  const { data: blogs, isLoading } = useQuery<Blog[]>({
     queryKey: ["admin-blogs"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("blogs")
         .select(`
           *,
-          profiles!blogs_author_id_fkey (
+          profiles (
             full_name
           )
         `)
@@ -88,7 +100,7 @@ export function ContentManagement() {
           {blogs?.map((blog) => (
             <TableRow key={blog.id}>
               <TableCell className="font-medium">{blog.title}</TableCell>
-              <TableCell>{blog.profiles?.full_name}</TableCell>
+              <TableCell>{blog.profiles?.full_name || "Unknown"}</TableCell>
               <TableCell>
                 <Badge
                   variant={
