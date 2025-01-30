@@ -1,4 +1,4 @@
-import { type Profile, type AppRole } from "@/integrations/supabase/types";
+import { type Database } from "@/integrations/supabase/types";
 import {
   Table,
   TableBody,
@@ -9,6 +9,9 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type AppRole = Database['public']['Enums']['app_role'];
 
 type UserWithRole = Profile & {
   role: AppRole;

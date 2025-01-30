@@ -15,7 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type AppRole } from "@/integrations/supabase/types";
+import { type Database } from "@/integrations/supabase/types";
+
+type AppRole = Database['public']['Enums']['app_role'];
 
 interface AddUserDialogProps {
   open: boolean;
