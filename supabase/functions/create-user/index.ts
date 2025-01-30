@@ -44,100 +44,11 @@ const verifyAdmin = async (supabaseAdmin: any, userId: string) => {
       throw new Error(`Role verification failed: ${roleError.message}`);
     }
 
-    console.log('Admin verification result:', isAdmin);
     if (!isAdmin) {
       throw new Error('User is not authorized to create users');
     }
   } catch (error) {
     console.error('Admin verification error:', error);
-    throw error;
-  }
-};
-
-const createUserAndProfile = async (supabaseAdmin: any, email: string, fullName: string, role: string) => {
-  console.log('Starting user creation process for:', email);
-  
-  try {
-    // Check if user already exists
-    const { data: existingUser, error: checkError } = await supabaseAdmin
-      .from('profiles')
-      .select('id')
-      .eq('email', email)
-      .single();
-
-    if (checkError && checkError.code !== 'PGRST116') {
-      console.error('Error checking existing user:', checkError);
-      throw new Error(`User check failed: ${checkError.message}`);
-    }
-
-    if (existingUser) {
-      console.error('User already exists:', email);
-      throw new Error('User with this email already exists');
-    }
-
-    // Generate a random password
-    const tempPassword = Math.random().toString(36).slice(-8);
-
-    console.log('Attempting to create auth user...');
-    // Create the user with auth
-    const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password: tempPassword,
-      email_confirm: true,
-      user_metadata: { full_name: fullName }
-    });
-
-    if (createError) {
-      console.error('Error creating auth user:', createError);
-      throw new Error(`Auth user creation failed: ${createError.message}`);
-    }
-
-    if (!userData.user) {
-      throw new Error('User creation failed - no user data returned');
-    }
-
-    console.log('Auth user created successfully:', userData.user.id);
-
-    // Create profile
-    console.log('Creating user profile...');
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .insert({
-        id: userData.user.id,
-        full_name: fullName,
-        email: email
-      });
-
-    if (profileError) {
-      console.error('Error creating profile:', profileError);
-      // Clean up auth user if profile creation fails
-      await supabaseAdmin.auth.admin.deleteUser(userData.user.id);
-      throw new Error(`Profile creation failed: ${profileError.message}`);
-    }
-
-    console.log('Profile created successfully');
-
-    // Set user role
-    console.log('Setting user role...');
-    const { error: roleError } = await supabaseAdmin
-      .from('user_roles')
-      .insert({
-        user_id: userData.user.id,
-        role: role
-      });
-
-    if (roleError) {
-      console.error('Error setting user role:', roleError);
-      // Clean up profile and auth user if role assignment fails
-      await supabaseAdmin.from('profiles').delete().eq('id', userData.user.id);
-      await supabaseAdmin.auth.admin.deleteUser(userData.user.id);
-      throw new Error(`Role assignment failed: ${roleError.message}`);
-    }
-
-    console.log('User role assigned successfully');
-    return userData.user;
-  } catch (error) {
-    console.error('Error in createUserAndProfile:', error);
     throw error;
   }
 };
@@ -155,6 +66,7 @@ Deno.serve(async (req) => {
       return createErrorResponse(401, 'Unauthorized', 'Missing Authorization header');
     }
 
+    // Initialize Supabase client with service role key
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -174,6 +86,7 @@ Deno.serve(async (req) => {
       return createErrorResponse(400, 'Validation Error', 'Invalid input data', validationErrors);
     }
 
+    // Verify JWT and get admin user
     const jwt = authHeader.replace('Bearer ', '');
     const { data: { user: adminUser }, error: verifyError } = await supabaseAdmin.auth.getUser(jwt);
     
@@ -182,18 +95,72 @@ Deno.serve(async (req) => {
       return createErrorResponse(401, 'Unauthorized', 'Invalid authentication token');
     }
 
+    // Verify admin status
     try {
       await verifyAdmin(supabaseAdmin, adminUser.id);
     } catch (error) {
       return createErrorResponse(403, 'Forbidden', error.message);
     }
 
-    const user = await createUserAndProfile(supabaseAdmin, email, fullName, role);
+    console.log('Creating new user with auth.admin.createUser...');
+    
+    // Create the user with auth
+    const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: Math.random().toString(36).slice(-8),
+      email_confirm: true,
+      user_metadata: { full_name: fullName }
+    });
+
+    if (createError) {
+      console.error('Error creating auth user:', createError);
+      return createErrorResponse(500, 'Auth Error', `Failed to create auth user: ${createError.message}`);
+    }
+
+    if (!userData.user) {
+      return createErrorResponse(500, 'Auth Error', 'No user data returned from auth creation');
+    }
+
+    console.log('Auth user created successfully:', userData.user.id);
+
+    // Create profile
+    console.log('Creating user profile...');
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        id: userData.user.id,
+        full_name: fullName,
+        email: email
+      });
+
+    if (profileError) {
+      console.error('Error creating profile:', profileError);
+      // Clean up auth user if profile creation fails
+      await supabaseAdmin.auth.admin.deleteUser(userData.user.id);
+      return createErrorResponse(500, 'Database Error', `Failed to create profile: ${profileError.message}`);
+    }
+
+    // Set user role
+    console.log('Setting user role...');
+    const { error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .insert({
+        user_id: userData.user.id,
+        role: role
+      });
+
+    if (roleError) {
+      console.error('Error setting user role:', roleError);
+      // Clean up profile and auth user if role assignment fails
+      await supabaseAdmin.from('profiles').delete().eq('id', userData.user.id);
+      await supabaseAdmin.auth.admin.deleteUser(userData.user.id);
+      return createErrorResponse(500, 'Database Error', `Failed to assign role: ${roleError.message}`);
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        user,
+        user: userData.user,
         message: 'User created successfully'
       }),
       {
