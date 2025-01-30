@@ -1,10 +1,7 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+import { BlogsTable, CommentsTable, RatingsTable } from './content'
+import { EventsTable } from './events'
+import { WritersTable } from './writers'
+import { ProfilesTable, UserRolesTable } from './auth'
 
 export interface Database {
   public: {
@@ -29,57 +26,6 @@ export interface Database {
     CompositeTypes: {
       [_ in never]: never
     }
-  }
-}
-
-interface ProfilesTable {
-  Row: {
-    id: string
-    full_name: string | null
-    bio: string | null
-    avatar_url: string | null
-    created_at: string | null
-    updated_at: string | null
-    email: string | null
-  }
-  Insert: {
-    id: string
-    full_name?: string | null
-    bio?: string | null
-    avatar_url?: string | null
-    created_at?: string | null
-    updated_at?: string | null
-    email?: string | null
-  }
-  Update: {
-    id?: string
-    full_name?: string | null
-    bio?: string | null
-    avatar_url?: string | null
-    created_at?: string | null
-    updated_at?: string | null
-    email?: string | null
-  }
-}
-
-interface UserRolesTable {
-  Row: {
-    id: string
-    user_id: string
-    role: Database["public"]["Enums"]["app_role"]
-    created_at: string | null
-  }
-  Insert: {
-    id?: string
-    user_id: string
-    role?: Database["public"]["Enums"]["app_role"]
-    created_at?: string | null
-  }
-  Update: {
-    id?: string
-    user_id?: string
-    role?: Database["public"]["Enums"]["app_role"]
-    created_at?: string | null
   }
 }
 

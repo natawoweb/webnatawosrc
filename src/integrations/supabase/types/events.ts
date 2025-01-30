@@ -1,4 +1,4 @@
-import { Database } from './database'
+import { Json } from './shared'
 
 export interface EventsTable {
   Row: {
