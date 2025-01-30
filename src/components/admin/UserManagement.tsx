@@ -17,8 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield } from "lucide-react";
+import { Loader2, UserPlus, Shield, Search, Filter } from "lucide-react";
 
 interface User {
   id: string;
@@ -30,6 +31,7 @@ interface User {
 export function UserManagement() {
   const { toast } = useToast();
   const [selectedRole, setSelectedRole] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   const { data: users, isLoading } = useQuery({
@@ -72,6 +74,14 @@ export function UserManagement() {
     setUpdatingUserId(null);
   };
 
+  const filteredUsers = users?.filter((user) => {
+    const matchesRole = selectedRole ? user.role === selectedRole : true;
+    const matchesSearch = searchQuery
+      ? user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    return matchesRole && matchesSearch;
+  });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -90,6 +100,35 @@ export function UserManagement() {
         </Button>
       </div>
 
+      <div className="flex gap-4 items-center">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search users by email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+        <div className="w-[200px]">
+          <Select value={selectedRole} onValueChange={setSelectedRole}>
+            <SelectTrigger>
+              <Filter className="mr-2 h-4 w-4" />
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Roles</SelectItem>
+              <SelectItem value="reader">Reader</SelectItem>
+              <SelectItem value="writer">Writer</SelectItem>
+              <SelectItem value="manager">Manager</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -100,7 +139,7 @@ export function UserManagement() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users?.map((user) => (
+          {filteredUsers?.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.email}</TableCell>
               <TableCell>

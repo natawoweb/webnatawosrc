@@ -18,20 +18,38 @@ export default function Auth() {
 
   useEffect(() => {
     // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Current session:", session);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        // Check if user is admin
+        const { data: isAdmin } = await supabase.rpc('has_role', {
+          user_id: session.user.id,
+          required_role: 'admin'
+        });
+        
+        if (isAdmin) {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       }
     });
 
     // Set up auth state listener
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", _event, session);
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        navigate("/");
+        // Check if user is admin
+        const { data: isAdmin } = await supabase.rpc('has_role', {
+          user_id: session.user.id,
+          required_role: 'admin'
+        });
+        
+        if (isAdmin) {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       }
     });
 
