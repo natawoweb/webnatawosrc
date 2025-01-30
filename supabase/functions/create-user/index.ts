@@ -5,32 +5,115 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Utility function to create error responses
+const createErrorResponse = (status: number, error: string, message: string) => {
+  console.error(`Error: ${error}, Message: ${message}`);
+  return new Response(
+    JSON.stringify({ error, message }),
+    {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    }
+  );
+};
+
+// Validate required fields
+const validateFields = (email: string, fullName: string, role: string) => {
+  if (!email || !fullName || !role) {
+    throw new Error('Missing required fields');
+  }
+  
+  if (!email.includes('@')) {
+    throw new Error('Invalid email format');
+  }
+};
+
+// Verify admin status
+const verifyAdmin = async (supabaseAdmin: any, userId: string) => {
+  console.log('Verifying admin status for user:', userId);
+  const { data: isAdmin, error: roleError } = await supabaseAdmin.rpc('has_role', {
+    user_id: userId,
+    required_role: 'admin'
+  });
+
+  if (roleError || !isAdmin) {
+    throw new Error('User is not authorized to create users');
+  }
+};
+
+// Create user and profile
+const createUserAndProfile = async (supabaseAdmin: any, email: string, fullName: string, role: string) => {
+  console.log('Creating user with email:', email);
+  
+  // Generate a random password
+  const tempPassword = Math.random().toString(36).slice(-8);
+
+  // Create the user
+  const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password: tempPassword,
+    email_confirm: true,
+    user_metadata: { full_name: fullName }
+  });
+
+  if (createError) {
+    console.error('Error creating user:', createError);
+    throw new Error(`Failed to create user: ${createError.message}`);
+  }
+
+  if (!userData.user) {
+    throw new Error('User creation failed - no user data returned');
+  }
+
+  console.log('User created successfully, creating profile...');
+
+  // Create profile
+  const { error: profileError } = await supabaseAdmin
+    .from('profiles')
+    .insert({
+      id: userData.user.id,
+      full_name: fullName,
+      email: email
+    });
+
+  if (profileError) {
+    console.error('Error creating profile:', profileError);
+    throw new Error(`Failed to create profile: ${profileError.message}`);
+  }
+
+  console.log('Profile created successfully, setting user role...');
+
+  // Set user role
+  const { error: roleError } = await supabaseAdmin
+    .from('user_roles')
+    .insert({
+      user_id: userData.user.id,
+      role: role
+    });
+
+  if (roleError) {
+    console.error('Error setting user role:', roleError);
+    throw new Error(`Failed to set user role: ${roleError.message}`);
+  }
+
+  return userData.user;
+};
+
+// Main handler
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: corsHeaders,
-    })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
     // Get the authorization header
-    const authHeader = req.headers.get('Authorization')
+    const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error('Missing Authorization header')
-      return new Response(
-        JSON.stringify({ 
-          error: 'Missing Authorization header',
-          message: 'Authorization header is required'
-        }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
+      return createErrorResponse(401, 'Unauthorized', 'Missing Authorization header');
     }
 
-    // Initialize Supabase client with service role key
+    // Initialize Supabase client
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -40,165 +123,54 @@ Deno.serve(async (req) => {
           persistSession: false,
         },
       }
-    )
+    );
 
-    // Get the request body
-    const { email, fullName, role } = await req.json()
-    console.log('Received request to create user:', { email, fullName, role })
+    // Get request body
+    const { email, fullName, role } = await req.json();
+    console.log('Received request to create user:', { email, fullName, role });
 
-    if (!email || !fullName || !role) {
-      console.error('Missing required fields:', { email, fullName, role })
-      return new Response(
-        JSON.stringify({ 
-          error: 'Missing required fields',
-          message: 'Email, full name, and role are required'
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
+    // Validate fields
+    try {
+      validateFields(email, fullName, role);
+    } catch (error) {
+      return createErrorResponse(400, 'Validation Error', error.message);
     }
 
-    // Get user from auth token
-    const jwt = authHeader.replace('Bearer ', '')
-    const { data: { user: adminUser }, error: verifyError } = await supabaseAdmin.auth.getUser(jwt)
+    // Verify admin status
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user: adminUser }, error: verifyError } = await supabaseAdmin.auth.getUser(jwt);
     
     if (verifyError || !adminUser) {
-      console.error('Invalid JWT or user not found:', verifyError)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Unauthorized',
-          message: 'Invalid authentication token'
-        }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
+      return createErrorResponse(401, 'Unauthorized', 'Invalid authentication token');
     }
 
-    // Verify admin role
-    const { data: isAdmin, error: roleError } = await supabaseAdmin.rpc('has_role', {
-      user_id: adminUser.id,
-      required_role: 'admin'
-    })
-
-    if (roleError || !isAdmin) {
-      console.error('User is not an admin:', adminUser.id)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Unauthorized',
-          message: 'Only admins can create users'
-        }),
-        {
-          status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
+    try {
+      await verifyAdmin(supabaseAdmin, adminUser.id);
+    } catch (error) {
+      return createErrorResponse(403, 'Forbidden', error.message);
     }
 
-    // Generate a random password
-    const tempPassword = Math.random().toString(36).slice(-8)
-    console.log('Creating user with email:', email)
-
-    // Create the user
-    const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password: tempPassword,
-      email_confirm: true,
-      user_metadata: { full_name: fullName }
-    })
-
-    if (createError) {
-      console.error('Error creating user:', createError)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Database error creating new user',
-          message: createError.message
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
-    }
-
-    if (!userData.user) {
-      console.error('User data is null after creation')
-      return new Response(
-        JSON.stringify({ 
-          error: 'Database error creating new user',
-          message: 'User creation failed'
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
-    }
-
-    // Create profile for the new user
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .insert({
-        id: userData.user.id,
-        full_name: fullName,
-        email: email
-      })
-
-    if (profileError) {
-      console.error('Error creating profile:', profileError)
-      // Continue with role creation even if profile creation fails
-    }
-
-    // Set the user's role
-    const { error: roleSetError } = await supabaseAdmin
-      .from('user_roles')
-      .upsert({
-        user_id: userData.user.id,
-        role: role
-      })
-
-    if (roleSetError) {
-      console.error('Error setting user role:', roleSetError)
-      // Even if role setting fails, the user was created successfully
-      return new Response(
-        JSON.stringify({ 
-          success: true,
-          user: userData.user,
-          warning: 'User created but role setting failed: ' + roleSetError.message
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
-    }
+    // Create user and associated records
+    const user = await createUserAndProfile(supabaseAdmin, email, fullName, role);
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        user: userData.user,
+        user,
         message: 'User created successfully'
       }),
       {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
-    )
+    );
 
   } catch (error) {
-    console.error('Error in create-user function:', error)
-    return new Response(
-      JSON.stringify({ 
-        error: 'Server error',
-        message: error.message
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
+    console.error('Unexpected error:', error);
+    return createErrorResponse(
+      500,
+      'Server Error',
+      error.message || 'An unexpected error occurred'
+    );
   }
-})
+});
