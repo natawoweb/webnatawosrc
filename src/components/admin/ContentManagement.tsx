@@ -116,6 +116,20 @@ export function ContentManagement() {
     );
   }
 
+  const getRoleBadge = (role: AppRole) => {
+    const baseClasses = "capitalize";
+    switch (role) {
+      case "admin":
+        return <Badge variant="destructive" className={baseClasses}>Admin</Badge>;
+      case "manager":
+        return <Badge variant="default" className={baseClasses}>Manager</Badge>;
+      case "writer":
+        return <Badge variant="secondary" className={baseClasses}>Writer</Badge>;
+      default:
+        return <Badge variant="outline" className={baseClasses}>Reader</Badge>;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -150,6 +164,7 @@ export function ContentManagement() {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Full Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Role</TableHead>
@@ -159,30 +174,30 @@ export function ContentManagement() {
         <TableBody>
           {users?.map((user) => (
             <TableRow key={user.id}>
+              <TableCell>{user.full_name || 'N/A'}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 {new Date(user.created_at || "").toLocaleDateString()}
               </TableCell>
               <TableCell>
-                <Badge variant="outline" className="capitalize">
-                  {user.role}
-                </Badge>
+                {getRoleBadge(user.role)}
               </TableCell>
               <TableCell className="space-x-2">
-                <Select
-                  value={user.role}
-                  onValueChange={(value) => handleUpdateRole(user.id, value as AppRole)}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const nextRole: Record<AppRole, AppRole> = {
+                      reader: "writer",
+                      writer: "manager",
+                      manager: "admin",
+                      admin: "reader"
+                    };
+                    handleUpdateRole(user.id, nextRole[user.role]);
+                  }}
                 >
-                  <SelectTrigger className="w-[120px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="reader">Reader</SelectItem>
-                    <SelectItem value="writer">Writer</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <UserCog className="h-4 w-4 text-blue-500" />
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
