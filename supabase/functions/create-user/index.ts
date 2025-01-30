@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
       }
 
       // Generate a strong password that meets requirements
-      const tempPassword = `${crypto.randomUUID().slice(0, 8)}#Aa1!${crypto.randomUUID().slice(0, 4)}`
+      const tempPassword = `${Math.random().toString(36).slice(2)}#Aa1!${Math.random().toString(36).slice(2)}`
       
       // Create auth user with all required data upfront
       console.log('Creating auth user with email:', payload.email)
