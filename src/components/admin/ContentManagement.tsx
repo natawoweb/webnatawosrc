@@ -14,10 +14,15 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, XCircle, FileText } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
-type BlogWithProfile = Database["public"]["Tables"]["blogs"]["Row"] & {
-  profiles: {
-    full_name: string | null;
-  } | null;
+type BlogWithProfile = {
+  id: string;
+  title: string;
+  content: string;
+  author_id: string;
+  status: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  author_name: string | null;
 };
 
 export function ContentManagement() {
@@ -26,15 +31,28 @@ export function ContentManagement() {
   const { data: blogs, isLoading } = useQuery({
     queryKey: ["admin-blogs"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: blogsData, error: blogsError } = await supabase
         .from("blogs")
-        .select(`
-          *,
-          profiles!blogs_author_id_fkey(full_name)
-        `);
+        .select("*");
 
-      if (error) throw error;
-      return data as BlogWithProfile[];
+      if (blogsError) throw blogsError;
+
+      // Fetch author names separately
+      const authorIds = blogsData?.map(blog => blog.author_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", authorIds);
+
+      if (profilesError) throw profilesError;
+
+      // Map profiles to blogs
+      const blogsWithProfiles: BlogWithProfile[] = blogsData.map(blog => ({
+        ...blog,
+        author_name: profilesData?.find(profile => profile.id === blog.author_id)?.full_name || "Unknown"
+      }));
+
+      return blogsWithProfiles;
     },
   });
 
@@ -92,7 +110,7 @@ export function ContentManagement() {
           {blogs?.map((blog) => (
             <TableRow key={blog.id}>
               <TableCell className="font-medium">{blog.title}</TableCell>
-              <TableCell>{blog.profiles?.full_name || "Unknown"}</TableCell>
+              <TableCell>{blog.author_name}</TableCell>
               <TableCell>
                 <Badge
                   variant={
