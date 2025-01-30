@@ -12,18 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, XCircle, FileText } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
 
-interface Blog {
-  id: string;
-  title: string;
-  content: string;
-  status: string;
-  created_at: string;
-  author_id: string;
+type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
   profiles: {
     full_name: string | null;
   } | null;
-}
+};
 
 export function ContentManagement() {
   const { toast } = useToast();
@@ -38,11 +33,10 @@ export function ContentManagement() {
           profiles (
             full_name
           )
-        `)
-        .order("created_at", { ascending: false });
+        `);
 
       if (error) throw error;
-      return data;
+      return data as Blog[];
     },
   });
 
@@ -115,7 +109,7 @@ export function ContentManagement() {
                 </Badge>
               </TableCell>
               <TableCell>
-                {new Date(blog.created_at).toLocaleDateString()}
+                {new Date(blog.created_at || "").toLocaleDateString()}
               </TableCell>
               <TableCell className="space-x-2">
                 <Button
