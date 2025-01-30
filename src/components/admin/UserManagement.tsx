@@ -35,16 +35,28 @@ export function UserManagement() {
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   const { data: users, isLoading } = useQuery({
-    queryKey: ["admin-users"],
+    queryKey: ["users-with-roles"],
     queryFn: async () => {
-      const { data: users, error } = await supabase.auth.admin.listUsers();
-      if (error) throw error;
-
-      const { data: roles } = await supabase.from("user_roles").select("*");
+      // Get all user roles
+      const { data: userRoles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("user_id, role");
       
-      const usersWithRoles = users.users.map((user) => ({
-        ...user,
-        role: roles?.find((role) => role.user_id === user.id)?.role || "reader",
+      if (rolesError) throw rolesError;
+
+      // Get all profiles (which are created for each user)
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email:auth.users!profiles_id_fkey(email), created_at:auth.users!profiles_id_fkey(created_at)");
+      
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      const usersWithRoles = profiles.map((profile) => ({
+        id: profile.id,
+        email: profile.email,
+        created_at: profile.created_at,
+        role: userRoles?.find((ur) => ur.user_id === profile.id)?.role || "reader",
       }));
 
       return usersWithRoles;
@@ -75,7 +87,7 @@ export function UserManagement() {
   };
 
   const filteredUsers = users?.filter((user) => {
-    const matchesRole = selectedRole ? user.role === selectedRole : true;
+    const matchesRole = selectedRole === "all" || !selectedRole ? true : user.role === selectedRole;
     const matchesSearch = searchQuery
       ? user.email.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
