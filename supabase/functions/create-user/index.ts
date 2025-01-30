@@ -1,6 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
-import { corsHeaders } from '../_shared/cors.ts'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 interface CreateUserPayload {
   email: string
@@ -99,18 +103,23 @@ async function handleCreateUser(req: Request): Promise<Response> {
       return createErrorResponse(400, validation.error!);
     }
 
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      }
-    );
+    // Initialize Supabase admin client with service role key
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    // First, check if user already exists
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing environment variables');
+      return createErrorResponse(500, 'Server configuration error');
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
+
+    // Check if user already exists
     const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
     
     if (listError) {
@@ -126,11 +135,14 @@ async function handleCreateUser(req: Request): Promise<Response> {
     const tempPassword = generateSecurePassword();
     console.log('Creating auth user for email:', payload.email);
 
-    // Create auth user with minimal metadata
+    // Create auth user with email confirmation disabled
     const { data: authUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
       email: payload.email,
       password: tempPassword,
       email_confirm: true,
+      user_metadata: {
+        full_name: payload.fullName,
+      },
     });
 
     if (createUserError) {
@@ -145,7 +157,7 @@ async function handleCreateUser(req: Request): Promise<Response> {
 
     console.log('Auth user created successfully:', authUser.user.id);
 
-    // The trigger function will handle creating the profile and role
+    // The database trigger will handle creating the profile and role
     return createSuccessResponse({
       user: authUser.user,
       tempPassword,
