@@ -50,35 +50,6 @@ export function useUserManagement() {
     },
   });
 
-  // Update user role mutation
-  const updateRoleMutation = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .upsert({ 
-          user_id: userId, 
-          role 
-        });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
-      toast({
-        title: "Success",
-        description: "User role updated successfully",
-      });
-      setEditDialogOpen(false);
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update user role: " + error.message,
-      });
-    },
-  });
-
   // Add new user mutation using the Edge Function
   const addUserMutation = useMutation({
     mutationFn: async ({ email, fullName, role }: { email: string; fullName: string; role: AppRole }) => {
@@ -117,7 +88,7 @@ export function useUserManagement() {
       setAddUserDialogOpen(false);
     },
     onError: (error) => {
-      console.error('Mutation error:', error);
+      console.error('Error adding user:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -126,6 +97,36 @@ export function useUserManagement() {
     },
   });
 
+  // Update user role mutation
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
+      const { error } = await supabase
+        .from('user_roles')
+        .upsert({ 
+          user_id: userId, 
+          role 
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+      toast({
+        title: "Success",
+        description: "User role updated successfully",
+      });
+      setEditDialogOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update user role: " + error.message,
+      });
+    },
+  });
+
+  // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
       const { error } = await supabase.auth.admin.deleteUser(userId);
