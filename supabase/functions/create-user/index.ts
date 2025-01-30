@@ -148,6 +148,22 @@ async function handleCreateUser(req: Request): Promise<Response> {
     }
 
     console.log('Auth user created successfully');
+
+    // Insert into profiles table first
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        id: authUser.user.id,
+        full_name: payload.fullName,
+        email: payload.email,
+      });
+
+    if (profileError) {
+      console.error('Error creating profile:', profileError);
+      // Clean up: delete the auth user if profile creation fails
+      await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
+      return createErrorResponse(500, `Failed to create profile: ${profileError.message}`);
+    }
     
     // Insert into user_roles table
     const { error: roleError } = await supabaseAdmin
@@ -159,7 +175,7 @@ async function handleCreateUser(req: Request): Promise<Response> {
 
     if (roleError) {
       console.error('Error setting user role:', roleError);
-      // If role assignment fails, we should delete the created user
+      // Clean up: delete the auth user and profile if role assignment fails
       await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
       return createErrorResponse(500, `Failed to set user role: ${roleError.message}`);
     }
