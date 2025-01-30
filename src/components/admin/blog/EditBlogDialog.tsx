@@ -51,7 +51,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
       category_id?: string;
       status: string;
     }) => {
-      console.log("Updating blog with status:", blogData.status); // Debug log
+      console.log("Updating blog with status:", blogData.status);
       
       const { data, error } = await supabase
         .from("blogs")
@@ -65,7 +65,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
           updated_at: new Date().toISOString(),
         })
         .eq("id", blog.id)
-        .select();
+        .select("*");
 
       if (error) throw error;
       return data;
@@ -97,7 +97,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
       return;
     }
 
-    console.log("Handling update with status:", status); // Debug log
+    console.log("Handling update with status:", status);
 
     updateBlogMutation.mutate({
       title,
@@ -116,7 +116,8 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
           <Pencil className="h-4 w-4 text-blue-500" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[1400px] w-[90vw]">
+      <DialogContent className="max-w-[1400px] w-[90vw]" aria-describedby="dialog-description">
+        <div id="dialog-description" className="sr-only">Edit blog post</div>
         <BlogDialogHeader
           categories={categories || []}
           selectedCategory={selectedCategory}
