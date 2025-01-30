@@ -45,24 +45,30 @@ export function UserManagement() {
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
+      // First, fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("*")
-        .returns<Profile[]>();
+        .select("*");
       
       if (profilesError) throw profilesError;
 
+      // Then, fetch all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
-        .select("*")
-        .returns<UserRole[]>();
+        .select("*");
       
       if (rolesError) throw rolesError;
 
-      const usersWithRoles: UserWithRole[] = profiles.map(profile => ({
-        ...profile,
-        role: userRoles?.find(ur => ur.user_id === profile.id)?.role || "reader"
-      }));
+      // Combine profiles with their roles
+      const usersWithRoles: UserWithRole[] = profiles.map(profile => {
+        const userRole = userRoles.find(ur => ur.user_id === profile.id);
+        return {
+          ...profile,
+          role: userRole?.role || "reader"
+        };
+      });
+
+      console.log("Users with roles:", usersWithRoles); // Debug log
 
       return usersWithRoles;
     },
