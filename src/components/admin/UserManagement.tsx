@@ -33,6 +33,10 @@ type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
 type AppRole = Database["public"]["Enums"]["app_role"];
 
+type ProfileWithRoles = Profile & {
+  user_roles: Pick<UserRole, "role">[] | null;
+};
+
 type UserWithRole = Profile & {
   role: AppRole;
 };
@@ -45,7 +49,6 @@ export function UserManagement() {
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
-      // First, fetch all profiles with their roles using a join
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -58,7 +61,7 @@ export function UserManagement() {
       if (error) throw error;
 
       // Transform the data to match our UserWithRole type
-      const usersWithRoles: UserWithRole[] = data.map(profile => ({
+      const usersWithRoles: UserWithRole[] = (data as ProfileWithRoles[]).map(profile => ({
         ...profile,
         role: profile.user_roles?.[0]?.role || "reader"
       }));
