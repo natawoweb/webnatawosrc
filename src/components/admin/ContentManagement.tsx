@@ -28,12 +28,7 @@ export function ContentManagement() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("blogs")
-        .select(`
-          *,
-          profiles (
-            full_name
-          )
-        `);
+        .select("*, profiles!blogs_author_id_fkey(full_name)");
 
       if (error) throw error;
       return data as Blog[];
