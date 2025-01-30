@@ -13,31 +13,37 @@ export type Database = {
         Row: {
           author_id: string
           content: Json
+          content_tamil: Json | null
           cover_image: string | null
           created_at: string | null
           id: string
           status: string
           title: string
+          title_tamil: string | null
           updated_at: string | null
         }
         Insert: {
           author_id: string
           content: Json
+          content_tamil?: Json | null
           cover_image?: string | null
           created_at?: string | null
           id?: string
           status?: string
           title: string
+          title_tamil?: string | null
           updated_at?: string | null
         }
         Update: {
           author_id?: string
           content?: Json
+          content_tamil?: Json | null
           cover_image?: string | null
           created_at?: string | null
           id?: string
           status?: string
           title?: string
+          title_tamil?: string | null
           updated_at?: string | null
         }
         Relationships: []

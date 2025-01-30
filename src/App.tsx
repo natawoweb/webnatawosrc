@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import SearchWriters from "./pages/SearchWriters";
 import Events from "./pages/Events";
 import AdminDashboard from "./pages/AdminDashboard";
+import CreateBlog from "./pages/CreateBlog";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App: React.FC = () => {
             <Route path="search" element={<SearchWriters />} />
             <Route path="events" element={<Events />} />
             <Route path="admin" element={<AdminDashboard />} />
+            <Route path="admin/create-blog" element={<CreateBlog />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

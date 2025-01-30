@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
-import { CreateBlogDialog } from "./blog/CreateBlogDialog";
+import { Loader2, BookPlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { BlogFilters } from "./blog/BlogFilters";
 import { BlogList } from "./blog/BlogList";
 import { Database } from "@/integrations/supabase/types";
@@ -44,7 +45,12 @@ export function ContentManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Blog Management</h2>
-        <CreateBlogDialog />
+        <Link to="/admin/create-blog">
+          <Button>
+            <BookPlus className="mr-2 h-4 w-4" />
+            Create Blog
+          </Button>
+        </Link>
       </div>
 
       <BlogFilters
