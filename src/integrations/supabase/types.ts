@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       writers: {
         Row: {
+          accomplishments: Json | null
           bio: string
           created_at: string
           featured: boolean | null
@@ -19,9 +20,11 @@ export type Database = {
           id: string
           image_url: string | null
           name: string
+          published_works: Json | null
           social_links: Json | null
         }
         Insert: {
+          accomplishments?: Json | null
           bio: string
           created_at?: string
           featured?: boolean | null
@@ -30,9 +33,11 @@ export type Database = {
           id?: string
           image_url?: string | null
           name: string
+          published_works?: Json | null
           social_links?: Json | null
         }
         Update: {
+          accomplishments?: Json | null
           bio?: string
           created_at?: string
           featured?: boolean | null
@@ -41,6 +46,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           name?: string
+          published_works?: Json | null
           social_links?: Json | null
         }
         Relationships: []
