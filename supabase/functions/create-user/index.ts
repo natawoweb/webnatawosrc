@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
 import { corsHeaders } from '../_shared/cors.ts'
 
 interface CreateUserPayload {
@@ -10,8 +10,24 @@ interface CreateUserPayload {
 
 // Utility function to generate a secure password
 function generateSecurePassword(): string {
-  const generateRandomString = () => crypto.randomUUID().slice(0, 8);
-  return `${generateRandomString()}#Aa1!${generateRandomString().slice(0, 4)}`;
+  const length = 16;
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  let password = '';
+  
+  // Ensure at least one of each required character type
+  password += 'A'; // Uppercase
+  password += 'a'; // Lowercase
+  password += '1'; // Number
+  password += '!'; // Special character
+  
+  // Fill the rest with random characters
+  for (let i = password.length; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    password += charset[randomIndex];
+  }
+  
+  // Shuffle the password
+  return password.split('').sort(() => Math.random() - 0.5).join('');
 }
 
 // Utility function to validate email format
@@ -82,7 +98,7 @@ function createSuccessResponse(data: any): Response {
 async function handleCreateUser(req: Request): Promise<Response> {
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
