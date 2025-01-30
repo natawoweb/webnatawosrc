@@ -91,7 +91,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
     },
   });
 
-  const handleUpdate = (status: "draft" | "pending_approval") => {
+  const handleUpdate = (status: "draft" | "submitted") => {
     if (!title || !content) {
       toast({
         variant: "destructive",
@@ -149,11 +149,11 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
                 Save as Draft
               </Button>
               <Button
-                onClick={() => handleUpdate("pending_approval")}
+                onClick={() => handleUpdate("submitted")}
                 disabled={updateBlogMutation.isPending}
               >
                 <SendHorizontal className="mr-2 h-4 w-4" />
-                Submit for Approval
+                Submit for Review
               </Button>
             </div>
           </div>
