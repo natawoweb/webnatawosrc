@@ -30,7 +30,8 @@ export function useUserManagement() {
       // First get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false });
       
       if (profilesError) throw profilesError;
 
@@ -99,7 +100,10 @@ export function useUserManagement() {
         throw new Error("Failed to create user");
       }
 
-      // Set user role
+      // Wait for the trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Set user role explicitly
       const { error: roleError } = await supabase
         .from('user_roles')
         .upsert({ 
