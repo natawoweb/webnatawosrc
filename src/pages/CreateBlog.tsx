@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Save, ArrowLeft } from "lucide-react";
+import { Save, SendHorizontal, ArrowLeft } from "lucide-react";
 import { BlogContentSection } from "@/components/admin/blog/BlogContentSection";
 import { CategoryManagement } from "@/components/admin/blog/CategoryManagement";
 import {
@@ -136,6 +136,7 @@ export default function CreateBlog() {
               onClick={() => handleCreate("pending_approval")}
               disabled={createBlogMutation.isPending}
             >
+              <SendHorizontal className="mr-2 h-4 w-4" />
               Submit for Approval
             </Button>
           </div>
