@@ -43,6 +43,7 @@ const verifyAdmin = async (supabaseAdmin: any, userId: string) => {
       throw new Error(`Role verification failed: ${roleError.message}`);
     }
 
+    console.log('Admin verification result:', isAdmin);
     if (!isAdmin) {
       throw new Error('User is not authorized to create users');
     }
@@ -59,6 +60,7 @@ const createUserAndProfile = async (supabaseAdmin: any, email: string, fullName:
     // Generate a random password
     const tempPassword = Math.random().toString(36).slice(-8);
 
+    console.log('Attempting to create auth user...');
     // Create the user with auth
     const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
@@ -79,6 +81,7 @@ const createUserAndProfile = async (supabaseAdmin: any, email: string, fullName:
     console.log('Auth user created successfully:', userData.user.id);
 
     // Create profile
+    console.log('Creating user profile...');
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .insert({
@@ -97,6 +100,7 @@ const createUserAndProfile = async (supabaseAdmin: any, email: string, fullName:
     console.log('Profile created successfully');
 
     // Set user role
+    console.log('Setting user role...');
     const { error: roleError } = await supabaseAdmin
       .from('user_roles')
       .insert({
