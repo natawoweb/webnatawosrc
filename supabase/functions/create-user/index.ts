@@ -60,11 +60,11 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Verify the caller is an admin
+    // Get user from auth token
     const jwt = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: verifyError } = await supabaseAdmin.auth.getUser(jwt)
+    const { data: { user: adminUser }, error: verifyError } = await supabaseAdmin.auth.getUser(jwt)
     
-    if (verifyError || !user) {
+    if (verifyError || !adminUser) {
       console.error('Invalid JWT or user not found:', verifyError)
       return new Response(
         JSON.stringify({ 
@@ -79,13 +79,13 @@ Deno.serve(async (req) => {
     }
 
     // Verify admin role
-    const { data: isAdmin } = await supabaseAdmin.rpc('has_role', {
-      user_id: user.id,
+    const { data: isAdmin, error: roleError } = await supabaseAdmin.rpc('has_role', {
+      user_id: adminUser.id,
       required_role: 'admin'
     })
 
-    if (!isAdmin) {
-      console.error('User is not an admin:', user.id)
+    if (roleError || !isAdmin) {
+      console.error('User is not an admin:', adminUser.id)
       return new Response(
         JSON.stringify({ 
           error: 'Unauthorized',
@@ -124,28 +124,41 @@ Deno.serve(async (req) => {
       )
     }
 
+    if (!userData.user) {
+      console.error('User data is null after creation')
+      return new Response(
+        JSON.stringify({ 
+          error: 'Database error creating new user',
+          message: 'User creation failed'
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
     console.log('User created successfully:', userData.user.id)
 
-    // Wait for the trigger to create the profile
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
     // Set the user's role
-    const { error: roleError } = await supabaseAdmin
+    const { error: roleSetError } = await supabaseAdmin
       .from('user_roles')
       .upsert({
         user_id: userData.user.id,
         role: role
       })
 
-    if (roleError) {
-      console.error('Error setting user role:', roleError)
+    if (roleSetError) {
+      console.error('Error setting user role:', roleSetError)
+      // Even if role setting fails, the user was created successfully
       return new Response(
         JSON.stringify({ 
-          error: 'Database error setting user role',
-          message: roleError.message
+          success: true,
+          user: userData.user,
+          warning: 'User created but role setting failed: ' + roleSetError.message
         }),
         {
-          status: 400,
+          status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       )
