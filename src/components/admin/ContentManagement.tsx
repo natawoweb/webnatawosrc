@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
@@ -12,12 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Loader2, 
-  UserCog, 
-  Trash2, 
-  User,
-  ShieldCheck, // Changed from Shield
-  UserCheck2, // Changed from UserCheck
+  Loader2,
+  BookText,
+  Trash2,
+  Edit,
+  BookPlus,
+  CheckSquare,
+  XSquare,
 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 import {
@@ -28,89 +29,139 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 
-type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
-type AppRole = Database["public"]["Enums"]["app_role"];
-
-type UserWithRole = Profile & {
-  role: AppRole;
-};
+type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
 export function ContentManagement() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const { data: users, isLoading, refetch } = useQuery({
-    queryKey: ["admin-users"],
+  const { data: blogs, isLoading } = useQuery({
+    queryKey: ["admin-blogs"],
     queryFn: async () => {
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
+      const { data, error } = await supabase
+        .from("blogs")
         .select("*")
-        .returns<Profile[]>();
+        .order("created_at", { ascending: false });
 
-      if (profilesError) throw profilesError;
-
-      const { data: userRoles, error: rolesError } = await supabase
-        .from("user_roles")
-        .select("*")
-        .returns<UserRole[]>();
-
-      if (rolesError) throw rolesError;
-
-      const usersWithRoles: UserWithRole[] = profiles.map(profile => ({
-        ...profile,
-        role: userRoles.find(ur => ur.user_id === profile.id)?.role || "reader"
-      }));
-
-      return usersWithRoles;
+      if (error) throw error;
+      return data as Blog[];
     },
   });
 
-  const handleDeleteUser = async (userId: string) => {
-    try {
-      const { error } = await supabase.auth.admin.deleteUser(userId);
-      if (error) throw error;
+  const createBlogMutation = useMutation({
+    mutationFn: async (blogData: { title: string; content: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
 
-      await refetch();
-      
-      toast({
-        title: "User deleted",
-        description: "User has been successfully deleted.",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete user. Only admins can delete users.",
-      });
-    }
-  };
-
-  const handleUpdateRole = async (userId: string, newRole: AppRole) => {
-    try {
       const { error } = await supabase
-        .from("user_roles")
-        .upsert({ 
-          user_id: userId, 
-          role: newRole 
-        });
+        .from("blogs")
+        .insert([
+          {
+            title: blogData.title,
+            content: blogData.content,
+            author_id: user.id,
+            status: "draft"
+          }
+        ]);
 
       if (error) throw error;
-
-      await refetch();
-      
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
       toast({
-        title: "Role updated",
-        description: "User role has been successfully updated.",
+        title: "Success",
+        description: "Blog created successfully",
       });
-    } catch (error) {
+      setIsCreateDialogOpen(false);
+      setTitle("");
+      setContent("");
+    },
+    onError: (error) => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update user role.",
+        description: "Failed to create blog: " + error.message,
       });
+    },
+  });
+
+  const updateBlogStatusMutation = useMutation({
+    mutationFn: async ({ blogId, status }: { blogId: string; status: string }) => {
+      const { error } = await supabase
+        .from("blogs")
+        .update({ status })
+        .eq("id", blogId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
+      toast({
+        title: "Success",
+        description: "Blog status updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update blog status: " + error.message,
+      });
+    },
+  });
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: async (blogId: string) => {
+      const { error } = await supabase
+        .from("blogs")
+        .delete()
+        .eq("id", blogId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
+      toast({
+        title: "Success",
+        description: "Blog deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete blog: " + error.message,
+      });
+    },
+  });
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "approved":
+        return <Badge variant="success" className="bg-green-500"><CheckSquare className="w-4 h-4 mr-1" /> Approved</Badge>;
+      case "rejected":
+        return <Badge variant="destructive"><XSquare className="w-4 h-4 mr-1" /> Rejected</Badge>;
+      case "submitted":
+        return <Badge variant="warning" className="bg-yellow-500"><BookText className="w-4 h-4 mr-1" /> Submitted</Badge>;
+      default:
+        return <Badge variant="secondary"><Edit className="w-4 h-4 mr-1" /> Draft</Badge>;
     }
   };
+
+  const filteredBlogs = blogs?.filter((blog) => {
+    const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || blog.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   if (isLoading) {
     return (
@@ -120,67 +171,71 @@ export function ContentManagement() {
     );
   }
 
-  const getRoleBadge = (role: AppRole) => {
-    const baseClasses = "inline-flex items-center gap-1";
-    switch (role) {
-      case "admin":
-        return (
-          <Badge variant="destructive" className={baseClasses}>
-            <ShieldCheck className="h-3 w-3" />
-            Admin
-          </Badge>
-        );
-      case "manager":
-        return (
-          <Badge variant="default" className={baseClasses}>
-            <UserCog className="h-3 w-3" />
-            Manager
-          </Badge>
-        );
-      case "writer":
-        return (
-          <Badge variant="secondary" className={baseClasses}>
-            <UserCheck2 className="h-3 w-3" />
-            Writer
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="outline" className={baseClasses}>
-            <User className="h-3 w-3" />
-            Reader
-          </Badge>
-        );
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">User Management</h2>
-        <Button>
-          <User className="mr-2 h-4 w-4" />
-          Invite User
-        </Button>
+        <h2 className="text-2xl font-bold">Blog Management</h2>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <BookPlus className="mr-2 h-4 w-4" />
+              Create Blog
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Blog</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="title" className="text-sm font-medium">Title</label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter blog title"
+                />
+              </div>
+              <div>
+                <label htmlFor="content" className="text-sm font-medium">Content</label>
+                <Textarea
+                  id="content"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Enter blog content"
+                  rows={5}
+                />
+              </div>
+              <Button
+                onClick={() => createBlogMutation.mutate({ title, content })}
+                disabled={!title || !content}
+              >
+                Create Blog
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="flex gap-4 items-center">
         <div className="flex-1">
           <Input
-            placeholder="Search users by email..."
+            placeholder="Search blogs by title..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full"
           />
         </div>
-        <Select defaultValue="all">
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="All Roles" />
+            <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="reader">Reader</SelectItem>
-            <SelectItem value="writer">Writer</SelectItem>
-            <SelectItem value="manager">Manager</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="submitted">Submitted</SelectItem>
+            <SelectItem value="approved">Approved</SelectItem>
+            <SelectItem value="rejected">Rejected</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -188,44 +243,43 @@ export function ContentManagement() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Full Name</TableHead>
-            <TableHead>Email</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Created At</TableHead>
-            <TableHead>Role</TableHead>
+            <TableHead>Last Modified</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users?.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.full_name || 'N/A'}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>
-                {new Date(user.created_at || "").toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                {getRoleBadge(user.role)}
-              </TableCell>
+          {filteredBlogs?.map((blog) => (
+            <TableRow key={blog.id}>
+              <TableCell className="font-medium">{blog.title}</TableCell>
+              <TableCell>{getStatusBadge(blog.status)}</TableCell>
+              <TableCell>{new Date(blog.created_at || "").toLocaleDateString()}</TableCell>
+              <TableCell>{new Date(blog.updated_at || "").toLocaleDateString()}</TableCell>
               <TableCell className="space-x-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    const nextRole: Record<AppRole, AppRole> = {
-                      reader: "writer",
-                      writer: "manager",
-                      manager: "admin",
-                      admin: "reader"
-                    };
-                    handleUpdateRole(user.id, nextRole[user.role]);
+                    const nextStatus = {
+                      draft: "submitted",
+                      submitted: "approved",
+                      approved: "rejected",
+                      rejected: "draft"
+                    }[blog.status as string];
+                    updateBlogStatusMutation.mutate({ 
+                      blogId: blog.id, 
+                      status: nextStatus 
+                    });
                   }}
                 >
-                  <UserCog className="h-4 w-4 text-blue-500" />
+                  <Edit className="h-4 w-4 text-blue-500" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleDeleteUser(user.id)}
+                  onClick={() => deleteBlogMutation.mutate(blog.id)}
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
