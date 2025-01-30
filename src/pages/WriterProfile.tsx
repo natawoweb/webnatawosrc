@@ -39,6 +39,10 @@ const WriterProfile = () => {
     );
   }
 
+  // Type guards to check if the fields are arrays
+  const hasAccomplishments = Array.isArray(writer.accomplishments) && writer.accomplishments.length > 0;
+  const hasPublishedWorks = Array.isArray(writer.published_works) && writer.published_works.length > 0;
+
   return (
     <div className="container mx-auto py-8 px-4">
       <Card>
@@ -69,7 +73,7 @@ const WriterProfile = () => {
           <Separator />
 
           {/* Accomplishments */}
-          {writer.accomplishments && writer.accomplishments.length > 0 && (
+          {hasAccomplishments && (
             <div>
               <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
                 <Award className="h-6 w-6" />
@@ -88,7 +92,7 @@ const WriterProfile = () => {
           <Separator />
 
           {/* Published Works */}
-          {writer.published_works && writer.published_works.length > 0 && (
+          {hasPublishedWorks && (
             <div>
               <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
                 <BookOpen className="h-6 w-6" />
