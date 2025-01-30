@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Save, SendHorizontal } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -57,6 +57,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
       title_tamil?: string;
       content_tamil?: string;
       category_id?: string;
+      status: string;
     }) => {
       const { error } = await supabase
         .from("blogs")
@@ -66,6 +67,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
           title_tamil: blogData.title_tamil || null,
           content_tamil: blogData.content_tamil ? JSON.parse(blogData.content_tamil) : {},
           category_id: blogData.category_id || null,
+          status: blogData.status,
           updated_at: new Date().toISOString(),
         })
         .eq("id", blog.id);
@@ -89,7 +91,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
     },
   });
 
-  const handleUpdate = () => {
+  const handleUpdate = (status: "draft" | "pending_approval") => {
     if (!title || !content) {
       toast({
         variant: "destructive",
@@ -105,6 +107,7 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
       title_tamil: titleTamil,
       content_tamil: contentTamil,
       category_id: selectedCategory,
+      status,
     });
   };
 
@@ -136,9 +139,23 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={handleUpdate} disabled={updateBlogMutation.isPending}>
-              Update Blog
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => handleUpdate("draft")}
+                disabled={updateBlogMutation.isPending}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                Save as Draft
+              </Button>
+              <Button
+                onClick={() => handleUpdate("pending_approval")}
+                disabled={updateBlogMutation.isPending}
+              >
+                <SendHorizontal className="mr-2 h-4 w-4" />
+                Submit for Approval
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
