@@ -96,6 +96,7 @@ export function useUserManagement() {
 
       if (!response.ok) {
         const error = await response.json();
+        console.error('Error response:', error);
         throw new Error(error.error || 'Failed to create user');
       }
 
@@ -110,6 +111,7 @@ export function useUserManagement() {
       setAddUserDialogOpen(false);
     },
     onError: (error) => {
+      console.error('Mutation error:', error);
       toast({
         variant: "destructive",
         title: "Error",

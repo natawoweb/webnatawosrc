@@ -17,6 +17,12 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verify authorization header
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      throw new Error('Missing authorization header')
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -40,6 +46,8 @@ Deno.serve(async (req) => {
         }
       )
     }
+
+    console.log('Creating user:', { email, fullName, role })
 
     // Create the user
     const { data: userData, error: createError } = await supabaseClient.auth.admin.createUser({
@@ -82,6 +90,8 @@ Deno.serve(async (req) => {
       )
     }
 
+    console.log('User created successfully:', userData.user.id)
+
     return new Response(
       JSON.stringify({ success: true, user: userData.user }),
       {
@@ -94,7 +104,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ error: error.message }),
       {
-        status: 500,
+        status: error.message === 'Missing authorization header' ? 401 : 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     )
