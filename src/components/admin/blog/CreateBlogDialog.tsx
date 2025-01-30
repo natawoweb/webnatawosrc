@@ -28,16 +28,17 @@ export function CreateBlogDialog() {
 
       const { error } = await supabase
         .from("blogs")
-        .insert([
-          {
-            title: blogData.title,
-            content: JSON.parse(blogData.content),
-            author_id: user.id,
-            status: "draft"
-          }
-        ]);
+        .insert({
+          title: blogData.title,
+          content: blogData.content ? JSON.parse(blogData.content) : {},
+          author_id: user.id,
+          status: "draft"
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error creating blog:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
@@ -50,6 +51,7 @@ export function CreateBlogDialog() {
       setContent("");
     },
     onError: (error) => {
+      console.error("Mutation error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -57,6 +59,19 @@ export function CreateBlogDialog() {
       });
     },
   });
+
+  const handleCreate = () => {
+    if (!title || !content) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Title and content are required",
+      });
+      return;
+    }
+
+    createBlogMutation.mutate({ title, content });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -88,10 +103,10 @@ export function CreateBlogDialog() {
             />
           </div>
           <Button
-            onClick={() => createBlogMutation.mutate({ title, content })}
-            disabled={!title || !content}
+            onClick={handleCreate}
+            disabled={!title || !content || createBlogMutation.isPending}
           >
-            Create Blog
+            {createBlogMutation.isPending ? "Creating..." : "Create Blog"}
           </Button>
         </div>
       </DialogContent>
