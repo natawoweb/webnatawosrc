@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, XCircle, FileText } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
-type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
+type BlogWithProfile = Database["public"]["Tables"]["blogs"]["Row"] & {
   profiles: {
     full_name: string | null;
   } | null;
@@ -23,15 +23,15 @@ type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
 export function ContentManagement() {
   const { toast } = useToast();
 
-  const { data: blogs, isLoading } = useQuery<Blog[]>({
+  const { data: blogs, isLoading } = useQuery({
     queryKey: ["admin-blogs"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("blogs")
-        .select("*, profiles!blogs_author_id_fkey(full_name)");
+        .select("*, profiles(full_name)");
 
       if (error) throw error;
-      return data as Blog[];
+      return data as BlogWithProfile[];
     },
   });
 
