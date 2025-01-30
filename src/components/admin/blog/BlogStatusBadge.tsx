@@ -6,7 +6,9 @@ interface BlogStatusBadgeProps {
 }
 
 export function BlogStatusBadge({ status }: BlogStatusBadgeProps) {
-  switch (status) {
+  console.log("Rendering status badge for:", status); // Debug log
+  
+  switch (status.toLowerCase()) {
     case "approved":
       return (
         <Badge variant="secondary" className="bg-green-500 text-white">

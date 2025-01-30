@@ -72,6 +72,9 @@ export function BlogList({ blogs }: BlogListProps) {
     return profile?.full_name || 'Unknown Author';
   };
 
+  // Add console log to debug status
+  console.log("Blogs with statuses:", blogs.map(blog => ({ id: blog.id, status: blog.status })));
+
   return (
     <>
       <Table>
