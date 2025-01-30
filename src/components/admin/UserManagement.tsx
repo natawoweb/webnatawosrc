@@ -25,62 +25,51 @@ import {
   Search,
   Filter,
   UserCog,
-  User,
   Trash2,
-  ShieldCheck,
-  UserCheck2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Database } from "@/integrations/supabase/types";
 
-interface User {
-  id: string;
-  email: string;
-  full_name: string | null;
-  created_at: string;
-  role: "reader" | "writer" | "manager" | "admin";
-}
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
+type AppRole = Database["public"]["Enums"]["app_role"];
+
+type UserWithRole = Profile & {
+  role: AppRole;
+};
 
 export function UserManagement() {
   const { toast } = useToast();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
-      // First get all profiles with full names
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, email, full_name, created_at");
+        .select("*")
+        .returns<Profile[]>();
       
       if (profilesError) throw profilesError;
 
-      // Then get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
-        .select("user_id, role");
+        .select("*")
+        .returns<UserRole[]>();
       
       if (rolesError) throw rolesError;
 
-      // Combine the data
-      const usersWithRoles = profiles.map((profile) => {
-        const userRole = userRoles?.find((ur) => ur.user_id === profile.id);
-        return {
-          id: profile.id,
-          email: profile.email || "No email",
-          full_name: profile.full_name,
-          created_at: profile.created_at,
-          role: userRole?.role || "reader",
-        };
-      });
+      const usersWithRoles: UserWithRole[] = profiles.map(profile => ({
+        ...profile,
+        role: userRoles?.find(ur => ur.user_id === profile.id)?.role || "reader"
+      }));
 
       return usersWithRoles;
     },
   });
 
-  const updateUserRole = async (userId: string, newRole: "reader" | "writer" | "manager" | "admin") => {
-    setUpdatingUserId(userId);
+  const updateUserRole = async (userId: string, newRole: AppRole) => {
     try {
       const { error } = await supabase
         .from("user_roles")
@@ -92,7 +81,7 @@ export function UserManagement() {
       if (error) throw error;
 
       await refetch();
-
+      
       toast({
         title: "Role updated",
         description: "User role has been successfully updated.",
@@ -104,7 +93,6 @@ export function UserManagement() {
         description: "Failed to update user role.",
       });
     }
-    setUpdatingUserId(null);
   };
 
   const handleDeleteUser = async (userId: string) => {
@@ -127,44 +115,25 @@ export function UserManagement() {
     }
   };
 
-  const getRoleBadge = (role: string) => {
-    const baseClasses = "inline-flex items-center gap-1";
-    switch (role) {
-      case "admin":
-        return (
-          <Badge variant="destructive" className={baseClasses}>
-            <ShieldCheck className="h-3 w-3" />
-            Admin
-          </Badge>
-        );
-      case "manager":
-        return (
-          <Badge variant="default" className={baseClasses}>
-            <UserCog className="h-3 w-3" />
-            Manager
-          </Badge>
-        );
-      case "writer":
-        return (
-          <Badge variant="secondary" className={baseClasses}>
-            <UserCheck2 className="h-3 w-3" />
-            Writer
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="outline" className={baseClasses}>
-            <User className="h-3 w-3" />
-            Reader
-          </Badge>
-        );
-    }
+  const getRoleBadge = (role: AppRole) => {
+    const variants = {
+      admin: "destructive",
+      manager: "default",
+      writer: "secondary",
+      reader: "outline"
+    } as const;
+
+    return (
+      <Badge variant={variants[role]} className="capitalize">
+        {role}
+      </Badge>
+    );
   };
 
   const filteredUsers = users?.filter((user) => {
     const matchesRole = selectedRole === "all" || !selectedRole ? true : user.role === selectedRole;
     const matchesSearch = searchQuery
-      ? user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      ? user.email?.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
     return matchesRole && matchesSearch;
   });
@@ -232,7 +201,7 @@ export function UserManagement() {
               <TableCell>{user.full_name || 'N/A'}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>
-                {new Date(user.created_at).toLocaleDateString()}
+                {new Date(user.created_at || "").toLocaleDateString()}
               </TableCell>
               <TableCell>
                 {getRoleBadge(user.role)}
@@ -243,7 +212,7 @@ export function UserManagement() {
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      const nextRole: Record<typeof user.role, typeof user.role> = {
+                      const nextRole: Record<AppRole, AppRole> = {
                         reader: "writer",
                         writer: "manager",
                         manager: "admin",
