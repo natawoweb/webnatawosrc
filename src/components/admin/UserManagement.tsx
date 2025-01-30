@@ -1,54 +1,16 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { 
-  Loader2, 
-  UserPlus, 
-  Search,
-  Filter,
-  Pencil,
-  Trash2,
-} from "lucide-react";
-import { Database } from "@/integrations/supabase/types";
-
-type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
-type AppRole = Database["public"]["Enums"]["app_role"];
+import { Loader2, UserPlus } from "lucide-react";
+import { type AppRole } from "@/integrations/supabase/types";
+import { UserTable } from "./UserTable";
+import { UserFilters } from "./UserFilters";
+import { AddUserDialog } from "./AddUserDialog";
+import { EditUserDialog } from "./EditUserDialog";
+import { DeleteUserDialog } from "./DeleteUserDialog";
+import { type Profile } from "@/integrations/supabase/types";
 
 type UserWithRole = Profile & {
   role: AppRole;
@@ -63,28 +25,22 @@ export function UserManagement() {
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [editRole, setEditRole] = useState<AppRole>("reader");
-  const [newUserEmail, setNewUserEmail] = useState("");
-  const [newUserFullName, setNewUserFullName] = useState("");
-  const [newUserRole, setNewUserRole] = useState<AppRole>("reader");
 
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
-      // Get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
       
       if (profilesError) throw profilesError;
 
-      // Get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
       
       if (rolesError) throw rolesError;
 
-      // Combine the data
       const usersWithRoles: UserWithRole[] = profiles.map(profile => {
         const userRole = userRoles.find(role => role.user_id === profile.id);
         return {
@@ -147,25 +103,23 @@ export function UserManagement() {
     }
   };
 
-  const handleAddUser = async () => {
+  const handleAddUser = async (email: string, fullName: string, role: AppRole) => {
     try {
-      // Create auth user
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: newUserEmail,
-        password: "tempPassword123", // You might want to generate this randomly
+        email,
+        password: "tempPassword123",
         email_confirm: true,
-        user_metadata: { full_name: newUserFullName }
+        user_metadata: { full_name: fullName }
       });
 
       if (authError) throw authError;
 
-      // Add user role
       if (authData.user) {
         const { error: roleError } = await supabase
           .from("user_roles")
           .insert({ 
             user_id: authData.user.id, 
-            role: newUserRole 
+            role
           });
 
         if (roleError) throw roleError;
@@ -179,9 +133,6 @@ export function UserManagement() {
       });
       
       setAddUserDialogOpen(false);
-      setNewUserEmail("");
-      setNewUserFullName("");
-      setNewUserRole("reader");
     } catch (error) {
       toast({
         variant: "destructive",
@@ -217,196 +168,46 @@ export function UserManagement() {
         </Button>
       </div>
 
-      <div className="flex gap-4 items-center">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search users by email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-        <div className="w-[200px]">
-          <Select value={selectedRole || "all"} onValueChange={setSelectedRole}>
-            <SelectTrigger>
-              <Filter className="mr-2 h-4 w-4" />
-              <SelectValue placeholder="Filter by role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
-              <SelectItem value="reader">Reader</SelectItem>
-              <SelectItem value="writer">Writer</SelectItem>
-              <SelectItem value="manager">Manager</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <UserFilters
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedRole={selectedRole}
+        onRoleChange={setSelectedRole}
+      />
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Full Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredUsers?.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.full_name || 'N/A'}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>
-                {new Date(user.created_at || "").toLocaleDateString()}
-              </TableCell>
-              <TableCell className="capitalize">
-                {user.role}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setEditRole(user.role);
-                      setEditDialogOpen(true);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setDeleteDialogOpen(true);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <UserTable
+        users={filteredUsers || []}
+        onEdit={(user) => {
+          setSelectedUser(user);
+          setEditRole(user.role);
+          setEditDialogOpen(true);
+        }}
+        onDelete={(user) => {
+          setSelectedUser(user);
+          setDeleteDialogOpen(true);
+        }}
+      />
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the user account
-              and remove their data from our servers.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => selectedUser && handleDeleteUser(selectedUser.id)}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteUserDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={() => selectedUser && handleDeleteUser(selectedUser.id)}
+      />
 
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Email</label>
-                <p className="text-sm text-muted-foreground">{selectedUser?.email}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Role</label>
-                <Select value={editRole} onValueChange={(value) => setEditRole(value as AppRole)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="reader">Reader</SelectItem>
-                    <SelectItem value="writer">Writer</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button 
-              onClick={() => selectedUser && updateUserRole(selectedUser.id, editRole)}
-            >
-              Save changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditUserDialog
+        user={selectedUser}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSubmit={updateUserRole}
+        selectedRole={editRole}
+        onRoleChange={setEditRole}
+      />
 
-      <Dialog open={addUserDialogOpen} onOpenChange={setAddUserDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Full Name</label>
-                <Input
-                  value={newUserFullName}
-                  onChange={(e) => setNewUserFullName(e.target.value)}
-                  placeholder="Enter full name"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Email</label>
-                <Input
-                  value={newUserEmail}
-                  onChange={(e) => setNewUserEmail(e.target.value)}
-                  placeholder="Enter email address"
-                  type="email"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Role</label>
-                <Select value={newUserRole} onValueChange={(value) => setNewUserRole(value as AppRole)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="reader">Reader</SelectItem>
-                    <SelectItem value="writer">Writer</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddUserDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddUser}>
-              Add User
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AddUserDialog
+        open={addUserDialogOpen}
+        onOpenChange={setAddUserDialogOpen}
+        onSubmit={handleAddUser}
+      />
     </div>
   );
 }
