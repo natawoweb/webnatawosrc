@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
@@ -23,6 +23,18 @@ interface BlogListProps {
 export function BlogList({ blogs }: BlogListProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Add query to fetch author names
+  const { data: profiles } = useQuery({
+    queryKey: ["profiles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name");
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const updateBlogStatusMutation = useMutation({
     mutationFn: async ({ blogId, status }: { blogId: string; status: string }) => {
@@ -74,13 +86,19 @@ export function BlogList({ blogs }: BlogListProps) {
     },
   });
 
+  // Helper function to get author name
+  const getAuthorName = (authorId: string) => {
+    const profile = profiles?.find(p => p.id === authorId);
+    return profile?.full_name || 'Unknown Author';
+  };
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Title</TableHead>
+          <TableHead>Author</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Created At</TableHead>
           <TableHead>Last Modified</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
@@ -89,10 +107,10 @@ export function BlogList({ blogs }: BlogListProps) {
         {blogs.map((blog) => (
           <TableRow key={blog.id}>
             <TableCell className="font-medium">{blog.title}</TableCell>
+            <TableCell>{getAuthorName(blog.author_id)}</TableCell>
             <TableCell>
               <BlogStatusBadge status={blog.status} />
             </TableCell>
-            <TableCell>{new Date(blog.created_at || "").toLocaleDateString()}</TableCell>
             <TableCell>{new Date(blog.updated_at || "").toLocaleDateString()}</TableCell>
             <TableCell className="space-x-2">
               <Button
@@ -116,7 +134,11 @@ export function BlogList({ blogs }: BlogListProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => deleteBlogMutation.mutate(blog.id)}
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this blog?')) {
+                    deleteBlogMutation.mutate(blog.id);
+                  }
+                }}
               >
                 <Trash2 className="h-4 w-4 text-red-500" />
               </Button>
