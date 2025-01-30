@@ -28,6 +28,7 @@ export function UserManagement() {
     updateUserRole,
     handleDeleteUser,
     handleAddUser,
+    isAddingUser,
   } = useUserManagement();
 
   if (isLoading) {
@@ -87,6 +88,7 @@ export function UserManagement() {
         open={addUserDialogOpen}
         onOpenChange={setAddUserDialogOpen}
         onSubmit={handleAddUser}
+        isLoading={isAddingUser}
       />
     </div>
   );

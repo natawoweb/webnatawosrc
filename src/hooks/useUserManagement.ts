@@ -95,17 +95,21 @@ export function useUserManagement() {
 
       if (authError) throw authError;
 
-      if (authData.user) {
-        // Set user role
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .upsert({ 
-            user_id: authData.user.id, 
-            role 
-          });
-
-        if (roleError) throw roleError;
+      if (!authData.user) {
+        throw new Error("Failed to create user");
       }
+
+      // Set user role
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .upsert({ 
+          user_id: authData.user.id, 
+          role 
+        });
+
+      if (roleError) throw roleError;
+
+      return authData.user;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
@@ -155,8 +159,8 @@ export function useUserManagement() {
     deleteUserMutation.mutate(userId);
   };
 
-  const handleAddUser = (email: string, fullName: string, role: AppRole) => {
-    addUserMutation.mutate({ email, fullName, role });
+  const handleAddUser = async (email: string, fullName: string, role: AppRole) => {
+    await addUserMutation.mutateAsync({ email, fullName, role });
   };
 
   const filteredUsers = users?.filter((user) => {
@@ -187,5 +191,6 @@ export function useUserManagement() {
     updateUserRole,
     handleDeleteUser,
     handleAddUser,
+    isAddingUser: addUserMutation.isPending,
   };
 }

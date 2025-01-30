@@ -22,19 +22,26 @@ type AppRole = Database['public']['Enums']['app_role'];
 interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (email: string, fullName: string, role: AppRole) => void;
+  onSubmit: (email: string, fullName: string, role: AppRole) => Promise<void>;
+  isLoading?: boolean;
 }
 
-export function AddUserDialog({ open, onOpenChange, onSubmit }: AddUserDialogProps) {
+export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUserDialogProps) {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<AppRole>("reader");
 
-  const handleSubmit = () => {
-    onSubmit(email, fullName, role);
-    setEmail("");
-    setFullName("");
-    setRole("reader");
+  const handleSubmit = async () => {
+    try {
+      await onSubmit(email, fullName, role);
+      // Only clear the form if the submission was successful
+      setEmail("");
+      setFullName("");
+      setRole("reader");
+    } catch (error) {
+      // If there's an error, the form won't be cleared
+      console.error("Error adding user:", error);
+    }
   };
 
   return (
@@ -82,8 +89,8 @@ export function AddUserDialog({ open, onOpenChange, onSubmit }: AddUserDialogPro
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>
-            Add User
+          <Button onClick={handleSubmit} disabled={isLoading}>
+            {isLoading ? "Adding..." : "Add User"}
           </Button>
         </DialogFooter>
       </DialogContent>
