@@ -97,7 +97,7 @@ export function useUserManagement() {
       if (!response.ok) {
         const error = await response.json();
         console.error('Error response:', error);
-        throw new Error(error.error || 'Failed to create user');
+        throw new Error(error.message || 'Failed to create user');
       }
 
       return response.json();
