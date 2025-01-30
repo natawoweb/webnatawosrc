@@ -18,27 +18,25 @@ const queryClient = new QueryClient();
 
 const App: React.FC = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Index />} />
-              <Route path="about" element={<About />} />
-              <Route path="contact" element={<Contact />} />
-              <Route path="privacy" element={<Privacy />} />
-              <Route path="terms" element={<Terms />} />
-              <Route path="writer/:id" element={<WriterProfile />} />
-              <Route path="auth" element={<Auth />} />
-              <Route path="search" element={<SearchWriters />} />
-              <Route path="events" element={<Events />} />
-              <Route path="admin" element={<AdminDashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </Router>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Index />} />
+            <Route path="about" element={<About />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="privacy" element={<Privacy />} />
+            <Route path="terms" element={<Terms />} />
+            <Route path="writer/:id" element={<WriterProfile />} />
+            <Route path="auth" element={<Auth />} />
+            <Route path="search" element={<SearchWriters />} />
+            <Route path="events" element={<Events />} />
+            <Route path="admin" element={<AdminDashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </Router>
+    </QueryClientProvider>
   );
 };
 
