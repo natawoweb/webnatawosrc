@@ -22,6 +22,7 @@ const createErrorResponse = (status: number, error: string, message: string, det
 };
 
 const validateFields = (email: string, fullName: string, role: string) => {
+  console.log('Validating fields:', { email, fullName, role });
   const errors = [];
   if (!email) errors.push('Email is required');
   if (!fullName) errors.push('Full name is required');
@@ -57,6 +58,23 @@ const createUserAndProfile = async (supabaseAdmin: any, email: string, fullName:
   console.log('Starting user creation process for:', email);
   
   try {
+    // Check if user already exists
+    const { data: existingUser, error: checkError } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking existing user:', checkError);
+      throw new Error(`User check failed: ${checkError.message}`);
+    }
+
+    if (existingUser) {
+      console.error('User already exists:', email);
+      throw new Error('User with this email already exists');
+    }
+
     // Generate a random password
     const tempPassword = Math.random().toString(36).slice(-8);
 
