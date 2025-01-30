@@ -9,11 +9,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { EditBlogDialog } from "./EditBlogDialog";
+import { DeleteUserDialog } from "../DeleteUserDialog";
 import { Database } from "@/integrations/supabase/types";
+import { useState } from "react";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -24,6 +26,7 @@ interface BlogListProps {
 export function BlogList({ blogs }: BlogListProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
 
   // Add query to fetch author names
   const { data: profiles } = useQuery({
@@ -34,31 +37,6 @@ export function BlogList({ blogs }: BlogListProps) {
         .select("id, full_name");
       if (error) throw error;
       return data;
-    },
-  });
-
-  const updateBlogStatusMutation = useMutation({
-    mutationFn: async ({ blogId, status }: { blogId: string; status: string }) => {
-      const { error } = await supabase
-        .from("blogs")
-        .update({ status })
-        .eq("id", blogId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
-      toast({
-        title: "Success",
-        description: "Blog status updated successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update blog status: " + error.message,
-      });
     },
   });
 
@@ -77,6 +55,7 @@ export function BlogList({ blogs }: BlogListProps) {
         title: "Success",
         description: "Blog deleted successfully",
       });
+      setBlogToDelete(null);
     },
     onError: (error) => {
       toast({
@@ -94,60 +73,50 @@ export function BlogList({ blogs }: BlogListProps) {
   };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Title</TableHead>
-          <TableHead>Author</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Last Modified</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {blogs.map((blog) => (
-          <TableRow key={blog.id}>
-            <TableCell className="font-medium">{blog.title}</TableCell>
-            <TableCell>{getAuthorName(blog.author_id)}</TableCell>
-            <TableCell>
-              <BlogStatusBadge status={blog.status} />
-            </TableCell>
-            <TableCell>{new Date(blog.updated_at || "").toLocaleDateString()}</TableCell>
-            <TableCell className="space-x-2">
-              <EditBlogDialog blog={blog} />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  const nextStatus = {
-                    draft: "submitted",
-                    submitted: "approved",
-                    approved: "rejected",
-                    rejected: "draft"
-                  }[blog.status as string];
-                  updateBlogStatusMutation.mutate({ 
-                    blogId: blog.id, 
-                    status: nextStatus 
-                  });
-                }}
-              >
-                <Edit className="h-4 w-4 text-blue-500" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to delete this blog?')) {
-                    deleteBlogMutation.mutate(blog.id);
-                  }
-                }}
-              >
-                <Trash2 className="h-4 w-4 text-red-500" />
-              </Button>
-            </TableCell>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Title</TableHead>
+            <TableHead>Author</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Last Modified</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {blogs.map((blog) => (
+            <TableRow key={blog.id}>
+              <TableCell className="font-medium">{blog.title}</TableCell>
+              <TableCell>{getAuthorName(blog.author_id)}</TableCell>
+              <TableCell>
+                <BlogStatusBadge status={blog.status} />
+              </TableCell>
+              <TableCell>{new Date(blog.updated_at || "").toLocaleDateString()}</TableCell>
+              <TableCell className="space-x-2">
+                <EditBlogDialog blog={blog} />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setBlogToDelete(blog)}
+                >
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <DeleteUserDialog
+        open={!!blogToDelete}
+        onOpenChange={() => setBlogToDelete(null)}
+        onConfirm={() => {
+          if (blogToDelete) {
+            deleteBlogMutation.mutate(blogToDelete.id);
+          }
+        }}
+      />
+    </>
   );
 }

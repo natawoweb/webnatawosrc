@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Pencil } from "lucide-react";
 import {
   Dialog,
@@ -13,7 +12,15 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
-import { RichTextEditor } from "./RichTextEditor";
+import { BlogContentSection } from "./BlogContentSection";
+import { CategoryManagement } from "./CategoryManagement";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -27,14 +34,38 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState(blog.title);
   const [content, setContent] = useState(JSON.stringify(blog.content));
+  const [titleTamil, setTitleTamil] = useState(blog.title_tamil || "");
+  const [contentTamil, setContentTamil] = useState(JSON.stringify(blog.content_tamil || {}));
+  const [selectedCategory, setSelectedCategory] = useState<string>(blog.category_id || "");
+
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("blog_categories")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const updateBlogMutation = useMutation({
-    mutationFn: async (blogData: { title: string; content: string }) => {
+    mutationFn: async (blogData: {
+      title: string;
+      content: string;
+      title_tamil?: string;
+      content_tamil?: string;
+      category_id?: string;
+    }) => {
       const { error } = await supabase
         .from("blogs")
         .update({
           title: blogData.title,
           content: JSON.parse(blogData.content),
+          title_tamil: blogData.title_tamil || null,
+          content_tamil: blogData.content_tamil ? JSON.parse(blogData.content_tamil) : {},
+          category_id: blogData.category_id || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", blog.id);
@@ -58,6 +89,25 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
     },
   });
 
+  const handleUpdate = () => {
+    if (!title || !content) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Title and content are required",
+      });
+      return;
+    }
+
+    updateBlogMutation.mutate({
+      title,
+      content,
+      title_tamil: titleTamil,
+      content_tamil: contentTamil,
+      category_id: selectedCategory,
+    });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -65,33 +115,48 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
           <Pencil className="h-4 w-4 text-blue-500" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-[1400px] w-[90vw]">
         <DialogHeader>
           <DialogTitle>Edit Blog</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="title" className="text-sm font-medium">Title</label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter blog title"
-            />
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CategoryManagement categories={categories || []} />
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories?.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={handleUpdate} disabled={updateBlogMutation.isPending}>
+              Update Blog
+            </Button>
           </div>
-          <div>
-            <label htmlFor="content" className="text-sm font-medium">Content</label>
-            <RichTextEditor
+
+          <div className="grid grid-cols-2 gap-6">
+            <BlogContentSection
+              language="english"
+              title={title}
               content={content}
-              onChange={setContent}
+              onTitleChange={setTitle}
+              onContentChange={setContent}
+            />
+            <BlogContentSection
+              language="tamil"
+              title={titleTamil}
+              content={contentTamil}
+              onTitleChange={setTitleTamil}
+              onContentChange={setContentTamil}
             />
           </div>
-          <Button
-            onClick={() => updateBlogMutation.mutate({ title, content })}
-            disabled={!title || !content}
-          >
-            Update Blog
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
