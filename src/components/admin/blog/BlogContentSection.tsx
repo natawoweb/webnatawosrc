@@ -1,7 +1,7 @@
-import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "./RichTextEditor";
+import { ContentInput } from "./editor/ContentInput";
 import { Button } from "@/components/ui/button";
-import { Globe, Keyboard } from "lucide-react";
+import { Globe } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useEffect, useRef } from "react";
 
 interface BlogContentSectionProps {
   language: "english" | "tamil";
@@ -19,21 +18,6 @@ interface BlogContentSectionProps {
   onContentChange: (value: string) => void;
   onTranslate?: () => void;
   hasContent?: boolean;
-}
-
-declare global {
-  interface Window {
-    google: {
-      elements: {
-        transliteration: {
-          TransliterationControl: any;
-          LanguageCode: {
-            TAMIL: string;
-          };
-        };
-      };
-    };
-  }
 }
 
 export function BlogContentSection({
@@ -46,48 +30,6 @@ export function BlogContentSection({
   hasContent,
 }: BlogContentSectionProps) {
   const isEnglish = language === "english";
-  const titleInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (!isEnglish && titleInputRef.current) {
-      const script = document.createElement('script');
-      script.src = "https://www.google.com/jsapi";
-      
-      script.onload = () => {
-        // @ts-ignore
-        google.load("elements", "1", {
-          packages: "transliteration",
-          callback: () => {
-            const control = new window.google.elements.transliteration.TransliterationControl({
-              sourceLanguage: 'en',
-              destinationLanguage: ['ta'],
-              shortcutKey: 'ctrl+g',
-              transliterationEnabled: true
-            });
-            
-            if (titleInputRef.current) {
-              control.makeTransliteratable([titleInputRef.current]);
-              // Enable transliteration by default
-              control.toggleTransliteration();
-            }
-          }
-        });
-      };
-
-      // Only add the script if it hasn't been added before
-      if (!document.querySelector('script[src="https://www.google.com/jsapi"]')) {
-        document.head.appendChild(script);
-      }
-
-      return () => {
-        // Cleanup if needed
-        const scriptElement = document.querySelector('script[src="https://www.google.com/jsapi"]');
-        if (scriptElement) {
-          scriptElement.remove();
-        }
-      };
-    }
-  }, [isEnglish]);
 
   return (
     <Card className="h-[600px] flex flex-col">
@@ -111,27 +53,15 @@ export function BlogContentSection({
               Translate
             </Button>
           )}
-          {!isEnglish && (
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Keyboard className="mr-2 h-4 w-4" />
-              Press Ctrl+G to toggle Tamil typing
-            </div>
-          )}
         </div>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden flex flex-col space-y-4">
-        <div>
-          <label htmlFor={`title-${language}`} className="text-sm font-medium">
-            Title
-          </label>
-          <Input
-            id={`title-${language}`}
-            ref={titleInputRef}
-            value={title}
-            onChange={(e) => onTitleChange(e.target.value)}
-            placeholder={isEnglish ? "Enter blog title" : "தலைப்பை உள்ளிடவும்"}
-          />
-        </div>
+        <ContentInput
+          language={language}
+          title={title}
+          onTitleChange={onTitleChange}
+          placeholder={isEnglish ? "Enter blog title" : "தலைப்பை உள்ளிடவும்"}
+        />
         <div className="flex-1 min-h-0">
           <label htmlFor={`content-${language}`} className="text-sm font-medium block mb-2">
             Content
