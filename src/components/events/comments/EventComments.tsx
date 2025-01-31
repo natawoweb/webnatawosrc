@@ -33,7 +33,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
         .from("event_comments")
         .select(`
           *,
-          profiles(
+          profiles (
             full_name,
             avatar_url
           )
