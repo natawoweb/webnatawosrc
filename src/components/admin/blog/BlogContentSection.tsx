@@ -38,8 +38,21 @@ export function BlogContentSection({
           <div>
             {isEnglish ? (
               <>
-                <CardTitle>English Content</CardTitle>
-                <CardDescription>Write your blog post in English</CardDescription>
+                <div className="flex items-center gap-4">
+                  <div>
+                    <CardTitle>English Content</CardTitle>
+                    <CardDescription>Write your blog post in English</CardDescription>
+                  </div>
+                  {onTranslate && (
+                    <Button
+                      onClick={onTranslate}
+                      disabled={!hasContent}
+                      className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white px-8"
+                    >
+                      Translate
+                    </Button>
+                  )}
+                </div>
               </>
             ) : (
               <>
@@ -48,17 +61,6 @@ export function BlogContentSection({
               </>
             )}
           </div>
-          {isEnglish && onTranslate && (
-            <Button
-              variant="secondary"
-              onClick={onTranslate}
-              disabled={!hasContent}
-              className="min-w-[160px]"
-            >
-              <Globe className="mr-2 h-4 w-4" />
-              Translate
-            </Button>
-          )}
         </div>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden flex flex-col space-y-4">
