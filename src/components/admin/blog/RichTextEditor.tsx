@@ -27,7 +27,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
         alignments: ['left', 'center', 'right', 'justify'],
       }),
     ],
-    content: content,
+    content: content ? JSON.parse(content) : '',
     onUpdate: ({ editor }) => {
       onChange(JSON.stringify(editor.getJSON()));
     },
@@ -106,7 +106,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           <AlignJustify className="h-4 w-4" />
         </Button>
       </div>
-      <EditorContent editor={editor} className="prose max-w-none p-4 flex-grow min-h-[600px]" />
+      <EditorContent editor={editor} className="prose max-w-none p-4 flex-grow overflow-y-auto" />
     </div>
   );
 }
