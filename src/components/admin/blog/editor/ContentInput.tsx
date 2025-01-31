@@ -1,6 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { useRef } from "react";
-import { useTamilInputSetup } from "./TamilInputSetup";
 
 interface ContentInputProps {
   language: "english" | "tamil";
@@ -10,13 +8,6 @@ interface ContentInputProps {
 }
 
 export function ContentInput({ language, title, onTitleChange, placeholder }: ContentInputProps) {
-  const titleInputRef = useRef<HTMLInputElement>(null);
-  
-  useTamilInputSetup({
-    elementRef: titleInputRef.current,
-    enabled: language === "tamil"
-  });
-
   return (
     <div>
       <label htmlFor={`title-${language}`} className="text-sm font-medium">
@@ -24,7 +15,6 @@ export function ContentInput({ language, title, onTitleChange, placeholder }: Co
       </label>
       <Input
         id={`title-${language}`}
-        ref={titleInputRef}
         value={title}
         onChange={(e) => onTitleChange(e.target.value)}
         placeholder={placeholder}
