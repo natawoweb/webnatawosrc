@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "./RichTextEditor";
 import { Button } from "@/components/ui/button";
+import { Globe } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -48,6 +49,7 @@ export function BlogContentSection({
                       disabled={!hasContent}
                       className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white px-8"
                     >
+                      <Globe className="mr-2 h-4 w-4" />
                       Translate
                     </Button>
                   )}
