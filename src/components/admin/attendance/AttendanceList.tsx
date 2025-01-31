@@ -36,7 +36,11 @@ type EventRegistration = {
   user_id: string;
   status: string;
   created_at: string;
-  profiles: Profile;
+  profiles: Profile | null;
+};
+
+type EventAttendance = Database["public"]["Tables"]["event_attendance"]["Row"] & {
+  profile: Profile | null;
 };
 
 export function AttendanceList({ events }: AttendanceListProps) {
@@ -56,7 +60,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return data;
+      return data as EventAttendance[];
     },
   });
 
@@ -73,7 +77,12 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return data as EventRegistration[];
+      
+      // Transform the data to match our expected type
+      return (data || []).map(item => ({
+        ...item,
+        profiles: item.profiles as Profile | null
+      })) as EventRegistration[];
     },
   });
 
@@ -144,7 +153,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
 
               return (
                 <TableRow key={registration.id}>
-                  <TableCell>{registration.profiles.full_name}</TableCell>
+                  <TableCell>{registration.profiles?.full_name || "Unknown"}</TableCell>
                   <TableCell>
                     {attendance ? (
                       <Badge className="bg-green-500">
