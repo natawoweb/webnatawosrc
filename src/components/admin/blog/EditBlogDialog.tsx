@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
@@ -10,9 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
-import { BlogContentSection } from "./BlogContentSection";
-import { BlogDialogHeader } from "./BlogDialogHeader";
-import { BlogDialogActions } from "./BlogDialogActions";
+import { BlogDialogContent } from "./BlogDialogContent";
+import { useBlogManagement } from "@/hooks/useBlogManagement";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -21,14 +20,15 @@ interface EditBlogDialogProps {
 }
 
 export function EditBlogDialog({ blog }: EditBlogDialogProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState(blog.title);
   const [content, setContent] = useState(JSON.stringify(blog.content));
   const [titleTamil, setTitleTamil] = useState(blog.title_tamil || "");
   const [contentTamil, setContentTamil] = useState(JSON.stringify(blog.content_tamil || {}));
   const [selectedCategory, setSelectedCategory] = useState<string>(blog.category_id || "");
+
+  const { updateBlog, isUpdating } = useBlogManagement();
+  const { toast } = useToast();
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -39,51 +39,6 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
         .order("name");
       if (error) throw error;
       return data;
-    },
-  });
-
-  const updateBlogMutation = useMutation({
-    mutationFn: async (blogData: {
-      title: string;
-      content: string;
-      title_tamil?: string;
-      content_tamil?: string;
-      category_id?: string;
-      status: string;
-    }) => {
-      console.log("Updating blog with status:", blogData.status);
-      
-      const { data, error } = await supabase
-        .from("blogs")
-        .update({
-          title: blogData.title,
-          content: JSON.parse(blogData.content),
-          title_tamil: blogData.title_tamil || null,
-          content_tamil: blogData.content_tamil ? JSON.parse(blogData.content_tamil) : {},
-          category_id: blogData.category_id || null,
-          status: blogData.status,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", blog.id)
-        .select("*");
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
-      toast({
-        title: "Success",
-        description: "Blog updated successfully",
-      });
-      setIsOpen(false);
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update blog: " + error.message,
-      });
     },
   });
 
@@ -99,13 +54,18 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
 
     console.log("Handling update with status:", status);
 
-    updateBlogMutation.mutate({
-      title,
-      content,
-      title_tamil: titleTamil,
-      content_tamil: contentTamil,
-      category_id: selectedCategory,
-      status,
+    updateBlog({
+      blogId: blog.id,
+      blogData: {
+        title,
+        content,
+        title_tamil: titleTamil,
+        content_tamil: contentTamil,
+        category_id: selectedCategory,
+        status,
+      }
+    }, {
+      onSuccess: () => setIsOpen(false)
     });
   };
 
@@ -116,39 +76,28 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
           <Pencil className="h-4 w-4 text-blue-500" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[1400px] w-[90vw]" aria-describedby="dialog-description">
+      <DialogContent 
+        className="max-w-[1400px] w-[90vw]" 
+        aria-describedby="dialog-description"
+      >
         <div id="dialog-description" className="sr-only">Edit blog post</div>
-        <BlogDialogHeader
-          categories={categories || []}
+        <BlogDialogContent
+          blog={blog}
+          title={title}
+          content={content}
+          titleTamil={titleTamil}
+          contentTamil={contentTamil}
           selectedCategory={selectedCategory}
+          categories={categories || []}
+          onTitleChange={setTitle}
+          onContentChange={setContent}
+          onTitleTamilChange={setTitleTamil}
+          onContentTamilChange={setContentTamil}
           onCategoryChange={setSelectedCategory}
+          onSaveDraft={() => handleUpdate("draft")}
+          onSubmit={() => handleUpdate("submitted")}
+          isLoading={isUpdating}
         />
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <BlogDialogActions
-              onSaveDraft={() => handleUpdate("draft")}
-              onSubmit={() => handleUpdate("submitted")}
-              isLoading={updateBlogMutation.isPending}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-6">
-            <BlogContentSection
-              language="english"
-              title={title}
-              content={content}
-              onTitleChange={setTitle}
-              onContentChange={setContent}
-            />
-            <BlogContentSection
-              language="tamil"
-              title={titleTamil}
-              content={contentTamil}
-              onTitleChange={setTitleTamil}
-              onContentChange={setContentTamil}
-            />
-          </div>
-        </div>
       </DialogContent>
     </Dialog>
   );
