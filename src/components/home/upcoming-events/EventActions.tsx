@@ -48,28 +48,21 @@ export function EventActions({ event }: EventActionsProps) {
     mutationFn: async () => {
       if (!session?.user.id) throw new Error("Must be logged in to register");
       
-      // Insert registration
-      const { error: registrationError } = await supabase
-        .from("event_registrations")
-        .insert({
-          event_id: event.id,
-          user_id: session.user.id,
-        });
+      // Start a transaction using RPC
+      const { data: result, error } = await supabase.rpc('register_for_event', {
+        p_event_id: event.id,
+        p_user_id: session.user.id
+      });
       
-      if (registrationError) throw registrationError;
-
-      // Update participant count
-      const { error: updateError } = await supabase
-        .from("events")
-        .update({ current_participants: (event.current_participants || 0) + 1 })
-        .eq("id", event.id);
-
-      if (updateError) throw updateError;
+      if (error) throw error;
+      return result;
     },
     onSuccess: () => {
+      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
       toast({
         title: "Success",
         description: "You have successfully registered for this event",
@@ -88,27 +81,21 @@ export function EventActions({ event }: EventActionsProps) {
     mutationFn: async () => {
       if (!session?.user.id) throw new Error("Must be logged in to unregister");
       
-      // Delete registration
-      const { error: unregisterError } = await supabase
-        .from("event_registrations")
-        .delete()
-        .eq("event_id", event.id)
-        .eq("user_id", session.user.id);
+      // Start a transaction using RPC
+      const { data: result, error } = await supabase.rpc('unregister_from_event', {
+        p_event_id: event.id,
+        p_user_id: session.user.id
+      });
       
-      if (unregisterError) throw unregisterError;
-
-      // Update participant count
-      const { error: updateError } = await supabase
-        .from("events")
-        .update({ current_participants: (event.current_participants || 1) - 1 })
-        .eq("id", event.id);
-
-      if (updateError) throw updateError;
+      if (error) throw error;
+      return result;
     },
     onSuccess: () => {
+      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
       toast({
         title: "Success",
         description: "You have successfully unregistered from this event",
