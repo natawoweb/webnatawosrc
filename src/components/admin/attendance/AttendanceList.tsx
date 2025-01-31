@@ -35,7 +35,7 @@ type EventRegistration = {
   event_id: string;
   user_id: string;
   status: string;
-  created_at: string | null;
+  created_at: string;
   profiles: Profile;
 };
 
@@ -68,23 +68,12 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .from("event_registrations")
         .select(`
           *,
-          profiles!inner(*)
+          profiles(*)
         `)
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return (data || []).map((registration: EventRegistration) => ({
-        ...registration,
-        profiles: registration.profiles || {
-          full_name: "Unknown",
-          avatar_url: null,
-          bio: "",
-          created_at: "",
-          email: "",
-          id: registration.user_id,
-          updated_at: "",
-        }
-      }));
+      return data as EventRegistration[];
     },
   });
 
