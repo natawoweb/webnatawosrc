@@ -115,6 +115,24 @@ export type Database = {
           },
         ]
       }
+      event_categories: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       event_registrations: {
         Row: {
           created_at: string | null
@@ -149,6 +167,7 @@ export type Database = {
       }
       events: {
         Row: {
+          category_id: string | null
           created_at: string | null
           created_by: string | null
           current_participants: number | null
@@ -159,10 +178,12 @@ export type Database = {
           is_upcoming: boolean | null
           location: string
           max_participants: number | null
+          tags: Json | null
           time: string
           title: string
         }
         Insert: {
+          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           current_participants?: number | null
@@ -173,10 +194,12 @@ export type Database = {
           is_upcoming?: boolean | null
           location: string
           max_participants?: number | null
+          tags?: Json | null
           time: string
           title: string
         }
         Update: {
+          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           current_participants?: number | null
@@ -187,10 +210,19 @@ export type Database = {
           is_upcoming?: boolean | null
           location?: string
           max_participants?: number | null
+          tags?: Json | null
           time?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "event_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

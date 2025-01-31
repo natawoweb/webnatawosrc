@@ -7,6 +7,7 @@ import { EventFormHeader } from "./form/EventFormHeader";
 import { EventDateTime } from "./form/EventDateTime";
 import { EventLocation } from "./form/EventLocation";
 import { EventGallery } from "./form/EventGallery";
+import { EventCategories } from "./form/EventCategories";
 
 interface EventFormData {
   title: string;
@@ -16,6 +17,8 @@ interface EventFormData {
   location: string;
   max_participants: number;
   gallery: string[];
+  category_id: string | null;
+  tags: string[];
 }
 
 interface EventFormProps {
@@ -35,6 +38,8 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
       location: "",
       max_participants: 0,
       gallery: [],
+      category_id: null,
+      tags: [],
     }
   );
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -192,6 +197,13 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
         maxParticipants={formData.max_participants}
         onLocationChange={(value) => setFormData({ ...formData, location: value })}
         onMaxParticipantsChange={(value) => setFormData({ ...formData, max_participants: value })}
+      />
+
+      <EventCategories
+        categoryId={formData.category_id}
+        tags={formData.tags}
+        onCategoryChange={(value) => setFormData({ ...formData, category_id: value })}
+        onTagsChange={(value) => setFormData({ ...formData, tags: value })}
       />
 
       <EventGallery
