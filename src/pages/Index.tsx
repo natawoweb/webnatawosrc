@@ -6,6 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { Database } from "@/integrations/supabase/types";
+
+type Event = Database['public']['Tables']['events']['Row'];
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -37,7 +40,7 @@ const Index = () => {
         .limit(3);
 
       if (error) throw error;
-      return data;
+      return data as Event[];
     },
   });
 
@@ -141,10 +144,10 @@ const Index = () => {
                   key={event.id}
                   className="glass-card p-6 space-y-4 transition-all duration-300 hover:scale-[1.02]"
                 >
-                  {event.gallery && event.gallery.length > 0 && (
+                  {event.gallery && Array.isArray(event.gallery) && event.gallery.length > 0 && (
                     <div className="relative h-48 w-full overflow-hidden rounded-lg">
                       <img
-                        src={event.gallery[0]}
+                        src={event.gallery[0] as string}
                         alt={event.title}
                         className="w-full h-full object-cover"
                       />
