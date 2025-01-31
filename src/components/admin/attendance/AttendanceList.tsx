@@ -30,6 +30,15 @@ interface AttendanceListProps {
   events: Event[];
 }
 
+type EventRegistration = {
+  id: string;
+  event_id: string;
+  user_id: string;
+  status: string;
+  created_at: string | null;
+  profiles: Profile;
+};
+
 export function AttendanceList({ events }: AttendanceListProps) {
   const { toast } = useToast();
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
@@ -64,9 +73,9 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return data?.map(registration => ({
+      return (data || []).map((registration: EventRegistration) => ({
         ...registration,
-        profile: registration.profiles || {
+        profiles: registration.profiles || {
           full_name: "Unknown",
           avatar_url: null,
           bio: "",
@@ -146,7 +155,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
 
               return (
                 <TableRow key={registration.id}>
-                  <TableCell>{registration.profile.full_name}</TableCell>
+                  <TableCell>{registration.profiles.full_name}</TableCell>
                   <TableCell>
                     {attendance ? (
                       <Badge className="bg-green-500">
