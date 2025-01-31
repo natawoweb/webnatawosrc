@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { EventFormHeader } from "./form/EventFormHeader";
 import { EventDateTime } from "./form/EventDateTime";
@@ -22,8 +21,8 @@ interface EventFormData {
 }
 
 interface EventFormProps {
-  initialData?: EventFormData & { id?: string };
-  onSuccess: () => void;
+  initialData?: Partial<EventFormData>;
+  onSuccess?: () => void;
 }
 
 export function EventForm({ initialData, onSuccess }: EventFormProps) {
@@ -46,138 +45,100 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
 
   const createEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
-      const uploadedGallery = [];
-      
-      for (const image of selectedImages) {
-        const fileExt = image.name.split('.').pop();
-        const filePath = `${crypto.randomUUID()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from("blog-images")
-          .upload(filePath, image);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from("blog-images")
-          .getPublicUrl(filePath);
-
-        uploadedGallery.push(publicUrl);
-      }
-
-      const { data: event, error } = await supabase
+      const { error } = await supabase
         .from("events")
-        .insert([
-          {
-            ...data,
-            gallery: uploadedGallery,
-            current_participants: 0,
-          },
-        ])
-        .select()
-        .single();
+        .insert([data]);
 
       if (error) throw error;
-      return event;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-events"] });
-      onSuccess();
       toast({
         title: "Success",
         description: "Event created successfully",
       });
+      onSuccess?.();
     },
     onError: (error) => {
       toast({
+        variant: "destructive",
         title: "Error",
         description: "Failed to create event: " + error.message,
-        variant: "destructive",
       });
     },
   });
 
   const updateEventMutation = useMutation({
     mutationFn: async (data: EventFormData & { id: string }) => {
-      const { id, ...eventData } = data;
-      const uploadedGallery = [...(eventData.gallery || [])];
-      
-      for (const image of selectedImages) {
-        const fileExt = image.name.split('.').pop();
-        const filePath = `${crypto.randomUUID()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from("blog-images")
-          .upload(filePath, image);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from("blog-images")
-          .getPublicUrl(filePath);
-
-        uploadedGallery.push(publicUrl);
-      }
-
-      const { data: event, error } = await supabase
+      const { error } = await supabase
         .from("events")
-        .update({
-          ...eventData,
-          gallery: uploadedGallery,
-        })
-        .eq('id', id)
-        .select()
-        .single();
+        .update(data)
+        .eq("id", data.id);
 
       if (error) throw error;
-      return event;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-events"] });
-      onSuccess();
       toast({
         title: "Success",
         description: "Event updated successfully",
       });
+      onSuccess?.();
     },
     onError: (error) => {
       toast({
+        variant: "destructive",
         title: "Error",
         description: "Failed to update event: " + error.message,
-        variant: "destructive",
       });
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (initialData?.id) {
-      updateEventMutation.mutate({ ...formData, id: initialData.id });
-    } else {
-      createEventMutation.mutate(formData);
-    }
-  };
 
-  const handleImageSelect = (files: FileList | null) => {
-    if (files) {
-      const newFiles = Array.from(files);
-      setSelectedImages((prev) => [...prev, ...newFiles]);
-    }
-  };
+    const uploadPromises = selectedImages.map(async (file) => {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
 
-  const handleImageRemove = (index: number) => {
-    if (initialData?.id) {
-      setFormData(prev => ({
-        ...prev,
-        gallery: prev.gallery.filter((_, i) => i !== index)
-      }));
-    } else {
-      setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+      const { error: uploadError } = await supabase.storage
+        .from("event-images")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from("event-images")
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    });
+
+    try {
+      const uploadedUrls = await Promise.all(uploadPromises);
+      const galleryUrls = [...formData.gallery, ...uploadedUrls];
+
+      const eventData = {
+        ...formData,
+        gallery: galleryUrls,
+      };
+
+      if (initialData?.id) {
+        await updateEventMutation.mutateAsync({
+          ...eventData,
+          id: initialData.id,
+        });
+      } else {
+        await createEventMutation.mutateAsync(eventData);
+      }
+    } catch (error) {
+      console.error("Error handling form submission:", error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-8">
       <EventFormHeader
         title={formData.title}
         description={formData.description}
@@ -209,13 +170,19 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
       <EventGallery
         initialGallery={formData.gallery}
         selectedImages={selectedImages}
-        onImageSelect={handleImageSelect}
-        onImageRemove={handleImageRemove}
+        onImagesSelected={setSelectedImages}
+        onGalleryChange={(urls) => setFormData({ ...formData, gallery: urls })}
       />
 
-      <Button type="submit" className="w-full">
-        {initialData?.id ? 'Update Event' : 'Create Event'}
-      </Button>
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          disabled={createEventMutation.isPending || updateEventMutation.isPending}
+        >
+          {initialData ? "Update Event" : "Create Event"}
+        </button>
+      </div>
     </form>
   );
 }
