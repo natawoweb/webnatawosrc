@@ -16,10 +16,12 @@ interface Comment {
   content: string;
   created_at: string;
   user_id: string;
+  event_id: string;
+  updated_at: string | null;
   profiles: {
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 export function EventComments({ eventId }: EventCommentsProps) {
@@ -36,7 +38,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
         .from("event_comments")
         .select(`
           *,
-          profiles:user_id (
+          profiles (
             full_name,
             avatar_url
           )
@@ -61,7 +63,11 @@ export function EventComments({ eventId }: EventCommentsProps) {
     mutationFn: async (content: string) => {
       const { error } = await supabase
         .from("event_comments")
-        .insert([{ event_id: eventId, content }]);
+        .insert([{ 
+          event_id: eventId, 
+          content,
+          user_id: currentUser?.id 
+        }]);
 
       if (error) throw error;
     },
@@ -159,7 +165,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-2">
                   <div className="font-semibold">
-                    {comment.profiles.full_name || "Anonymous"}
+                    {comment.profiles?.full_name || "Anonymous"}
                   </div>
                   <span className="text-sm text-muted-foreground">
                     {format(new Date(comment.created_at), "MMM d, yyyy 'at' h:mm a")}
