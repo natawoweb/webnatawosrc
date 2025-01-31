@@ -14,12 +14,12 @@ const Blogs = () => {
       const { data: session } = await supabase.auth.getSession();
       console.log("Current session:", session);
 
+      // First fetch blogs with their categories
       const { data, error } = await supabase
         .from("blogs")
         .select(`
           *,
-          blog_categories(name),
-          profiles(full_name)
+          blog_categories(name)
         `)
         .eq("status", "approved");
 
@@ -27,9 +27,25 @@ const Blogs = () => {
         console.error("Error fetching blogs:", error);
         throw error;
       }
+
+      // Then fetch author profiles for the blogs
+      const blogsWithAuthors = await Promise.all(
+        data.map(async (blog) => {
+          const { data: authorData } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", blog.author_id)
+            .single();
+          
+          return {
+            ...blog,
+            author_name: authorData?.full_name || "Anonymous"
+          };
+        })
+      );
       
-      console.log("Fetched blogs:", data);
-      return data;
+      console.log("Fetched blogs:", blogsWithAuthors);
+      return blogsWithAuthors;
     },
   });
 
@@ -95,7 +111,7 @@ const Blogs = () => {
                 Category: {blog.blog_categories?.name || "Uncategorized"}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
-                Author: {blog.profiles?.full_name || "Anonymous"}
+                Author: {blog.author_name}
               </p>
             </CardContent>
           </Card>
