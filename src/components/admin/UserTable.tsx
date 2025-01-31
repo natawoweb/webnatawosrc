@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -32,6 +33,7 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
           <TableHead>Email</TableHead>
           <TableHead>Created At</TableHead>
           <TableHead>Role</TableHead>
+          <TableHead>Level</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -44,6 +46,13 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
               {new Date(user.created_at || "").toLocaleDateString()}
             </TableCell>
             <TableCell className="capitalize">{user.role}</TableCell>
+            <TableCell>
+              {user.level ? (
+                <Badge variant="secondary">{user.level}</Badge>
+              ) : (
+                <span className="text-muted-foreground text-sm">Not set</span>
+              )}
+            </TableCell>
             <TableCell>
               <div className="flex gap-2">
                 <Button

@@ -14,9 +14,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { type Database } from "@/integrations/supabase/types";
+import { Badge } from "@/components/ui/badge";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
+type UserLevel = Database['public']['Enums']['user_level'];
 
 type UserWithRole = Profile & {
   role: AppRole;
@@ -26,9 +28,11 @@ interface EditUserDialogProps {
   user: UserWithRole | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (userId: string, role: AppRole) => void;
+  onSubmit: (userId: string, role: AppRole, level?: UserLevel) => void;
   selectedRole: AppRole;
+  selectedLevel?: UserLevel;
   onRoleChange: (role: AppRole) => void;
+  onLevelChange: (level: UserLevel) => void;
 }
 
 export function EditUserDialog({
@@ -37,7 +41,9 @@ export function EditUserDialog({
   onOpenChange,
   onSubmit,
   selectedRole,
+  selectedLevel,
   onRoleChange,
+  onLevelChange,
 }: EditUserDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -65,13 +71,30 @@ export function EditUserDialog({
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <label className="text-sm font-medium">Level</label>
+              <Select 
+                value={selectedLevel} 
+                onValueChange={(value) => onLevelChange(value as UserLevel)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select user level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Literary Tamil Writers">Literary Tamil Writers</SelectItem>
+                  <SelectItem value="Talented Experts">Talented Experts</SelectItem>
+                  <SelectItem value="NATAWO Volunteers">NATAWO Volunteers</SelectItem>
+                  <SelectItem value="NATAWO Students Writers">NATAWO Students Writers</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => user && onSubmit(user.id, selectedRole)}>
+          <Button onClick={() => user && onSubmit(user.id, selectedRole, selectedLevel)}>
             Save changes
           </Button>
         </DialogFooter>

@@ -25,6 +25,8 @@ export function UserManagement() {
     setSelectedUser,
     editRole,
     setEditRole,
+    editLevel,
+    setEditLevel,
     updateUserRole,
     handleDeleteUser,
     handleAddUser,
@@ -61,6 +63,7 @@ export function UserManagement() {
         onEdit={(user) => {
           setSelectedUser(user);
           setEditRole(user.role);
+          setEditLevel(user.level);
           setEditDialogOpen(true);
         }}
         onDelete={(user) => {
@@ -81,7 +84,9 @@ export function UserManagement() {
         onOpenChange={setEditDialogOpen}
         onSubmit={updateUserRole}
         selectedRole={editRole}
+        selectedLevel={editLevel}
         onRoleChange={setEditRole}
+        onLevelChange={setEditLevel}
       />
 
       <AddUserDialog

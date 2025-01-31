@@ -340,6 +340,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          level: Database["public"]["Enums"]["user_level"] | null
           updated_at: string | null
         }
         Insert: {
@@ -349,6 +350,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          level?: Database["public"]["Enums"]["user_level"] | null
           updated_at?: string | null
         }
         Update: {
@@ -358,6 +360,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          level?: Database["public"]["Enums"]["user_level"] | null
           updated_at?: string | null
         }
         Relationships: []
@@ -486,6 +489,11 @@ export type Database = {
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
+      user_level:
+        | "Literary Tamil Writers"
+        | "Talented Experts"
+        | "NATAWO Volunteers"
+        | "NATAWO Students Writers"
     }
     CompositeTypes: {
       [_ in never]: never

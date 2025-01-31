@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { type Database } from "@/integrations/supabase/types";
+import type { UserLevel } from "@/integrations/supabase/types/models";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
@@ -22,6 +23,7 @@ export function useUserManagement() {
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [editRole, setEditRole] = useState<AppRole>("reader");
+  const [editLevel, setEditLevel] = useState<UserLevel | undefined>(undefined);
 
   // Fetch users with their roles
   const { data: users, isLoading } = useQuery({
@@ -49,6 +51,58 @@ export function useUserManagement() {
       });
     },
   });
+
+  // Update user role and level mutation
+  const updateUserMutation = useMutation({
+    mutationFn: async ({ 
+      userId, 
+      role, 
+      level 
+    }: { 
+      userId: string; 
+      role: AppRole; 
+      level?: UserLevel 
+    }) => {
+      // Update role
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .upsert({ 
+          user_id: userId, 
+          role 
+        });
+
+      if (roleError) throw roleError;
+
+      // Update level in profile
+      if (level) {
+        const { error: levelError } = await supabase
+          .from('profiles')
+          .update({ level })
+          .eq('id', userId);
+
+        if (levelError) throw levelError;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+      toast({
+        title: "Success",
+        description: "User updated successfully",
+      });
+      setEditDialogOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update user: " + error.message,
+      });
+    },
+  });
+
+  const updateUserRole = (userId: string, role: AppRole, level?: UserLevel) => {
+    updateUserMutation.mutate({ userId, role, level });
+  };
 
   // Add new user mutation using the Edge Function
   const addUserMutation = useMutation({
@@ -97,35 +151,6 @@ export function useUserManagement() {
     },
   });
 
-  // Update user role mutation
-  const updateRoleMutation = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .upsert({ 
-          user_id: userId, 
-          role 
-        });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
-      toast({
-        title: "Success",
-        description: "User role updated successfully",
-      });
-      setEditDialogOpen(false);
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update user role: " + error.message,
-      });
-    },
-  });
-
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -148,10 +173,6 @@ export function useUserManagement() {
       });
     },
   });
-
-  const updateUserRole = (userId: string, role: AppRole) => {
-    updateRoleMutation.mutate({ userId, role });
-  };
 
   const handleDeleteUser = (userId: string) => {
     deleteUserMutation.mutate(userId);
@@ -186,6 +207,8 @@ export function useUserManagement() {
     setSelectedUser,
     editRole,
     setEditRole,
+    editLevel,
+    setEditLevel,
     updateUserRole,
     handleDeleteUser,
     handleAddUser,
