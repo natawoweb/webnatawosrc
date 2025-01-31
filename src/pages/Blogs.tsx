@@ -11,11 +11,15 @@ const Blogs = () => {
     queryKey: ["blogs"],
     queryFn: async () => {
       console.log("Fetching blogs...");
+      const { data: session } = await supabase.auth.getSession();
+      console.log("Current session:", session);
+
       const { data, error } = await supabase
         .from("blogs")
         .select(`
           *,
-          blog_categories(name)
+          blog_categories(name),
+          profiles(full_name)
         `)
         .eq("status", "approved");
 
@@ -89,6 +93,9 @@ const Blogs = () => {
             <CardContent>
               <p className="text-sm text-muted-foreground">
                 Category: {blog.blog_categories?.name || "Uncategorized"}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Author: {blog.profiles?.full_name || "Anonymous"}
               </p>
             </CardContent>
           </Card>
