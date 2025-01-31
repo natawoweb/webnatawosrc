@@ -30,7 +30,7 @@ export function BlogSearch() {
         .select(`
           *,
           blog_categories(*),
-          author:author_id(*)
+          author:profiles!blogs_author_id_fkey(*)
         `)
         .eq('status', 'approved');
 
@@ -38,7 +38,7 @@ export function BlogSearch() {
         query = query.ilike("title", `%${searchQuery}%`);
       }
 
-      if (categoryFilter) {
+      if (categoryFilter && categoryFilter !== "all") {
         query = query.eq("category_id", categoryFilter);
       }
 

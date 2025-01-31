@@ -40,7 +40,7 @@ export function AttendanceManagement() {
         </TabsContent>
 
         <TabsContent value="stats">
-          <AttendanceStats />
+          <AttendanceStats events={events || []} />
         </TabsContent>
       </Tabs>
     </div>
