@@ -117,7 +117,7 @@ export function BlogDialogContent({
         onCategoryChange={onCategoryChange}
       />
       
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <BlogDialogActions
           onSaveDraft={onSaveDraft}
           onSubmit={onSubmit}
