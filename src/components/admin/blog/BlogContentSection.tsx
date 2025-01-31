@@ -1,5 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "./RichTextEditor";
+import { Button } from "@/components/ui/button";
+import { Globe } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -14,6 +16,8 @@ interface BlogContentSectionProps {
   content: string;
   onTitleChange: (value: string) => void;
   onContentChange: (value: string) => void;
+  onTranslate?: () => void;
+  hasContent?: boolean;
 }
 
 export function BlogContentSection({
@@ -22,23 +26,40 @@ export function BlogContentSection({
   content,
   onTitleChange,
   onContentChange,
+  onTranslate,
+  hasContent,
 }: BlogContentSectionProps) {
   const isEnglish = language === "english";
 
   return (
     <Card className="h-[800px] flex flex-col">
       <CardHeader>
-        {isEnglish ? (
-          <>
-            <CardTitle>English Content</CardTitle>
-            <CardDescription>Write your blog post in English</CardDescription>
-          </>
-        ) : (
+        <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Tamil Content</CardTitle>
-            <CardDescription>தமிழில் உங்கள் வலைப்பதிவை எழுதுங்கள்</CardDescription>
+            {isEnglish ? (
+              <>
+                <CardTitle>English Content</CardTitle>
+                <CardDescription>Write your blog post in English</CardDescription>
+              </>
+            ) : (
+              <>
+                <CardTitle>Tamil Content</CardTitle>
+                <CardDescription>தமிழில் உங்கள் வலைப்பதிவை எழுதுங்கள்</CardDescription>
+              </>
+            )}
           </div>
-        )}
+          {isEnglish && onTranslate && (
+            <Button
+              variant="secondary"
+              onClick={onTranslate}
+              disabled={!hasContent}
+              className="min-w-[160px]"
+            >
+              <Globe className="mr-2 h-4 w-4" />
+              Translate
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden flex flex-col space-y-4">
         <div>

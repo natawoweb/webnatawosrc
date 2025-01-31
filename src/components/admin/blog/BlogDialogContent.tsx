@@ -112,9 +112,7 @@ export function BlogDialogContent({
       <BlogActions
         onSaveDraft={onSaveDraft}
         onSubmit={onSubmit}
-        onTranslate={handleTranslate}
         isLoading={isLoading}
-        hasContent={hasContent()}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -124,6 +122,8 @@ export function BlogDialogContent({
           content={content}
           onTitleChange={onTitleChange}
           onContentChange={onContentChange}
+          onTranslate={handleTranslate}
+          hasContent={hasContent()}
         />
         <BlogContentSection
           language="tamil"
