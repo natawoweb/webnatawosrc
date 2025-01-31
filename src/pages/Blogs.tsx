@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Blogs = () => {
   const { data: blogs, isLoading } = useQuery({
@@ -34,17 +36,31 @@ const Blogs = () => {
     );
   }
 
+  if (!blogs?.length) {
+    return (
+      <div className="container mx-auto py-8">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>No Blogs Found</AlertTitle>
+          <AlertDescription>
+            There are currently no approved blogs to display. Please check back later!
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-8">Latest Blogs</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {blogs?.map((blog) => (
+        {blogs.map((blog) => (
           <Card key={blog.id}>
             {blog.cover_image && (
               <img
                 src={blog.cover_image}
                 alt={blog.title}
-                className="w-full h-48 object-cover"
+                className="w-full h-48 object-cover rounded-t-lg"
               />
             )}
             <CardHeader>
