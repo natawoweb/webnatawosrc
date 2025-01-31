@@ -42,21 +42,36 @@ export function EventActions({ event }: EventActionsProps) {
     enabled: !!session?.user.id,
   });
 
+  const updateParticipantCount = async (increment: boolean) => {
+    const { error } = await supabase
+      .from("events")
+      .update({
+        current_participants: event.current_participants + (increment ? 1 : -1),
+      })
+      .eq("id", event.id);
+
+    if (error) throw error;
+  };
+
   const registerMutation = useMutation({
     mutationFn: async () => {
       if (!session?.user.id) throw new Error("Must be logged in to register");
       
-      const { error } = await supabase
+      // Start a transaction by using multiple operations
+      const { error: registrationError } = await supabase
         .from("event_registrations")
         .insert({
           event_id: event.id,
           user_id: session.user.id,
         });
       
-      if (error) throw error;
+      if (registrationError) throw registrationError;
+
+      await updateParticipantCount(true);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
+      queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       toast({
         title: "Success",
         description: "You have successfully registered for this event",
@@ -75,16 +90,19 @@ export function EventActions({ event }: EventActionsProps) {
     mutationFn: async () => {
       if (!session?.user.id) throw new Error("Must be logged in to unregister");
       
-      const { error } = await supabase
+      const { error: unregisterError } = await supabase
         .from("event_registrations")
         .delete()
         .eq("event_id", event.id)
         .eq("user_id", session.user.id);
       
-      if (error) throw error;
+      if (unregisterError) throw unregisterError;
+
+      await updateParticipantCount(false);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
+      queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       toast({
         title: "Success",
         description: "You have successfully unregistered from this event",
