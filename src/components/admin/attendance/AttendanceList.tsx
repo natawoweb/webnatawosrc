@@ -59,14 +59,14 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .from("event_registrations")
         .select(`
           *,
-          profile:profiles(*)
+          profiles!inner(*)
         `)
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
       return data?.map(registration => ({
         ...registration,
-        profile: registration.profile || {
+        profile: registration.profiles || {
           full_name: "Unknown",
           avatar_url: null,
           bio: "",
