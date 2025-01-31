@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface AttendanceListProps {
   events: Event[];
@@ -41,7 +42,8 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .from("event_attendance")
         .select(`
           *,
-          profiles (
+          profiles:user_id (
+            id,
             full_name,
             avatar_url
           )
@@ -62,6 +64,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .select(`
           *,
           profiles:user_id (
+            id,
             full_name,
             avatar_url
           )
@@ -137,7 +140,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
               const attendance = attendanceData?.find(
                 (a) => a.user_id === registration.user_id
               );
-              const profile = registration.profiles as { full_name: string };
+              const profile = registration.profiles as Profile | null;
 
               return (
                 <TableRow key={registration.id}>

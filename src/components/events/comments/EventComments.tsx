@@ -4,10 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CommentForm } from "./CommentForm";
 import { CommentItem } from "./CommentItem";
+import type { Database } from "@/integrations/supabase/types";
 
 interface EventCommentsProps {
   eventId: string;
 }
+
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface Comment {
   id: string;
@@ -16,10 +19,7 @@ interface Comment {
   user_id: string;
   event_id: string;
   updated_at: string | null;
-  profiles: {
-    full_name: string | null;
-    avatar_url: string | null;
-  } | null;
+  profiles: Profile | null;
 }
 
 export function EventComments({ eventId }: EventCommentsProps) {
@@ -34,6 +34,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
         .select(`
           *,
           profiles:user_id (
+            id,
             full_name,
             avatar_url
           )
