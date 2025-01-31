@@ -1,7 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "./RichTextEditor";
 import { Button } from "@/components/ui/button";
-import { Globe } from "lucide-react";
 import {
   Card,
   CardContent,
