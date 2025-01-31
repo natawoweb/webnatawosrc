@@ -30,7 +30,9 @@ const USER_LEVELS: UserLevel[] = [
   'Literary Tamil Writers',
   'Talented Experts',
   'NATAWO Volunteers',
-  'NATAWO Students Writers'
+  'NATAWO Students Writers',
+  'Subscriber',
+  'Technical'
 ];
 
 export function ProfileDialog({

@@ -85,6 +85,8 @@ export function EditUserDialog({
                   <SelectItem value="Talented Experts">Talented Experts</SelectItem>
                   <SelectItem value="NATAWO Volunteers">NATAWO Volunteers</SelectItem>
                   <SelectItem value="NATAWO Students Writers">NATAWO Students Writers</SelectItem>
+                  <SelectItem value="Subscriber">Subscriber</SelectItem>
+                  <SelectItem value="Technical">Technical</SelectItem>
                 </SelectContent>
               </Select>
             </div>

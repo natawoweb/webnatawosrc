@@ -494,6 +494,8 @@ export type Database = {
         | "Talented Experts"
         | "NATAWO Volunteers"
         | "NATAWO Students Writers"
+        | "Subscriber"
+        | "Technical"
     }
     CompositeTypes: {
       [_ in never]: never
