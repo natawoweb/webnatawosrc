@@ -14,7 +14,7 @@ type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
   blog_categories: BlogCategory | null;
-  profiles: Profile | null;
+  author: Profile | null;
 };
 
 export function BlogSearch() {
@@ -30,7 +30,7 @@ export function BlogSearch() {
         .select(`
           *,
           blog_categories(*),
-          profiles(*)
+          author:author_id(*)
         `)
         .eq('status', 'approved');
 
@@ -79,7 +79,7 @@ export function BlogSearch() {
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories?.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
@@ -103,7 +103,7 @@ export function BlogSearch() {
                 )}
                 <h3 className="font-semibold text-lg mb-2">{blog.title}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  By {blog.profiles?.full_name} in {blog.blog_categories?.name}
+                  By {blog.author?.full_name} in {blog.blog_categories?.name}
                 </p>
                 <Button
                   variant="outline"

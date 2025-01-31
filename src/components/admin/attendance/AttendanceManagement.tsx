@@ -12,13 +12,12 @@ export function AttendanceManagement() {
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 
   const { data: events } = useQuery({
-    queryKey: ["admin-events"],
+    queryKey: ["events"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
         .select("*")
         .order("date", { ascending: false });
-
       if (error) throw error;
       return data;
     },
@@ -26,11 +25,9 @@ export function AttendanceManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Attendance Management</h2>
-      </div>
+      <h2 className="text-2xl font-bold">Attendance Management</h2>
 
-      <Tabs defaultValue="list" className="space-y-4">
+      <Tabs defaultValue="list">
         <TabsList>
           <TabsTrigger value="list">Attendance List</TabsTrigger>
           <TabsTrigger value="stats">Statistics</TabsTrigger>
@@ -43,7 +40,7 @@ export function AttendanceManagement() {
         </TabsContent>
 
         <TabsContent value="stats">
-          <AttendanceStats events={events || []} />
+          <AttendanceStats />
         </TabsContent>
       </Tabs>
     </div>

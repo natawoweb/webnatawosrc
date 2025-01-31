@@ -55,6 +55,10 @@ export function UserManagement() {
     );
   }
 
+  const handleLevelChange = (level: UserLevel) => {
+    setEditLevel(level);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -104,7 +108,7 @@ export function UserManagement() {
         selectedRole={editRole}
         selectedLevel={editLevel}
         onRoleChange={setEditRole}
-        onLevelChange={setEditLevel}
+        onLevelChange={handleLevelChange}
       />
 
       <AddUserDialog
