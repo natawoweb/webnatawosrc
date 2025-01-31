@@ -12,6 +12,11 @@ import { type Database } from "@/integrations/supabase/types";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type UserLevel = Database['public']['Enums']['user_level'];
+type AppRole = Database['public']['Enums']['app_role'];
+
+type UserWithRole = Profile & {
+  role: AppRole;
+};
 
 export function UserManagement() {
   const {
@@ -99,7 +104,7 @@ export function UserManagement() {
         selectedRole={editRole}
         selectedLevel={editLevel}
         onRoleChange={setEditRole}
-        onLevelChange={setEditLevel}
+        onLevelChange={(level) => setEditLevel(level as UserLevel)}
       />
 
       <AddUserDialog

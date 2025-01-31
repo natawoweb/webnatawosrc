@@ -55,7 +55,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return data as EventAttendance[];
+      return data as unknown as EventAttendance[];
     },
   });
 
@@ -72,7 +72,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return data as EventRegistration[];
+      return data as unknown as EventRegistration[];
     },
   });
 

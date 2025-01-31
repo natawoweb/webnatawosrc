@@ -9,9 +9,12 @@ import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
+type BlogCategory = Database["public"]["Tables"]["blog_categories"]["Row"];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+
 type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
-  blog_categories: Database["public"]["Tables"]["blog_categories"]["Row"] | null;
-  profiles: Database["public"]["Tables"]["profiles"]["Row"] | null;
+  blog_categories: BlogCategory | null;
+  profiles: Profile | null;
 };
 
 export function BlogSearch() {
@@ -26,8 +29,8 @@ export function BlogSearch() {
         .from("blogs")
         .select(`
           *,
-          blog_categories(name),
-          profiles(full_name)
+          blog_categories(*),
+          profiles(*)
         `)
         .eq('status', 'approved');
 
@@ -41,18 +44,7 @@ export function BlogSearch() {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Blog[];
-    },
-  });
-
-  const { data: categories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("blog_categories")
-        .select("*");
-      if (error) throw error;
-      return data;
+      return data as unknown as Blog[];
     },
   });
 
