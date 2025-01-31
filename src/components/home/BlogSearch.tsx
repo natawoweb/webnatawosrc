@@ -48,6 +48,17 @@ export function BlogSearch() {
     },
   });
 
+  const { data: categories } = useQuery({
+    queryKey: ["blog_categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("blog_categories")
+        .select("*");
+      if (error) throw error;
+      return data as BlogCategory[];
+    },
+  });
+
   return (
     <section className="py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
