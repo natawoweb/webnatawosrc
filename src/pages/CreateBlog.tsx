@@ -1,24 +1,18 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Save, SendHorizontal, ArrowLeft } from "lucide-react";
 import { BlogContentSection } from "@/components/admin/blog/BlogContentSection";
-import { CategoryManagement } from "@/components/admin/blog/CategoryManagement";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CreateBlogHeader } from "@/components/admin/blog/CreateBlogHeader";
+import { CreateBlogActions } from "@/components/admin/blog/CreateBlogActions";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CreateBlog() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { translateContent } = useTranslation();
+  
   const [title, setTitle] = useState("");
   const [content, setContent] = useState(JSON.stringify({
     type: 'doc',
@@ -76,7 +70,6 @@ export default function CreateBlog() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
       toast({
         title: "Success",
         description: "Blog created successfully",
@@ -114,52 +107,12 @@ export default function CreateBlog() {
 
   const handleTranslate = async () => {
     try {
-      const contentObj = JSON.parse(content || '{}');
-      const textContent = contentObj.content?.[0]?.content?.[0]?.text || '';
-
-      // First translate the title
-      const titleResponse = await supabase.functions.invoke('translate', {
-        body: { text: title }
-      });
-
-      if (titleResponse.error) throw new Error(titleResponse.error.message);
-      
-      // Then translate the content
-      const contentResponse = await supabase.functions.invoke('translate', {
-        body: { text: textContent }
-      });
-
-      if (contentResponse.error) throw new Error(contentResponse.error.message);
-
-      // Immediately update the Tamil title
-      const translatedTitle = titleResponse.data.data.translations[0].translatedText;
+      const { translatedTitle, translatedContent } = await translateContent(title, content);
       setTitleTamil(translatedTitle);
-
-      // Immediately update the Tamil content
-      const translatedText = contentResponse.data.data.translations[0].translatedText;
-      const newContent = {
-        type: 'doc',
-        content: [{
-          type: 'paragraph',
-          content: [{
-            type: 'text',
-            text: translatedText
-          }]
-        }]
-      };
-      setContentTamil(JSON.stringify(newContent));
-
-      toast({
-        title: "Translation Complete",
-        description: "Content has been translated to Tamil",
-      });
+      setContentTamil(translatedContent);
     } catch (error) {
-      console.error('Translation error:', error);
-      toast({
-        variant: "destructive",
-        title: "Translation Failed",
-        description: error.message,
-      });
+      // Error is already handled in the hook
+      console.error('Translation failed:', error);
     }
   };
 
@@ -177,44 +130,18 @@ export default function CreateBlog() {
   return (
     <div className="container max-w-[1400px] py-8">
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h2 className="text-2xl font-bold">Create New Blog</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <CategoryManagement categories={categories || []} />
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories?.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              onClick={() => handleCreate("draft")}
-              disabled={createBlogMutation.isPending}
-            >
-              <Save className="mr-2 h-4 w-4" />
-              Save as Draft
-            </Button>
-            <Button
-              onClick={() => handleCreate("pending_approval")}
-              disabled={createBlogMutation.isPending}
-            >
-              <SendHorizontal className="mr-2 h-4 w-4" />
-              Submit for Approval
-            </Button>
-          </div>
-        </div>
+        <CreateBlogHeader
+          categories={categories || []}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          onBack={() => navigate("/admin")}
+        />
+        
+        <CreateBlogActions
+          onSaveDraft={() => handleCreate("draft")}
+          onSubmit={() => handleCreate("pending_approval")}
+          isLoading={createBlogMutation.isPending}
+        />
 
         <div className="grid grid-cols-2 gap-6">
           <BlogContentSection
