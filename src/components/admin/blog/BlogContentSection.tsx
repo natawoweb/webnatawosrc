@@ -84,6 +84,18 @@ export function BlogContentSection({
     }
   };
 
+  // Check if there's content to translate
+  const hasContent = () => {
+    try {
+      if (!title) return false;
+      const contentObj = JSON.parse(content || '{}');
+      const textContent = contentObj.content?.[0]?.content?.[0]?.text;
+      return Boolean(textContent);
+    } catch (error) {
+      return false;
+    }
+  };
+
   return (
     <Card className="h-[800px] flex flex-col">
       <CardHeader>
@@ -102,7 +114,7 @@ export function BlogContentSection({
               variant="ghost" 
               size="sm" 
               onClick={handleTranslate}
-              disabled={!title && !content}
+              disabled={!hasContent()}
             >
               <Globe className="mr-2 h-4 w-4" />
               Translate
