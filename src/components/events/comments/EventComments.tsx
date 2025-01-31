@@ -19,7 +19,7 @@ interface Comment {
   user_id: string;
   event_id: string;
   updated_at: string | null;
-  profile: Profile | null;
+  profile: Profile;
 }
 
 export function EventComments({ eventId }: EventCommentsProps) {
@@ -33,7 +33,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
         .from("event_comments")
         .select(`
           *,
-          profile:user_id (*)
+          profile:profiles!inner(*)
         `)
         .eq("event_id", eventId)
         .order("created_at", { ascending: false });

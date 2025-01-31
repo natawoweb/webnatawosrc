@@ -3,16 +3,16 @@ import { format } from "date-fns";
 import { Edit2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CommentForm } from "./CommentForm";
+import type { Database } from "@/integrations/supabase/types";
+
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface Comment {
   id: string;
   content: string;
   created_at: string;
   user_id: string;
-  profiles: {
-    full_name: string | null;
-    avatar_url: string | null;
-  } | null;
+  profile: Profile;
 }
 
 interface CommentItemProps {
@@ -40,7 +40,7 @@ export function CommentItem({
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-2">
           <div className="font-semibold">
-            {comment.profiles?.full_name || "Anonymous"}
+            {comment.profile?.full_name || "Anonymous"}
           </div>
           <span className="text-sm text-muted-foreground">
             {format(new Date(comment.created_at), "MMM d, yyyy 'at' h:mm a")}
