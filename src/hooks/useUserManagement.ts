@@ -52,6 +52,32 @@ export function useUserManagement() {
     },
   });
 
+  // Update user profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (profile: Partial<Profile>) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update(profile)
+        .eq('id', profile.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update profile: " + error.message,
+      });
+    },
+  });
+
   // Update user role and level mutation
   const updateUserMutation = useMutation({
     mutationFn: async ({ 
@@ -102,6 +128,10 @@ export function useUserManagement() {
 
   const updateUserRole = (userId: string, role: AppRole, level?: UserLevel) => {
     updateUserMutation.mutate({ userId, role, level });
+  };
+
+  const updateUserProfile = (profile: Partial<Profile>) => {
+    updateProfileMutation.mutate(profile);
   };
 
   // Add new user mutation using the Edge Function
@@ -210,6 +240,7 @@ export function useUserManagement() {
     editLevel,
     setEditLevel,
     updateUserRole,
+    updateUserProfile,
     handleDeleteUser,
     handleAddUser,
     isAddingUser: addUserMutation.isPending,

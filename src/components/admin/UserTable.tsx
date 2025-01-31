@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Eye } from "lucide-react";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
@@ -22,9 +22,10 @@ interface UserTableProps {
   users: UserWithRole[];
   onEdit: (user: UserWithRole) => void;
   onDelete: (user: UserWithRole) => void;
+  onView: (user: UserWithRole) => void;
 }
 
-export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
+export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -55,6 +56,13 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
             </TableCell>
             <TableCell>
               <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onView(user)}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"

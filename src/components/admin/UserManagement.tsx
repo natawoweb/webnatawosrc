@@ -5,7 +5,12 @@ import { UserFilters } from "./UserFilters";
 import { AddUserDialog } from "./AddUserDialog";
 import { EditUserDialog } from "./EditUserDialog";
 import { DeleteUserDialog } from "./DeleteUserDialog";
+import { ProfileDialog } from "./ProfileDialog";
 import { useUserManagement } from "@/hooks/useUserManagement";
+import { useState } from "react";
+import { type Database } from "@/integrations/supabase/types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export function UserManagement() {
   const {
@@ -31,7 +36,10 @@ export function UserManagement() {
     handleDeleteUser,
     handleAddUser,
     isAddingUser,
+    updateUserProfile,
   } = useUserManagement();
+
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -70,6 +78,10 @@ export function UserManagement() {
           setSelectedUser(user);
           setDeleteDialogOpen(true);
         }}
+        onView={(user) => {
+          setSelectedUser(user);
+          setProfileDialogOpen(true);
+        }}
       />
 
       <DeleteUserDialog
@@ -94,6 +106,14 @@ export function UserManagement() {
         onOpenChange={setAddUserDialogOpen}
         onSubmit={handleAddUser}
         isLoading={isAddingUser}
+      />
+
+      <ProfileDialog
+        profile={selectedUser}
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        onSubmit={updateUserProfile}
+        isAdmin={true}
       />
     </div>
   );
