@@ -38,7 +38,10 @@ const EventDetails = () => {
           <ChevronLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        <Skeleton className="h-[600px] w-full rounded-xl" />
+        <Skeleton className="h-[400px] w-full rounded-xl" />
+        <div className="mt-6">
+          <Skeleton className="h-[200px] w-full rounded-xl" />
+        </div>
       </div>
     );
   }
