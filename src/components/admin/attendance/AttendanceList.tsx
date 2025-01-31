@@ -41,7 +41,10 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .from("event_attendance")
         .select(`
           *,
-          profiles:profiles(full_name, avatar_url)
+          profiles (
+            full_name,
+            avatar_url
+          )
         `)
         .eq("event_id", selectedEvent);
 
@@ -58,7 +61,10 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .from("event_registrations")
         .select(`
           *,
-          profiles:profiles(full_name, avatar_url)
+          profiles:user_id (
+            full_name,
+            avatar_url
+          )
         `)
         .eq("event_id", selectedEvent);
 
@@ -135,7 +141,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
 
               return (
                 <TableRow key={registration.id}>
-                  <TableCell>{profile.full_name}</TableCell>
+                  <TableCell>{profile?.full_name || "Unknown"}</TableCell>
                   <TableCell>
                     {attendance ? (
                       <Badge className="bg-green-500">
