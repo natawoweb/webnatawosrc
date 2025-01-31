@@ -20,9 +20,21 @@ export default function CreateBlog() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(JSON.stringify({
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: []
+    }]
+  }));
   const [titleTamil, setTitleTamil] = useState("");
-  const [contentTamil, setContentTamil] = useState("");
+  const [contentTamil, setContentTamil] = useState(JSON.stringify({
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: []
+    }]
+  }));
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   const { data: categories } = useQuery({
@@ -100,6 +112,64 @@ export default function CreateBlog() {
     });
   };
 
+  const handleTranslate = async () => {
+    try {
+      const contentObj = JSON.parse(content || '{}');
+      const textContent = contentObj.content?.[0]?.content?.[0]?.text || '';
+
+      const titleResponse = await supabase.functions.invoke('translate', {
+        body: { text: title }
+      });
+
+      if (titleResponse.error) throw new Error(titleResponse.error.message);
+      
+      const contentResponse = await supabase.functions.invoke('translate', {
+        body: { text: textContent }
+      });
+
+      if (contentResponse.error) throw new Error(contentResponse.error.message);
+
+      const translatedTitle = titleResponse.data.data.translations[0].translatedText;
+      setTitleTamil(translatedTitle);
+
+      const translatedText = contentResponse.data.data.translations[0].translatedText;
+      const newContent = {
+        type: 'doc',
+        content: [{
+          type: 'paragraph',
+          content: [{
+            type: 'text',
+            text: translatedText
+          }]
+        }]
+      };
+      setContentTamil(JSON.stringify(newContent));
+
+      toast({
+        title: "Translation Complete",
+        description: "Content has been translated to Tamil",
+      });
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast({
+        variant: "destructive",
+        title: "Translation Failed",
+        description: error.message,
+      });
+    }
+  };
+
+  const hasContent = () => {
+    try {
+      if (!title) return false;
+      const contentObj = JSON.parse(content || '{}');
+      const textContent = contentObj.content?.[0]?.content?.[0]?.text;
+      return Boolean(textContent);
+    } catch (error) {
+      return false;
+    }
+  };
+
   return (
     <div className="container max-w-[1400px] py-8">
       <div className="space-y-6">
@@ -149,6 +219,8 @@ export default function CreateBlog() {
             content={content}
             onTitleChange={setTitle}
             onContentChange={setContent}
+            onTranslate={handleTranslate}
+            hasContent={hasContent()}
           />
           <BlogContentSection
             language="tamil"
