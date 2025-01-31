@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 
 interface DesktopNavProps {
   currentLanguage: string;
@@ -52,6 +53,8 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {session && <NotificationsDropdown />}
 
       {session ? (
         <Button variant="outline" onClick={handleSignOut} className="ml-4">

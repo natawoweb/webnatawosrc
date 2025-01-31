@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -67,6 +68,12 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        {session && (
+          <div className="px-3 py-2">
+            <NotificationsDropdown />
+          </div>
+        )}
 
         {session ? (
           <Button variant="outline" onClick={handleSignOut} className="w-full mt-4">
