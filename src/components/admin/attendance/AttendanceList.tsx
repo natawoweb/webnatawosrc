@@ -64,7 +64,18 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return data;
+      return data?.map(registration => ({
+        ...registration,
+        profile: registration.profile || {
+          full_name: "Unknown",
+          avatar_url: null,
+          bio: "",
+          created_at: "",
+          email: "",
+          id: registration.user_id,
+          updated_at: "",
+        }
+      }));
     },
   });
 
@@ -132,19 +143,10 @@ export function AttendanceList({ events }: AttendanceListProps) {
               const attendance = attendanceData?.find(
                 (a) => a.user_id === registration.user_id
               );
-              const profile = registration.profile as Profile || {
-                full_name: "Unknown",
-                avatar_url: null,
-                bio: "",
-                created_at: "",
-                email: "",
-                id: registration.user_id,
-                updated_at: "",
-              };
 
               return (
                 <TableRow key={registration.id}>
-                  <TableCell>{profile?.full_name || "Unknown"}</TableCell>
+                  <TableCell>{registration.profile.full_name}</TableCell>
                   <TableCell>
                     {attendance ? (
                       <Badge className="bg-green-500">
