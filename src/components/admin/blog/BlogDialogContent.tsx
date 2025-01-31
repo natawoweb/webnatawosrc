@@ -2,6 +2,10 @@ import { BlogContentSection } from "./BlogContentSection";
 import { BlogDialogHeader } from "./BlogDialogHeader";
 import { BlogDialogActions } from "./BlogDialogActions";
 import { Database } from "@/integrations/supabase/types";
+import { Button } from "@/components/ui/button";
+import { Globe } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -39,6 +43,72 @@ export function BlogDialogContent({
   onSubmit,
   isLoading,
 }: BlogDialogContentProps) {
+  const { toast } = useToast();
+
+  // Check if there's content to translate
+  const hasContent = () => {
+    try {
+      if (!title) return false;
+      const contentObj = JSON.parse(content || '{}');
+      const textContent = contentObj.content?.[0]?.content?.[0]?.text;
+      return Boolean(textContent);
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const handleTranslate = async () => {
+    try {
+      // Parse the content JSON to extract text
+      const contentObj = JSON.parse(content || '{}');
+      const textContent = contentObj.content?.[0]?.content?.[0]?.text || '';
+
+      // Translate title
+      const titleResponse = await supabase.functions.invoke('translate', {
+        body: { text: title }
+      });
+
+      if (titleResponse.error) throw new Error(titleResponse.error.message);
+      
+      // Translate content
+      const contentResponse = await supabase.functions.invoke('translate', {
+        body: { text: textContent }
+      });
+
+      if (contentResponse.error) throw new Error(contentResponse.error.message);
+
+      // Update title
+      const translatedTitle = titleResponse.data.data.translations[0].translatedText;
+      onTitleTamilChange(translatedTitle);
+
+      // Update content
+      const translatedText = contentResponse.data.data.translations[0].translatedText;
+      const newContent = {
+        ...contentObj,
+        content: [{
+          ...contentObj.content?.[0],
+          content: [{
+            ...contentObj.content?.[0]?.content?.[0],
+            text: translatedText
+          }]
+        }]
+      };
+      onContentTamilChange(JSON.stringify(newContent));
+
+      toast({
+        title: "Translation Complete",
+        description: "Content has been translated to Tamil",
+      });
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast({
+        variant: "destructive",
+        title: "Translation Failed",
+        description: error.message,
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <BlogDialogHeader
@@ -53,6 +123,15 @@ export function BlogDialogContent({
           onSubmit={onSubmit}
           isLoading={isLoading}
         />
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleTranslate}
+          disabled={!hasContent()}
+        >
+          <Globe className="mr-2 h-4 w-4" />
+          Translate to Tamil
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 gap-6">
