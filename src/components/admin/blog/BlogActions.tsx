@@ -18,24 +18,23 @@ export function BlogActions({
   hasContent,
 }: BlogActionsProps) {
   return (
-    <div className="space-y-4 mb-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4 mb-6">
+      <div className="flex items-center justify-between gap-4">
         <BlogDialogActions
           onSaveDraft={onSaveDraft}
           onSubmit={onSubmit}
           isLoading={isLoading}
         />
+        <Button 
+          variant="secondary"
+          onClick={onTranslate}
+          disabled={!hasContent}
+          className="min-w-[200px]"
+        >
+          <Globe className="mr-2 h-4 w-4" />
+          Translate to Tamil
+        </Button>
       </div>
-      
-      <Button 
-        variant="outline"
-        onClick={onTranslate}
-        disabled={!hasContent}
-        className="w-full"
-      >
-        <Globe className="mr-2 h-4 w-4" />
-        Translate to Tamil
-      </Button>
     </div>
   );
 }
