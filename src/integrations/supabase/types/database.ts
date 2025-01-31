@@ -19,6 +19,8 @@ export interface Database {
     }
     Functions: {
       has_role: HasRoleFunction
+      register_for_event: RegisterForEventFunction
+      unregister_from_event: UnregisterFromEventFunction
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
@@ -33,6 +35,22 @@ interface HasRoleFunction {
   Args: {
     user_id: string
     required_role: Database["public"]["Enums"]["app_role"]
+  }
+  Returns: boolean
+}
+
+interface RegisterForEventFunction {
+  Args: {
+    p_event_id: string
+    p_user_id: string
+  }
+  Returns: boolean
+}
+
+interface UnregisterFromEventFunction {
+  Args: {
+    p_event_id: string
+    p_user_id: string
   }
   Returns: boolean
 }

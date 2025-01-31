@@ -48,17 +48,15 @@ export function EventActions({ event }: EventActionsProps) {
     mutationFn: async () => {
       if (!session?.user.id) throw new Error("Must be logged in to register");
       
-      // Start a transaction using RPC
-      const { data: result, error } = await supabase.rpc('register_for_event', {
+      const { data, error } = await supabase.rpc('register_for_event', {
         p_event_id: event.id,
         p_user_id: session.user.id
       });
       
       if (error) throw error;
-      return result;
+      return data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -81,17 +79,15 @@ export function EventActions({ event }: EventActionsProps) {
     mutationFn: async () => {
       if (!session?.user.id) throw new Error("Must be logged in to unregister");
       
-      // Start a transaction using RPC
-      const { data: result, error } = await supabase.rpc('unregister_from_event', {
+      const { data, error } = await supabase.rpc('unregister_from_event', {
         p_event_id: event.id,
         p_user_id: session.user.id
       });
       
       if (error) throw error;
-      return result;
+      return data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });

@@ -361,6 +361,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      register_for_event: {
+        Args: {
+          p_event_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      unregister_from_event: {
+        Args: {
+          p_event_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
