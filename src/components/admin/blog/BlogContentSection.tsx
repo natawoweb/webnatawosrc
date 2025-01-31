@@ -48,8 +48,8 @@ export function BlogContentSection({
           </div>
         )}
       </CardHeader>
-      <CardContent className="space-y-4 flex-grow">
-        <div className="space-y-2">
+      <CardContent className="flex-1 overflow-hidden flex flex-col space-y-4">
+        <div>
           <label htmlFor={`title-${language}`} className="text-sm font-medium">
             Title
           </label>
@@ -60,11 +60,11 @@ export function BlogContentSection({
             placeholder={isEnglish ? "Enter blog title" : "தலைப்பை உள்ளிடவும்"}
           />
         </div>
-        <div className="space-y-2 flex-grow h-full">
-          <label htmlFor={`content-${language}`} className="text-sm font-medium">
+        <div className="flex-1 min-h-0">
+          <label htmlFor={`content-${language}`} className="text-sm font-medium block mb-2">
             Content
           </label>
-          <div className="h-[650px]">
+          <div className="h-[600px]">
             <RichTextEditor
               content={content}
               onChange={onContentChange}
