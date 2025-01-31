@@ -12,17 +12,26 @@ import { Badge } from "@/components/ui/badge";
 import { type Database } from "@/integrations/supabase/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type UserLevel = Database['public']['Enums']['user_level'];
+type AppRole = Database['public']['Enums']['app_role'];
 
 interface ProfileDialogProps {
-  profile: Profile | null;
+  profile: (Profile & { role: AppRole }) | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (profile: Partial<Profile>) => void;
   isAdmin: boolean;
 }
+
+const USER_LEVELS: UserLevel[] = [
+  'Literary Tamil Writers',
+  'Talented Experts',
+  'NATAWO Volunteers',
+  'NATAWO Students Writers'
+];
 
 export function ProfileDialog({
   profile,
@@ -33,6 +42,7 @@ export function ProfileDialog({
 }: ProfileDialogProps) {
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [bio, setBio] = useState(profile?.bio || '');
+  const [level, setLevel] = useState<UserLevel | undefined>(profile?.level || undefined);
 
   const handleSubmit = () => {
     if (!profile) return;
@@ -40,6 +50,7 @@ export function ProfileDialog({
       id: profile.id,
       full_name: fullName,
       bio,
+      level,
     });
   };
 
@@ -55,23 +66,29 @@ export function ProfileDialog({
               <AvatarImage src={profile?.avatar_url || ''} />
               <AvatarFallback>{profile?.full_name?.[0] || '?'}</AvatarFallback>
             </Avatar>
-            <div>
+            <div className="space-y-1">
               <h3 className="text-lg font-semibold">{profile?.email}</h3>
-              {profile?.level && (
-                <Badge variant="secondary" className="mt-1">
-                  {profile.level}
+              <div className="flex gap-2">
+                <Badge variant="outline" className="capitalize">
+                  {profile?.role}
                 </Badge>
-              )}
+                {profile?.level && (
+                  <Badge variant="secondary">
+                    {profile.level}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="grid gap-4">
             <div>
               <label className="text-sm font-medium">Full Name</label>
               <Input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 disabled={!isAdmin}
+                placeholder="Enter full name"
               />
             </div>
 
@@ -82,8 +99,30 @@ export function ProfileDialog({
                 onChange={(e) => setBio(e.target.value)}
                 disabled={!isAdmin}
                 className="h-32"
+                placeholder="Enter user bio"
               />
             </div>
+
+            {isAdmin && (
+              <div>
+                <label className="text-sm font-medium">Level</label>
+                <Select
+                  value={level}
+                  onValueChange={(value) => setLevel(value as UserLevel)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select user level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {USER_LEVELS.map((userLevel) => (
+                      <SelectItem key={userLevel} value={userLevel}>
+                        {userLevel}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div>
               <label className="text-sm font-medium">Created At</label>
@@ -93,6 +132,15 @@ export function ProfileDialog({
                   : 'N/A'}
               </p>
             </div>
+
+            {profile?.updated_at && (
+              <div>
+                <label className="text-sm font-medium">Last Updated</label>
+                <p className="text-sm text-muted-foreground">
+                  {new Date(profile.updated_at).toLocaleDateString()}
+                </p>
+              </div>
+            )}
           </div>
         </div>
         {isAdmin && (
