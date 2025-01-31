@@ -19,6 +19,46 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
+  const parseContent = (contentString: string) => {
+    try {
+      // If content is empty, return a valid empty document
+      if (!contentString) {
+        return {
+          type: 'doc',
+          content: [{
+            type: 'paragraph',
+            content: []
+          }]
+        };
+      }
+
+      const parsed = JSON.parse(contentString);
+      
+      // If parsed content doesn't have the correct structure, create a valid document
+      if (!parsed.type || parsed.type !== 'doc') {
+        return {
+          type: 'doc',
+          content: [{
+            type: 'paragraph',
+            content: parsed.content?.[0]?.content || []
+          }]
+        };
+      }
+
+      return parsed;
+    } catch (error) {
+      console.warn('Error parsing editor content:', error);
+      // Return a valid empty document structure
+      return {
+        type: 'doc',
+        content: [{
+          type: 'paragraph',
+          content: []
+        }]
+      };
+    }
+  };
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -27,7 +67,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
         alignments: ['left', 'center', 'right', 'justify'],
       }),
     ],
-    content: content ? JSON.parse(content) : '',
+    content: parseContent(content),
     onUpdate: ({ editor }) => {
       onChange(JSON.stringify(editor.getJSON()));
     },
