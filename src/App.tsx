@@ -15,6 +15,7 @@ import Events from "./pages/Events";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateBlog from "./pages/CreateBlog";
 import EventDetails from "./pages/EventDetails";
+import Blogs from "./pages/Blogs";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App: React.FC = () => {
             <Route path="writer/:id" element={<WriterProfile />} />
             <Route path="auth" element={<Auth />} />
             <Route path="search" element={<SearchWriters />} />
+            <Route path="blogs" element={<Blogs />} />
             <Route path="events" element={<Events />} />
             <Route path="events/:id" element={<EventDetails />} />
             <Route path="admin" element={<AdminDashboard />} />
