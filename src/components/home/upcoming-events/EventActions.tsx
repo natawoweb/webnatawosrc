@@ -38,7 +38,7 @@ export function EventActions({ event }: EventActionsProps) {
         .select("*")
         .eq("event_id", event.id)
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle();
       return data;
     },
     enabled: !!session?.user.id,
@@ -57,10 +57,12 @@ export function EventActions({ event }: EventActionsProps) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
+      // Invalidate all relevant queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["registration"] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
       queryClient.invalidateQueries({ queryKey: ["admin-events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
       toast({
         title: "Success",
         description: "You have successfully registered for this event",
@@ -88,10 +90,12 @@ export function EventActions({ event }: EventActionsProps) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
+      // Invalidate all relevant queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["registration"] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
       queryClient.invalidateQueries({ queryKey: ["admin-events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
       toast({
         title: "Success",
         description: "You have successfully unregistered from this event",
