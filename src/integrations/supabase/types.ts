@@ -115,6 +115,41 @@ export type Database = {
           },
         ]
       }
+      event_attendance: {
+        Row: {
+          check_in_time: string | null
+          created_at: string | null
+          event_id: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          check_in_time?: string | null
+          created_at?: string | null
+          event_id: string
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          check_in_time?: string | null
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_attendance_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_categories: {
         Row: {
           created_at: string | null

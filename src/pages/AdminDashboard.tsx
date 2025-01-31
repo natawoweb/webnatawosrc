@@ -6,16 +6,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { ContentManagement } from "@/components/admin/ContentManagement";
 import { EventManagement } from "@/components/admin/EventManagement";
+import { AttendanceManagement } from "@/components/admin/attendance/AttendanceManagement";
 import { SettingsManagement } from "@/components/admin/SettingsManagement";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Users, BookText, Calendar, Settings } from "lucide-react";
+import { Loader2, Users, BookText, Calendar, ClipboardCheck, Settings } from "lucide-react";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("users");
 
-  // Check if user is admin
   const { data: isAdmin, isLoading: checkingAdmin } = useQuery({
     queryKey: ["checkAdminRole"],
     queryFn: async () => {
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
       <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
       
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 w-full mb-8">
+        <TabsList className="grid grid-cols-5 w-full mb-8">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Users
@@ -76,6 +76,10 @@ export default function AdminDashboard() {
           <TabsTrigger value="events" className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             Events
+          </TabsTrigger>
+          <TabsTrigger value="attendance" className="flex items-center gap-2">
+            <ClipboardCheck className="h-4 w-4" />
+            Attendance
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
@@ -93,6 +97,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="events">
           <EventManagement />
+        </TabsContent>
+
+        <TabsContent value="attendance">
+          <AttendanceManagement />
         </TabsContent>
 
         <TabsContent value="settings">
