@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Database } from "@/integrations/supabase/types";
+import { isPast } from "date-fns";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
@@ -18,6 +19,7 @@ export function EventActions({ event }: EventActionsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isRegistering, setIsRegistering] = useState(false);
+  const isPastEvent = isPast(new Date(event.date));
 
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -42,22 +44,11 @@ export function EventActions({ event }: EventActionsProps) {
     enabled: !!session?.user.id,
   });
 
-  const updateParticipantCount = async (increment: boolean) => {
-    const { error } = await supabase
-      .from("events")
-      .update({
-        current_participants: event.current_participants + (increment ? 1 : -1),
-      })
-      .eq("id", event.id);
-
-    if (error) throw error;
-  };
-
   const registerMutation = useMutation({
     mutationFn: async () => {
       if (!session?.user.id) throw new Error("Must be logged in to register");
       
-      // Start a transaction by using multiple operations
+      // Insert registration
       const { error: registrationError } = await supabase
         .from("event_registrations")
         .insert({
@@ -67,11 +58,18 @@ export function EventActions({ event }: EventActionsProps) {
       
       if (registrationError) throw registrationError;
 
-      await updateParticipantCount(true);
+      // Update participant count
+      const { error: updateError } = await supabase
+        .from("events")
+        .update({ current_participants: (event.current_participants || 0) + 1 })
+        .eq("id", event.id);
+
+      if (updateError) throw updateError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
+      queryClient.invalidateQueries({ queryKey: ["events"] });
       toast({
         title: "Success",
         description: "You have successfully registered for this event",
@@ -90,6 +88,7 @@ export function EventActions({ event }: EventActionsProps) {
     mutationFn: async () => {
       if (!session?.user.id) throw new Error("Must be logged in to unregister");
       
+      // Delete registration
       const { error: unregisterError } = await supabase
         .from("event_registrations")
         .delete()
@@ -98,11 +97,18 @@ export function EventActions({ event }: EventActionsProps) {
       
       if (unregisterError) throw unregisterError;
 
-      await updateParticipantCount(false);
+      // Update participant count
+      const { error: updateError } = await supabase
+        .from("events")
+        .update({ current_participants: (event.current_participants || 1) - 1 })
+        .eq("id", event.id);
+
+      if (updateError) throw updateError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["registration", event.id] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
+      queryClient.invalidateQueries({ queryKey: ["events"] });
       toast({
         title: "Success",
         description: "You have successfully unregistered from this event",
@@ -169,10 +175,14 @@ export function EventActions({ event }: EventActionsProps) {
       <Button
         variant={registration ? "destructive" : "default"}
         onClick={handleRegistration}
-        disabled={isRegistering}
+        disabled={isRegistering || isPastEvent || (event.current_participants >= (event.max_participants || 0) && !registration)}
         className="flex-1"
       >
-        {isRegistering ? "Processing..." : registration ? "Unregister" : "Register"}
+        {isPastEvent ? "Event Ended" : 
+          isRegistering ? "Processing..." : 
+          registration ? "Unregister" : 
+          event.current_participants >= (event.max_participants || 0) ? "Full" :
+          "Register"}
       </Button>
       <Button
         variant="outline"

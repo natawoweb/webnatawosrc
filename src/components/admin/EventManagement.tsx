@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { EventForm } from "./events/EventForm";
 import { EventList } from "./events/EventList";
 
@@ -25,6 +26,8 @@ export function EventManagement() {
       location: event.location,
       max_participants: event.max_participants,
       gallery: event.gallery || [],
+      category_id: event.category_id,
+      tags: event.tags || [],
     });
     setIsOpen(true);
   };
@@ -45,14 +48,16 @@ export function EventManagement() {
               Create Event
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
             <DialogHeader>
               <DialogTitle>{editingEvent ? 'Edit Event' : 'Create New Event'}</DialogTitle>
             </DialogHeader>
-            <EventForm
-              initialData={editingEvent}
-              onSuccess={handleDialogClose}
-            />
+            <ScrollArea className="h-[calc(90vh-120px)] pr-4">
+              <EventForm
+                initialData={editingEvent}
+                onSuccess={handleDialogClose}
+              />
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </div>
