@@ -55,8 +55,9 @@ export function EventCalendar() {
           modifiersStyles={{
             hasEvent: {
               fontWeight: 'bold',
-              textDecoration: 'underline',
-              color: 'var(--primary)',
+              color: '#8B5CF6', // Using Vivid Purple from our color palette
+              backgroundColor: '#E5DEFF', // Using Soft Purple for background
+              borderRadius: '4px'
             },
           }}
           className="rounded-md border shadow"
