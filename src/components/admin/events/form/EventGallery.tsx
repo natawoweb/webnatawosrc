@@ -6,7 +6,7 @@ import { X, Plus } from "lucide-react";
 interface EventGalleryProps {
   initialGallery?: string[];
   selectedImages: File[];
-  onImageSelect: (files: FileList | null) => void;
+  onImageSelect: (files: File[]) => void;
   onImageRemove: (index: number) => void;
 }
 
@@ -16,6 +16,13 @@ export function EventGallery({
   onImageSelect,
   onImageRemove,
 }: EventGalleryProps) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      onImageSelect(filesArray);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <Label htmlFor="images">Event Images</Label>
@@ -25,7 +32,7 @@ export function EventGallery({
           type="file"
           accept="image/*"
           multiple
-          onChange={(e) => onImageSelect(e.target.files)}
+          onChange={handleFileChange}
           className="flex-1"
         />
         <Button

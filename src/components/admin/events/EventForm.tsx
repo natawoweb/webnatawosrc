@@ -9,6 +9,7 @@ import { EventGallery } from "./form/EventGallery";
 import { EventCategories } from "./form/EventCategories";
 
 interface EventFormData {
+  id?: string;  // Make id optional since it's not required for new events
   title: string;
   description: string;
   date: string;
@@ -28,19 +29,18 @@ interface EventFormProps {
 export function EventForm({ initialData, onSuccess }: EventFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<EventFormData>(
-    initialData || {
-      title: "",
-      description: "",
-      date: "",
-      time: "",
-      location: "",
-      max_participants: 0,
-      gallery: [],
-      category_id: null,
-      tags: [],
-    }
-  );
+  const [formData, setFormData] = useState<EventFormData>({
+    title: initialData?.title || "",
+    description: initialData?.description || "",
+    date: initialData?.date || "",
+    time: initialData?.time || "",
+    location: initialData?.location || "",
+    max_participants: initialData?.max_participants || 0,
+    gallery: initialData?.gallery || [],
+    category_id: initialData?.category_id || null,
+    tags: initialData?.tags || [],
+    ...(initialData?.id ? { id: initialData.id } : {}),
+  });
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
   const createEventMutation = useMutation({
@@ -69,7 +69,9 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
   });
 
   const updateEventMutation = useMutation({
-    mutationFn: async (data: EventFormData & { id: string }) => {
+    mutationFn: async (data: EventFormData) => {
+      if (!data.id) throw new Error("Event ID is required for updates");
+      
       const { error } = await supabase
         .from("events")
         .update(data)
@@ -124,11 +126,8 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
         gallery: galleryUrls,
       };
 
-      if (initialData?.id) {
-        await updateEventMutation.mutateAsync({
-          ...eventData,
-          id: initialData.id,
-        });
+      if (formData.id) {
+        await updateEventMutation.mutateAsync(eventData);
       } else {
         await createEventMutation.mutateAsync(eventData);
       }
@@ -170,8 +169,12 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
       <EventGallery
         initialGallery={formData.gallery}
         selectedImages={selectedImages}
-        onImagesSelected={setSelectedImages}
-        onGalleryChange={(urls) => setFormData({ ...formData, gallery: urls })}
+        onImageSelect={setSelectedImages}
+        onImageRemove={(index) => {
+          const newImages = [...selectedImages];
+          newImages.splice(index, 1);
+          setSelectedImages(newImages);
+        }}
       />
 
       <div className="flex justify-end">
@@ -180,7 +183,7 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
           disabled={createEventMutation.isPending || updateEventMutation.isPending}
         >
-          {initialData ? "Update Event" : "Create Event"}
+          {formData.id ? "Update Event" : "Create Event"}
         </button>
       </div>
     </form>
