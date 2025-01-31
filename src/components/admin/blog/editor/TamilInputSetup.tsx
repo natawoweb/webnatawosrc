@@ -13,9 +13,8 @@ export function useTamilInputSetup({ elementRef, enabled }: TamilInputSetupProps
     script.src = "https://www.google.com/jsapi";
     
     script.onload = () => {
-      // @ts-ignore
-      google.load("elements", "1", {
-        packages: "transliteration",
+      window.google.load("elements", "1", {
+        packages: ["transliteration"],
         callback: () => {
           const control = new window.google.elements.transliteration.TransliterationControl({
             sourceLanguage: 'en',
