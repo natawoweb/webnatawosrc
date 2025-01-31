@@ -59,21 +59,25 @@ export function BlogDialogContent({
       const contentObj = JSON.parse(content || '{}');
       const textContent = contentObj.content?.[0]?.content?.[0]?.text || '';
 
+      // First translate the title
       const titleResponse = await supabase.functions.invoke('translate', {
         body: { text: title }
       });
 
       if (titleResponse.error) throw new Error(titleResponse.error.message);
       
+      // Then translate the content
       const contentResponse = await supabase.functions.invoke('translate', {
         body: { text: textContent }
       });
 
       if (contentResponse.error) throw new Error(contentResponse.error.message);
 
+      // Immediately update the Tamil title
       const translatedTitle = titleResponse.data.data.translations[0].translatedText;
       onTitleTamilChange(translatedTitle);
 
+      // Immediately update the Tamil content
       const translatedText = contentResponse.data.data.translations[0].translatedText;
       const newContentObj = {
         type: 'doc',
