@@ -75,17 +75,17 @@ export function BlogDialogContent({
       onTitleTamilChange(translatedTitle);
 
       const translatedText = contentResponse.data.data.translations[0].translatedText;
-      const newContent = {
-        ...contentObj,
+      const newContentObj = {
+        type: 'doc',
         content: [{
-          ...contentObj.content?.[0],
+          type: 'paragraph',
           content: [{
-            ...contentObj.content?.[0]?.content?.[0],
+            type: 'text',
             text: translatedText
           }]
         }]
       };
-      onContentTamilChange(JSON.stringify(newContent));
+      onContentTamilChange(JSON.stringify(newContentObj));
 
       toast({
         title: "Translation Complete",
