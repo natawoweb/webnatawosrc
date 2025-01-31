@@ -45,7 +45,6 @@ export function BlogDialogContent({
 }: BlogDialogContentProps) {
   const { toast } = useToast();
 
-  // Check if there's content to translate
   const hasContent = () => {
     try {
       if (!title) return false;
@@ -59,29 +58,24 @@ export function BlogDialogContent({
 
   const handleTranslate = async () => {
     try {
-      // Parse the content JSON to extract text
       const contentObj = JSON.parse(content || '{}');
       const textContent = contentObj.content?.[0]?.content?.[0]?.text || '';
 
-      // Translate title
       const titleResponse = await supabase.functions.invoke('translate', {
         body: { text: title }
       });
 
       if (titleResponse.error) throw new Error(titleResponse.error.message);
       
-      // Translate content
       const contentResponse = await supabase.functions.invoke('translate', {
         body: { text: textContent }
       });
 
       if (contentResponse.error) throw new Error(contentResponse.error.message);
 
-      // Update title
       const translatedTitle = titleResponse.data.data.translations[0].translatedText;
       onTitleTamilChange(translatedTitle);
 
-      // Update content
       const translatedText = contentResponse.data.data.translations[0].translatedText;
       const newContent = {
         ...contentObj,
@@ -117,24 +111,29 @@ export function BlogDialogContent({
         onCategoryChange={onCategoryChange}
       />
       
-      <div className="flex items-center justify-between mb-4">
-        <BlogDialogActions
-          onSaveDraft={onSaveDraft}
-          onSubmit={onSubmit}
-          isLoading={isLoading}
-        />
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleTranslate}
-          disabled={!hasContent()}
-        >
-          <Globe className="mr-2 h-4 w-4" />
-          Translate to Tamil
-        </Button>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <BlogDialogActions
+            onSaveDraft={onSaveDraft}
+            onSubmit={onSubmit}
+            isLoading={isLoading}
+          />
+        </div>
+        
+        <div className="flex items-center justify-end">
+          <Button 
+            variant="outline"
+            onClick={handleTranslate}
+            disabled={!hasContent()}
+            className="w-full sm:w-auto"
+          >
+            <Globe className="mr-2 h-4 w-4" />
+            Translate to Tamil
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <BlogContentSection
           language="english"
           title={title}

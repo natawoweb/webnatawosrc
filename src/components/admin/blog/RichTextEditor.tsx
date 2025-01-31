@@ -31,6 +31,8 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
     onUpdate: ({ editor }) => {
       onChange(JSON.stringify(editor.getJSON()));
     },
+    autofocus: true,
+    editable: true,
   });
 
   if (!editor) {
@@ -106,7 +108,10 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           <AlignJustify className="h-4 w-4" />
         </Button>
       </div>
-      <EditorContent editor={editor} className="prose max-w-none p-4 flex-grow overflow-y-auto" />
+      <EditorContent 
+        editor={editor} 
+        className="prose max-w-none p-4 flex-grow overflow-y-auto focus:outline-none cursor-text" 
+      />
     </div>
   );
 }
