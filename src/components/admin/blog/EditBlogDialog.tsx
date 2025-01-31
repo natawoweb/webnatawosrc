@@ -77,27 +77,29 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
         </Button>
       </DialogTrigger>
       <DialogContent 
-        className="max-w-[1400px] w-[90vw]" 
+        className="max-w-[90%] w-[1200px] h-[90vh] p-6" 
         aria-describedby="dialog-description"
       >
         <div id="dialog-description" className="sr-only">Edit blog post</div>
-        <BlogDialogContent
-          blog={blog}
-          title={title}
-          content={content}
-          titleTamil={titleTamil}
-          contentTamil={contentTamil}
-          selectedCategory={selectedCategory}
-          categories={categories || []}
-          onTitleChange={setTitle}
-          onContentChange={setContent}
-          onTitleTamilChange={setTitleTamil}
-          onContentTamilChange={setContentTamil}
-          onCategoryChange={setSelectedCategory}
-          onSaveDraft={() => handleUpdate("draft")}
-          onSubmit={() => handleUpdate("submitted")}
-          isLoading={isUpdating}
-        />
+        <div className="h-full overflow-y-auto">
+          <BlogDialogContent
+            blog={blog}
+            title={title}
+            content={content}
+            titleTamil={titleTamil}
+            contentTamil={contentTamil}
+            selectedCategory={selectedCategory}
+            categories={categories || []}
+            onTitleChange={setTitle}
+            onContentChange={setContent}
+            onTitleTamilChange={setTitleTamil}
+            onContentTamilChange={setContentTamil}
+            onCategoryChange={setSelectedCategory}
+            onSaveDraft={() => handleUpdate("draft")}
+            onSubmit={() => handleUpdate("submitted")}
+            isLoading={isUpdating}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

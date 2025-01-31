@@ -32,7 +32,7 @@ export function BlogContentSection({
   const isEnglish = language === "english";
 
   return (
-    <Card className="h-[800px] flex flex-col">
+    <Card className="h-[600px] flex flex-col">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -71,7 +71,7 @@ export function BlogContentSection({
           <label htmlFor={`content-${language}`} className="text-sm font-medium block mb-2">
             Content
           </label>
-          <div className="h-[600px]">
+          <div className="h-[400px]">
             <RichTextEditor
               content={content}
               onChange={onContentChange}
