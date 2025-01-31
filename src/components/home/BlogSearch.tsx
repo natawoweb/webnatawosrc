@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
+
+type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
+  blog_categories: Database["public"]["Tables"]["blog_categories"]["Row"] | null;
+  profiles: Database["public"]["Tables"]["profiles"]["Row"] | null;
+};
 
 export function BlogSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,7 +41,7 @@ export function BlogSearch() {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data as Blog[];
     },
   });
 

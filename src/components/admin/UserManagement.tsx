@@ -11,6 +11,7 @@ import { useState } from "react";
 import { type Database } from "@/integrations/supabase/types";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
+type UserLevel = Database['public']['Enums']['user_level'];
 
 export function UserManagement() {
   const {
@@ -71,7 +72,7 @@ export function UserManagement() {
         onEdit={(user) => {
           setSelectedUser(user);
           setEditRole(user.role);
-          setEditLevel(user.level);
+          setEditLevel(user.level as UserLevel);
           setEditDialogOpen(true);
         }}
         onDelete={(user) => {

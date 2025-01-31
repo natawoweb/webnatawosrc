@@ -31,11 +31,11 @@ interface AttendanceListProps {
 }
 
 type EventRegistration = Database["public"]["Tables"]["event_registrations"]["Row"] & {
-  profiles: Profile | null;
+  profiles: Profile;
 };
 
 type EventAttendance = Database["public"]["Tables"]["event_attendance"]["Row"] & {
-  profiles: Profile | null;
+  profiles: Profile;
 };
 
 export function AttendanceList({ events }: AttendanceListProps) {
@@ -55,7 +55,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return (data || []) as EventAttendance[];
+      return data as EventAttendance[];
     },
   });
 
@@ -72,8 +72,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      
-      return (data || []) as EventRegistration[];
+      return data as EventRegistration[];
     },
   });
 
