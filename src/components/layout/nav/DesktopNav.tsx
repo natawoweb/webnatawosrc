@@ -27,14 +27,14 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
 }) => {
   return (
     <div className="hidden md:flex md:items-center md:space-x-4">
-      <Link to="/writers" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
+      <Link to="/search" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
         Writers
-      </Link>
-      <Link to="/events" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
-        Events
       </Link>
       <Link to="/blogs" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
         Blogs
+      </Link>
+      <Link to="/events" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
+        Events
       </Link>
       
       <DropdownMenu>

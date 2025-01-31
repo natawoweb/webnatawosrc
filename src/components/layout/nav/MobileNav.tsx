@@ -32,22 +32,22 @@ export const MobileNav: React.FC<MobileNavProps> = ({
     <div className={cn("md:hidden", isOpen ? "block" : "hidden")}>
       <div className="px-2 pt-2 pb-3 space-y-1">
         <Link
-          to="/writers"
+          to="/search"
           className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
         >
           Writers
-        </Link>
-        <Link
-          to="/events"
-          className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
-        >
-          Events
         </Link>
         <Link
           to="/blogs"
           className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
         >
           Blogs
+        </Link>
+        <Link
+          to="/events"
+          className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
+        >
+          Events
         </Link>
         
         <div className="px-3 py-2">
