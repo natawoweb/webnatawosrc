@@ -7,18 +7,24 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Blogs = () => {
-  const { data: blogs, isLoading } = useQuery({
+  const { data: blogs, isLoading, error } = useQuery({
     queryKey: ["blogs"],
     queryFn: async () => {
+      console.log("Fetching blogs...");
       const { data, error } = await supabase
         .from("blogs")
         .select(`
           *,
-          blog_categories(*)
+          blog_categories(name)
         `)
         .eq("status", "approved");
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching blogs:", error);
+        throw error;
+      }
+      
+      console.log("Fetched blogs:", data);
       return data;
     },
   });
@@ -32,6 +38,20 @@ const Blogs = () => {
             <Skeleton key={i} className="h-64" />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-8">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Failed to load blogs. Please try again later.
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
@@ -55,7 +75,7 @@ const Blogs = () => {
       <h1 className="text-3xl font-bold mb-8">Latest Blogs</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {blogs.map((blog) => (
-          <Card key={blog.id}>
+          <Card key={blog.id} className="flex flex-col">
             {blog.cover_image && (
               <img
                 src={blog.cover_image}
@@ -64,7 +84,7 @@ const Blogs = () => {
               />
             )}
             <CardHeader>
-              <CardTitle>{blog.title}</CardTitle>
+              <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
