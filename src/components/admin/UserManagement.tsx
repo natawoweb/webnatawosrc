@@ -9,9 +9,9 @@ import { ProfileDialog } from "./ProfileDialog";
 import { useUserManagement } from "@/hooks/useUserManagement";
 import { useState } from "react";
 import { type Database } from "@/integrations/supabase/types";
+import type { UserLevel } from "@/integrations/supabase/types/models";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
-type UserLevel = Database['public']['Enums']['user_level'];
 type AppRole = Database['public']['Enums']['app_role'];
 
 type UserWithRole = Profile & {
@@ -104,7 +104,7 @@ export function UserManagement() {
         selectedRole={editRole}
         selectedLevel={editLevel}
         onRoleChange={setEditRole}
-        onLevelChange={(level) => setEditLevel(level as UserLevel)}
+        onLevelChange={setEditLevel}
       />
 
       <AddUserDialog
