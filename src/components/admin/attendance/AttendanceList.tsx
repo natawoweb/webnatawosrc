@@ -42,7 +42,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .from("event_attendance")
         .select(`
           *,
-          profile:profiles!inner(*)
+          profile:profiles(*)
         `)
         .eq("event_id", selectedEvent);
 
@@ -59,7 +59,7 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .from("event_registrations")
         .select(`
           *,
-          profile:profiles!inner(*)
+          profile:profiles(*)
         `)
         .eq("event_id", selectedEvent);
 
@@ -132,7 +132,15 @@ export function AttendanceList({ events }: AttendanceListProps) {
               const attendance = attendanceData?.find(
                 (a) => a.user_id === registration.user_id
               );
-              const profile = registration.profile as Profile;
+              const profile = registration.profile as Profile || {
+                full_name: "Unknown",
+                avatar_url: null,
+                bio: "",
+                created_at: "",
+                email: "",
+                id: registration.user_id,
+                updated_at: "",
+              };
 
               return (
                 <TableRow key={registration.id}>

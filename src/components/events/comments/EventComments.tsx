@@ -33,13 +33,26 @@ export function EventComments({ eventId }: EventCommentsProps) {
         .from("event_comments")
         .select(`
           *,
-          profile:profiles!inner(*)
+          profile:profiles(*)
         `)
         .eq("event_id", eventId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Comment[];
+
+      // Transform the data to ensure profile data is always present
+      return (data || []).map(comment => ({
+        ...comment,
+        profile: comment.profile || {
+          id: comment.user_id,
+          full_name: "Unknown",
+          bio: "",
+          avatar_url: null,
+          created_at: "",
+          updated_at: "",
+          email: "",
+        }
+      })) as Comment[];
     },
   });
 
