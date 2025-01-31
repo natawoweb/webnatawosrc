@@ -50,35 +50,42 @@ export function BlogContentSection({
 
   useEffect(() => {
     if (!isEnglish && titleInputRef.current) {
-      const loadGoogleInputTools = () => {
-        if (window.google?.elements?.transliteration) {
-          const options = {
-            sourceLanguage: 'en',
-            destinationLanguage: ['ta'],
-            shortcutKey: 'ctrl+g',
-            transliterationEnabled: true
-          };
-
-          const control = new window.google.elements.transliteration.TransliterationControl(options);
-          control.makeTransliteratable([titleInputRef.current!]);
-        }
+      const script = document.createElement('script');
+      script.src = "https://www.google.com/jsapi";
+      
+      script.onload = () => {
+        // @ts-ignore
+        google.load("elements", "1", {
+          packages: "transliteration",
+          callback: () => {
+            const control = new window.google.elements.transliteration.TransliterationControl({
+              sourceLanguage: 'en',
+              destinationLanguage: ['ta'],
+              shortcutKey: 'ctrl+g',
+              transliterationEnabled: true
+            });
+            
+            if (titleInputRef.current) {
+              control.makeTransliteratable([titleInputRef.current]);
+              // Enable transliteration by default
+              control.toggleTransliteration();
+            }
+          }
+        });
       };
 
-      // Load Google Input Tools script if not already loaded
-      if (!window.google?.elements?.transliteration) {
-        const script = document.createElement('script');
-        script.src = 'https://www.google.com/jsapi';
-        script.onload = () => {
-          // @ts-ignore
-          google.load('elements', '1', {
-            packages: 'transliteration',
-            callback: loadGoogleInputTools
-          });
-        };
+      // Only add the script if it hasn't been added before
+      if (!document.querySelector('script[src="https://www.google.com/jsapi"]')) {
         document.head.appendChild(script);
-      } else {
-        loadGoogleInputTools();
       }
+
+      return () => {
+        // Cleanup if needed
+        const scriptElement = document.querySelector('script[src="https://www.google.com/jsapi"]');
+        if (scriptElement) {
+          scriptElement.remove();
+        }
+      };
     }
   }, [isEnglish]);
 

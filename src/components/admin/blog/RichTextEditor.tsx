@@ -79,37 +79,43 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
 
   useEffect(() => {
     if (language === "tamil" && editorRef.current) {
-      const loadGoogleInputTools = () => {
-        if (window.google?.elements?.transliteration) {
-          const options = {
-            sourceLanguage: 'en',
-            destinationLanguage: ['ta'],
-            shortcutKey: 'ctrl+g',
-            transliterationEnabled: true
-          };
-
-          const control = new window.google.elements.transliteration.TransliterationControl(options);
-          const elements = editorRef.current!.getElementsByClassName('ProseMirror');
-          if (elements.length > 0) {
-            control.makeTransliteratable([elements[0]]);
+      const script = document.createElement('script');
+      script.src = "https://www.google.com/jsapi";
+      
+      script.onload = () => {
+        // @ts-ignore
+        google.load("elements", "1", {
+          packages: "transliteration",
+          callback: () => {
+            const control = new window.google.elements.transliteration.TransliterationControl({
+              sourceLanguage: 'en',
+              destinationLanguage: ['ta'],
+              shortcutKey: 'ctrl+g',
+              transliterationEnabled: true
+            });
+            
+            const elements = editorRef.current!.getElementsByClassName('ProseMirror');
+            if (elements.length > 0) {
+              control.makeTransliteratable([elements[0]]);
+              // Enable transliteration by default
+              control.toggleTransliteration();
+            }
           }
-        }
+        });
       };
 
-      if (!window.google?.elements?.transliteration) {
-        const script = document.createElement('script');
-        script.src = 'https://www.google.com/jsapi';
-        script.onload = () => {
-          // @ts-ignore
-          google.load('elements', '1', {
-            packages: 'transliteration',
-            callback: loadGoogleInputTools
-          });
-        };
+      // Only add the script if it hasn't been added before
+      if (!document.querySelector('script[src="https://www.google.com/jsapi"]')) {
         document.head.appendChild(script);
-      } else {
-        loadGoogleInputTools();
       }
+
+      return () => {
+        // Cleanup if needed
+        const scriptElement = document.querySelector('script[src="https://www.google.com/jsapi"]');
+        if (scriptElement) {
+          scriptElement.remove();
+        }
+      };
     }
   }, [language, editor]);
 
