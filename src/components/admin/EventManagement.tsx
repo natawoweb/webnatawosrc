@@ -18,7 +18,8 @@ import {
   MapPin, 
   Image as ImageIcon,
   Plus,
-  X
+  X,
+  Pencil,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -47,6 +48,7 @@ export function EventManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<string | null>(null);
   const [formData, setFormData] = useState<EventFormData>({
     title: "",
     description: "",
@@ -73,7 +75,6 @@ export function EventManagement() {
 
   const createEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
-      // Upload images first
       const uploadedGallery = [];
       
       for (const image of selectedImages) {
@@ -93,7 +94,6 @@ export function EventManagement() {
         uploadedGallery.push(publicUrl);
       }
 
-      // Create event with uploaded image URLs
       const { data: event, error } = await supabase
         .from("events")
         .insert([
@@ -112,16 +112,7 @@ export function EventManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-events"] });
       setIsOpen(false);
-      setFormData({
-        title: "",
-        description: "",
-        date: "",
-        time: "",
-        location: "",
-        max_participants: 0,
-        gallery: [],
-      });
-      setSelectedImages([]);
+      resetForm();
       toast({
         title: "Success",
         description: "Event created successfully",
@@ -136,9 +127,95 @@ export function EventManagement() {
     },
   });
 
+  const updateEventMutation = useMutation({
+    mutationFn: async (data: EventFormData & { id: string }) => {
+      const { id, ...eventData } = data;
+      const uploadedGallery = [...(eventData.gallery || [])];
+      
+      // Upload new images
+      for (const image of selectedImages) {
+        const fileExt = image.name.split('.').pop();
+        const filePath = `${crypto.randomUUID()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from("blog-images")
+          .upload(filePath, image);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("blog-images")
+          .getPublicUrl(filePath);
+
+        uploadedGallery.push(publicUrl);
+      }
+
+      const { data: event, error } = await supabase
+        .from("events")
+        .update({
+          ...eventData,
+          gallery: uploadedGallery,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return event;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
+      setIsOpen(false);
+      resetForm();
+      toast({
+        title: "Success",
+        description: "Event updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update event: " + error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createEventMutation.mutate(formData);
+    if (editingEvent) {
+      updateEventMutation.mutate({ ...formData, id: editingEvent });
+    } else {
+      createEventMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (event: any) => {
+    setEditingEvent(event.id);
+    setFormData({
+      title: event.title,
+      description: event.description,
+      date: event.date.split('T')[0],
+      time: event.time,
+      location: event.location,
+      max_participants: event.max_participants,
+      gallery: event.gallery || [],
+    });
+    setIsOpen(true);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      description: "",
+      date: "",
+      time: "",
+      location: "",
+      max_participants: 0,
+      gallery: [],
+    });
+    setSelectedImages([]);
+    setEditingEvent(null);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,7 +226,16 @@ export function EventManagement() {
   };
 
   const removeImage = (index: number) => {
-    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    if (editingEvent) {
+      // Remove from existing gallery
+      setFormData(prev => ({
+        ...prev,
+        gallery: prev.gallery.filter((_, i) => i !== index)
+      }));
+    } else {
+      // Remove from selected images
+      setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
   if (isLoading) {
@@ -164,7 +250,10 @@ export function EventManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Event Management</h2>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={(open) => {
+          setIsOpen(open);
+          if (!open) resetForm();
+        }}>
           <DialogTrigger asChild>
             <Button>
               <Calendar className="mr-2 h-4 w-4" />
@@ -173,7 +262,7 @@ export function EventManagement() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Create New Event</DialogTitle>
+              <DialogTitle>{editingEvent ? 'Edit Event' : 'Create New Event'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -277,30 +366,60 @@ export function EventManagement() {
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
+
+                {/* Display existing gallery images */}
+                {editingEvent && formData.gallery && formData.gallery.length > 0 && (
+                  <div className="mt-4">
+                    <Label>Current Gallery</Label>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {formData.gallery.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={url}
+                            alt={`Gallery ${index + 1}`}
+                            className="w-full h-20 object-cover rounded-md"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-1 right-1 bg-background/80 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Display new selected images */}
                 {selectedImages.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    {selectedImages.map((file, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-20 object-cover rounded-md"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute top-1 right-1 bg-background/80 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
+                  <div className="mt-4">
+                    <Label>New Images</Label>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {selectedImages.map((file, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-20 object-cover rounded-md"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-1 right-1 bg-background/80 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
 
               <Button type="submit" className="w-full">
-                Create Event
+                {editingEvent ? 'Update Event' : 'Create Event'}
               </Button>
             </form>
           </DialogContent>
@@ -315,6 +434,7 @@ export function EventManagement() {
             <TableHead>Location</TableHead>
             <TableHead>Participants</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -342,6 +462,15 @@ export function EventManagement() {
                 <Badge variant={event.is_upcoming ? "default" : "secondary"}>
                   {event.is_upcoming ? "Upcoming" : "Past"}
                 </Badge>
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleEdit(event)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
