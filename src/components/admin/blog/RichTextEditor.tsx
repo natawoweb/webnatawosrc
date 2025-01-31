@@ -9,19 +9,23 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  AlignJustify
+  AlignJustify,
+  Keyboard
 } from "lucide-react";
 import TextAlign from '@tiptap/extension-text-align';
+import { useEffect, useRef } from 'react';
 
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
+  language?: "english" | "tamil";
 }
 
-export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
+export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
+  const editorRef = useRef<HTMLDivElement>(null);
+
   const parseContent = (contentString: string) => {
     try {
-      // If content is empty, return a valid empty document
       if (!contentString) {
         return {
           type: 'doc',
@@ -34,7 +38,6 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
 
       const parsed = JSON.parse(contentString);
       
-      // If parsed content doesn't have the correct structure, create a valid document
       if (!parsed.type || parsed.type !== 'doc') {
         return {
           type: 'doc',
@@ -48,7 +51,6 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
       return parsed;
     } catch (error) {
       console.warn('Error parsing editor content:', error);
-      // Return a valid empty document structure
       return {
         type: 'doc',
         content: [{
@@ -75,78 +77,122 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
     editable: true,
   });
 
+  useEffect(() => {
+    if (language === "tamil" && editorRef.current) {
+      const loadGoogleInputTools = () => {
+        if (window.google?.elements?.transliteration) {
+          const options = {
+            sourceLanguage: 'en',
+            destinationLanguage: ['ta'],
+            shortcutKey: 'ctrl+g',
+            transliterationEnabled: true
+          };
+
+          const control = new window.google.elements.transliteration.TransliterationControl(options);
+          const elements = editorRef.current!.getElementsByClassName('ProseMirror');
+          if (elements.length > 0) {
+            control.makeTransliteratable([elements[0]]);
+          }
+        }
+      };
+
+      if (!window.google?.elements?.transliteration) {
+        const script = document.createElement('script');
+        script.src = 'https://www.google.com/jsapi';
+        script.onload = () => {
+          // @ts-ignore
+          google.load('elements', '1', {
+            packages: 'transliteration',
+            callback: loadGoogleInputTools
+          });
+        };
+        document.head.appendChild(script);
+      } else {
+        loadGoogleInputTools();
+      }
+    }
+  }, [language, editor]);
+
   if (!editor) {
     return null;
   }
 
   return (
-    <div className="border rounded-lg h-full flex flex-col">
-      <div className="border-b p-2 flex gap-2 flex-wrap">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={editor.isActive('bold') ? 'bg-muted' : ''}
-        >
-          <Bold className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={editor.isActive('italic') ? 'bg-muted' : ''}
-        >
-          <Italic className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive('bulletList') ? 'bg-muted' : ''}
-        >
-          <List className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={editor.isActive('orderedList') ? 'bg-muted' : ''}
-        >
-          <ListOrdered className="h-4 w-4" />
-        </Button>
-        <div className="h-6 w-px bg-border mx-2" />
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().setTextAlign('left').run()}
-          className={editor.isActive({ textAlign: 'left' }) ? 'bg-muted' : ''}
-        >
-          <AlignLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().setTextAlign('center').run()}
-          className={editor.isActive({ textAlign: 'center' }) ? 'bg-muted' : ''}
-        >
-          <AlignCenter className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().setTextAlign('right').run()}
-          className={editor.isActive({ textAlign: 'right' }) ? 'bg-muted' : ''}
-        >
-          <AlignRight className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-          className={editor.isActive({ textAlign: 'justify' }) ? 'bg-muted' : ''}
-        >
-          <AlignJustify className="h-4 w-4" />
-        </Button>
+    <div className="border rounded-lg h-full flex flex-col" ref={editorRef}>
+      <div className="border-b p-2 flex gap-2 flex-wrap items-center justify-between">
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            className={editor.isActive('bold') ? 'bg-muted' : ''}
+          >
+            <Bold className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={editor.isActive('italic') ? 'bg-muted' : ''}
+          >
+            <Italic className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            className={editor.isActive('bulletList') ? 'bg-muted' : ''}
+          >
+            <List className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            className={editor.isActive('orderedList') ? 'bg-muted' : ''}
+          >
+            <ListOrdered className="h-4 w-4" />
+          </Button>
+          <div className="h-6 w-px bg-border mx-2" />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+            className={editor.isActive({ textAlign: 'left' }) ? 'bg-muted' : ''}
+          >
+            <AlignLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().setTextAlign('center').run()}
+            className={editor.isActive({ textAlign: 'center' }) ? 'bg-muted' : ''}
+          >
+            <AlignCenter className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().setTextAlign('right').run()}
+            className={editor.isActive({ textAlign: 'right' }) ? 'bg-muted' : ''}
+          >
+            <AlignRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+            className={editor.isActive({ textAlign: 'justify' }) ? 'bg-muted' : ''}
+          >
+            <AlignJustify className="h-4 w-4" />
+          </Button>
+        </div>
+        {language === "tamil" && (
+          <div className="flex items-center text-sm text-muted-foreground">
+            <Keyboard className="mr-2 h-4 w-4" />
+            Press Ctrl+G to toggle Tamil typing
+          </div>
+        )}
       </div>
       <EditorContent 
         editor={editor} 
