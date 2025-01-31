@@ -31,7 +31,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
     onUpdate: ({ editor }) => {
       onChange(JSON.stringify(editor.getJSON()));
     },
-    autofocus: true,
+    autofocus: 'end',
     editable: true,
   });
 

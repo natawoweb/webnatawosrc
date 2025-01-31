@@ -1,9 +1,7 @@
 import { BlogContentSection } from "./BlogContentSection";
 import { BlogDialogHeader } from "./BlogDialogHeader";
-import { BlogDialogActions } from "./BlogDialogActions";
+import { BlogActions } from "./BlogActions";
 import { Database } from "@/integrations/supabase/types";
-import { Button } from "@/components/ui/button";
-import { Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -111,27 +109,13 @@ export function BlogDialogContent({
         onCategoryChange={onCategoryChange}
       />
       
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <BlogDialogActions
-            onSaveDraft={onSaveDraft}
-            onSubmit={onSubmit}
-            isLoading={isLoading}
-          />
-        </div>
-        
-        <div className="flex items-center justify-end">
-          <Button 
-            variant="outline"
-            onClick={handleTranslate}
-            disabled={!hasContent()}
-            className="w-full sm:w-auto"
-          >
-            <Globe className="mr-2 h-4 w-4" />
-            Translate to Tamil
-          </Button>
-        </div>
-      </div>
+      <BlogActions
+        onSaveDraft={onSaveDraft}
+        onSubmit={onSubmit}
+        onTranslate={handleTranslate}
+        isLoading={isLoading}
+        hasContent={hasContent()}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <BlogContentSection
