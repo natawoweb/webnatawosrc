@@ -30,17 +30,12 @@ interface AttendanceListProps {
   events: Event[];
 }
 
-type EventRegistration = {
-  id: string;
-  event_id: string;
-  user_id: string;
-  status: string;
-  created_at: string;
+type EventRegistration = Database["public"]["Tables"]["event_registrations"]["Row"] & {
   profiles: Profile | null;
 };
 
 type EventAttendance = Database["public"]["Tables"]["event_attendance"]["Row"] & {
-  profile: Profile | null;
+  profiles: Profile | null;
 };
 
 export function AttendanceList({ events }: AttendanceListProps) {
@@ -55,12 +50,12 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .from("event_attendance")
         .select(`
           *,
-          profile:profiles(*)
+          profiles:profiles(*)
         `)
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return data as EventAttendance[];
+      return (data || []) as EventAttendance[];
     },
   });
 
@@ -72,17 +67,13 @@ export function AttendanceList({ events }: AttendanceListProps) {
         .from("event_registrations")
         .select(`
           *,
-          profiles(*)
+          profiles:profiles(*)
         `)
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
       
-      // Transform the data to match our expected type
-      return (data || []).map(item => ({
-        ...item,
-        profiles: item.profiles as Profile | null
-      })) as EventRegistration[];
+      return (data || []) as EventRegistration[];
     },
   });
 
