@@ -3,7 +3,6 @@ import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import { useRef } from 'react';
 import { EditorToolbar } from './editor/EditorToolbar';
-import { useTamilInputSetup } from './editor/TamilInputSetup';
 
 interface RichTextEditorProps {
   content: string;
@@ -65,12 +64,6 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     },
     autofocus: 'end',
     editable: true,
-  });
-
-  const editorElement = editorRef.current?.getElementsByClassName('ProseMirror')[0];
-  useTamilInputSetup({
-    elementRef: editorElement as HTMLElement,
-    enabled: language === "tamil"
   });
 
   if (!editor) {
