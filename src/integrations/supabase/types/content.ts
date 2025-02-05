@@ -1,4 +1,4 @@
-```typescript
+
 import { Database } from './database'
 
 export interface BlogsTable {
@@ -99,4 +99,3 @@ export interface RatingsTable {
     created_at?: string | null
   }
 }
-```

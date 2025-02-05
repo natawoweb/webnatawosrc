@@ -1,4 +1,4 @@
-```typescript
+
 import { BlogsTable, CommentsTable, RatingsTable } from './content'
 import { EventsTable } from './events'
 import { WritersTable } from './writers'
@@ -72,4 +72,3 @@ interface UnregisterFromEventFunction {
   }
   Returns: boolean
 }
-```

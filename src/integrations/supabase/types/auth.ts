@@ -1,4 +1,4 @@
-```typescript
+
 import { Database } from './database'
 
 export interface ProfilesTable {
@@ -81,4 +81,3 @@ export interface UserRolesTable {
     created_at?: string | null
   }
 }
-```
