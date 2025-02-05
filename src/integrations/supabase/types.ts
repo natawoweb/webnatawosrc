@@ -241,6 +241,38 @@ export type Database = {
           },
         ]
       }
+      event_ratings: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_ratings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
           created_at: string | null

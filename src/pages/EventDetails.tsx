@@ -1,9 +1,11 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { EventCard } from "@/components/home/upcoming-events/EventCard";
 import { EventComments } from "@/components/events/comments/EventComments";
+import { EventRatingAndComments } from "@/components/events/EventRatingAndComments";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
@@ -92,6 +94,10 @@ const EventDetails = () => {
       <div className="space-y-8">
         <div className="bg-background">
           <EventCard event={event} />
+        </div>
+
+        <div className="bg-background p-6 rounded-lg">
+          <EventRatingAndComments event={event} />
         </div>
         
         <div className="bg-background p-6 rounded-lg">
