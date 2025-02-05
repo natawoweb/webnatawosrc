@@ -1,8 +1,11 @@
+
 import { useState } from "react";
 import { format } from "date-fns";
 import { Edit2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CommentForm } from "./CommentForm";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -30,6 +33,29 @@ export function CommentItem({
 }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
 
+  const { data: userRoles } = useQuery({
+    queryKey: ["userRoles", currentUserId],
+    queryFn: async () => {
+      if (!currentUserId) return [];
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", currentUserId);
+
+      if (error) {
+        console.error("Error fetching user roles:", error);
+        return [];
+      }
+      return data.map(r => r.role);
+    },
+    enabled: !!currentUserId
+  });
+
+  const canDelete = 
+    currentUserId === comment.user_id || 
+    userRoles?.includes("admin") || 
+    userRoles?.includes("manager");
+
   const handleEdit = (content: string) => {
     onEdit(comment.id, content);
     setIsEditing(false);
@@ -46,8 +72,8 @@ export function CommentItem({
             {format(new Date(comment.created_at), "MMM d, yyyy 'at' h:mm a")}
           </span>
         </div>
-        {currentUserId === comment.user_id && (
-          <div className="flex gap-2">
+        <div className="flex gap-2">
+          {currentUserId === comment.user_id && (
             <Button
               variant="ghost"
               size="sm"
@@ -55,6 +81,8 @@ export function CommentItem({
             >
               <Edit2 className="h-4 w-4" />
             </Button>
+          )}
+          {canDelete && (
             <Button
               variant="ghost"
               size="sm"
@@ -62,8 +90,8 @@ export function CommentItem({
             >
               <Trash2 className="h-4 w-4" />
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       {isEditing ? (
         <CommentForm
