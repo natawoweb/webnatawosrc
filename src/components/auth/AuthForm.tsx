@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,14 @@ export function AuthForm({ type, onSuccess }: AuthFormProps) {
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Signup error:', error);
+          let errorMessage = error.message;
+          if (error.message.includes('User already registered')) {
+            errorMessage = 'This email is already registered. Please try signing in instead.';
+          }
+          throw new Error(errorMessage);
+        }
         
         toast({
           title: "Success",
@@ -43,7 +51,14 @@ export function AuthForm({ type, onSuccess }: AuthFormProps) {
           password,
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Signin error:', error);
+          let errorMessage = error.message;
+          if (error.message.includes('Invalid login credentials')) {
+            errorMessage = 'Invalid email or password. If this is your first time logging in, make sure to use the temporary password provided.';
+          }
+          throw new Error(errorMessage);
+        }
         
         toast({
           title: "Welcome back!",
