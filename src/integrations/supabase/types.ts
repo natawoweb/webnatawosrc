@@ -473,6 +473,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_current_time: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       has_role:
         | {
             Args: {
