@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -81,9 +82,11 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             Sign Out
           </Button>
         ) : (
-          <Button variant="outline" onClick={() => navigate("/auth")} className="w-full mt-4">
-            Sign In
-          </Button>
+          <Link to="/auth">
+            <Button variant="outline" className="w-full mt-4">
+              Sign In
+            </Button>
+          </Link>
         )}
       </div>
     </div>

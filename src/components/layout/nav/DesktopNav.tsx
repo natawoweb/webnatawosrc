@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -62,9 +63,11 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
           Sign Out
         </Button>
       ) : (
-        <Button variant="outline" onClick={() => navigate("/auth")} className="ml-4">
-          Sign In
-        </Button>
+        <Link to="/auth">
+          <Button variant="outline" className="ml-4">
+            Sign In
+          </Button>
+        </Link>
       )}
     </div>
   );
