@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,9 +14,9 @@ import { type Database } from "@/integrations/supabase/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { type UserLevel } from "@/integrations/supabase/types/models";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
-type UserLevel = Database['public']['Enums']['user_level'];
 type AppRole = Database['public']['Enums']['app_role'];
 
 interface ProfileDialogProps {
@@ -44,7 +45,9 @@ export function ProfileDialog({
 }: ProfileDialogProps) {
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [bio, setBio] = useState(profile?.bio || '');
-  const [level, setLevel] = useState<UserLevel | undefined>(profile?.level || undefined);
+  const [level, setLevel] = useState<UserLevel | undefined>(
+    profile?.level as UserLevel | undefined
+  );
 
   const handleSubmit = () => {
     if (!profile) return;
@@ -110,7 +113,7 @@ export function ProfileDialog({
                 <label className="text-sm font-medium">Level</label>
                 <Select
                   value={level}
-                  onValueChange={(value) => setLevel(value as UserLevel)}
+                  onValueChange={(value: UserLevel) => setLevel(value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select user level" />
