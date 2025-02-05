@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,10 @@ export function EventActions({ event }: EventActionsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isRegistering, setIsRegistering] = useState(false);
-  const isPastEvent = isPast(new Date(event.date));
+  
+  // Combine date and time for accurate past/future comparison
+  const eventDateTime = new Date(`${event.date}T${event.time}`);
+  const isPastEvent = isPast(eventDateTime);
 
   const { data: session } = useQuery({
     queryKey: ["session"],
