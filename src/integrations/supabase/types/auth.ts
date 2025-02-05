@@ -9,7 +9,7 @@ export interface ProfilesTable {
     created_at: string | null
     updated_at: string | null
     email: string | null
-    level?: Database["public"]["Enums"]["user_level"]
+    level: Database["public"]["Enums"]["user_level"] | null
     county: string | null
     date_of_birth: string | null
     gender: string | null
@@ -28,7 +28,7 @@ export interface ProfilesTable {
     created_at?: string | null
     updated_at?: string | null
     email?: string | null
-    level?: Database["public"]["Enums"]["user_level"]
+    level?: Database["public"]["Enums"]["user_level"] | null
     county?: string | null
     date_of_birth?: string | null
     gender?: string | null
@@ -47,7 +47,7 @@ export interface ProfilesTable {
     created_at?: string | null
     updated_at?: string | null
     email?: string | null
-    level?: Database["public"]["Enums"]["user_level"]
+    level?: Database["public"]["Enums"]["user_level"] | null
     county?: string | null
     date_of_birth?: string | null
     gender?: string | null

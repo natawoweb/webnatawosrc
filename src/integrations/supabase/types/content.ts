@@ -9,10 +9,10 @@ export interface BlogsTable {
     updated_at: string | null
     published_at: string | null
     views_count: number | null
-    title_tamil?: string | null
-    content_tamil?: string | null
-    category_id?: string | null
-    cover_image?: string | null
+    title_tamil: string | null
+    content_tamil: string | null
+    category_id: string | null
+    cover_image: string | null
   }
   Insert: {
     id?: string
@@ -53,7 +53,6 @@ export interface CommentsTable {
     user_id: string
     content: string
     created_at: string | null
-    updated_at: string | null
   }
   Insert: {
     id?: string
@@ -61,7 +60,6 @@ export interface CommentsTable {
     user_id: string
     content: string
     created_at?: string | null
-    updated_at?: string | null
   }
   Update: {
     id?: string
@@ -69,7 +67,6 @@ export interface CommentsTable {
     user_id?: string
     content?: string
     created_at?: string | null
-    updated_at?: string | null
   }
 }
 

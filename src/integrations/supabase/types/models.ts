@@ -13,12 +13,12 @@ export type EventNotification = Database['public']['Tables']['event_notification
 export type EventCategory = Database['public']['Tables']['event_categories']['Row']
 export type BlogCategory = Database['public']['Tables']['blog_categories']['Row']
 
-export interface UserWithRole extends Profile {
+export type UserWithRole = Profile & {
   role: AppRole;
   level?: UserLevel;
 }
 
-export interface Blog extends Database['public']['Tables']['blogs']['Row'] {
+export type Blog = Database['public']['Tables']['blogs']['Row'] & {
   blog_categories?: BlogCategory | null;
   author?: Profile | null;
 }
