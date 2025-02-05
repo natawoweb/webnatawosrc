@@ -16,7 +16,43 @@ export function AuthForm({ type, onSuccess }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const { toast } = useToast();
+
+  const handlePasswordReset = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter your email address to reset your password.",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?type=reset`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Check your email",
+        description: "We've sent you a password reset link.",
+      });
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,16 +147,30 @@ export function AuthForm({ type, onSuccess }: AuthFormProps) {
           />
         </div>
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {type === 'signup' ? (
-          loading ? "Signing up..." : "Sign Up"
-        ) : (
-          <>
-            <LogIn className="mr-2 h-4 w-4" />
-            {loading ? "Signing in..." : "Sign In"}
-          </>
+      <div className="flex flex-col space-y-2">
+        <Button type="submit" className="w-full" disabled={loading}>
+          {type === 'signup' ? (
+            loading ? "Signing up..." : "Sign Up"
+          ) : (
+            <>
+              <LogIn className="mr-2 h-4 w-4" />
+              {loading ? "Signing in..." : "Sign In"}
+            </>
+          )}
+        </Button>
+        
+        {type === 'signin' && (
+          <Button
+            type="button"
+            variant="link"
+            className="text-sm"
+            onClick={handlePasswordReset}
+            disabled={loading}
+          >
+            Forgot your password?
+          </Button>
         )}
-      </Button>
+      </div>
     </form>
   );
 }
