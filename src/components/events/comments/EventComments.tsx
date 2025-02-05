@@ -1,9 +1,11 @@
+
 import { MessageSquare } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CommentForm } from "./CommentForm";
 import { CommentItem } from "./CommentItem";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Database } from "@/integrations/supabase/types";
 
 interface EventCommentsProps {
@@ -26,9 +28,10 @@ export function EventComments({ eventId }: EventCommentsProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: comments, isLoading } = useQuery({
+  const { data: comments, isLoading, error } = useQuery({
     queryKey: ["eventComments", eventId],
     queryFn: async () => {
+      console.log("Fetching comments for event:", eventId);
       const { data, error } = await supabase
         .from("event_comments")
         .select(`
@@ -38,9 +41,12 @@ export function EventComments({ eventId }: EventCommentsProps) {
         .eq("event_id", eventId)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching comments:", error);
+        throw error;
+      }
 
-      // Transform the data to ensure profile data is always present
+      console.log("Fetched comments:", data);
       return (data || []).map(comment => ({
         ...comment,
         profile: comment.profile || {
@@ -83,6 +89,14 @@ export function EventComments({ eventId }: EventCommentsProps) {
         description: "Your comment has been added successfully.",
       });
     },
+    onError: (error) => {
+      console.error("Error adding comment:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add comment. Please try again.",
+      });
+    }
   });
 
   const updateCommentMutation = useMutation({
@@ -101,6 +115,14 @@ export function EventComments({ eventId }: EventCommentsProps) {
         description: "Your comment has been updated successfully.",
       });
     },
+    onError: (error) => {
+      console.error("Error updating comment:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update comment. Please try again.",
+      });
+    }
   });
 
   const deleteCommentMutation = useMutation({
@@ -119,7 +141,23 @@ export function EventComments({ eventId }: EventCommentsProps) {
         description: "Your comment has been deleted successfully.",
       });
     },
+    onError: (error) => {
+      console.error("Error deleting comment:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete comment. Please try again.",
+      });
+    }
   });
+
+  if (error) {
+    return (
+      <div className="text-red-500">
+        Error loading comments. Please try again.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -132,7 +170,15 @@ export function EventComments({ eventId }: EventCommentsProps) {
 
       <div className="space-y-4">
         {isLoading ? (
-          <p>Loading comments...</p>
+          <>
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </>
+        ) : comments?.length === 0 ? (
+          <p className="text-muted-foreground text-center py-4">
+            No comments yet. Be the first to comment!
+          </p>
         ) : (
           comments?.map((comment) => (
             <CommentItem
