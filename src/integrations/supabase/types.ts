@@ -368,34 +368,34 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
-          created_at: string | null
+          created_at: string
           email: string | null
           full_name: string | null
           id: string
           level: Database["public"]["Enums"]["user_level"] | null
-          updated_at: string | null
+          updated_at: string
           UserRole: Database["public"]["Enums"]["app_role"] | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
-          created_at?: string | null
+          created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
           level?: Database["public"]["Enums"]["user_level"] | null
-          updated_at?: string | null
+          updated_at?: string
           UserRole?: Database["public"]["Enums"]["app_role"] | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
-          created_at?: string | null
+          created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
           level?: Database["public"]["Enums"]["user_level"] | null
-          updated_at?: string | null
+          updated_at?: string
           UserRole?: Database["public"]["Enums"]["app_role"] | null
         }
         Relationships: []
