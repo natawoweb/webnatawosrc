@@ -407,7 +407,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
+          role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
@@ -465,13 +465,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
+      create_user_with_role: {
         Args: {
           user_id: string
-          required_role: Database["public"]["Enums"]["app_role"]
+          user_email: string
+          user_role: Database["public"]["Enums"]["app_role"]
         }
-        Returns: boolean
+        Returns: undefined
       }
+      has_role:
+        | {
+            Args: {
+              required_role: Database["public"]["Enums"]["app_role"]
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              user_id: string
+              required_role: Database["public"]["Enums"]["app_role"]
+            }
+            Returns: boolean
+          }
       register_for_event: {
         Args: {
           p_event_id: string
