@@ -1,5 +1,6 @@
 
 import { Database } from './database'
+import { Json } from './shared'
 
 export interface BlogsTable {
   Row: {
@@ -12,7 +13,7 @@ export interface BlogsTable {
     updated_at: string | null
     views_count: number | null
     title_tamil: string | null
-    content_tamil: jsonb | null
+    content_tamil: Json | null
     category_id: string | null
     cover_image: string | null
     published_at: string | null
@@ -27,7 +28,7 @@ export interface BlogsTable {
     updated_at?: string | null
     views_count?: number | null
     title_tamil?: string | null
-    content_tamil?: jsonb | null
+    content_tamil?: Json | null
     category_id?: string | null
     cover_image?: string | null
     published_at?: string | null
@@ -42,7 +43,7 @@ export interface BlogsTable {
     updated_at?: string | null
     views_count?: number | null
     title_tamil?: string | null
-    content_tamil?: jsonb | null
+    content_tamil?: Json | null
     category_id?: string | null
     cover_image?: string | null
     published_at?: string | null
