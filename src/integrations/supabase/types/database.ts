@@ -1,7 +1,8 @@
 import { BlogsTable, CommentsTable, RatingsTable } from './content'
-import { EventsTable } from './events'
+import { EventsTable, EventRegistrationsTable, EventAttendanceTable, EventCommentsTable, EventNotificationsTable, EventCategoriesTable } from './events'
 import { WritersTable } from './writers'
 import { ProfilesTable, UserRolesTable } from './auth'
+import { BlogCategoriesTable } from './content'
 
 export interface Database {
   public: {
@@ -9,9 +10,15 @@ export interface Database {
       profiles: ProfilesTable
       user_roles: UserRolesTable
       blogs: BlogsTable
-      comments: CommentsTable
+      blog_comments: CommentsTable
+      blog_ratings: RatingsTable
+      blog_categories: BlogCategoriesTable
       events: EventsTable
-      ratings: RatingsTable
+      event_registrations: EventRegistrationsTable
+      event_attendance: EventAttendanceTable
+      event_comments: EventCommentsTable
+      event_notifications: EventNotificationsTable
+      event_categories: EventCategoriesTable
       writers: WritersTable
     }
     Views: {
@@ -19,6 +26,8 @@ export interface Database {
     }
     Functions: {
       has_role: HasRoleFunction
+      register_for_event: RegisterForEventFunction
+      unregister_from_event: UnregisterFromEventFunction
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
@@ -34,6 +43,22 @@ interface HasRoleFunction {
   Args: {
     user_id: string
     required_role: Database["public"]["Enums"]["app_role"]
+  }
+  Returns: boolean
+}
+
+interface RegisterForEventFunction {
+  Args: {
+    p_event_id: string
+    p_user_id: string
+  }
+  Returns: boolean
+}
+
+interface UnregisterFromEventFunction {
+  Args: {
+    p_event_id: string
+    p_user_id: string
   }
   Returns: boolean
 }

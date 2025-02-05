@@ -9,6 +9,24 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      blog_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       blog_comments: {
         Row: {
           blog_id: string
@@ -131,6 +149,186 @@ export type Database = {
           },
         ]
       }
+      event_attendance: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_attendance_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      event_comments: {
+        Row: {
+          content: string
+          created_at: string
+          event_id: string | null
+          id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_comments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      event_registrations: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          current_participants: number | null
+          date: string
+          description: string | null
+          gallery: Json | null
+          id: string
+          is_upcoming: boolean | null
+          location: string
+          max_participants: number | null
+          time: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          current_participants?: number | null
+          date: string
+          description?: string | null
+          gallery?: Json | null
+          id?: string
+          is_upcoming?: boolean | null
+          location: string
+          max_participants?: number | null
+          time: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          current_participants?: number | null
+          date?: string
+          description?: string | null
+          gallery?: Json | null
+          id?: string
+          is_upcoming?: boolean | null
+          location?: string
+          max_participants?: number | null
+          time?: string
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -209,6 +407,48 @@ export type Database = {
         }
         Relationships: []
       }
+      writers: {
+        Row: {
+          accomplishments: Json | null
+          bio: string | null
+          created_at: string
+          featured: boolean | null
+          featured_month: string | null
+          genre: string | null
+          id: string
+          image_url: string | null
+          name: string
+          published_works: Json | null
+          social_links: Json | null
+        }
+        Insert: {
+          accomplishments?: Json | null
+          bio?: string | null
+          created_at?: string
+          featured?: boolean | null
+          featured_month?: string | null
+          genre?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          published_works?: Json | null
+          social_links?: Json | null
+        }
+        Update: {
+          accomplishments?: Json | null
+          bio?: string | null
+          created_at?: string
+          featured?: boolean | null
+          featured_month?: string | null
+          genre?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          published_works?: Json | null
+          social_links?: Json | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -218,6 +458,20 @@ export type Database = {
         Args: {
           user_id: string
           required_role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
+      register_for_event: {
+        Args: {
+          p_event_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      unregister_from_event: {
+        Args: {
+          p_event_id: string
+          p_user_id: string
         }
         Returns: boolean
       }
