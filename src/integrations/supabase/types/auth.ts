@@ -10,6 +10,15 @@ export interface ProfilesTable {
     updated_at: string | null
     email: string | null
     level?: Database["public"]["Enums"]["user_level"]
+    county: string | null
+    date_of_birth: string | null
+    gender: string | null
+    location: string | null
+    pseudonym: string | null
+    state: string | null
+    status: string | null
+    uesr_id: string | null
+    user_type: string
   }
   Insert: {
     id: string
@@ -20,6 +29,15 @@ export interface ProfilesTable {
     updated_at?: string | null
     email?: string | null
     level?: Database["public"]["Enums"]["user_level"]
+    county?: string | null
+    date_of_birth?: string | null
+    gender?: string | null
+    location?: string | null
+    pseudonym?: string | null
+    state?: string | null
+    status?: string | null
+    uesr_id?: string | null
+    user_type?: string
   }
   Update: {
     id?: string
@@ -30,6 +48,15 @@ export interface ProfilesTable {
     updated_at?: string | null
     email?: string | null
     level?: Database["public"]["Enums"]["user_level"]
+    county?: string | null
+    date_of_birth?: string | null
+    gender?: string | null
+    location?: string | null
+    pseudonym?: string | null
+    state?: string | null
+    status?: string | null
+    uesr_id?: string | null
+    user_type?: string
   }
 }
 

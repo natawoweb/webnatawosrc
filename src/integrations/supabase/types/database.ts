@@ -1,8 +1,7 @@
-import { BlogsTable, CommentsTable, RatingsTable } from './content'
+import { BlogsTable, CommentsTable, RatingsTable, BlogCategoriesTable } from './content'
 import { EventsTable, EventRegistrationsTable, EventAttendanceTable, EventCommentsTable, EventNotificationsTable, EventCategoriesTable } from './events'
 import { WritersTable } from './writers'
 import { ProfilesTable, UserRolesTable } from './auth'
-import { BlogCategoriesTable } from './content'
 
 export interface Database {
   public: {
