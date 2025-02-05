@@ -36,7 +36,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
         .from("event_comments")
         .select(`
           *,
-          profile:profiles(*)
+          profile:profiles!event_comments_user_id_fkey(*)
         `)
         .eq("event_id", eventId)
         .order("created_at", { ascending: false });
@@ -51,7 +51,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
         ...comment,
         profile: comment.profile || {
           id: comment.user_id,
-          full_name: "Unknown",
+          full_name: "Anonymous",
           bio: "",
           avatar_url: null,
           created_at: "",
