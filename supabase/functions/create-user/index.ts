@@ -139,6 +139,7 @@ serve(async (req: Request) => {
       email_confirm: true,
       user_metadata: {
         full_name: payload.fullName,
+        role: payload.role,
       },
     });
 
