@@ -1,41 +1,43 @@
+import { Json } from './shared'
+
 export interface WritersTable {
   Row: {
     id: string
     name: string
-    bio: string | null
-    genre: string | null
+    bio: string
+    genre: string
     image_url: string | null
-    social_links: any | null
-    featured: boolean
+    social_links: Json | null
+    featured: boolean | null
     featured_month: string | null
     created_at: string
-    accomplishments: any | null
-    published_works: any | null
+    accomplishments: Json | null
+    published_works: Json | null
   }
   Insert: {
     id?: string
     name: string
-    bio?: string | null
-    genre?: string | null
+    bio: string
+    genre: string
     image_url?: string | null
-    social_links?: any | null
-    featured?: boolean
+    social_links?: Json | null
+    featured?: boolean | null
     featured_month?: string | null
     created_at?: string
-    accomplishments?: any | null
-    published_works?: any | null
+    accomplishments?: Json | null
+    published_works?: Json | null
   }
   Update: {
     id?: string
     name?: string
-    bio?: string | null
-    genre?: string | null
+    bio?: string
+    genre?: string
     image_url?: string | null
-    social_links?: any | null
-    featured?: boolean
+    social_links?: Json | null
+    featured?: boolean | null
     featured_month?: string | null
     created_at?: string
-    accomplishments?: any | null
-    published_works?: any | null
+    accomplishments?: Json | null
+    published_works?: Json | null
   }
 }

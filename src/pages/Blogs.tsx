@@ -1,25 +1,25 @@
+import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Blogs = () => {
   const { data: blogs, isLoading, error } = useQuery({
     queryKey: ["blogs"],
     queryFn: async () => {
       console.log("Fetching blogs...");
-      
-      // Fetch blogs with categories and author profiles in a single query
+      const { data: session } = await supabase.auth.getSession();
+      console.log("Current session:", session);
+
+      // First fetch blogs with their categories
       const { data, error } = await supabase
         .from("blogs")
         .select(`
           *,
-          blog_categories (
-            name
-          ),
-          author:profiles!blogs_author_id_fkey (
-            full_name
-          )
+          blog_categories(name)
         `)
         .eq("status", "approved");
 
@@ -27,24 +27,35 @@ const Blogs = () => {
         console.error("Error fetching blogs:", error);
         throw error;
       }
+
+      // Then fetch author profiles for the blogs
+      const blogsWithAuthors = await Promise.all(
+        data.map(async (blog) => {
+          const { data: authorData } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", blog.author_id)
+            .single();
+          
+          return {
+            ...blog,
+            author_name: authorData?.full_name || "Anonymous"
+          };
+        })
+      );
       
-      console.log("Fetched blogs:", data);
-      return data;
+      console.log("Fetched blogs:", blogsWithAuthors);
+      return blogsWithAuthors;
     },
   });
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto py-8 space-y-4">
+        <Skeleton className="h-12 w-48" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="flex flex-col h-full">
-              <CardContent className="p-6">
-                <Skeleton className="h-4 w-3/4 mb-4" />
-                <Skeleton className="h-20 w-full mb-4" />
-                <Skeleton className="h-4 w-1/2" />
-              </CardContent>
-            </Card>
+            <Skeleton key={i} className="h-64" />
           ))}
         </div>
       </div>
@@ -53,46 +64,54 @@ const Blogs = () => {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <p className="text-red-500">Error loading blogs: {error.message}</p>
+      <div className="container mx-auto py-8">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Failed to load blogs. Please try again later.
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
 
-  if (!blogs || blogs.length === 0) {
+  if (!blogs?.length) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <p>No Blogs Found</p>
-        <p className="text-muted-foreground">
-          There are currently no approved blogs to display. Please check back later!
-        </p>
+      <div className="container mx-auto py-8">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>No Blogs Found</AlertTitle>
+          <AlertDescription>
+            There are currently no approved blogs to display. Please check back later!
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-8">Latest Blogs</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {blogs.map((blog) => (
-          <Card key={blog.id} className="flex flex-col h-full">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-2 line-clamp-2">
-                {blog.title}
-              </h2>
-              <div
-                className="text-muted-foreground mb-4 line-clamp-3"
-                dangerouslySetInnerHTML={{
-                  __html:
-                    typeof blog.content === "string"
-                      ? blog.content
-                      : JSON.stringify(blog.content),
-                }}
+          <Card key={blog.id} className="flex flex-col">
+            {blog.cover_image && (
+              <img
+                src={blog.cover_image}
+                alt={blog.title}
+                className="w-full h-48 object-cover rounded-t-lg"
               />
+            )}
+            <CardHeader>
+              <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
               <p className="text-sm text-muted-foreground">
                 Category: {blog.blog_categories?.name || "Uncategorized"}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
-                Author: {blog.author?.full_name || "Anonymous"}
+                Author: {blog.author_name}
               </p>
             </CardContent>
           </Card>

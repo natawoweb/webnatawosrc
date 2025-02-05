@@ -1,5 +1,5 @@
-import { BlogsTable, CommentsTable, RatingsTable, BlogCategoriesTable } from './content'
-import { EventsTable, EventRegistrationsTable, EventAttendanceTable, EventCommentsTable, EventNotificationsTable, EventCategoriesTable } from './events'
+import { BlogsTable, CommentsTable, RatingsTable } from './content'
+import { EventsTable } from './events'
 import { WritersTable } from './writers'
 import { ProfilesTable, UserRolesTable } from './auth'
 
@@ -9,15 +9,9 @@ export interface Database {
       profiles: ProfilesTable
       user_roles: UserRolesTable
       blogs: BlogsTable
-      blog_comments: CommentsTable
-      blog_ratings: RatingsTable
-      blog_categories: BlogCategoriesTable
+      comments: CommentsTable
       events: EventsTable
-      event_registrations: EventRegistrationsTable
-      event_attendance: EventAttendanceTable
-      event_comments: EventCommentsTable
-      event_notifications: EventNotificationsTable
-      event_categories: EventCategoriesTable
+      ratings: RatingsTable
       writers: WritersTable
     }
     Views: {
@@ -30,7 +24,6 @@ export interface Database {
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
-      user_level: "Literary Tamil Writers" | "Talented Experts" | "NATAWO Volunteers" | "NATAWO Students Writers" | "Subscriber" | "Technical"
     }
     CompositeTypes: {
       [_ in never]: never
