@@ -4,4 +4,4 @@ export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Writer = Database['public']['Tables']['writers']['Row']
 export type AppRole = Database['public']['Enums']['app_role']
 export type UserRole = Database['public']['Tables']['user_roles']['Row']
-export type UserLevel = 'Literary Tamil Writers' | 'Talented Experts' | 'NATAWO Volunteers' | 'NATAWO Students Writers'
+export type UserLevel = Database['public']['Enums']['user_level']

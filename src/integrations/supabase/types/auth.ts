@@ -9,6 +9,7 @@ export interface ProfilesTable {
     created_at: string | null
     updated_at: string | null
     email: string | null
+    level?: Database["public"]["Enums"]["user_level"]
   }
   Insert: {
     id: string
@@ -18,6 +19,7 @@ export interface ProfilesTable {
     created_at?: string | null
     updated_at?: string | null
     email?: string | null
+    level?: Database["public"]["Enums"]["user_level"]
   }
   Update: {
     id?: string
@@ -27,6 +29,7 @@ export interface ProfilesTable {
     created_at?: string | null
     updated_at?: string | null
     email?: string | null
+    level?: Database["public"]["Enums"]["user_level"]
   }
 }
 
