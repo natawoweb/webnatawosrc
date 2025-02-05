@@ -36,7 +36,15 @@ export function EventComments({ eventId }: EventCommentsProps) {
         .from("event_comments")
         .select(`
           *,
-          profile:profiles!event_comments_user_id_fkey(*)
+          profile:user_id(
+            id,
+            full_name,
+            bio,
+            avatar_url,
+            created_at,
+            updated_at,
+            email
+          )
         `)
         .eq("event_id", eventId)
         .order("created_at", { ascending: false });
