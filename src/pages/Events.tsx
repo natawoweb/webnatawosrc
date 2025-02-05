@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +8,6 @@ import { EventGrid } from "@/components/events/EventGrid";
 import { EventCalendar } from "@/components/events/EventCalendar";
 import { Loader2, LayoutGrid, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Events = () => {
   const [searchQuery, setSearchQuery] = useState("");
