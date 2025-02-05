@@ -1,3 +1,4 @@
+```typescript
 import { BlogsTable, CommentsTable, RatingsTable } from './content'
 import { EventsTable } from './events'
 import { WritersTable } from './writers'
@@ -13,6 +14,23 @@ export interface Database {
       events: EventsTable
       ratings: RatingsTable
       writers: WritersTable
+      blog_categories: {
+        Row: {
+          id: string
+          name: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -54,3 +72,4 @@ interface UnregisterFromEventFunction {
   }
   Returns: boolean
 }
+```

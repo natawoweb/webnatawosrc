@@ -1,3 +1,4 @@
+```typescript
 import { Database } from './database'
 
 export interface ProfilesTable {
@@ -9,6 +10,16 @@ export interface ProfilesTable {
     created_at: string | null
     updated_at: string | null
     email: string | null
+    level: string | null
+    location: string | null
+    status: string | null
+    user_type: string
+    date_of_birth: string | null
+    gender: string | null
+    pseudonym: string | null
+    county: string | null
+    state: string | null
+    uesr_id: string | null
   }
   Insert: {
     id: string
@@ -18,6 +29,16 @@ export interface ProfilesTable {
     created_at?: string | null
     updated_at?: string | null
     email?: string | null
+    level?: string | null
+    location?: string | null
+    status?: string | null
+    user_type?: string
+    date_of_birth?: string | null
+    gender?: string | null
+    pseudonym?: string | null
+    county?: string | null
+    state?: string | null
+    uesr_id?: string | null
   }
   Update: {
     id?: string
@@ -27,6 +48,16 @@ export interface ProfilesTable {
     created_at?: string | null
     updated_at?: string | null
     email?: string | null
+    level?: string | null
+    location?: string | null
+    status?: string | null
+    user_type?: string
+    date_of_birth?: string | null
+    gender?: string | null
+    pseudonym?: string | null
+    county?: string | null
+    state?: string | null
+    uesr_id?: string | null
   }
 }
 
@@ -50,3 +81,4 @@ export interface UserRolesTable {
     created_at?: string | null
   }
 }
+```

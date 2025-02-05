@@ -1,3 +1,4 @@
+```typescript
 import { Database } from './database'
 
 export interface BlogsTable {
@@ -9,6 +10,12 @@ export interface BlogsTable {
     status: string | null
     created_at: string | null
     updated_at: string | null
+    views_count: number | null
+    title_tamil: string | null
+    content_tamil: jsonb | null
+    category_id: string | null
+    cover_image: string | null
+    published_at: string | null
   }
   Insert: {
     id?: string
@@ -18,6 +25,12 @@ export interface BlogsTable {
     status?: string | null
     created_at?: string | null
     updated_at?: string | null
+    views_count?: number | null
+    title_tamil?: string | null
+    content_tamil?: jsonb | null
+    category_id?: string | null
+    cover_image?: string | null
+    published_at?: string | null
   }
   Update: {
     id?: string
@@ -27,6 +40,12 @@ export interface BlogsTable {
     status?: string | null
     created_at?: string | null
     updated_at?: string | null
+    views_count?: number | null
+    title_tamil?: string | null
+    content_tamil?: jsonb | null
+    category_id?: string | null
+    cover_image?: string | null
+    published_at?: string | null
   }
 }
 
@@ -80,3 +99,4 @@ export interface RatingsTable {
     created_at?: string | null
   }
 }
+```

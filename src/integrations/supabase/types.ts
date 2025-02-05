@@ -108,34 +108,46 @@ export type Database = {
       blogs: {
         Row: {
           author_id: string
+          category_id: string | null
           content: string | null
+          content_tamil: Json | null
+          cover_image: string | null
           created_at: string
           id: string
           published_at: string | null
           status: string
           title: string
+          title_tamil: string | null
           updated_at: string
           views_count: number | null
         }
         Insert: {
           author_id: string
+          category_id?: string | null
           content?: string | null
+          content_tamil?: Json | null
+          cover_image?: string | null
           created_at?: string
           id?: string
           published_at?: string | null
           status?: string
           title: string
+          title_tamil?: string | null
           updated_at?: string
           views_count?: number | null
         }
         Update: {
           author_id?: string
+          category_id?: string | null
           content?: string | null
+          content_tamil?: Json | null
+          cover_image?: string | null
           created_at?: string
           id?: string
           published_at?: string | null
           status?: string
           title?: string
+          title_tamil?: string | null
           updated_at?: string
           views_count?: number | null
         }
@@ -145,6 +157,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blogs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
             referencedColumns: ["id"]
           },
         ]
@@ -340,6 +359,7 @@ export type Database = {
           full_name: string | null
           gender: string | null
           id: string
+          level: string | null
           location: string | null
           pseudonym: string | null
           state: string | null
@@ -358,6 +378,7 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id: string
+          level?: string | null
           location?: string | null
           pseudonym?: string | null
           state?: string | null
@@ -376,6 +397,7 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id?: string
+          level?: string | null
           location?: string | null
           pseudonym?: string | null
           state?: string | null
