@@ -529,6 +529,7 @@ export type Database = {
           level: string | null
           location: string | null
           pseudonym: string | null
+          social_links: Json | null
           state: string | null
           status: string | null
           uesr_id: string | null
@@ -548,6 +549,7 @@ export type Database = {
           level?: string | null
           location?: string | null
           pseudonym?: string | null
+          social_links?: Json | null
           state?: string | null
           status?: string | null
           uesr_id?: string | null
@@ -567,6 +569,7 @@ export type Database = {
           level?: string | null
           location?: string | null
           pseudonym?: string | null
+          social_links?: Json | null
           state?: string | null
           status?: string | null
           uesr_id?: string | null
