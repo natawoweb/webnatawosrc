@@ -1,8 +1,8 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AttendanceList } from "./AttendanceList";
-import { AttendanceStats } from "./AttendanceStats";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type Database } from "@/integrations/supabase/types";
 
@@ -30,17 +30,12 @@ export function AttendanceManagement() {
       <Tabs defaultValue="list">
         <TabsList>
           <TabsTrigger value="list">Attendance List</TabsTrigger>
-          <TabsTrigger value="stats">Statistics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="list">
           {/* Temporarily comment out AttendanceList until its types are fixed */}
           {/* <AttendanceList events={events || []} /> */}
           <div>Attendance List temporarily disabled</div>
-        </TabsContent>
-
-        <TabsContent value="stats">
-          <AttendanceStats events={events || []} />
         </TabsContent>
       </Tabs>
     </div>
