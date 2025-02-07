@@ -26,6 +26,7 @@ export function useUserMutations() {
       });
     },
     onError: (error) => {
+      console.error('Profile update error:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -44,34 +45,44 @@ export function useUserMutations() {
       role: AppRole; 
       level?: UserLevel 
     }) => {
-      // Update role
+      // First, update the user role
       const { error: roleError } = await supabase
         .from('user_roles')
         .upsert({ 
           user_id: userId, 
-          role 
+          role,
+          created_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         });
 
-      if (roleError) throw roleError;
+      if (roleError) {
+        console.error('Role update error:', roleError);
+        throw roleError;
+      }
 
-      // Update level in profile
+      // Then update level in profile if provided
       if (level) {
         const { error: levelError } = await supabase
           .from('profiles')
           .update({ level })
           .eq('id', userId);
 
-        if (levelError) throw levelError;
+        if (levelError) {
+          console.error('Level update error:', levelError);
+          throw levelError;
+        }
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
       toast({
         title: "Success",
-        description: "User updated successfully",
+        description: "User role and level updated successfully",
       });
     },
     onError: (error) => {
+      console.error('User update error:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -132,6 +143,7 @@ export function useUserMutations() {
       });
     },
     onError: (error) => {
+      console.error('User deletion error:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -147,4 +159,3 @@ export function useUserMutations() {
     deleteUserMutation,
   };
 }
-
