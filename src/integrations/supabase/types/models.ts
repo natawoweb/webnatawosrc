@@ -19,7 +19,7 @@ export type Profile = {
   pseudonym: string | null
   county: string | null
   state: string | null
-  social_links: { [key: string]: string } | null
+  social_links: Json | null
   user_id: string | null
 }
 

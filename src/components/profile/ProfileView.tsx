@@ -11,6 +11,12 @@ export function ProfileView({ profile }: ProfileViewProps) {
     return null;
   }
 
+  const socialLinks = profile.social_links ? 
+    (typeof profile.social_links === 'string' ? 
+      JSON.parse(profile.social_links) : 
+      profile.social_links) : 
+    null;
+
   return (
     <div className="space-y-6">
       <div>
@@ -41,19 +47,19 @@ export function ProfileView({ profile }: ProfileViewProps) {
       <div>
         <Label className="text-muted-foreground">Social Media</Label>
         <div className="mt-2 space-y-2">
-          {profile.social_links?.twitter && (
-            <p>Twitter: {profile.social_links.twitter}</p>
+          {socialLinks?.twitter && (
+            <p>Twitter: {socialLinks.twitter}</p>
           )}
-          {profile.social_links?.facebook && (
-            <p>Facebook: {profile.social_links.facebook}</p>
+          {socialLinks?.facebook && (
+            <p>Facebook: {socialLinks.facebook}</p>
           )}
-          {profile.social_links?.instagram && (
-            <p>Instagram: {profile.social_links.instagram}</p>
+          {socialLinks?.instagram && (
+            <p>Instagram: {socialLinks.instagram}</p>
           )}
-          {profile.social_links?.linkedin && (
-            <p>LinkedIn: {profile.social_links.linkedin}</p>
+          {socialLinks?.linkedin && (
+            <p>LinkedIn: {socialLinks.linkedin}</p>
           )}
-          {(!profile.social_links || Object.keys(profile.social_links).length === 0) && (
+          {(!socialLinks || Object.keys(socialLinks).length === 0) && (
             <p className="text-muted-foreground">No social media links added</p>
           )}
         </div>
