@@ -33,10 +33,13 @@ export function useUserQueries() {
 
       // Map each profile to include its role
       const usersWithRoles = profiles.map(profile => {
+        // Find the role for this profile (if it exists)
         const userRole = userRoles.find(role => role.user_id === profile.id);
+        
+        // Return the profile with its role, defaulting to "reader" if no role is found
         return {
           ...profile,
-          role: userRole?.role || "reader" // Default to reader if no role is found
+          role: userRole?.role || "reader"
         };
       });
 
