@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Globe, LogOut } from "lucide-react";
 import {
@@ -29,24 +29,45 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   handleSignOut,
   navigate,
 }) => {
+  const location = useLocation();
+
+  const isActiveRoute = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <div className={cn("md:hidden", isOpen ? "block" : "hidden")}>
       <div className="px-2 pt-2 pb-3 space-y-1">
         <Link
           to="/search"
-          className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
+          className={cn(
+            "block px-3 py-2 rounded-md transition-colors",
+            isActiveRoute("/search")
+              ? "text-foreground font-medium bg-accent"
+              : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
+          )}
         >
           Writers
         </Link>
         <Link
           to="/blogs"
-          className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
+          className={cn(
+            "block px-3 py-2 rounded-md transition-colors",
+            isActiveRoute("/blogs")
+              ? "text-foreground font-medium bg-accent"
+              : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
+          )}
         >
           Blogs
         </Link>
         <Link
           to="/events"
-          className="block px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
+          className={cn(
+            "block px-3 py-2 rounded-md transition-colors",
+            isActiveRoute("/events")
+              ? "text-foreground font-medium bg-accent"
+              : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
+          )}
         >
           Events
         </Link>

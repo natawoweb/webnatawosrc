@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Globe, LogOut } from "lucide-react";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface DesktopNavProps {
   currentLanguage: string;
@@ -27,15 +28,45 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
   handleSignOut,
   navigate,
 }) => {
+  const location = useLocation();
+
+  const isActiveRoute = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <div className="hidden md:flex md:items-center md:space-x-4">
-      <Link to="/search" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
+      <Link 
+        to="/search" 
+        className={cn(
+          "px-3 py-2 rounded-md transition-colors",
+          isActiveRoute("/search")
+            ? "text-foreground font-medium bg-accent"
+            : "text-foreground/80 hover:text-foreground"
+        )}
+      >
         Writers
       </Link>
-      <Link to="/blogs" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
+      <Link 
+        to="/blogs" 
+        className={cn(
+          "px-3 py-2 rounded-md transition-colors",
+          isActiveRoute("/blogs")
+            ? "text-foreground font-medium bg-accent"
+            : "text-foreground/80 hover:text-foreground"
+        )}
+      >
         Blogs
       </Link>
-      <Link to="/events" className="text-foreground/80 hover:text-foreground px-3 py-2 rounded-md">
+      <Link 
+        to="/events" 
+        className={cn(
+          "px-3 py-2 rounded-md transition-colors",
+          isActiveRoute("/events")
+            ? "text-foreground font-medium bg-accent"
+            : "text-foreground/80 hover:text-foreground"
+        )}
+      >
         Events
       </Link>
       
