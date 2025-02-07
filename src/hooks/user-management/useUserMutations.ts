@@ -20,6 +20,7 @@ export function useUserMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -76,6 +77,7 @@ export function useUserMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
       toast({
         title: "Success",
         description: "User role and level updated successfully",

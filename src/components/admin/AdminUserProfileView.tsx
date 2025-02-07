@@ -14,6 +14,7 @@ import { type UserWithRole } from "@/types/user-management";
 import { type UserLevel } from "@/integrations/supabase/types/models";
 import { type Database } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 type AppRole = Database['public']['Enums']['app_role'];
 
@@ -24,6 +25,7 @@ interface AdminUserProfileViewProps {
 export function AdminUserProfileView({ profile }: AdminUserProfileViewProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRole, setSelectedRole] = useState<AppRole>(profile?.role || 'reader');
   const [selectedLevel, setSelectedLevel] = useState<UserLevel | undefined>(profile?.level as UserLevel);
@@ -40,6 +42,11 @@ export function AdminUserProfileView({ profile }: AdminUserProfileViewProps) {
         role: selectedRole,
         level: selectedLevel,
       });
+
+      // Invalidate all related queries to trigger refetch
+      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+      queryClient.invalidateQueries({ queryKey: ["user-profile", profile.id] });
+      
       setIsEditing(false);
       toast({
         title: "Success",
