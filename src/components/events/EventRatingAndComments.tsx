@@ -8,6 +8,7 @@ import { CommentForm } from "@/components/events/comments/CommentForm";
 import { CommentItem } from "@/components/events/comments/CommentItem";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
+import { useSession } from "@/hooks/useSession";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
@@ -19,14 +20,7 @@ export function EventRatingAndComments({ event }: EventRatingAndCommentsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [hoveredRating, setHoveredRating] = useState(0);
-
-  const { data: session } = useQuery({
-    queryKey: ["session"],
-    queryFn: async () => {
-      const { data } = await supabase.auth.getSession();
-      return data.session;
-    },
-  });
+  const { session } = useSession();
 
   const { data: userRating } = useQuery({
     queryKey: ["eventRating", event.id, session?.user.id],
@@ -59,14 +53,35 @@ export function EventRatingAndComments({ event }: EventRatingAndCommentsProps) {
   const rateMutation = useMutation({
     mutationFn: async (rating: number) => {
       if (!session?.user.id) throw new Error("Must be logged in to rate");
-      const { error } = await supabase
+      
+      // First try to update any existing rating
+      const { data: existingRating, error: fetchError } = await supabase
         .from("event_ratings")
-        .upsert({
-          event_id: event.id,
-          user_id: session.user.id,
-          rating,
-        });
-      if (error) throw error;
+        .select("id")
+        .eq("event_id", event.id)
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (fetchError) throw fetchError;
+
+      if (existingRating) {
+        // Update existing rating
+        const { error } = await supabase
+          .from("event_ratings")
+          .update({ rating })
+          .eq("id", existingRating.id);
+        if (error) throw error;
+      } else {
+        // Insert new rating
+        const { error } = await supabase
+          .from("event_ratings")
+          .insert({
+            event_id: event.id,
+            user_id: session.user.id,
+            rating,
+          });
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["eventRating"] });
