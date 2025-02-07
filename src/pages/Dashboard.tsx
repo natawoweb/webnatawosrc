@@ -127,7 +127,7 @@ export default function Dashboard() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => navigate(`/blog/${blog.id}`)}
+                      onClick={() => navigate(`/blogs/${blog.id}`)}
                     >
                       View
                     </Button>
