@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -148,7 +149,13 @@ export function useUserManagement() {
 
   // Add new user mutation using the Edge Function
   const addUserMutation = useMutation({
-    mutationFn: async ({ email, fullName, role }: { email: string; fullName: string; role: AppRole }) => {
+    mutationFn: async ({ email, fullName, role, password, level }: { 
+      email: string; 
+      fullName: string; 
+      role: AppRole;
+      password: string;
+      level: UserLevel;
+    }) => {
       const response = await fetch(
         'https://yqqfxpvptgcczumqowpc.supabase.co/functions/v1/create-user',
         {
@@ -157,7 +164,7 @@ export function useUserManagement() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
           },
-          body: JSON.stringify({ email, fullName, role }),
+          body: JSON.stringify({ email, fullName, role, password, level }),
         }
       );
 
@@ -214,8 +221,8 @@ export function useUserManagement() {
     deleteUserMutation.mutate(userId);
   };
 
-  const handleAddUser = async (email: string, fullName: string, role: AppRole) => {
-    await addUserMutation.mutateAsync({ email, fullName, role });
+  const handleAddUser = async (email: string, fullName: string, role: AppRole, password: string, level: UserLevel) => {
+    await addUserMutation.mutateAsync({ email, fullName, role, password, level });
   };
 
   const filteredUsers = users?.filter((user) => {
