@@ -35,16 +35,36 @@ export default function UserProfile() {
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading profile:', error);
+        throw error;
+      }
+
+      // If no profile exists, create one with default values
+      if (!data) {
+        const newProfile = {
+          id: session.user.id,
+          email: session.user.email,
+          user_type: 'reader',
+        };
+
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert([newProfile]);
+
+        if (insertError) throw insertError;
+        data = newProfile;
+      }
+
       setProfile(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading profile:', error);
       toast({
         variant: "destructive",
         title: "Error loading profile",
-        description: "Please try again later.",
+        description: error.message || "Please try again later.",
       });
     } finally {
       setLoading(false);
@@ -66,22 +86,27 @@ export default function UserProfile() {
         full_name: profile.full_name,
         bio: profile.bio,
         updated_at: new Date().toISOString(),
-        user_type: profile.user_type || 'reader', // Add the required user_type field
+        user_type: profile.user_type || 'reader',
+        email: session.user.email,
       };
 
       let { error } = await supabase.from('profiles').upsert(updates);
 
       if (error) throw error;
+      
       toast({
         title: "Success",
         description: "Profile updated successfully.",
       });
-    } catch (error) {
+      
+      // Refresh profile data
+      getProfile();
+    } catch (error: any) {
       console.error('Error updating profile:', error);
       toast({
         variant: "destructive",
         title: "Error updating profile",
-        description: "Please try again later.",
+        description: error.message || "Please try again later.",
       });
     }
   }
@@ -95,11 +120,27 @@ export default function UserProfile() {
       }
 
       const file = event.target.files[0];
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+      if (!fileExt || !allowedExtensions.includes(fileExt)) {
+        throw new Error('Please upload an image file (jpg, jpeg, png, or gif).');
+      }
+
       const fileName = `${profile.id}-${Math.random()}.${fileExt}`;
 
-      // Upload to storage
-      let { error: uploadError } = await supabase.storage
+      // Delete old avatar if exists
+      if (profile.avatar_url) {
+        const oldFileName = profile.avatar_url.split('/').pop();
+        if (oldFileName) {
+          await supabase.storage
+            .from('avatars')
+            .remove([oldFileName]);
+        }
+      }
+
+      // Upload new avatar
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file);
 
@@ -111,14 +152,13 @@ export default function UserProfile() {
         .getPublicUrl(fileName);
 
       // Update profile
-      const updates = {
-        id: profile.id,
-        avatar_url: publicUrl,
-        updated_at: new Date().toISOString(),
-        user_type: profile.user_type || 'reader', // Add the required user_type field
-      };
-
-      let { error: updateError } = await supabase.from('profiles').upsert(updates);
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', profile.id);
 
       if (updateError) throw updateError;
 
@@ -127,12 +167,12 @@ export default function UserProfile() {
         title: "Success",
         description: "Avatar updated successfully.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading avatar:', error);
       toast({
         variant: "destructive",
         title: "Error uploading avatar",
-        description: "Please try again later.",
+        description: error.message || "Please try again later.",
       });
     } finally {
       setUploading(false);
@@ -157,8 +197,12 @@ export default function UserProfile() {
           <div className="space-y-8">
             <div className="flex flex-col items-center gap-4">
               <Avatar className="h-32 w-32 ring-2 ring-primary/10">
-                <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-                <AvatarFallback>
+                <AvatarImage 
+                  src={profile?.avatar_url} 
+                  alt={profile?.full_name} 
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-primary/5">
                   <User className="h-12 w-12 text-muted-foreground" />
                 </AvatarFallback>
               </Avatar>
