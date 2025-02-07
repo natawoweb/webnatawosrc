@@ -63,7 +63,8 @@ export const useProfile = () => {
           status: null,
           county: null,
           state: null,
-          user_id: session.user.id
+          user_id: session.user.id,
+          uesr_id: session.user.id // Keep for backward compatibility
         };
 
         const { error: insertError } = await supabase

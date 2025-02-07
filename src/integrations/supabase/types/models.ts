@@ -21,9 +21,9 @@ export type Profile = {
   state: string | null
   social_links: { [key: string]: string } | null
   user_id: string | null
+  uesr_id: string | null // Keep this for backward compatibility
 }
 
-export type Writer = Database['public']['Tables']['writers']['Row']
 export type AppRole = Database['public']['Enums']['app_role']
 export type UserRole = Database['public']['Tables']['user_roles']['Row']
 export type UserLevel = 'Literary Tamil Writers' | 'Talented Experts' | 'NATAWO Volunteers' | 'NATAWO Students Writers' | 'Subscriber' | 'Technical'

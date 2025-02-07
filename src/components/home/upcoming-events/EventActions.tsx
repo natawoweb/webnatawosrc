@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Database } from "@/integrations/supabase/types";
-import { isPast } from "date-fns";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
@@ -21,9 +20,8 @@ export function EventActions({ event }: EventActionsProps) {
   const queryClient = useQueryClient();
   const [isRegistering, setIsRegistering] = useState(false);
   
-  // Combine date and time for accurate past/future comparison
   const eventDateTime = new Date(`${event.date}T${event.time}`);
-  const isPastEvent = isPast(eventDateTime);
+  const isPastEvent = new Date() > eventDateTime;
 
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -38,7 +36,7 @@ export function EventActions({ event }: EventActionsProps) {
     queryFn: async () => {
       if (!session?.user.id) return null;
       const { data } = await supabase
-        .from("event_registrations")
+        .from("events_registrations")
         .select("*")
         .eq("event_id", event.id)
         .eq("user_id", session.user.id)

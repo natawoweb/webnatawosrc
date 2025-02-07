@@ -27,7 +27,7 @@ export function useBlogComments(blogId: string, session: any) {
       const commentsWithReactions = await Promise.all(
         commentsData.map(async (comment) => {
           const { data: reactions } = await supabase
-            .from("comment_reactions")
+            .from("blog_comment_reactions")
             .select("reaction_type, user_id")
             .eq("comment_id", comment.id);
 
