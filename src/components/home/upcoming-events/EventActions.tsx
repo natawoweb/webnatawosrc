@@ -61,7 +61,6 @@ export function EventActions({ event }: EventActionsProps) {
       return data;
     },
     onSuccess: () => {
-      // Invalidate all relevant queries to refresh the data
       queryClient.invalidateQueries({ queryKey: ["registration"] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -94,7 +93,6 @@ export function EventActions({ event }: EventActionsProps) {
       return data;
     },
     onSuccess: () => {
-      // Invalidate all relevant queries to refresh the data
       queryClient.invalidateQueries({ queryKey: ["registration"] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });

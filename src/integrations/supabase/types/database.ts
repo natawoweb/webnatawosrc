@@ -31,6 +31,29 @@ export interface Database {
           created_at?: string
         }
       }
+      event_registrations: {
+        Row: {
+          id: string
+          event_id: string
+          user_id: string
+          created_at: string
+          status: string
+        }
+        Insert: {
+          id?: string
+          event_id: string
+          user_id: string
+          created_at?: string
+          status?: string
+        }
+        Update: {
+          id?: string
+          event_id?: string
+          user_id?: string
+          created_at?: string
+          status?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
