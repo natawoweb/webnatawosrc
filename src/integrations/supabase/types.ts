@@ -66,6 +66,20 @@ export type Database = {
             referencedRelation: "blogs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_blog_comments_blogs"
+            columns: ["blog_id"]
+            isOneToOne: false
+            referencedRelation: "blogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_blog_comments_profiles"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       blog_ratings: {

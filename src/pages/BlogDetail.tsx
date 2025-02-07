@@ -74,7 +74,10 @@ const BlogDetail = () => {
       const { data, error } = await supabase
         .from("blog_comments")
         .select(`
-          *,
+          id,
+          content,
+          created_at,
+          user_id,
           profiles (
             full_name
           )
