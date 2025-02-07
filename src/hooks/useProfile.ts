@@ -33,37 +33,49 @@ export const useProfile = () => {
         return;
       }
 
-      let { data, error } = await supabase
+      // First try to get the existing profile
+      let { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error loading profile:', error);
-        throw error;
+      if (fetchError) {
+        console.error('Error loading profile:', fetchError);
+        throw fetchError;
       }
 
-      if (!data) {
+      // If no profile exists, create a new one with default values
+      if (!existingProfile) {
         const newProfile = {
           id: session.user.id,
           email: session.user.email,
+          full_name: null,
+          bio: null,
+          avatar_url: null,
           user_type: 'reader',
           social_links: {},
           gender: null,
           date_of_birth: null,
+          pseudonym: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         } as Profile;
 
         const { error: insertError } = await supabase
           .from('profiles')
           .insert([newProfile]);
 
-        if (insertError) throw insertError;
-        data = newProfile;
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          throw insertError;
+        }
+
+        existingProfile = newProfile;
       }
 
-      setProfile(data);
-      setEditedProfile(data);
+      setProfile(existingProfile);
+      setEditedProfile(existingProfile);
     } catch (error: any) {
       console.error('Error loading profile:', error);
       toast({
@@ -93,7 +105,9 @@ export const useProfile = () => {
         updated_at: new Date().toISOString(),
       };
 
-      let { error } = await supabase.from('profiles').upsert(updates);
+      let { error } = await supabase
+        .from('profiles')
+        .upsert(updates);
 
       if (error) throw error;
       
