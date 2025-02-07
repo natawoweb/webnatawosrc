@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -11,6 +11,7 @@ interface Comment {
   id: string;
   content: string;
   created_at: string;
+  user_id?: string;
   profiles?: {
     full_name: string | null;
   };
@@ -30,6 +31,8 @@ export const BlogComments = ({
   canDeleteComments,
 }: BlogCommentsProps) => {
   const [comment, setComment] = useState("");
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editedContent, setEditedContent] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -76,6 +79,40 @@ export const BlogComments = ({
     }
   };
 
+  const handleEditComment = async (commentId: string) => {
+    if (!editedContent.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Comment cannot be empty",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("blog_comments")
+        .update({ content: editedContent.trim() })
+        .eq("id", commentId);
+
+      if (error) throw error;
+
+      setEditingCommentId(null);
+      setEditedContent("");
+      queryClient.invalidateQueries({ queryKey: ["blog-comments", blogId] });
+      toast({
+        title: "Success",
+        description: "Comment updated successfully",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
   const handleDeleteComment = async (commentId: string) => {
     try {
       const { error } = await supabase
@@ -97,6 +134,16 @@ export const BlogComments = ({
         description: error.message,
       });
     }
+  };
+
+  const startEditing = (comment: Comment) => {
+    setEditingCommentId(comment.id);
+    setEditedContent(comment.content);
+  };
+
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    setEditedContent("");
   };
 
   return (
@@ -132,17 +179,56 @@ export const BlogComments = ({
                   {new Date(comment.created_at).toLocaleDateString()}
                 </p>
               </div>
-              {canDeleteComments && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeleteComment(comment.id)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              )}
+              <div className="flex gap-2">
+                {(session?.user.id === comment.user_id || canDeleteComments) && (
+                  <>
+                    {session?.user.id === comment.user_id && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => startEditing(comment)}
+                        disabled={editingCommentId === comment.id}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteComment(comment.id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
-            <p>{comment.content}</p>
+            {editingCommentId === comment.id ? (
+              <div className="space-y-2">
+                <Textarea
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                  className="mt-2"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleEditComment(comment.id)}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={cancelEditing}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p>{comment.content}</p>
+            )}
           </div>
         ))}
       </div>
