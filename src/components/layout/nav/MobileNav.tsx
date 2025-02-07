@@ -33,6 +33,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 }) => {
   const location = useLocation();
   const { profile } = useProfile();
+  const isWriter = profile?.role === "writer";
 
   const isActiveRoute = (path: string) => {
     return location.pathname === path;
@@ -41,6 +42,19 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   return (
     <div className={cn("md:hidden", isOpen ? "block" : "hidden")}>
       <div className="px-2 pt-2 pb-3 space-y-1">
+        {isWriter && (
+          <Link
+            to="/dashboard"
+            className={cn(
+              "block px-3 py-2 rounded-md transition-colors",
+              isActiveRoute("/dashboard")
+                ? "text-foreground font-medium bg-accent"
+                : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
+            )}
+          >
+            Dashboard
+          </Link>
+        )}
         <Link
           to="/search"
           className={cn(
@@ -127,4 +141,3 @@ export const MobileNav: React.FC<MobileNavProps> = ({
     </div>
   );
 };
-

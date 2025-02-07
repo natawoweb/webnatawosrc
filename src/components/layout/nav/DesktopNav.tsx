@@ -31,6 +31,7 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
 }) => {
   const location = useLocation();
   const { profile } = useProfile();
+  const isWriter = profile?.role === "writer";
 
   const isActiveRoute = (path: string) => {
     return location.pathname === path;
@@ -38,6 +39,19 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
 
   return (
     <div className="hidden md:flex md:items-center md:space-x-4">
+      {isWriter && (
+        <Link 
+          to="/dashboard" 
+          className={cn(
+            "px-3 py-2 rounded-md transition-colors",
+            isActiveRoute("/dashboard")
+              ? "text-foreground font-medium bg-accent"
+              : "text-foreground/80 hover:text-foreground"
+          )}
+        >
+          Dashboard
+        </Link>
+      )}
       <Link 
         to="/search" 
         className={cn(
@@ -116,4 +130,3 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
     </div>
   );
 };
-
