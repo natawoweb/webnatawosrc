@@ -12,15 +12,18 @@ const Blogs = () => {
     queryKey: ["blogs"],
     queryFn: async () => {
       console.log("Fetching blogs...");
-      const { data: session } = await supabase.auth.getSession();
-      console.log("Current session:", session);
-
-      // First fetch blogs with their categories
+      
+      // Fetch blogs with their categories and authors
       const { data, error } = await supabase
         .from("blogs")
         .select(`
           *,
-          blog_categories(name)
+          blog_categories (
+            name
+          ),
+          profiles (
+            full_name
+          )
         `)
         .eq("status", "approved");
 
@@ -29,32 +32,13 @@ const Blogs = () => {
         throw error;
       }
 
-      console.log("Raw blogs data:", data); // Added to see raw data before author processing
-
-      // Then fetch author profiles for the blogs
-      const blogsWithAuthors = await Promise.all(
-        data.map(async (blog) => {
-          console.log("Processing blog:", blog); // Added to debug individual blog processing
-          const { data: authorData, error: authorError } = await supabase
-            .from("profiles")
-            .select("full_name")
-            .eq("id", blog.author_id)
-            .single();
-          
-          if (authorError) {
-            console.error("Error fetching author for blog:", blog.id, authorError);
-          }
-          console.log("Author data for blog:", blog.id, authorData); // Added to debug author data
-          
-          return {
-            ...blog,
-            author_name: authorData?.full_name || "Anonymous"
-          };
-        })
-      );
+      console.log("Fetched blogs:", data);
       
-      console.log("Final processed blogs:", blogsWithAuthors);
-      return blogsWithAuthors;
+      // Transform the data to match our expected format
+      return data?.map(blog => ({
+        ...blog,
+        author_name: blog.profiles?.full_name || "Anonymous"
+      })) || [];
     },
   });
 
