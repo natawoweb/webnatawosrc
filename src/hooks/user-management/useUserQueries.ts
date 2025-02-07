@@ -31,15 +31,18 @@ export function useUserQueries() {
       console.log('Fetched profiles:', profiles);
       console.log('Fetched user roles:', userRoles);
 
-      // Combine profiles with their roles
-      return profiles.map(profile => {
+      // Map each profile to include its role
+      const usersWithRoles = profiles.map(profile => {
         const userRole = userRoles.find(role => role.user_id === profile.id);
         return {
           ...profile,
-          role: userRole?.role || "reader"
+          role: userRole?.role || "reader" // Default to reader if no role is found
         };
-      }) as UserWithRole[];
+      });
+
+      console.log('Combined users with roles:', usersWithRoles);
+      
+      return usersWithRoles as UserWithRole[];
     },
   });
 }
-
