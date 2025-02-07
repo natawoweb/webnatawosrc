@@ -54,14 +54,15 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
 
     try {
       await onSubmit(email, fullName, role, password, level);
-      // Only clear the form if the submission was successful
+      // Only clear the form and close the dialog if the submission was successful
       setEmail("");
       setFullName("");
       setRole("reader");
       setPassword("");
       setLevel("Subscriber");
+      onOpenChange(false);
     } catch (error) {
-      // If there's an error, the form won't be cleared
+      // If there's an error, the form won't be cleared and dialog won't close
       console.error("Error adding user:", error);
     }
   };

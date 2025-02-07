@@ -116,7 +116,7 @@ export function useUserMutations() {
       queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
       toast({
         title: "Success",
-        description: "User added successfully",
+        description: "User created successfully",
       });
     },
     onError: (error) => {
