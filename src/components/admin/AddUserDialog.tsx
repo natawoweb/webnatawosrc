@@ -18,13 +18,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { type Database } from "@/integrations/supabase/types";
+import { type UserLevel } from "@/integrations/supabase/types/models";
 
 type AppRole = Database['public']['Enums']['app_role'];
 
 interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (email: string, fullName: string, role: AppRole, password: string, userType: string) => Promise<void>;
+  onSubmit: (email: string, fullName: string, role: AppRole, password: string, level: UserLevel) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -33,10 +34,10 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<AppRole>("reader");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState("reader");
+  const [level, setLevel] = useState<UserLevel>("Subscriber");
 
   const handleSubmit = async () => {
-    if (!email || !fullName || !role || !password || !userType) {
+    if (!email || !fullName || !role || !password || !level) {
       console.error("All fields are required");
       return;
     }
@@ -52,13 +53,13 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
     }
 
     try {
-      await onSubmit(email, fullName, role, password, userType);
+      await onSubmit(email, fullName, role, password, level);
       // Only clear the form if the submission was successful
       setEmail("");
       setFullName("");
       setRole("reader");
       setPassword("");
-      setUserType("reader");
+      setLevel("Subscriber");
     } catch (error) {
       // If there's an error, the form won't be cleared
       console.error("Error adding user:", error);
@@ -122,16 +123,18 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">User Type</label>
-              <Select value={userType} onValueChange={setUserType}>
+              <label className="text-sm font-medium">Level</label>
+              <Select value={level} onValueChange={(value) => setLevel(value as UserLevel)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="reader">Reader</SelectItem>
-                  <SelectItem value="writer">Writer</SelectItem>
-                  <SelectItem value="manager">Manager</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="Literary Tamil Writers">Literary Tamil Writers</SelectItem>
+                  <SelectItem value="Talented Experts">Talented Experts</SelectItem>
+                  <SelectItem value="NATAWO Volunteers">NATAWO Volunteers</SelectItem>
+                  <SelectItem value="NATAWO Students Writers">NATAWO Students Writers</SelectItem>
+                  <SelectItem value="Subscriber">Subscriber</SelectItem>
+                  <SelectItem value="Technical">Technical</SelectItem>
                 </SelectContent>
               </Select>
             </div>
