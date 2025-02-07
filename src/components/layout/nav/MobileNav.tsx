@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useProfile } from "@/hooks/useProfile";
 
 interface MobileNavProps {
@@ -117,9 +118,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           <>
             <Link to="/profile" className="px-3 py-2 flex items-center gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={profile?.avatar_url} />
                 <AvatarFallback>
-                  {profile?.pseudonym ? profile.pseudonym[0].toUpperCase() : profile?.email?.[0].toUpperCase() || '?'}
+                  {profile?.email?.[0].toUpperCase() || '?'}
                 </AvatarFallback>
               </Avatar>
               <span className="text-sm">Profile</span>

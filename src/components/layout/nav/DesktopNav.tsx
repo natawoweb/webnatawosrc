@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -109,9 +109,8 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
         <div className="flex items-center gap-4">
           <Link to="/profile">
             <Avatar className="h-8 w-8 cursor-pointer">
-              <AvatarImage src={profile?.avatar_url} />
               <AvatarFallback>
-                {profile?.pseudonym ? profile.pseudonym[0].toUpperCase() : profile?.email?.[0].toUpperCase() || '?'}
+                {profile?.email?.[0].toUpperCase() || '?'}
               </AvatarFallback>
             </Avatar>
           </Link>
