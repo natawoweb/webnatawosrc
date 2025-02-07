@@ -1,10 +1,12 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
+import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileView } from "@/components/profile/ProfileView";
 import { Loader2 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
+import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 
 export default function UserProfile() {
   const {
@@ -15,8 +17,13 @@ export default function UserProfile() {
     setIsEditing,
     updateProfile,
     handleProfileChange,
+    handleSocialLinkChange,
     handleCancel,
   } = useProfile();
+
+  const { uploading, uploadAvatar } = useAvatarUpload(profile, (url) => {
+    profile && (profile.avatar_url = url);
+  });
 
   if (loading) {
     return (
@@ -36,10 +43,19 @@ export default function UserProfile() {
         />
         <CardContent>
           <div className="space-y-8">
+            <AvatarUpload
+              avatarUrl={profile?.avatar_url}
+              fullName={profile?.full_name}
+              isEditing={isEditing}
+              uploading={uploading}
+              onAvatarChange={uploadAvatar}
+            />
+
             {isEditing ? (
               <ProfileForm
                 editedProfile={editedProfile}
                 onProfileChange={handleProfileChange}
+                onSocialLinkChange={handleSocialLinkChange}
                 onSubmit={updateProfile}
                 onCancel={handleCancel}
               />

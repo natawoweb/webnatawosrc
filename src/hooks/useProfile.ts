@@ -5,6 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Profile } from "@/integrations/supabase/types/models";
 
+interface SocialLinks {
+  twitter?: string;
+  facebook?: string;
+  instagram?: string;
+  linkedin?: string;
+}
+
 export const useProfile = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -42,8 +49,21 @@ export const useProfile = () => {
           id: session.user.id,
           email: session.user.email,
           full_name: null,
+          bio: null,
+          avatar_url: null,
+          user_type: 'reader',
+          social_links: {},
+          gender: null,
+          date_of_birth: null,
+          pseudonym: null,
           created_at: new Date().toISOString(),
-          user_type: 'reader'
+          updated_at: new Date().toISOString(),
+          level: null,
+          location: null,
+          status: null,
+          county: null,
+          state: null,
+          user_id: session.user.id
         };
 
         const { error: insertError } = await supabase
@@ -86,6 +106,7 @@ export const useProfile = () => {
 
       const updates = {
         ...editedProfile,
+        updated_at: new Date().toISOString(),
       };
 
       let { error } = await supabase
@@ -118,6 +139,16 @@ export const useProfile = () => {
     }));
   }
 
+  function handleSocialLinkChange(platform: keyof SocialLinks, value: string) {
+    setEditedProfile((prev) => ({
+      ...prev!,
+      social_links: {
+        ...(prev?.social_links || {}),
+        [platform]: value
+      }
+    }));
+  }
+
   function handleCancel() {
     setEditedProfile(profile);
     setIsEditing(false);
@@ -131,6 +162,7 @@ export const useProfile = () => {
     setIsEditing,
     updateProfile,
     handleProfileChange,
+    handleSocialLinkChange,
     handleCancel,
   };
 };

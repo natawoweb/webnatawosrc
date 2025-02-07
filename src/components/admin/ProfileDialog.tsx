@@ -8,11 +8,16 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { type Database } from "@/integrations/supabase/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
-import { type Profile } from "@/integrations/supabase/types/models";
-import { type AppRole } from "@/integrations/supabase/types/models";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { type UserLevel } from "@/integrations/supabase/types/models";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type AppRole = Database['public']['Enums']['app_role'];
 
 interface ProfileDialogProps {
   profile: (Profile & { role: AppRole }) | null;
@@ -22,6 +27,15 @@ interface ProfileDialogProps {
   isAdmin: boolean;
 }
 
+const USER_LEVELS: UserLevel[] = [
+  'Literary Tamil Writers',
+  'Talented Experts',
+  'NATAWO Volunteers',
+  'NATAWO Students Writers',
+  'Subscriber',
+  'Technical'
+];
+
 export function ProfileDialog({
   profile,
   open,
@@ -30,12 +44,18 @@ export function ProfileDialog({
   isAdmin,
 }: ProfileDialogProps) {
   const [fullName, setFullName] = useState(profile?.full_name || '');
+  const [bio, setBio] = useState(profile?.bio || '');
+  const [level, setLevel] = useState<UserLevel | undefined>(
+    profile?.level as UserLevel | undefined
+  );
 
   const handleSubmit = () => {
     if (!profile) return;
     onSubmit({
       id: profile.id,
       full_name: fullName,
+      bio,
+      level,
     });
   };
 
@@ -48,6 +68,7 @@ export function ProfileDialog({
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
+              <AvatarImage src={profile?.avatar_url || ''} />
               <AvatarFallback>{profile?.full_name?.[0] || '?'}</AvatarFallback>
             </Avatar>
             <div className="space-y-1">
@@ -56,9 +77,11 @@ export function ProfileDialog({
                 <Badge variant="outline" className="capitalize">
                   {profile?.role}
                 </Badge>
-                <Badge variant="secondary">
-                  {profile?.user_type}
-                </Badge>
+                {profile?.level && (
+                  <Badge variant="secondary">
+                    {profile.level}
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -75,6 +98,38 @@ export function ProfileDialog({
             </div>
 
             <div>
+              <label className="text-sm font-medium">Bio</label>
+              <Textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                disabled={!isAdmin}
+                className="h-32"
+                placeholder="Enter user bio"
+              />
+            </div>
+
+            {isAdmin && (
+              <div>
+                <label className="text-sm font-medium">Level</label>
+                <Select
+                  value={level}
+                  onValueChange={(value: UserLevel) => setLevel(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select user level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {USER_LEVELS.map((userLevel) => (
+                      <SelectItem key={userLevel} value={userLevel}>
+                        {userLevel}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div>
               <label className="text-sm font-medium">Created At</label>
               <p className="text-sm text-muted-foreground">
                 {profile?.created_at
@@ -82,6 +137,15 @@ export function ProfileDialog({
                   : 'N/A'}
               </p>
             </div>
+
+            {profile?.updated_at && (
+              <div>
+                <label className="text-sm font-medium">Last Updated</label>
+                <p className="text-sm text-muted-foreground">
+                  {new Date(profile.updated_at).toLocaleDateString()}
+                </p>
+              </div>
+            )}
           </div>
         </div>
         {isAdmin && (
