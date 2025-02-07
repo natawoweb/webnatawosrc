@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, Edit2 } from "lucide-react";
+import { ChevronLeft, Edit2, Lock } from "lucide-react";
 import { ProfileView } from "@/components/profile/ProfileView";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { useUserMutations } from "@/hooks/user-management/useUserMutations";
@@ -15,6 +15,8 @@ import { type UserLevel } from "@/integrations/supabase/types/models";
 import { type Database } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { ResetPasswordDialog } from "./ResetPasswordDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 type AppRole = Database['public']['Enums']['app_role'];
 
@@ -29,6 +31,7 @@ export function AdminUserProfileView({ profile }: AdminUserProfileViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRole, setSelectedRole] = useState<AppRole>(profile?.role || 'reader');
   const [selectedLevel, setSelectedLevel] = useState<UserLevel | undefined>(profile?.level as UserLevel);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const { updateUserMutation } = useUserMutations();
 
   if (!profile) {
@@ -61,6 +64,28 @@ export function AdminUserProfileView({ profile }: AdminUserProfileViewProps) {
     }
   };
 
+  const handleResetPassword = async () => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Password reset email has been sent",
+      });
+      setResetPasswordDialogOpen(false);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to send password reset email",
+      });
+    }
+  };
+
   return (
     <div className="container max-w-2xl mx-auto py-8 px-4">
       <Button 
@@ -77,14 +102,24 @@ export function AdminUserProfileView({ profile }: AdminUserProfileViewProps) {
           <div className="space-y-8">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">User Profile</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                <Edit2 className="h-4 w-4 mr-2" />
-                {isEditing ? "Cancel" : "Edit Role & Level"}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setResetPasswordDialogOpen(true)}
+                >
+                  <Lock className="h-4 w-4 mr-2" />
+                  Reset Password
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(!isEditing)}
+                >
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  {isEditing ? "Cancel" : "Edit Role & Level"}
+                </Button>
+              </div>
             </div>
 
             <AvatarUpload
@@ -162,6 +197,13 @@ export function AdminUserProfileView({ profile }: AdminUserProfileViewProps) {
           </div>
         </CardContent>
       </Card>
+
+      <ResetPasswordDialog
+        open={resetPasswordDialogOpen}
+        onOpenChange={setResetPasswordDialogOpen}
+        onConfirm={handleResetPassword}
+        email={profile.email}
+      />
     </div>
   );
 }
