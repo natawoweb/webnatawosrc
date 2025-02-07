@@ -11,6 +11,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import WriterProfile from "./pages/WriterProfile";
 import UserProfile from "./pages/UserProfile";
+import AdminUserProfile from "./pages/AdminUserProfile";
 import Auth from "./pages/Auth";
 import SearchWriters from "./pages/SearchWriters";
 import Events from "./pages/Events";
@@ -44,6 +45,7 @@ const App: React.FC = () => {
             <Route path="events" element={<Events />} />
             <Route path="events/:id" element={<EventDetails />} />
             <Route path="admin" element={<AdminDashboard />} />
+            <Route path="admin/user-profile" element={<AdminUserProfile />} />
             <Route path="write" element={<CreateBlog />} />
             <Route path="edit/:id" element={<EditBlog />} />
             <Route path="dashboard" element={<Dashboard />} />

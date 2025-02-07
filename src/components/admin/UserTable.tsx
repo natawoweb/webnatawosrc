@@ -1,3 +1,4 @@
+
 import { type Database } from "@/integrations/supabase/types";
 import {
   Table,
@@ -10,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
@@ -26,6 +28,12 @@ interface UserTableProps {
 }
 
 export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
+  const navigate = useNavigate();
+
+  const handleView = (user: UserWithRole) => {
+    navigate('/admin/user-profile', { state: { user } });
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -59,7 +67,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onView(user)}
+                  onClick={() => handleView(user)}
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
