@@ -1,3 +1,4 @@
+
 import { Json } from './shared'
 
 export interface EventsTable {
@@ -11,7 +12,7 @@ export interface EventsTable {
     is_upcoming: boolean | null
     max_participants: number | null
     current_participants: number | null
-    gallery: Json | null
+    gallery: Json[] | null
     created_at: string | null
     created_by: string | null
   }
@@ -25,7 +26,7 @@ export interface EventsTable {
     is_upcoming?: boolean | null
     max_participants?: number | null
     current_participants?: number | null
-    gallery?: Json | null
+    gallery?: Json[] | null
     created_at?: string | null
     created_by?: string | null
   }
@@ -39,7 +40,7 @@ export interface EventsTable {
     is_upcoming?: boolean | null
     max_participants?: number | null
     current_participants?: number | null
-    gallery?: Json | null
+    gallery?: Json[] | null
     created_at?: string | null
     created_by?: string | null
   }

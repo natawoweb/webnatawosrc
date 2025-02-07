@@ -1,4 +1,3 @@
-
 import { BlogsTable, CommentsTable, RatingsTable } from './content'
 import { EventsTable } from './events'
 import { WritersTable } from './writers'
@@ -10,48 +9,30 @@ export interface Database {
       profiles: ProfilesTable
       user_roles: UserRolesTable
       blogs: BlogsTable
-      comments: CommentsTable
-      events: EventsTable
-      ratings: RatingsTable
-      writers: WritersTable
-      blog_categories: {
+      blog_comments: {
         Row: {
           id: string
-          name: string
+          blog_id: string
+          user_id: string
+          content: string
           created_at: string
+          updated_at: string | null
         }
         Insert: {
           id?: string
-          name: string
+          blog_id: string
+          user_id: string
+          content: string
           created_at?: string
+          updated_at?: string | null
         }
         Update: {
           id?: string
-          name?: string
-          created_at?: string
-        }
-      }
-      event_registrations: {
-        Row: {
-          id: string
-          event_id: string
-          user_id: string
-          created_at: string
-          status: string
-        }
-        Insert: {
-          id?: string
-          event_id: string
-          user_id: string
-          created_at?: string
-          status?: string
-        }
-        Update: {
-          id?: string
-          event_id?: string
+          blog_id?: string
           user_id?: string
+          content?: string
           created_at?: string
-          status?: string
+          updated_at?: string | null
         }
       }
       event_comments: {
@@ -61,7 +42,7 @@ export interface Database {
           user_id: string
           content: string
           created_at: string
-          updated_at: string
+          updated_at: string | null
         }
         Insert: {
           id?: string
@@ -69,7 +50,7 @@ export interface Database {
           user_id: string
           content: string
           created_at?: string
-          updated_at?: string
+          updated_at?: string | null
         }
         Update: {
           id?: string
@@ -77,7 +58,30 @@ export interface Database {
           user_id?: string
           content?: string
           created_at?: string
-          updated_at?: string
+          updated_at?: string | null
+        }
+      }
+      blog_ratings: {
+        Row: {
+          id: string
+          blog_id: string
+          user_id: string
+          rating: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          blog_id: string
+          user_id: string
+          rating: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          blog_id?: string
+          user_id?: string
+          rating?: number
+          created_at?: string
         }
       }
       event_ratings: {
@@ -103,6 +107,69 @@ export interface Database {
           created_at?: string
         }
       }
+      blog_comment_reactions: {
+        Row: {
+          id: string
+          comment_id: string
+          user_id: string
+          reaction_type: 'like' | 'dislike'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          comment_id: string
+          user_id: string
+          reaction_type: 'like' | 'dislike'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          comment_id?: string
+          user_id?: string
+          reaction_type?: 'like' | 'dislike'
+          created_at?: string
+        }
+      }
+      event_comment_reactions: {
+        Row: {
+          id: string
+          comment_id: string
+          user_id: string
+          type: 'like' | 'dislike'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          comment_id: string
+          user_id: string
+          type: 'like' | 'dislike'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          comment_id?: string
+          user_id?: string
+          type?: 'like' | 'dislike'
+          created_at?: string
+        }
+      }
+      event_categories: {
+        Row: {
+          id: string
+          name: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -111,6 +178,7 @@ export interface Database {
       has_role: HasRoleFunction
       register_for_event: RegisterForEventFunction
       unregister_from_event: UnregisterFromEventFunction
+      increment_blog_views: IncrementBlogViewsFunction
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
@@ -143,4 +211,11 @@ interface UnregisterFromEventFunction {
     p_user_id: string
   }
   Returns: boolean
+}
+
+interface IncrementBlogViewsFunction {
+  Args: {
+    blog_id: string
+  }
+  Returns: void
 }
