@@ -119,7 +119,7 @@ export function EventRatingAndComments({ event }: EventRatingAndCommentsProps) {
         )}
       </div>
       
-      {/* Comments section is already implemented in EventComments component */}
+      {/* Comments section will be rendered by EventComments component */}
     </div>
   );
 }

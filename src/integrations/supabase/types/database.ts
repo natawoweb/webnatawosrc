@@ -54,6 +54,55 @@ export interface Database {
           status?: string
         }
       }
+      event_comments: {
+        Row: {
+          id: string
+          event_id: string
+          user_id: string
+          content: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          event_id: string
+          user_id: string
+          content: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          event_id?: string
+          user_id?: string
+          content?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      event_ratings: {
+        Row: {
+          id: string
+          event_id: string
+          user_id: string
+          rating: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          event_id: string
+          user_id: string
+          rating: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          event_id?: string
+          user_id?: string
+          rating?: number
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
