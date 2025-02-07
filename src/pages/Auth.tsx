@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,22 +6,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { GoogleAuth } from "@/components/auth/GoogleAuth";
+import { useProfile } from "@/hooks/useProfile";
 
 export default function Auth() {
   const navigate = useNavigate();
+  const { profile } = useProfile();
 
   useEffect(() => {
     // Check if user is already logged in
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        // Check if user is admin
-        const { data: isAdmin } = await supabase.rpc('has_role', {
-          user_id: session.user.id,
-          required_role: 'admin'
-        });
-        
-        if (isAdmin) {
-          navigate("/admin");
+        if (profile?.user_type === 'writer') {
+          navigate("/dashboard");
         } else {
           navigate("/");
         }
@@ -32,14 +29,8 @@ export default function Auth() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        // Check if user is admin
-        const { data: isAdmin } = await supabase.rpc('has_role', {
-          user_id: session.user.id,
-          required_role: 'admin'
-        });
-        
-        if (isAdmin) {
-          navigate("/admin");
+        if (profile?.user_type === 'writer') {
+          navigate("/dashboard");
         } else {
           navigate("/");
         }
@@ -47,11 +38,7 @@ export default function Auth() {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const handleAuthSuccess = () => {
-    navigate("/");
-  };
+  }, [navigate, profile]);
 
   return (
     <div className="container mx-auto py-10">
@@ -84,11 +71,11 @@ export default function Auth() {
               </TabsList>
               
               <TabsContent value="signin">
-                <AuthForm type="signin" onSuccess={handleAuthSuccess} />
+                <AuthForm type="signin" onSuccess={() => {}} />
               </TabsContent>
               
               <TabsContent value="signup">
-                <AuthForm type="signup" onSuccess={handleAuthSuccess} />
+                <AuthForm type="signup" onSuccess={() => {}} />
               </TabsContent>
             </Tabs>
           </div>
