@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,13 +7,22 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Upload, User } from "lucide-react";
+import { ArrowLeft, ChevronLeft, Loader2, Pencil, Upload, User } from "lucide-react";
 import { Label } from "@/components/ui/label";
+
+interface SocialLinks {
+  twitter?: string;
+  facebook?: string;
+  instagram?: string;
+  linkedin?: string;
+}
 
 export default function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [profile, setProfile] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -48,6 +56,7 @@ export default function UserProfile() {
           id: session.user.id,
           email: session.user.email,
           user_type: 'reader',
+          social_links: {},
         };
 
         const { error: insertError } = await supabase
@@ -59,6 +68,7 @@ export default function UserProfile() {
       }
 
       setProfile(data);
+      setEditedProfile(data);
     } catch (error: any) {
       console.error('Error loading profile:', error);
       toast({
@@ -83,10 +93,12 @@ export default function UserProfile() {
 
       const updates = {
         id: session.user.id,
-        full_name: profile.full_name,
-        bio: profile.bio,
+        full_name: editedProfile.full_name,
+        bio: editedProfile.bio,
+        pseudonym: editedProfile.pseudonym,
+        social_links: editedProfile.social_links,
         updated_at: new Date().toISOString(),
-        user_type: profile.user_type || 'reader',
+        user_type: editedProfile.user_type || 'reader',
         email: session.user.email,
       };
 
@@ -94,13 +106,13 @@ export default function UserProfile() {
 
       if (error) throw error;
       
+      setProfile(editedProfile);
+      setIsEditing(false);
+      
       toast({
         title: "Success",
         description: "Profile updated successfully.",
       });
-      
-      // Refresh profile data
-      getProfile();
     } catch (error: any) {
       console.error('Error updating profile:', error);
       toast({
@@ -109,6 +121,21 @@ export default function UserProfile() {
         description: error.message || "Please try again later.",
       });
     }
+  }
+
+  function handleSocialLinkChange(platform: keyof SocialLinks, value: string) {
+    setEditedProfile({
+      ...editedProfile,
+      social_links: {
+        ...editedProfile.social_links,
+        [platform]: value
+      }
+    });
+  }
+
+  function handleCancel() {
+    setEditedProfile(profile);
+    setIsEditing(false);
   }
 
   async function uploadAvatar(event: React.ChangeEvent<HTMLInputElement>) {
@@ -189,9 +216,28 @@ export default function UserProfile() {
 
   return (
     <div className="container max-w-2xl mx-auto py-8 px-4">
+      <Button 
+        variant="ghost" 
+        className="mb-4" 
+        onClick={() => navigate(-1)}
+      >
+        <ChevronLeft className="h-4 w-4 mr-2" />
+        Back
+      </Button>
+
       <Card className="shadow-lg">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center relative">
           <CardTitle className="text-2xl font-bold">My Profile</CardTitle>
+          {!isEditing && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-4 top-4"
+              onClick={() => setIsEditing(true)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           <div className="space-y-8">
@@ -206,59 +252,164 @@ export default function UserProfile() {
                   <User className="h-12 w-12 text-muted-foreground" />
                 </AvatarFallback>
               </Avatar>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={uploadAvatar}
-                  disabled={uploading}
-                  className="hidden"
-                  id="avatar-upload"
-                />
-                <Button
-                  variant="outline"
-                  onClick={() => document.getElementById('avatar-upload')?.click()}
-                  disabled={uploading}
-                  className="w-[200px]"
-                >
-                  {uploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Upload className="h-4 w-4 mr-2" />
-                  )}
-                  {uploading ? "Uploading..." : "Change Avatar"}
-                </Button>
-              </div>
+              {isEditing && (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={uploadAvatar}
+                    disabled={uploading}
+                    className="hidden"
+                    id="avatar-upload"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => document.getElementById('avatar-upload')?.click()}
+                    disabled={uploading}
+                    className="w-[200px]"
+                  >
+                    {uploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <Upload className="h-4 w-4 mr-2" />
+                    )}
+                    {uploading ? "Uploading..." : "Change Avatar"}
+                  </Button>
+                </div>
+              )}
             </div>
 
-            <form onSubmit={updateProfile} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  type="text"
-                  value={profile?.full_name || ''}
-                  onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                  placeholder="Enter your full name"
-                  className="w-full"
-                />
-              </div>
+            {isEditing ? (
+              <form onSubmit={updateProfile} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="full_name">Full Name</Label>
+                  <Input
+                    id="full_name"
+                    type="text"
+                    value={editedProfile?.full_name || ''}
+                    onChange={(e) => setEditedProfile({ ...editedProfile, full_name: e.target.value })}
+                    placeholder="Enter your full name"
+                    className="w-full"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  value={profile?.bio || ''}
-                  onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                  placeholder="Tell us about yourself"
-                  className="min-h-[100px]"
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="pseudonym">Pseudonym</Label>
+                  <Input
+                    id="pseudonym"
+                    type="text"
+                    value={editedProfile?.pseudonym || ''}
+                    onChange={(e) => setEditedProfile({ ...editedProfile, pseudonym: e.target.value })}
+                    placeholder="Enter your pseudonym"
+                    className="w-full"
+                  />
+                </div>
 
-              <Button type="submit" className="w-full">
-                Update Profile
-              </Button>
-            </form>
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea
+                    id="bio"
+                    value={editedProfile?.bio || ''}
+                    onChange={(e) => setEditedProfile({ ...editedProfile, bio: e.target.value })}
+                    placeholder="Tell us about yourself"
+                    className="min-h-[100px]"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <Label>Social Media Links</Label>
+                  <div className="grid gap-4">
+                    <div>
+                      <Label htmlFor="twitter">Twitter</Label>
+                      <Input
+                        id="twitter"
+                        type="url"
+                        value={editedProfile?.social_links?.twitter || ''}
+                        onChange={(e) => handleSocialLinkChange('twitter', e.target.value)}
+                        placeholder="https://twitter.com/username"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="facebook">Facebook</Label>
+                      <Input
+                        id="facebook"
+                        type="url"
+                        value={editedProfile?.social_links?.facebook || ''}
+                        onChange={(e) => handleSocialLinkChange('facebook', e.target.value)}
+                        placeholder="https://facebook.com/username"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="instagram">Instagram</Label>
+                      <Input
+                        id="instagram"
+                        type="url"
+                        value={editedProfile?.social_links?.instagram || ''}
+                        onChange={(e) => handleSocialLinkChange('instagram', e.target.value)}
+                        placeholder="https://instagram.com/username"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="linkedin">LinkedIn</Label>
+                      <Input
+                        id="linkedin"
+                        type="url"
+                        value={editedProfile?.social_links?.linkedin || ''}
+                        onChange={(e) => handleSocialLinkChange('linkedin', e.target.value)}
+                        placeholder="https://linkedin.com/in/username"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <Button type="submit" className="flex-1">
+                    Update Profile
+                  </Button>
+                  <Button type="button" variant="outline" onClick={handleCancel} className="flex-1">
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-muted-foreground">Full Name</Label>
+                  <p className="mt-1">{profile?.full_name || 'Not set'}</p>
+                </div>
+
+                <div>
+                  <Label className="text-muted-foreground">Pseudonym</Label>
+                  <p className="mt-1">{profile?.pseudonym || 'Not set'}</p>
+                </div>
+
+                <div>
+                  <Label className="text-muted-foreground">Bio</Label>
+                  <p className="mt-1">{profile?.bio || 'No bio available'}</p>
+                </div>
+
+                <div>
+                  <Label className="text-muted-foreground">Social Media</Label>
+                  <div className="mt-2 space-y-2">
+                    {profile?.social_links?.twitter && (
+                      <p>Twitter: {profile.social_links.twitter}</p>
+                    )}
+                    {profile?.social_links?.facebook && (
+                      <p>Facebook: {profile.social_links.facebook}</p>
+                    )}
+                    {profile?.social_links?.instagram && (
+                      <p>Instagram: {profile.social_links.instagram}</p>
+                    )}
+                    {profile?.social_links?.linkedin && (
+                      <p>LinkedIn: {profile.social_links.linkedin}</p>
+                    )}
+                    {!profile?.social_links || Object.keys(profile.social_links).length === 0 && (
+                      <p className="text-muted-foreground">No social media links added</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
