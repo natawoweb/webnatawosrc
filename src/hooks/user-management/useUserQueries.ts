@@ -40,6 +40,9 @@ export function useUserQueries() {
         };
       });
 
+      console.log('Number of profiles:', profiles.length);
+      console.log('Number of roles:', userRoles.length);
+      console.log('Number of combined users:', usersWithRoles.length);
       console.log('Combined users with roles:', usersWithRoles);
       
       return usersWithRoles as UserWithRole[];
