@@ -1,5 +1,6 @@
 
 import * as React from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Blog {
@@ -44,29 +45,31 @@ export const BlogsList = ({ blogs }: BlogsListProps) => {
                   <h3 className="text-xl font-medium text-muted-foreground">{month}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {monthBlogs.map((blog) => (
-                      <Card key={blog.id} className="flex flex-col">
-                        {blog.cover_image && (
-                          <img
-                            src={blog.cover_image}
-                            alt={blog.title}
-                            className="w-full h-48 object-cover rounded-t-lg"
-                          />
-                        )}
-                        <CardHeader>
-                          <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground">
-                            Category: {blog.blog_categories?.name || "Uncategorized"}
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Author: {blog.author_name}
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {new Date(blog.published_at || blog.created_at).toLocaleDateString()}
-                          </p>
-                        </CardContent>
-                      </Card>
+                      <Link key={blog.id} to={`/blogs/${blog.id}`}>
+                        <Card className="flex flex-col hover:shadow-lg transition-shadow">
+                          {blog.cover_image && (
+                            <img
+                              src={blog.cover_image}
+                              alt={blog.title}
+                              className="w-full h-48 object-cover rounded-t-lg"
+                            />
+                          )}
+                          <CardHeader>
+                            <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                              Category: {blog.blog_categories?.name || "Uncategorized"}
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Author: {blog.author_name}
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {new Date(blog.published_at || blog.created_at).toLocaleDateString()}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </Link>
                     ))}
                   </div>
                 </div>
