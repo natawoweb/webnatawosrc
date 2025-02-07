@@ -532,8 +532,8 @@ export type Database = {
           social_links: Json | null
           state: string | null
           status: string | null
-          uesr_id: string | null
           updated_at: string | null
+          user_id: string | null
           user_type: string
         }
         Insert: {
@@ -552,8 +552,8 @@ export type Database = {
           social_links?: Json | null
           state?: string | null
           status?: string | null
-          uesr_id?: string | null
           updated_at?: string | null
+          user_id?: string | null
           user_type: string
         }
         Update: {
@@ -572,8 +572,8 @@ export type Database = {
           social_links?: Json | null
           state?: string | null
           status?: string | null
-          uesr_id?: string | null
           updated_at?: string | null
+          user_id?: string | null
           user_type?: string
         }
         Relationships: []
