@@ -120,27 +120,53 @@ const Blogs = () => {
   const hasActiveSearch = searchTerm.trim() !== '' || dateFilter || ratingFilter !== 'all';
 
   if (isLoading) {
-    return <LoadingState />;
+    return (
+      <div className="container mx-auto py-8">
+        <div className="flex flex-col space-y-6">
+          <div className="flex flex-col space-y-4">
+            <h1 className="text-3xl font-bold">Latest Blogs</h1>
+            <BlogSearch
+              searchTerm={searchTerm}
+              searchType={searchType}
+              onSearchTermChange={setSearchTerm}
+              onSearchTypeChange={setSearchType}
+              dateFilter={dateFilter}
+              onDateFilterChange={setDateFilter}
+              ratingFilter={ratingFilter}
+              onRatingFilterChange={setRatingFilter}
+            />
+          </div>
+          <LoadingState />
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
       <div className="container mx-auto py-8">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Failed to load blogs. Please try again later.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  if (!hasBlogs) {
-    return (
-      <div className="container mx-auto py-8">
-        <NoResults hasActiveSearch={hasActiveSearch} />
+        <div className="flex flex-col space-y-6">
+          <div className="flex flex-col space-y-4">
+            <h1 className="text-3xl font-bold">Latest Blogs</h1>
+            <BlogSearch
+              searchTerm={searchTerm}
+              searchType={searchType}
+              onSearchTermChange={setSearchTerm}
+              onSearchTypeChange={setSearchType}
+              dateFilter={dateFilter}
+              onDateFilterChange={setDateFilter}
+              ratingFilter={ratingFilter}
+              onRatingFilterChange={setRatingFilter}
+            />
+          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              Failed to load blogs. Please try again later.
+            </AlertDescription>
+          </Alert>
+        </div>
       </div>
     );
   }
@@ -162,7 +188,8 @@ const Blogs = () => {
           />
         </div>
 
-        <BlogsList blogs={blogs} />
+        {!hasBlogs && <NoResults hasActiveSearch={hasActiveSearch} />}
+        {hasBlogs && <BlogsList blogs={blogs} />}
       </div>
     </div>
   );
