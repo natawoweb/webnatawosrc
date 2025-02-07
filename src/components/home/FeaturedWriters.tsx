@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
+import { format } from "date-fns";
 
 export function FeaturedWriters() {
   const navigate = useNavigate();
@@ -33,6 +34,12 @@ export function FeaturedWriters() {
       return data;
     },
   });
+
+  const formatFeaturedMonth = (dateString: string | null) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return format(date, "MMMM yyyy");
+  };
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/50">
@@ -81,6 +88,11 @@ export function FeaturedWriters() {
                   <div>
                     <h3 className="font-semibold">{writer.name}</h3>
                     <p className="text-sm text-muted-foreground">{writer.genre}</p>
+                    {writer.featured_month && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Featured: {formatFeaturedMonth(writer.featured_month)}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <p className="mt-4 text-sm text-muted-foreground line-clamp-3">
