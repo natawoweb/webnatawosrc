@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,12 @@ export default function EditBlog() {
   const navigate = useNavigate();
   const { translateContent } = useTranslation();
 
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [titleTamil, setTitleTamil] = useState("");
+  const [contentTamil, setContentTamil] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+
   const { data: blog, isLoading } = useQuery({
     queryKey: ["blog", id],
     queryFn: async () => {
@@ -31,23 +37,28 @@ export default function EditBlog() {
     },
   });
 
-  const [title, setTitle] = useState(blog?.title || "");
-  const [content, setContent] = useState(blog?.content ? JSON.stringify(blog.content) : JSON.stringify({
-    type: 'doc',
-    content: [{
-      type: 'paragraph',
-      content: []
-    }]
-  }));
-  const [titleTamil, setTitleTamil] = useState(blog?.title_tamil || "");
-  const [contentTamil, setContentTamil] = useState(blog?.content_tamil ? JSON.stringify(blog.content_tamil) : JSON.stringify({
-    type: 'doc',
-    content: [{
-      type: 'paragraph',
-      content: []
-    }]
-  }));
-  const [selectedCategory, setSelectedCategory] = useState<string>(blog?.category_id || "");
+  // Update state when blog data is loaded
+  useEffect(() => {
+    if (blog) {
+      setTitle(blog.title || "");
+      setContent(blog.content ? JSON.stringify(blog.content) : JSON.stringify({
+        type: 'doc',
+        content: [{
+          type: 'paragraph',
+          content: []
+        }]
+      }));
+      setTitleTamil(blog.title_tamil || "");
+      setContentTamil(blog.content_tamil ? JSON.stringify(blog.content_tamil) : JSON.stringify({
+        type: 'doc',
+        content: [{
+          type: 'paragraph',
+          content: []
+        }]
+      }));
+      setSelectedCategory(blog.category_id || "");
+    }
+  }, [blog]);
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
