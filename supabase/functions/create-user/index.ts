@@ -12,7 +12,7 @@ interface CreateUserPayload {
   fullName: string
   role: 'reader' | 'writer' | 'manager' | 'admin'
   password: string
-  userType: string
+  level: string
 }
 
 function isValidEmail(email: string): boolean {
@@ -45,8 +45,8 @@ function validatePayload(payload: any): { isValid: boolean; error?: string } {
     return { isValid: false, error: 'Password is required (minimum 6 characters)' };
   }
 
-  if (!payload.userType) {
-    return { isValid: false, error: 'User type is required' };
+  if (!payload.level) {
+    return { isValid: false, error: 'Level is required' };
   }
 
   return { isValid: true };
@@ -89,14 +89,6 @@ serve(async (req: Request) => {
   }
 
   try {
-    const payload: CreateUserPayload = await req.json();
-    console.log('Received payload:', payload);
-    
-    const validation = validatePayload(payload);
-    if (!validation.isValid) {
-      return createErrorResponse(400, validation.error!);
-    }
-
     // Initialize Supabase admin client with service role key
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -107,6 +99,14 @@ serve(async (req: Request) => {
     }
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
+
+    const payload: CreateUserPayload = await req.json();
+    console.log('Received payload:', payload);
+    
+    const validation = validatePayload(payload);
+    if (!validation.isValid) {
+      return createErrorResponse(400, validation.error!);
+    }
 
     // Check if user already exists
     const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
@@ -121,7 +121,7 @@ serve(async (req: Request) => {
       return createErrorResponse(400, 'User with this email already exists');
     }
 
-    console.log('Creating auth user for email:', payload.email);
+    console.log("Creating auth user for email:", payload.email);
 
     // Create auth user with email confirmation disabled
     const { data: authUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
@@ -131,7 +131,7 @@ serve(async (req: Request) => {
       user_metadata: {
         full_name: payload.fullName,
         role: payload.role,
-        user_type: payload.userType
+        level: payload.level
       },
     });
 
@@ -147,14 +147,13 @@ serve(async (req: Request) => {
 
     console.log('Auth user created successfully:', authUser.user.id);
 
-    // The database trigger will handle creating the profile and role
     return createSuccessResponse({
       user: authUser.user,
       message: 'User created successfully'
     });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error("Error in create-user function:", error);
     return createErrorResponse(500, 'An unexpected error occurred', error);
   }
 });

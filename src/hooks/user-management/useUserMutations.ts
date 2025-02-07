@@ -95,25 +95,22 @@ export function useUserMutations() {
 
   const addUserMutation = useMutation({
     mutationFn: async ({ email, fullName, role, password, level }: AddUserParams) => {
-      const response = await fetch(
-        'https://yqqfxpvptgcczumqowpc.supabase.co/functions/v1/create-user',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({ email, fullName, role, password, level }),
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('Error response:', error);
-        throw new Error(error.message || 'Failed to create user');
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error('No access token available');
       }
 
-      return response.json();
+      const response = await supabase.functions.invoke('create-user', {
+        body: { email, fullName, role, password, level }
+      });
+
+      if (response.error) {
+        console.error('Error response:', response.error);
+        throw new Error(response.error.message || 'Failed to create user');
+      }
+
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
