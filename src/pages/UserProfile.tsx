@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +7,7 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileView } from "@/components/profile/ProfileView";
+import { Loader2 } from "lucide-react";
 
 interface SocialLinks {
   twitter?: string;
