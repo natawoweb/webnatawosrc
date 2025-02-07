@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, Eye } from "lucide-react";
+import { Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -70,13 +70,6 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                   onClick={() => handleView(user)}
                 >
                   <Eye className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEdit(user)}
-                >
-                  <Pencil className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
