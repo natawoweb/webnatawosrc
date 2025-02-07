@@ -89,7 +89,7 @@ export default function Dashboard() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Writer's Dashboard</h1>
-          <Link to="/write">
+          <Link to="/admin/create-blog">
             <Button>
               <BookPlus className="mr-2 h-4 w-4" />
               Write New Blog
