@@ -1,11 +1,16 @@
-
 import { useState } from "react";
-import { Trash2, Pencil, X } from "lucide-react";
+import { Trash2, Pencil, ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Comment {
   id: string;
@@ -15,6 +20,9 @@ interface Comment {
   profiles?: {
     full_name: string | null;
   };
+  likes_count?: number;
+  dislikes_count?: number;
+  user_reaction?: 'like' | 'dislike' | null;
 }
 
 interface BlogCommentsProps {
@@ -77,6 +85,77 @@ export const BlogComments = ({
         description: error.message,
       });
     }
+  };
+
+  const handleReaction = async (commentId: string, type: 'like' | 'dislike') => {
+    if (!session) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please login to react to comments",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("comment_reactions")
+        .upsert(
+          {
+            comment_id: commentId,
+            user_id: session.user.id,
+            reaction_type: type,
+          },
+          {
+            onConflict: 'comment_id,user_id'
+          }
+        );
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ["blog-comments", blogId] });
+      toast({
+        title: "Success",
+        description: `Comment ${type}d successfully`,
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleShare = async (platform: string) => {
+    const url = window.location.href;
+    let shareUrl = '';
+
+    switch (platform) {
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
+        break;
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        break;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+        break;
+      default:
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              url: url,
+            });
+            return;
+          } catch (error) {
+            console.error('Error sharing:', error);
+          }
+        }
+        return;
+    }
+
+    window.open(shareUrl, '_blank');
   };
 
   const handleEditComment = async (commentId: string) => {
@@ -148,7 +227,29 @@ export const BlogComments = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-semibold">Comments</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-semibold">Comments</h3>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Share2 className="h-4 w-4 mr-2" />
+              Share
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => handleShare('twitter')}>
+              Share on Twitter
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleShare('facebook')}>
+              Share on Facebook
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleShare('linkedin')}>
+              Share on LinkedIn
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       {session ? (
         <div className="space-y-4">
           <Textarea
@@ -227,7 +328,29 @@ export const BlogComments = ({
                 </div>
               </div>
             ) : (
-              <p>{comment.content}</p>
+              <>
+                <p>{comment.content}</p>
+                <div className="flex items-center gap-4 mt-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleReaction(comment.id, 'like')}
+                    className={comment.user_reaction === 'like' ? 'bg-green-100' : ''}
+                  >
+                    <ThumbsUp className={`h-4 w-4 mr-2 ${comment.user_reaction === 'like' ? 'text-green-600' : ''}`} />
+                    {comment.likes_count || 0}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleReaction(comment.id, 'dislike')}
+                    className={comment.user_reaction === 'dislike' ? 'bg-red-100' : ''}
+                  >
+                    <ThumbsDown className={`h-4 w-4 mr-2 ${comment.user_reaction === 'dislike' ? 'text-red-600' : ''}`} />
+                    {comment.dislikes_count || 0}
+                  </Button>
+                </div>
+              </>
             )}
           </div>
         ))}

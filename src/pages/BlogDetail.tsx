@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -66,7 +65,7 @@ const BlogDetail = () => {
   const { data: comments } = useQuery({
     queryKey: ["blog-comments", id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: commentsData, error: commentsError } = await supabase
         .from("blog_comments")
         .select(`
           id,
@@ -80,9 +79,35 @@ const BlogDetail = () => {
         .eq("blog_id", id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (commentsError) throw commentsError;
+
+      // Fetch reactions for each comment
+      const commentsWithReactions = await Promise.all(
+        commentsData.map(async (comment) => {
+          const { data: reactions } = await supabase
+            .from("comment_reactions")
+            .select("reaction_type")
+            .eq("comment_id", comment.id);
+
+          const userReaction = reactions?.find(
+            (r) => r.user_id === session?.user?.id
+          )?.reaction_type;
+
+          const likes = reactions?.filter((r) => r.reaction_type === "like").length || 0;
+          const dislikes = reactions?.filter((r) => r.reaction_type === "dislike").length || 0;
+
+          return {
+            ...comment,
+            likes_count: likes,
+            dislikes_count: dislikes,
+            user_reaction: userReaction,
+          };
+        })
+      );
+
+      return commentsWithReactions;
     },
+    enabled: !!id,
   });
 
   const { data: userCurrentRating } = useQuery({
