@@ -9,6 +9,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface BlogsByDate {
   [year: string]: {
@@ -16,9 +23,23 @@ interface BlogsByDate {
   };
 }
 
+interface SearchFilters {
+  title: string;
+  author: string;
+  category: string;
+}
+
 const Blogs = () => {
-  const [searchInput, setSearchInput] = React.useState("");
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchInput, setSearchInput] = React.useState<SearchFilters>({
+    title: "",
+    author: "",
+    category: "",
+  });
+  const [searchQuery, setSearchQuery] = React.useState<SearchFilters>({
+    title: "",
+    author: "",
+    category: "",
+  });
   const { toast } = useToast();
   
   const { data: blogs, isLoading, error } = useQuery({
@@ -40,8 +61,16 @@ const Blogs = () => {
         .eq("status", "approved")
         .order('published_at', { ascending: false });
 
-      if (searchQuery) {
-        query = query.ilike('title', `%${searchQuery}%`);
+      if (searchQuery.title) {
+        query = query.ilike('title', `%${searchQuery.title}%`);
+      }
+      
+      if (searchQuery.author) {
+        query = query.ilike('profiles.full_name', `%${searchQuery.author}%`);
+      }
+
+      if (searchQuery.category) {
+        query = query.ilike('blog_categories.name', `%${searchQuery.category}%`);
       }
 
       const { data, error } = await query;
@@ -79,20 +108,37 @@ const Blogs = () => {
   });
 
   const handleSearch = () => {
-    if (searchInput.trim() === searchQuery.trim()) {
+    const hasNoChanges = Object.keys(searchInput).every(
+      (key) => searchInput[key as keyof SearchFilters].trim() === searchQuery[key as keyof SearchFilters].trim()
+    );
+
+    if (hasNoChanges) {
       toast({
-        description: "Please enter a different search term",
+        description: "Please modify at least one search term",
         duration: 2000,
       });
       return;
     }
-    setSearchQuery(searchInput.trim());
+
+    const trimmedInput = Object.keys(searchInput).reduce((acc, key) => ({
+      ...acc,
+      [key]: searchInput[key as keyof SearchFilters].trim()
+    }), {} as SearchFilters);
+
+    setSearchQuery(trimmedInput);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
+  };
+
+  const handleInputChange = (field: keyof SearchFilters, value: string) => {
+    setSearchInput(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   if (isLoading) {
@@ -123,6 +169,7 @@ const Blogs = () => {
   }
 
   const hasBlogs = blogs && Object.keys(blogs).length > 0;
+  const hasActiveSearch = Object.values(searchQuery).some(value => value.trim() !== '');
 
   if (!hasBlogs) {
     return (
@@ -131,8 +178,8 @@ const Blogs = () => {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>No Blogs Found</AlertTitle>
           <AlertDescription>
-            {searchQuery 
-              ? `No blogs found matching "${searchQuery}". Try a different search term.`
+            {hasActiveSearch 
+              ? `No blogs found matching your search criteria. Try different search terms.`
               : "There are currently no approved blogs to display. Please check back later!"}
           </AlertDescription>
         </Alert>
@@ -143,17 +190,35 @@ const Blogs = () => {
   return (
     <div className="container mx-auto py-8">
       <div className="flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col space-y-4">
           <h1 className="text-3xl font-bold">Latest Blogs</h1>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by title..."
+                  value={searchInput.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            <div className="flex-1">
               <Input
-                placeholder="Search blogs..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search by author..."
+                value={searchInput.author}
+                onChange={(e) => handleInputChange('author', e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="pl-9 w-72"
+              />
+            </div>
+            <div className="flex-1">
+              <Input
+                placeholder="Search by category..."
+                value={searchInput.category}
+                onChange={(e) => handleInputChange('category', e.target.value)}
+                onKeyDown={handleKeyDown}
               />
             </div>
             <Button 
@@ -224,3 +289,4 @@ const Blogs = () => {
 };
 
 export default Blogs;
+
