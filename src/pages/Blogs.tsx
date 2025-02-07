@@ -23,29 +23,15 @@ interface BlogsByDate {
   };
 }
 
-interface SearchFilters {
-  title: string;
-  author: string;
-  category: string;
-}
-
 const Blogs = () => {
-  const [searchInput, setSearchInput] = React.useState<SearchFilters>({
-    title: "",
-    author: "",
-    category: "",
-  });
-  const [searchQuery, setSearchQuery] = React.useState<SearchFilters>({
-    title: "",
-    author: "",
-    category: "",
-  });
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchType, setSearchType] = React.useState("title");
   const { toast } = useToast();
   
   const { data: blogs, isLoading, error } = useQuery({
-    queryKey: ["blogs", searchQuery],
+    queryKey: ["blogs", searchTerm, searchType],
     queryFn: async () => {
-      console.log("Fetching blogs with query:", searchQuery);
+      console.log("Fetching blogs with search:", { term: searchTerm, type: searchType });
       
       let query = supabase
         .from("blogs")
@@ -61,16 +47,18 @@ const Blogs = () => {
         .eq("status", "approved")
         .order('published_at', { ascending: false });
 
-      if (searchQuery.title) {
-        query = query.ilike('title', `%${searchQuery.title}%`);
-      }
-      
-      if (searchQuery.author) {
-        query = query.ilike('profiles.full_name', `%${searchQuery.author}%`);
-      }
-
-      if (searchQuery.category) {
-        query = query.ilike('blog_categories.name', `%${searchQuery.category}%`);
+      if (searchTerm) {
+        switch (searchType) {
+          case "title":
+            query = query.ilike('title', `%${searchTerm}%`);
+            break;
+          case "author":
+            query = query.ilike('profiles.full_name', `%${searchTerm}%`);
+            break;
+          case "category":
+            query = query.ilike('blog_categories.name', `%${searchTerm}%`);
+            break;
+        }
       }
 
       const { data, error } = await query;
@@ -107,39 +95,8 @@ const Blogs = () => {
     },
   });
 
-  const handleSearch = () => {
-    const hasNoChanges = Object.keys(searchInput).every(
-      (key) => searchInput[key as keyof SearchFilters].trim() === searchQuery[key as keyof SearchFilters].trim()
-    );
-
-    if (hasNoChanges) {
-      toast({
-        description: "Please modify at least one search term",
-        duration: 2000,
-      });
-      return;
-    }
-
-    const trimmedInput = Object.keys(searchInput).reduce((acc, key) => ({
-      ...acc,
-      [key]: searchInput[key as keyof SearchFilters].trim()
-    }), {} as SearchFilters);
-
-    setSearchQuery(trimmedInput);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const handleInputChange = (field: keyof SearchFilters, value: string) => {
-    setSearchInput(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  const hasBlogs = blogs && Object.keys(blogs).length > 0;
+  const hasActiveSearch = searchTerm.trim() !== '';
 
   if (isLoading) {
     return (
@@ -168,9 +125,6 @@ const Blogs = () => {
     );
   }
 
-  const hasBlogs = blogs && Object.keys(blogs).length > 0;
-  const hasActiveSearch = Object.values(searchQuery).some(value => value.trim() !== '');
-
   if (!hasBlogs) {
     return (
       <div className="container mx-auto py-8">
@@ -192,49 +146,27 @@ const Blogs = () => {
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col space-y-4">
           <h1 className="text-3xl font-bold">Latest Blogs</h1>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by title..."
-                  value={searchInput.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="pl-9"
-                />
-              </div>
-            </div>
-            <div className="flex-1">
+          <div className="flex gap-4">
+            <Select value={searchType} onValueChange={setSearchType}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Search by..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="title">Title</SelectItem>
+                <SelectItem value="author">Author</SelectItem>
+                <SelectItem value="category">Category</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by author..."
-                value={searchInput.author}
-                onChange={(e) => handleInputChange('author', e.target.value)}
-                onKeyDown={handleKeyDown}
+                placeholder={`Search by ${searchType}...`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
               />
             </div>
-            <div className="flex-1">
-              <Input
-                placeholder="Search by category..."
-                value={searchInput.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-            <Button 
-              onClick={handleSearch}
-              disabled={isLoading}
-              className="whitespace-nowrap"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Searching...
-                </>
-              ) : (
-                'Search'
-              )}
-            </Button>
           </div>
         </div>
 
