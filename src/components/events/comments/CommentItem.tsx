@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CommentForm } from "./CommentForm";
 import type { Database } from "@/integrations/supabase/types";
@@ -14,6 +14,9 @@ interface Comment {
   created_at: string;
   user_id: string;
   profiles: Profile;
+  likes_count?: number;
+  dislikes_count?: number;
+  user_reaction?: 'like' | 'dislike' | null;
 }
 
 interface CommentItemProps {
@@ -21,13 +24,15 @@ interface CommentItemProps {
   currentUserId?: string;
   onEdit: (id: string, content: string) => void;
   onDelete: (id: string) => void;
+  onReaction: (id: string, type: 'like' | 'dislike') => void;
 }
 
 export function CommentItem({ 
   comment, 
   currentUserId, 
   onEdit, 
-  onDelete 
+  onDelete,
+  onReaction
 }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -49,22 +54,22 @@ export function CommentItem({
         </div>
         <div className="flex gap-2">
           {currentUserId === comment.user_id && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-            >
-              <Edit2 className="h-4 w-4" />
-            </Button>
-          )}
-          {currentUserId === comment.user_id && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDelete(comment.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDelete(comment.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -78,6 +83,26 @@ export function CommentItem({
       ) : (
         <p className="text-muted-foreground">{comment.content}</p>
       )}
+      <div className="flex gap-4 mt-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onReaction(comment.id, 'like')}
+          className={comment.user_reaction === 'like' ? 'bg-green-100 dark:bg-green-900' : ''}
+        >
+          <ThumbsUp className={`h-4 w-4 mr-2 ${comment.user_reaction === 'like' ? 'text-green-600' : ''}`} />
+          {comment.likes_count || 0}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onReaction(comment.id, 'dislike')}
+          className={comment.user_reaction === 'dislike' ? 'bg-red-100 dark:bg-red-900' : ''}
+        >
+          <ThumbsDown className={`h-4 w-4 mr-2 ${comment.user_reaction === 'dislike' ? 'text-red-600' : ''}`} />
+          {comment.dislikes_count || 0}
+        </Button>
+      </div>
     </div>
   );
 }

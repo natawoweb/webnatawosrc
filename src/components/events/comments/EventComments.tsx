@@ -18,6 +18,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
     addComment,
     updateComment,
     deleteComment,
+    reactToComment,
   } = useEventComments(eventId);
 
   if (error) {
@@ -49,6 +50,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
               currentUserId={currentUser?.id}
               onEdit={(id, content) => updateComment(id, content)}
               onDelete={(id) => deleteComment(id)}
+              onReaction={(id, type) => reactToComment(id, type)}
             />
           ))
         )}

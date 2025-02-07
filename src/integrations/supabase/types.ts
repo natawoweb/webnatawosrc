@@ -290,6 +290,38 @@ export type Database = {
           },
         ]
       }
+      event_comment_reactions: {
+        Row: {
+          comment_id: string | null
+          created_at: string | null
+          id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          comment_id?: string | null
+          created_at?: string | null
+          id?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string | null
+          created_at?: string | null
+          id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_comment_reactions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "event_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_comments: {
         Row: {
           content: string
@@ -756,6 +788,15 @@ export type Database = {
           user_role: Database["public"]["Enums"]["app_role"]
         }
         Returns: undefined
+      }
+      get_comment_reactions: {
+        Args: {
+          p_comment_id: string
+        }
+        Returns: {
+          likes_count: number
+          dislikes_count: number
+        }[]
       }
       get_current_time: {
         Args: Record<PropertyKey, never>
