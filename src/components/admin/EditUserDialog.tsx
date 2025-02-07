@@ -1,9 +1,11 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -50,6 +52,9 @@ export function EditUserDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit User</DialogTitle>
+          <DialogDescription>
+            Make changes to the user's role and level. Click save when you're done.
+          </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <div className="space-y-4">
