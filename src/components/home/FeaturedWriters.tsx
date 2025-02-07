@@ -27,19 +27,29 @@ export function FeaturedWriters() {
       }
 
       const { data, error } = await query;
+      
+      console.log("Writers query result:", { data, error }); // Debug log
+      
       if (error) {
         console.error("Error fetching writers:", error);
         throw error;
       }
-      return data;
+      return data || []; // Ensure we return an empty array if data is null
     },
   });
 
   const formatFeaturedMonth = (dateString: string | null) => {
     if (!dateString) return "";
-    const date = new Date(dateString);
-    return format(date, "MMMM yyyy");
+    try {
+      const date = new Date(dateString);
+      return format(date, "MMMM yyyy");
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "";
+    }
   };
+
+  console.log("Current writers state:", writers); // Debug log
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/50">
