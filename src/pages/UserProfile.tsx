@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft, ChevronLeft, Loader2, Pencil, Upload, User } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SocialLinks {
   twitter?: string;
@@ -57,6 +59,8 @@ export default function UserProfile() {
           email: session.user.email,
           user_type: 'reader',
           social_links: {},
+          gender: null,
+          date_of_birth: null,
         };
 
         const { error: insertError } = await supabase
@@ -97,6 +101,8 @@ export default function UserProfile() {
         bio: editedProfile.bio,
         pseudonym: editedProfile.pseudonym,
         social_links: editedProfile.social_links,
+        gender: editedProfile.gender,
+        date_of_birth: editedProfile.date_of_birth,
         updated_at: new Date().toISOString(),
         user_type: editedProfile.user_type || 'reader',
         email: session.user.email,
@@ -306,6 +312,35 @@ export default function UserProfile() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="date_of_birth">Date of Birth</Label>
+                  <Input
+                    id="date_of_birth"
+                    type="date"
+                    value={editedProfile?.date_of_birth || ''}
+                    onChange={(e) => setEditedProfile({ ...editedProfile, date_of_birth: e.target.value })}
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select
+                    value={editedProfile?.gender || ''}
+                    onValueChange={(value) => setEditedProfile({ ...editedProfile, gender: value })}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select your gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="bio">Bio</Label>
                   <Textarea
                     id="bio"
@@ -381,6 +416,16 @@ export default function UserProfile() {
                 <div>
                   <Label className="text-muted-foreground">Pseudonym</Label>
                   <p className="mt-1">{profile?.pseudonym || 'Not set'}</p>
+                </div>
+
+                <div>
+                  <Label className="text-muted-foreground">Date of Birth</Label>
+                  <p className="mt-1">{profile?.date_of_birth || 'Not set'}</p>
+                </div>
+
+                <div>
+                  <Label className="text-muted-foreground">Gender</Label>
+                  <p className="mt-1">{profile?.gender || 'Not set'}</p>
                 </div>
 
                 <div>
