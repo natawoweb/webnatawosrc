@@ -43,7 +43,7 @@ const App: React.FC = () => {
             <Route path="events" element={<Events />} />
             <Route path="events/:id" element={<EventDetails />} />
             <Route path="admin" element={<AdminDashboard />} />
-            <Route path="admin/create-blog" element={<CreateBlog />} />
+            <Route path="write" element={<CreateBlog />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="*" element={<NotFound />} />
           </Route>
