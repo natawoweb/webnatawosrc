@@ -1,14 +1,12 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Profile } from "@/integrations/supabase/types/models";
 
 interface ProfileFormProps {
-  editedProfile: any;
+  editedProfile: Profile;
   onProfileChange: (field: string, value: any) => void;
-  onSocialLinkChange: (platform: string, value: string) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
 }
@@ -16,7 +14,6 @@ interface ProfileFormProps {
 export function ProfileForm({ 
   editedProfile, 
   onProfileChange, 
-  onSocialLinkChange, 
   onSubmit, 
   onCancel 
 }: ProfileFormProps) {
@@ -35,101 +32,16 @@ export function ProfileForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="pseudonym">Pseudonym</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
-          id="pseudonym"
-          type="text"
-          value={editedProfile?.pseudonym || ''}
-          onChange={(e) => onProfileChange('pseudonym', e.target.value)}
-          placeholder="Enter your pseudonym"
+          id="email"
+          type="email"
+          value={editedProfile?.email || ''}
+          onChange={(e) => onProfileChange('email', e.target.value)}
+          placeholder="Enter your email"
           className="w-full"
+          disabled
         />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="date_of_birth">Date of Birth</Label>
-        <Input
-          id="date_of_birth"
-          type="date"
-          value={editedProfile?.date_of_birth || ''}
-          onChange={(e) => onProfileChange('date_of_birth', e.target.value)}
-          className="w-full"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="gender">Gender</Label>
-        <Select
-          value={editedProfile?.gender || ''}
-          onValueChange={(value) => onProfileChange('gender', value)}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select your gender" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="male">Male</SelectItem>
-            <SelectItem value="female">Female</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-            <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="bio">Bio</Label>
-        <Textarea
-          id="bio"
-          value={editedProfile?.bio || ''}
-          onChange={(e) => onProfileChange('bio', e.target.value)}
-          placeholder="Tell us about yourself"
-          className="min-h-[100px]"
-        />
-      </div>
-
-      <div className="space-y-4">
-        <Label>Social Media Links</Label>
-        <div className="grid gap-4">
-          <div>
-            <Label htmlFor="twitter">Twitter</Label>
-            <Input
-              id="twitter"
-              type="url"
-              value={editedProfile?.social_links?.twitter || ''}
-              onChange={(e) => onSocialLinkChange('twitter', e.target.value)}
-              placeholder="https://twitter.com/username"
-            />
-          </div>
-          <div>
-            <Label htmlFor="facebook">Facebook</Label>
-            <Input
-              id="facebook"
-              type="url"
-              value={editedProfile?.social_links?.facebook || ''}
-              onChange={(e) => onSocialLinkChange('facebook', e.target.value)}
-              placeholder="https://facebook.com/username"
-            />
-          </div>
-          <div>
-            <Label htmlFor="instagram">Instagram</Label>
-            <Input
-              id="instagram"
-              type="url"
-              value={editedProfile?.social_links?.instagram || ''}
-              onChange={(e) => onSocialLinkChange('instagram', e.target.value)}
-              placeholder="https://instagram.com/username"
-            />
-          </div>
-          <div>
-            <Label htmlFor="linkedin">LinkedIn</Label>
-            <Input
-              id="linkedin"
-              type="url"
-              value={editedProfile?.social_links?.linkedin || ''}
-              onChange={(e) => onSocialLinkChange('linkedin', e.target.value)}
-              placeholder="https://linkedin.com/in/username"
-            />
-          </div>
-        </div>
       </div>
 
       <div className="flex gap-4">

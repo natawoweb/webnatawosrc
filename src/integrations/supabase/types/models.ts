@@ -1,26 +1,12 @@
 
 import { Database } from './database'
-import { Json } from './shared'
 
 export type Profile = {
   id: string
   full_name: string | null
-  bio: string | null
-  avatar_url: string | null
-  created_at: string | null
-  updated_at: string | null
   email: string | null
-  level: string | null
-  location: string | null
-  status: string | null
+  created_at: string | null
   user_type: string
-  date_of_birth: string | null
-  gender: string | null
-  pseudonym: string | null
-  county: string | null
-  state: string | null
-  social_links: { [key: string]: string } | null
-  user_id: string | null
 }
 
 export type Writer = Database['public']['Tables']['writers']['Row']
