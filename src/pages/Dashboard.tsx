@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, BookPlus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Loader2, BookPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -129,14 +129,14 @@ export default function Dashboard() {
                       size="sm"
                       onClick={() => navigate(`/blogs/${blog.id}`)}
                     >
-                      <Eye className="h-4 w-4" />
+                      View
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => navigate(`/edit/${blog.id}`)}
                     >
-                      <Pencil className="h-4 w-4" />
+                      Edit
                     </Button>
                     <Button
                       variant="ghost"
@@ -144,7 +144,7 @@ export default function Dashboard() {
                       className="text-red-500 hover:text-red-700"
                       onClick={() => handleDelete(blog.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      Delete
                     </Button>
                   </div>
                 </TableCell>

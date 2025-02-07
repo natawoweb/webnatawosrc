@@ -5,23 +5,59 @@ export interface ProfilesTable {
   Row: {
     id: string
     full_name: string | null
-    email: string | null
-    user_type: string
+    bio: string | null
+    avatar_url: string | null
     created_at: string | null
+    updated_at: string | null
+    email: string | null
+    level: string | null
+    location: string | null
+    status: string | null
+    user_type: string
+    date_of_birth: string | null
+    gender: string | null
+    pseudonym: string | null
+    county: string | null
+    state: string | null
+    uesr_id: string | null
   }
   Insert: {
     id: string
     full_name?: string | null
-    email?: string | null
-    user_type?: string
+    bio?: string | null
+    avatar_url?: string | null
     created_at?: string | null
+    updated_at?: string | null
+    email?: string | null
+    level?: string | null
+    location?: string | null
+    status?: string | null
+    user_type?: string
+    date_of_birth?: string | null
+    gender?: string | null
+    pseudonym?: string | null
+    county?: string | null
+    state?: string | null
+    uesr_id?: string | null
   }
   Update: {
     id?: string
     full_name?: string | null
-    email?: string | null
-    user_type?: string
+    bio?: string | null
+    avatar_url?: string | null
     created_at?: string | null
+    updated_at?: string | null
+    email?: string | null
+    level?: string | null
+    location?: string | null
+    status?: string | null
+    user_type?: string
+    date_of_birth?: string | null
+    gender?: string | null
+    pseudonym?: string | null
+    county?: string | null
+    state?: string | null
+    uesr_id?: string | null
   }
 }
 
