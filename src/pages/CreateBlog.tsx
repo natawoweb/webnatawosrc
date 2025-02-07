@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -74,7 +75,7 @@ export default function CreateBlog() {
         title: "Success",
         description: "Blog created successfully",
       });
-      navigate("/admin");
+      navigate("/dashboard");
     },
     onError: (error) => {
       toast({
@@ -134,7 +135,7 @@ export default function CreateBlog() {
           categories={categories || []}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
-          onBack={() => navigate("/admin")}
+          onBack={() => navigate("/dashboard")}
         />
         
         <CreateBlogActions

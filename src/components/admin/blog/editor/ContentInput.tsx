@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 
 interface ContentInputProps {
@@ -10,7 +11,7 @@ interface ContentInputProps {
 export function ContentInput({ language, title, onTitleChange, placeholder }: ContentInputProps) {
   return (
     <div>
-      <label htmlFor={`title-${language}`} className="text-sm font-medium">
+      <label htmlFor={`title-${language}`} className="text-sm font-medium block mb-2">
         Title
       </label>
       <Input
