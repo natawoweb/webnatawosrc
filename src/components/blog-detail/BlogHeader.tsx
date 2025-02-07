@@ -1,5 +1,5 @@
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +9,7 @@ interface BlogHeaderProps {
   publishedDate: string;
   categoryName: string;
   coverImage?: string;
+  viewsCount?: number;
 }
 
 export const BlogHeader = ({
@@ -17,6 +18,7 @@ export const BlogHeader = ({
   publishedDate,
   categoryName,
   coverImage,
+  viewsCount,
 }: BlogHeaderProps) => {
   const navigate = useNavigate();
 
@@ -45,6 +47,11 @@ export const BlogHeader = ({
         <p>{new Date(publishedDate).toLocaleDateString()}</p>
         <p>•</p>
         <p>{categoryName || "Uncategorized"}</p>
+        <p>•</p>
+        <div className="flex items-center gap-1">
+          <Eye className="h-4 w-4" />
+          <p>{viewsCount || 0} views</p>
+        </div>
       </div>
     </>
   );

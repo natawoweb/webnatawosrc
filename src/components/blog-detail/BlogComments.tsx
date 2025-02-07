@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { Trash2, Pencil, ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
+import { Trash2, Pencil, ThumbsUp, ThumbsDown, Share2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -129,8 +130,27 @@ export const BlogComments = ({
 
   const handleShare = async (platform: string) => {
     const url = window.location.href;
-    let shareUrl = '';
+    
+    if (platform === 'copy') {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast({
+          title: "Success",
+          description: "Link copied to clipboard",
+        });
+        return;
+      } catch (error) {
+        console.error('Error copying to clipboard:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to copy link",
+        });
+        return;
+      }
+    }
 
+    let shareUrl = '';
     switch (platform) {
       case 'twitter':
         shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
@@ -237,6 +257,10 @@ export const BlogComments = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => handleShare('copy')}>
+              <Copy className="h-4 w-4 mr-2" />
+              Copy link
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleShare('twitter')}>
               Share on Twitter
             </DropdownMenuItem>

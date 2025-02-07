@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +13,16 @@ import { BlogComments } from "@/components/blog-detail/BlogComments";
 
 const BlogDetail = () => {
   const { id } = useParams();
+
+  // Increment view count when the page loads
+  React.useEffect(() => {
+    if (id) {
+      const incrementViews = async () => {
+        await supabase.rpc('increment_blog_views', { blog_id: id });
+      };
+      incrementViews();
+    }
+  }, [id]);
 
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -86,7 +97,7 @@ const BlogDetail = () => {
         commentsData.map(async (comment) => {
           const { data: reactions } = await supabase
             .from("comment_reactions")
-            .select("reaction_type")
+            .select("reaction_type, user_id")
             .eq("comment_id", comment.id);
 
           const userReaction = reactions?.find(
@@ -168,6 +179,7 @@ const BlogDetail = () => {
           publishedDate={blog.published_at || blog.created_at}
           categoryName={blog.blog_categories?.name}
           coverImage={blog.cover_image}
+          viewsCount={blog.views_count}
         />
         
         <BlogContent content={blog.content} />

@@ -633,6 +633,12 @@ export type Database = {
             }
             Returns: boolean
           }
+      increment_blog_views: {
+        Args: {
+          blog_id: string
+        }
+        Returns: undefined
+      }
       is_admin: {
         Args: {
           user_id: string
