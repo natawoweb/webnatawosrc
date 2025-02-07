@@ -10,6 +10,7 @@ import { BlogHeader } from "@/components/blog-detail/BlogHeader";
 import { BlogContent } from "@/components/blog-detail/BlogContent";
 import { BlogRating } from "@/components/blog-detail/BlogRating";
 import { BlogComments } from "@/components/blog-detail/BlogComments";
+import { Comment } from "@/components/blog-detail/comments/types";
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -102,7 +103,7 @@ const BlogDetail = () => {
 
           const userReaction = reactions?.find(
             (r) => r.user_id === session?.user?.id
-          )?.reaction_type;
+          )?.reaction_type as 'like' | 'dislike' | null;
 
           const likes = reactions?.filter((r) => r.reaction_type === "like").length || 0;
           const dislikes = reactions?.filter((r) => r.reaction_type === "dislike").length || 0;
@@ -116,7 +117,7 @@ const BlogDetail = () => {
         })
       );
 
-      return commentsWithReactions;
+      return commentsWithReactions as Comment[];
     },
     enabled: !!id,
   });
