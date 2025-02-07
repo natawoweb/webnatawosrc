@@ -19,7 +19,7 @@ export interface ProfilesTable {
     pseudonym: string | null
     county: string | null
     state: string | null
-    uesr_id: string | null
+    user_id: string | null
   }
   Insert: {
     id: string
@@ -38,7 +38,7 @@ export interface ProfilesTable {
     pseudonym?: string | null
     county?: string | null
     state?: string | null
-    uesr_id?: string | null
+    user_id?: string | null
   }
   Update: {
     id?: string
@@ -57,7 +57,7 @@ export interface ProfilesTable {
     pseudonym?: string | null
     county?: string | null
     state?: string | null
-    uesr_id?: string | null
+    user_id?: string | null
   }
 }
 

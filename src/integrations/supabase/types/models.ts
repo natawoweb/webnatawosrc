@@ -21,7 +21,6 @@ export type Profile = {
   state: string | null
   social_links: { [key: string]: string } | null
   user_id: string | null
-  uesr_id: string | null // Keep this for backward compatibility
 }
 
 export type AppRole = Database['public']['Enums']['app_role']
