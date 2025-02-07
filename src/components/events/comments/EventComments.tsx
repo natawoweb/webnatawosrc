@@ -21,7 +21,7 @@ interface Comment {
   user_id: string;
   event_id: string;
   updated_at: string | null;
-  profile: Profile;
+  profiles: Profile;
 }
 
 export function EventComments({ eventId }: EventCommentsProps) {
@@ -36,15 +36,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
         .from("event_comments")
         .select(`
           *,
-          profile:user_id(
-            id,
-            full_name,
-            bio,
-            avatar_url,
-            created_at,
-            updated_at,
-            email
-          )
+          profiles:profiles!event_comments_user_id_fkey(*)
         `)
         .eq("event_id", eventId)
         .order("created_at", { ascending: false });
@@ -55,18 +47,7 @@ export function EventComments({ eventId }: EventCommentsProps) {
       }
 
       console.log("Fetched comments:", data);
-      return (data || []).map(comment => ({
-        ...comment,
-        profile: comment.profile || {
-          id: comment.user_id,
-          full_name: "Anonymous",
-          bio: "",
-          avatar_url: null,
-          created_at: "",
-          updated_at: "",
-          email: "",
-        }
-      })) as Comment[];
+      return data as Comment[];
     },
   });
 
