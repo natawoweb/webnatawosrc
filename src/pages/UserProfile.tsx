@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, User } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 export default function UserProfile() {
   const [loading, setLoading] = useState(true);
@@ -65,6 +66,7 @@ export default function UserProfile() {
         full_name: profile.full_name,
         bio: profile.bio,
         updated_at: new Date().toISOString(),
+        user_type: profile.user_type || 'reader', // Add the required user_type field
       };
 
       let { error } = await supabase.from('profiles').upsert(updates);
@@ -94,22 +96,26 @@ export default function UserProfile() {
 
       const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
-      const filePath = `${profile.id}-${Math.random()}.${fileExt}`;
+      const fileName = `${profile.id}-${Math.random()}.${fileExt}`;
 
+      // Upload to storage
       let { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file);
+        .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
+      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
 
+      // Update profile
       const updates = {
         id: profile.id,
         avatar_url: publicUrl,
         updated_at: new Date().toISOString(),
+        user_type: profile.user_type || 'reader', // Add the required user_type field
       };
 
       let { error: updateError } = await supabase.from('profiles').upsert(updates);
@@ -142,17 +148,19 @@ export default function UserProfile() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>User Profile</CardTitle>
+    <div className="container max-w-2xl mx-auto py-8 px-4">
+      <Card className="shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">My Profile</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="flex flex-col items-center gap-4">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback>{profile?.full_name?.[0] || '?'}</AvatarFallback>
+              <Avatar className="h-32 w-32 ring-2 ring-primary/10">
+                <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
+                <AvatarFallback>
+                  <User className="h-12 w-12 text-muted-foreground" />
+                </AvatarFallback>
               </Avatar>
               <div className="flex items-center gap-2">
                 <Input
@@ -167,39 +175,39 @@ export default function UserProfile() {
                   variant="outline"
                   onClick={() => document.getElementById('avatar-upload')?.click()}
                   disabled={uploading}
+                  className="w-[200px]"
                 >
                   {uploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : (
                     <Upload className="h-4 w-4 mr-2" />
                   )}
-                  Change Avatar
+                  {uploading ? "Uploading..." : "Change Avatar"}
                 </Button>
               </div>
             </div>
 
-            <form onSubmit={updateProfile} className="space-y-4">
-              <div>
-                <label htmlFor="full_name" className="text-sm font-medium">
-                  Full Name
-                </label>
+            <form onSubmit={updateProfile} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="full_name">Full Name</Label>
                 <Input
                   id="full_name"
                   type="text"
                   value={profile?.full_name || ''}
                   onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                  placeholder="Enter your full name"
+                  className="w-full"
                 />
               </div>
 
-              <div>
-                <label htmlFor="bio" className="text-sm font-medium">
-                  Bio
-                </label>
+              <div className="space-y-2">
+                <Label htmlFor="bio">Bio</Label>
                 <Textarea
                   id="bio"
                   value={profile?.bio || ''}
                   onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                  rows={4}
+                  placeholder="Tell us about yourself"
+                  className="min-h-[100px]"
                 />
               </div>
 
