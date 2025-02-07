@@ -49,7 +49,7 @@ export function EditUserDialog({
 }: EditUserDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit User</DialogTitle>
           <DialogDescription>
@@ -66,7 +66,7 @@ export function EditUserDialog({
               <label className="text-sm font-medium">Role</label>
               <Select value={selectedRole} onValueChange={(value) => onRoleChange(value as AppRole)}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Select user role" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="reader">Reader</SelectItem>

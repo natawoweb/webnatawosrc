@@ -725,12 +725,17 @@ export type Database = {
         }
         Returns: undefined
       }
-      is_admin: {
-        Args: {
-          user_id: string
-        }
-        Returns: boolean
-      }
+      is_admin:
+        | {
+            Args: Record<PropertyKey, never>
+            Returns: boolean
+          }
+        | {
+            Args: {
+              user_id: string
+            }
+            Returns: boolean
+          }
       is_valid_uuid: {
         Args: {
           str: string
