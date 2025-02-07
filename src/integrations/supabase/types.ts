@@ -66,13 +66,6 @@ export type Database = {
             referencedRelation: "blogs"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "fk_blog_comments_profiles"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       blog_ratings: {
@@ -158,13 +151,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "blogs_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "blogs_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false
@@ -230,13 +216,6 @@ export type Database = {
             referencedRelation: "blogs"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       event_categories: {
@@ -273,15 +252,7 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "event_categories_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       event_comment_reactions: {
         Row: {
@@ -349,24 +320,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "event_comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_event_comments_events"
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_event_comments_profiles"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -437,24 +394,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "event_ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_event_ratings_events"
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_event_ratings_profiles"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -487,13 +430,6 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "event_registrations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -587,74 +523,28 @@ export type Database = {
             referencedRelation: "events"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "events_registrations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       profiles: {
         Row: {
-          avatar_url: string | null
-          bio: string | null
-          county: string | null
           created_at: string | null
-          date_of_birth: string | null
           email: string | null
           full_name: string | null
-          gender: string | null
           id: string
-          level: string | null
-          location: string | null
-          pseudonym: string | null
-          social_links: Json | null
-          state: string | null
-          status: string | null
-          updated_at: string | null
-          user_id: string | null
           user_type: string
         }
         Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          county?: string | null
           created_at?: string | null
-          date_of_birth?: string | null
           email?: string | null
           full_name?: string | null
-          gender?: string | null
           id: string
-          level?: string | null
-          location?: string | null
-          pseudonym?: string | null
-          social_links?: Json | null
-          state?: string | null
-          status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          user_type: string
+          user_type?: string
         }
         Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          county?: string | null
           created_at?: string | null
-          date_of_birth?: string | null
           email?: string | null
           full_name?: string | null
-          gender?: string | null
           id?: string
-          level?: string | null
-          location?: string | null
-          pseudonym?: string | null
-          social_links?: Json | null
-          state?: string | null
-          status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
           user_type?: string
         }
         Relationships: []
@@ -689,32 +579,25 @@ export type Database = {
             referencedRelation: "blogs"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       user_roles: {
         Row: {
           created_at: string | null
           id: string
-          role: Database["public"]["Enums"]["app_role"] | null
+          role: Database["public"]["Enums"]["app_role"]
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["app_role"] | null
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["app_role"] | null
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string | null
         }
         Relationships: []
