@@ -33,80 +33,6 @@ export type Database = {
         }
         Relationships: []
       }
-      blog_comments: {
-        Row: {
-          blog_id: string | null
-          content: string
-          created_at: string | null
-          id: string
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          blog_id?: string | null
-          content: string
-          created_at?: string | null
-          id?: string
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          blog_id?: string | null
-          content?: string
-          created_at?: string | null
-          id?: string
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "blog_comments_blog_id_fkey"
-            columns: ["blog_id"]
-            isOneToOne: false
-            referencedRelation: "blogs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_blog_comments_profiles"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      blog_ratings: {
-        Row: {
-          blog_id: string | null
-          created_at: string | null
-          id: string
-          rating: number
-          user_id: string | null
-        }
-        Insert: {
-          blog_id?: string | null
-          created_at?: string | null
-          id?: string
-          rating: number
-          user_id?: string | null
-        }
-        Update: {
-          blog_id?: string | null
-          created_at?: string | null
-          id?: string
-          rating?: number
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "blog_ratings_blog_id_fkey"
-            columns: ["blog_id"]
-            isOneToOne: false
-            referencedRelation: "blogs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       blogs: {
         Row: {
           author_id: string | null
@@ -116,7 +42,6 @@ export type Database = {
           cover_image: string | null
           created_at: string | null
           id: string
-          last_rated_at: string | null
           published_at: string | null
           status: string | null
           title: string
@@ -132,7 +57,6 @@ export type Database = {
           cover_image?: string | null
           created_at?: string | null
           id?: string
-          last_rated_at?: string | null
           published_at?: string | null
           status?: string | null
           title: string
@@ -148,7 +72,6 @@ export type Database = {
           cover_image?: string | null
           created_at?: string | null
           id?: string
-          last_rated_at?: string | null
           published_at?: string | null
           status?: string | null
           title?: string
@@ -172,30 +95,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      comment_reactions: {
-        Row: {
-          comment_id: string
-          created_at: string | null
-          id: string
-          reaction_type: string
-          user_id: string
-        }
-        Insert: {
-          comment_id: string
-          created_at?: string | null
-          id?: string
-          reaction_type: string
-          user_id: string
-        }
-        Update: {
-          comment_id?: string
-          created_at?: string | null
-          id?: string
-          reaction_type?: string
-          user_id?: string
-        }
-        Relationships: []
       }
       comments: {
         Row: {
@@ -239,138 +138,6 @@ export type Database = {
           },
         ]
       }
-      event_categories: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          description: string | null
-          description_tamil: string | null
-          id: string
-          name: string
-          name_tamil: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          description_tamil?: string | null
-          id?: string
-          name: string
-          name_tamil?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          description_tamil?: string | null
-          id?: string
-          name?: string
-          name_tamil?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_categories_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      event_comment_reactions: {
-        Row: {
-          comment_id: string | null
-          created_at: string | null
-          id: string
-          type: string
-          user_id: string
-        }
-        Insert: {
-          comment_id?: string | null
-          created_at?: string | null
-          id?: string
-          type: string
-          user_id: string
-        }
-        Update: {
-          comment_id?: string | null
-          created_at?: string | null
-          id?: string
-          type?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_comment_reactions_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "event_comments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      event_comments: {
-        Row: {
-          content: string
-          created_at: string | null
-          event_id: string | null
-          id: string
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          event_id?: string | null
-          id?: string
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          event_id?: string | null
-          id?: string
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_comments_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "event_comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_event_comments_events"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_event_comments_profiles"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       event_notifications: {
         Row: {
           created_at: string | null
@@ -406,156 +173,47 @@ export type Database = {
           },
         ]
       }
-      event_ratings: {
-        Row: {
-          created_at: string | null
-          event_id: string | null
-          id: string
-          rating: number
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          event_id?: string | null
-          id?: string
-          rating: number
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          event_id?: string | null
-          id?: string
-          rating?: number
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_ratings_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "event_ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_event_ratings_events"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_event_ratings_profiles"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      event_registrations: {
-        Row: {
-          created_at: string | null
-          event_id: string | null
-          id: string
-          status: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          event_id?: string | null
-          id?: string
-          status?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          event_id?: string | null
-          id?: string
-          status?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_registrations_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "event_registrations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       events: {
         Row: {
-          category_id: string | null
           created_at: string | null
           created_by: string | null
           current_participants: number | null
           date: string
           description: string
-          gallery: string[] | null
           id: string
           is_upcoming: boolean | null
           location: string
           max_participants: number | null
-          tags: string[] | null
           time: string
           title: string
         }
         Insert: {
-          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           current_participants?: number | null
           date: string
           description: string
-          gallery?: string[] | null
           id?: string
           is_upcoming?: boolean | null
           location: string
           max_participants?: number | null
-          tags?: string[] | null
           time: string
           title: string
         }
         Update: {
-          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           current_participants?: number | null
           date?: string
           description?: string
-          gallery?: string[] | null
           id?: string
           is_upcoming?: boolean | null
           location?: string
           max_participants?: number | null
-          tags?: string[] | null
           time?: string
           title?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "events_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "event_categories"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       events_registrations: {
         Row: {
@@ -610,11 +268,10 @@ export type Database = {
           level: string | null
           location: string | null
           pseudonym: string | null
-          social_links: Json | null
           state: string | null
           status: string | null
+          uesr_id: string | null
           updated_at: string | null
-          user_id: string | null
           user_type: string
         }
         Insert: {
@@ -630,11 +287,10 @@ export type Database = {
           level?: string | null
           location?: string | null
           pseudonym?: string | null
-          social_links?: Json | null
           state?: string | null
           status?: string | null
+          uesr_id?: string | null
           updated_at?: string | null
-          user_id?: string | null
           user_type: string
         }
         Update: {
@@ -650,11 +306,10 @@ export type Database = {
           level?: string | null
           location?: string | null
           pseudonym?: string | null
-          social_links?: Json | null
           state?: string | null
           status?: string | null
+          uesr_id?: string | null
           updated_at?: string | null
-          user_id?: string | null
           user_type?: string
         }
         Relationships: []
@@ -717,7 +372,15 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"] | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       writers: {
         Row: {
@@ -774,23 +437,8 @@ export type Database = {
         }
         Returns: undefined
       }
-      get_comment_reactions: {
-        Args: {
-          p_comment_id: string
-        }
-        Returns: {
-          likes_count: number
-          dislikes_count: number
-        }[]
-      }
       get_current_time: {
         Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_month_year: {
-        Args: {
-          published_at: string
-        }
         Returns: string
       }
       has_role:
@@ -807,12 +455,6 @@ export type Database = {
             }
             Returns: boolean
           }
-      increment_blog_views: {
-        Args: {
-          blog_id: string
-        }
-        Returns: undefined
-      }
       is_admin: {
         Args: {
           user_id: string
