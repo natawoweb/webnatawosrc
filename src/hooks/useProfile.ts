@@ -52,7 +52,7 @@ export const useProfile = () => {
           bio: null,
           avatar_url: null,
           user_type: 'reader',
-          social_links: {},
+          social_links: null,
           gender: null,
           date_of_birth: null,
           pseudonym: null,
@@ -133,20 +133,27 @@ export const useProfile = () => {
   }
 
   function handleProfileChange(field: string, value: any) {
-    setEditedProfile((prev) => ({
-      ...prev!,
+    if (!editedProfile) return;
+    setEditedProfile({
+      ...editedProfile,
       [field]: value
-    }));
+    });
   }
 
   function handleSocialLinkChange(platform: keyof SocialLinks, value: string) {
-    setEditedProfile((prev) => ({
-      ...prev!,
+    if (!editedProfile) return;
+    const currentSocialLinks = editedProfile.social_links || {};
+    const updatedSocialLinks = typeof currentSocialLinks === 'string' 
+      ? JSON.parse(currentSocialLinks) 
+      : currentSocialLinks;
+
+    setEditedProfile({
+      ...editedProfile,
       social_links: {
-        ...(prev?.social_links || {}),
+        ...updatedSocialLinks,
         [platform]: value
       }
-    }));
+    });
   }
 
   function handleCancel() {
