@@ -8,7 +8,7 @@ import { BlogsList } from "@/components/blogs/BlogsList";
 import { BlogSearch } from "@/components/blogs/BlogSearch";
 import { LoadingState } from "@/components/blogs/LoadingState";
 import { NoResults } from "@/components/blogs/NoResults";
-import { startOfDay, endOfDay, parseISO } from "date-fns";
+import { startOfDay, endOfDay } from "date-fns";
 
 interface BlogsByDate {
   [year: string]: {
@@ -20,7 +20,7 @@ const Blogs = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [searchType, setSearchType] = React.useState("title");
   const [dateFilter, setDateFilter] = React.useState<Date>();
-  const [ratingFilter, setRatingFilter] = React.useState("");
+  const [ratingFilter, setRatingFilter] = React.useState("all");
   
   const { data: blogs, isLoading, error } = useQuery({
     queryKey: ["blogs", searchTerm, searchType, dateFilter, ratingFilter],
@@ -76,7 +76,7 @@ const Blogs = () => {
       }
 
       // If rating filter is applied, filter blogs by average rating
-      if (ratingFilter && blogsData) {
+      if (ratingFilter !== 'all' && blogsData) {
         const filteredBlogs = blogsData.filter(blog => {
           const ratings = blog.ratings || [];
           if (ratings.length === 0) return false;
@@ -117,7 +117,7 @@ const Blogs = () => {
   };
 
   const hasBlogs = blogs && Object.keys(blogs).length > 0;
-  const hasActiveSearch = searchTerm.trim() !== '' || dateFilter || ratingFilter !== '';
+  const hasActiveSearch = searchTerm.trim() !== '' || dateFilter || ratingFilter !== 'all';
 
   if (isLoading) {
     return <LoadingState />;

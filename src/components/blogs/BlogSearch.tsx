@@ -70,7 +70,7 @@ export const BlogSearch = ({
             <SelectValue placeholder="Filter by rating..." />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Ratings</SelectItem>
+            <SelectItem value="all">All Ratings</SelectItem>
             <SelectItem value="5">5 Stars</SelectItem>
             <SelectItem value="4">4+ Stars</SelectItem>
             <SelectItem value="3">3+ Stars</SelectItem>
