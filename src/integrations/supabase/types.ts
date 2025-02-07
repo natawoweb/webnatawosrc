@@ -329,6 +329,7 @@ export type Database = {
           level: string | null
           location: string | null
           pseudonym: string | null
+          social_links: Json | null
           state: string | null
           status: string | null
           updated_at: string | null
@@ -348,6 +349,7 @@ export type Database = {
           level?: string | null
           location?: string | null
           pseudonym?: string | null
+          social_links?: Json | null
           state?: string | null
           status?: string | null
           updated_at?: string | null
@@ -367,6 +369,7 @@ export type Database = {
           level?: string | null
           location?: string | null
           pseudonym?: string | null
+          social_links?: Json | null
           state?: string | null
           status?: string | null
           updated_at?: string | null

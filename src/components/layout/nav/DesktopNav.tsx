@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface DesktopNavProps {
   currentLanguage: string;
@@ -58,10 +59,18 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
       {session && <NotificationsDropdown />}
 
       {session ? (
-        <Button variant="outline" onClick={handleSignOut} className="ml-4">
-          <LogOut className="h-4 w-4 mr-2" />
-          Sign Out
-        </Button>
+        <div className="flex items-center gap-4">
+          <Link to="/profile">
+            <Avatar className="h-8 w-8 cursor-pointer">
+              <AvatarImage src={session?.user?.user_metadata?.avatar_url} />
+              <AvatarFallback>{session?.user?.email?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+            </Avatar>
+          </Link>
+          <Button variant="outline" onClick={handleSignOut}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
+        </div>
       ) : (
         <Link to="/auth">
           <Button variant="outline" className="ml-4">

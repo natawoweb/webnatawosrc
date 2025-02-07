@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -9,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import WriterProfile from "./pages/WriterProfile";
+import UserProfile from "./pages/UserProfile";
 import Auth from "./pages/Auth";
 import SearchWriters from "./pages/SearchWriters";
 import Events from "./pages/Events";
@@ -31,6 +33,7 @@ const App: React.FC = () => {
             <Route path="privacy" element={<Privacy />} />
             <Route path="terms" element={<Terms />} />
             <Route path="writer/:id" element={<WriterProfile />} />
+            <Route path="profile" element={<UserProfile />} />
             <Route path="auth" element={<Auth />} />
             <Route path="search" element={<SearchWriters />} />
             <Route path="blogs" element={<Blogs />} />
