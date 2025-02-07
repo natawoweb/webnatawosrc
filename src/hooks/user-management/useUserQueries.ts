@@ -1,9 +1,55 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { UserWithRole } from "@/types/user-management";
+import { useEffect } from "react";
 
 export function useUserQueries() {
+  const queryClient = useQueryClient();
+
+  // Set up real-time subscriptions
+  useEffect(() => {
+    // Subscribe to changes in profiles table
+    const profilesChannel = supabase
+      .channel('profiles-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'profiles'
+        },
+        () => {
+          // Invalidate and refetch when any change occurs
+          queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+        }
+      )
+      .subscribe();
+
+    // Subscribe to changes in user_roles table
+    const rolesChannel = supabase
+      .channel('user-roles-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes
+          schema: 'public',
+          table: 'user_roles'
+        },
+        () => {
+          // Invalidate and refetch when any change occurs
+          queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscriptions on unmount
+    return () => {
+      supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(rolesChannel);
+    };
+  }, [queryClient]);
+
   return useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
