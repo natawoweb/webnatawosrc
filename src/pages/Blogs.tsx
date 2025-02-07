@@ -8,6 +8,7 @@ import { BlogsList } from "@/components/blogs/BlogsList";
 import { BlogSearch } from "@/components/blogs/BlogSearch";
 import { LoadingState } from "@/components/blogs/LoadingState";
 import { NoResults } from "@/components/blogs/NoResults";
+import { startOfDay, endOfDay, parseISO } from "date-fns";
 
 interface BlogsByDate {
   [year: string]: {
@@ -18,11 +19,18 @@ interface BlogsByDate {
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [searchType, setSearchType] = React.useState("title");
+  const [dateFilter, setDateFilter] = React.useState<Date>();
+  const [ratingFilter, setRatingFilter] = React.useState("");
   
   const { data: blogs, isLoading, error } = useQuery({
-    queryKey: ["blogs", searchTerm, searchType],
+    queryKey: ["blogs", searchTerm, searchType, dateFilter, ratingFilter],
     queryFn: async () => {
-      console.log("Fetching blogs with search:", { term: searchTerm, type: searchType });
+      console.log("Fetching blogs with search:", { 
+        term: searchTerm, 
+        type: searchType,
+        date: dateFilter,
+        rating: ratingFilter
+      });
       
       let query = supabase
         .from("blogs")
@@ -33,6 +41,9 @@ const Blogs = () => {
           ),
           profiles (
             full_name
+          ),
+          ratings (
+            rating
           )
         `)
         .eq("status", "approved")
@@ -52,42 +63,61 @@ const Blogs = () => {
         }
       }
 
-      const { data, error } = await query;
+      if (dateFilter) {
+        query = query.gte('published_at', startOfDay(dateFilter).toISOString())
+                    .lte('published_at', endOfDay(dateFilter).toISOString());
+      }
+
+      const { data: blogsData, error } = await query;
 
       if (error) {
         console.error("Error fetching blogs:", error);
         throw error;
       }
 
-      console.log("Fetched blogs:", data);
-      
-      // Transform and group the data by date
-      const groupedBlogs = (data || []).reduce((acc: BlogsByDate, blog) => {
-        const date = new Date(blog.published_at || blog.created_at);
-        const year = date.getFullYear().toString();
-        const month = date.toLocaleString('default', { month: 'long' });
-        
-        if (!acc[year]) {
-          acc[year] = {};
-        }
-        if (!acc[year][month]) {
-          acc[year][month] = [];
-        }
-        
-        acc[year][month].push({
-          ...blog,
-          author_name: blog.profiles?.full_name || "Anonymous"
+      // If rating filter is applied, filter blogs by average rating
+      if (ratingFilter && blogsData) {
+        const filteredBlogs = blogsData.filter(blog => {
+          const ratings = blog.ratings || [];
+          if (ratings.length === 0) return false;
+          
+          const averageRating = ratings.reduce((acc: number, curr: any) => 
+            acc + curr.rating, 0) / ratings.length;
+          
+          return averageRating >= parseInt(ratingFilter);
         });
         
-        return acc;
-      }, {});
+        return groupBlogsByDate(filteredBlogs);
+      }
 
-      return groupedBlogs;
+      return groupBlogsByDate(blogsData || []);
     },
   });
 
+  const groupBlogsByDate = (blogs: any[]) => {
+    return blogs.reduce((acc: BlogsByDate, blog) => {
+      const date = new Date(blog.published_at || blog.created_at);
+      const year = date.getFullYear().toString();
+      const month = date.toLocaleString('default', { month: 'long' });
+      
+      if (!acc[year]) {
+        acc[year] = {};
+      }
+      if (!acc[year][month]) {
+        acc[year][month] = [];
+      }
+      
+      acc[year][month].push({
+        ...blog,
+        author_name: blog.profiles?.full_name || "Anonymous"
+      });
+      
+      return acc;
+    }, {});
+  };
+
   const hasBlogs = blogs && Object.keys(blogs).length > 0;
-  const hasActiveSearch = searchTerm.trim() !== '';
+  const hasActiveSearch = searchTerm.trim() !== '' || dateFilter || ratingFilter !== '';
 
   if (isLoading) {
     return <LoadingState />;
@@ -125,6 +155,10 @@ const Blogs = () => {
             searchType={searchType}
             onSearchTermChange={setSearchTerm}
             onSearchTypeChange={setSearchType}
+            dateFilter={dateFilter}
+            onDateFilterChange={setDateFilter}
+            ratingFilter={ratingFilter}
+            onRatingFilterChange={setRatingFilter}
           />
         </div>
 
