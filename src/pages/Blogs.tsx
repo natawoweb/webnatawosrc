@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Search } from "lucide-react";
+import { AlertCircle, Loader2, Search } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 interface BlogsByDate {
   [year: string]: {
@@ -15,12 +17,14 @@ interface BlogsByDate {
 }
 
 const Blogs = () => {
+  const [searchInput, setSearchInput] = React.useState("");
   const [searchQuery, setSearchQuery] = React.useState("");
+  const { toast } = useToast();
   
   const { data: blogs, isLoading, error } = useQuery({
     queryKey: ["blogs", searchQuery],
     queryFn: async () => {
-      console.log("Fetching blogs...");
+      console.log("Fetching blogs with query:", searchQuery);
       
       let query = supabase
         .from("blogs")
@@ -74,6 +78,23 @@ const Blogs = () => {
     },
   });
 
+  const handleSearch = () => {
+    if (searchInput.trim() === searchQuery.trim()) {
+      toast({
+        description: "Please enter a different search term",
+        duration: 2000,
+      });
+      return;
+    }
+    setSearchQuery(searchInput.trim());
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto py-8 space-y-4">
@@ -110,7 +131,9 @@ const Blogs = () => {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>No Blogs Found</AlertTitle>
           <AlertDescription>
-            There are currently no approved blogs to display. Please check back later!
+            {searchQuery 
+              ? `No blogs found matching "${searchQuery}". Try a different search term.`
+              : "There are currently no approved blogs to display. Please check back later!"}
           </AlertDescription>
         </Alert>
       </div>
@@ -122,14 +145,31 @@ const Blogs = () => {
       <div className="flex flex-col space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Latest Blogs</h1>
-          <div className="relative w-72">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search blogs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search blogs..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="pl-9 w-72"
+              />
+            </div>
+            <Button 
+              onClick={handleSearch}
+              disabled={isLoading}
+              className="whitespace-nowrap"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                'Search'
+              )}
+            </Button>
           </div>
         </div>
 
