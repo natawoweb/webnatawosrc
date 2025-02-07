@@ -1,10 +1,10 @@
 
 import * as React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, ArrowLeft, Star, StarOff } from "lucide-react";
+import { AlertCircle, ArrowLeft, Star, StarOff, Trash2 } from "lucide-react";
 import { LoadingState } from "@/components/blogs/LoadingState";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,7 @@ const BlogDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [comment, setComment] = React.useState("");
   const [userRating, setUserRating] = React.useState(0);
   const [hoveredRating, setHoveredRating] = React.useState(0);
@@ -25,6 +26,25 @@ const BlogDetail = () => {
       return data.session;
     },
   });
+
+  const { data: userRoles } = useQuery({
+    queryKey: ["user-roles", session?.user.id],
+    queryFn: async () => {
+      if (!session?.user.id) return null;
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user.id,
+  });
+
+  const canDeleteComments = userRoles?.some(
+    (role) => role.role === "admin" || role.role === "manager"
+  );
 
   const { data: blog, isLoading, error } = useQuery({
     queryKey: ["blog", id],
@@ -154,9 +174,33 @@ const BlogDetail = () => {
       if (error) throw error;
 
       setComment("");
+      queryClient.invalidateQueries({ queryKey: ["blog-comments", id] });
       toast({
         title: "Success",
         description: "Comment posted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      const { error } = await supabase
+        .from("blog_comments")
+        .delete()
+        .eq("id", commentId);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ["blog-comments", id] });
+      toast({
+        title: "Success",
+        description: "Comment deleted successfully",
       });
     } catch (error: any) {
       toast({
@@ -280,12 +324,23 @@ const BlogDetail = () => {
                   className="border rounded-lg p-4 space-y-2"
                 >
                   <div className="flex justify-between items-center">
-                    <p className="font-semibold">
-                      {comment.profiles?.full_name || "Anonymous"}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(comment.created_at).toLocaleDateString()}
-                    </p>
+                    <div>
+                      <p className="font-semibold">
+                        {comment.profiles?.full_name || "Anonymous"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(comment.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    {canDeleteComments && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteComment(comment.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
                   </div>
                   <p>{comment.content}</p>
                 </div>
