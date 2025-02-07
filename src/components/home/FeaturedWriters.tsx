@@ -7,6 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { format } from "date-fns";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 export function FeaturedWriters() {
   const navigate = useNavigate();
@@ -72,57 +79,66 @@ export function FeaturedWriters() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {isLoading ? (
-            <div className="col-span-full text-center">Loading writers...</div>
-          ) : writers && writers.length > 0 ? (
-            writers.map((writer) => (
-              <div
-                key={writer.id}
-                className="glass-card p-6 transition-all duration-300 hover:scale-[1.02]"
-              >
-                <div className="flex items-center space-x-4">
-                  {writer.image_url ? (
-                    <img
-                      src={writer.image_url}
-                      alt={writer.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
-                      <span className="text-2xl font-semibold text-muted-foreground">
-                        {writer.name.charAt(0)}
-                      </span>
+        {isLoading ? (
+          <div className="text-center">Loading writers...</div>
+        ) : writers && writers.length > 0 ? (
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full max-w-5xl mx-auto"
+          >
+            <CarouselContent>
+              {writers.map((writer) => (
+                <CarouselItem key={writer.id} className="md:basis-1/3">
+                  <div className="glass-card p-6 h-full transition-all duration-300 hover:scale-[1.02]">
+                    <div className="flex items-center space-x-4">
+                      {writer.image_url ? (
+                        <img
+                          src={writer.image_url}
+                          alt={writer.name}
+                          className="w-16 h-16 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
+                          <span className="text-2xl font-semibold text-muted-foreground">
+                            {writer.name.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-semibold">{writer.name}</h3>
+                        <p className="text-sm text-muted-foreground">{writer.genre}</p>
+                        {writer.featured_month && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Featured: {formatFeaturedMonth(writer.featured_month)}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  <div>
-                    <h3 className="font-semibold">{writer.name}</h3>
-                    <p className="text-sm text-muted-foreground">{writer.genre}</p>
-                    {writer.featured_month && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Featured: {formatFeaturedMonth(writer.featured_month)}
-                      </p>
-                    )}
+                    <p className="mt-4 text-sm text-muted-foreground line-clamp-3">
+                      {writer.bio}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      className="mt-4 w-full"
+                      onClick={() => navigate(`/writer/${writer.id}`)}
+                    >
+                      View Profile
+                    </Button>
                   </div>
-                </div>
-                <p className="mt-4 text-sm text-muted-foreground line-clamp-3">
-                  {writer.bio}
-                </p>
-                <Button
-                  variant="ghost"
-                  className="mt-4 w-full"
-                  onClick={() => navigate(`/writer/${writer.id}`)}
-                >
-                  View Profile
-                </Button>
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center text-muted-foreground">
-              No writers found
-            </div>
-          )}
-        </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
+        ) : (
+          <div className="text-center text-muted-foreground">
+            No writers found
+          </div>
+        )}
       </div>
     </section>
   );
