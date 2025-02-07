@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,14 +29,22 @@ const Blogs = () => {
         throw error;
       }
 
+      console.log("Raw blogs data:", data); // Added to see raw data before author processing
+
       // Then fetch author profiles for the blogs
       const blogsWithAuthors = await Promise.all(
         data.map(async (blog) => {
-          const { data: authorData } = await supabase
+          console.log("Processing blog:", blog); // Added to debug individual blog processing
+          const { data: authorData, error: authorError } = await supabase
             .from("profiles")
             .select("full_name")
             .eq("id", blog.author_id)
             .single();
+          
+          if (authorError) {
+            console.error("Error fetching author for blog:", blog.id, authorError);
+          }
+          console.log("Author data for blog:", blog.id, authorData); // Added to debug author data
           
           return {
             ...blog,
@@ -44,7 +53,7 @@ const Blogs = () => {
         })
       );
       
-      console.log("Fetched blogs:", blogsWithAuthors);
+      console.log("Final processed blogs:", blogsWithAuthors);
       return blogsWithAuthors;
     },
   });
