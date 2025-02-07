@@ -11,24 +11,8 @@ interface CreateUserPayload {
   email: string
   fullName: string
   role: 'reader' | 'writer' | 'manager' | 'admin'
-}
-
-function generateSecurePassword(): string {
-  const length = 16;
-  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
-  let password = '';
-  
-  password += 'A'; // Uppercase
-  password += 'a'; // Lowercase
-  password += '1'; // Number
-  password += '!'; // Special character
-  
-  for (let i = password.length; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charset.length);
-    password += charset[randomIndex];
-  }
-  
-  return password.split('').sort(() => Math.random() - 0.5).join('');
+  password: string
+  userType: string
 }
 
 function isValidEmail(email: string): boolean {
@@ -55,6 +39,14 @@ function validatePayload(payload: any): { isValid: boolean; error?: string } {
 
   if (!payload.role || !isValidRole(payload.role)) {
     return { isValid: false, error: 'Valid role is required (reader, writer, manager, or admin)' };
+  }
+
+  if (!payload.password || payload.password.length < 6) {
+    return { isValid: false, error: 'Password is required (minimum 6 characters)' };
+  }
+
+  if (!payload.userType) {
+    return { isValid: false, error: 'User type is required' };
   }
 
   return { isValid: true };
@@ -129,17 +121,17 @@ serve(async (req: Request) => {
       return createErrorResponse(400, 'User with this email already exists');
     }
 
-    const tempPassword = generateSecurePassword();
     console.log('Creating auth user for email:', payload.email);
 
     // Create auth user with email confirmation disabled
     const { data: authUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
       email: payload.email,
-      password: tempPassword,
+      password: payload.password,
       email_confirm: true,
       user_metadata: {
         full_name: payload.fullName,
         role: payload.role,
+        user_type: payload.userType
       },
     });
 
@@ -158,7 +150,7 @@ serve(async (req: Request) => {
     // The database trigger will handle creating the profile and role
     return createSuccessResponse({
       user: authUser.user,
-      tempPassword,
+      message: 'User created successfully'
     });
 
   } catch (error) {

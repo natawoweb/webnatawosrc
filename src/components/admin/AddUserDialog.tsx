@@ -24,7 +24,7 @@ type AppRole = Database['public']['Enums']['app_role'];
 interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (email: string, fullName: string, role: AppRole) => Promise<void>;
+  onSubmit: (email: string, fullName: string, role: AppRole, password: string, userType: string) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -32,9 +32,11 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<AppRole>("reader");
+  const [password, setPassword] = useState("");
+  const [userType, setUserType] = useState("reader");
 
   const handleSubmit = async () => {
-    if (!email || !fullName || !role) {
+    if (!email || !fullName || !role || !password || !userType) {
       console.error("All fields are required");
       return;
     }
@@ -44,12 +46,19 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
       return;
     }
 
+    if (password.length < 6) {
+      console.error("Password must be at least 6 characters long");
+      return;
+    }
+
     try {
-      await onSubmit(email, fullName, role);
+      await onSubmit(email, fullName, role, password, userType);
       // Only clear the form if the submission was successful
       setEmail("");
       setFullName("");
       setRole("reader");
+      setPassword("");
+      setUserType("reader");
     } catch (error) {
       // If there's an error, the form won't be cleared
       console.error("Error adding user:", error);
@@ -88,8 +97,33 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
               />
             </div>
             <div>
+              <label className="text-sm font-medium">Password</label>
+              <Input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                type="password"
+                required
+                minLength={6}
+              />
+            </div>
+            <div>
               <label className="text-sm font-medium">Role</label>
               <Select value={role} onValueChange={(value) => setRole(value as AppRole)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="reader">Reader</SelectItem>
+                  <SelectItem value="writer">Writer</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">User Type</label>
+              <Select value={userType} onValueChange={setUserType}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
