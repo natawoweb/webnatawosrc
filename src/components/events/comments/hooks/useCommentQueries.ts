@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { useSession } from "@/hooks/useSession";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -19,6 +20,8 @@ export interface Comment {
 }
 
 export function useCommentQueries(eventId: string) {
+  const { session } = useSession();
+
   const { data: comments, isLoading, error } = useQuery({
     queryKey: ["eventComments", eventId],
     queryFn: async () => {
@@ -34,12 +37,10 @@ export function useCommentQueries(eventId: string) {
 
       if (commentsError) throw commentsError;
 
-      const currentUser = (await supabase.auth.getUser()).data.user;
-
       // Process comments to include reaction data
       const processedComments = commentsData?.map(comment => {
         const reactions = comment.reactions || [];
-        const userReaction = reactions.find(r => r.user_id === currentUser?.id)?.type as 'like' | 'dislike' | null;
+        const userReaction = reactions.find(r => r.user_id === session?.user?.id)?.type as 'like' | 'dislike' | null;
         const likes = reactions.filter(r => r.type === 'like').length;
         const dislikes = reactions.filter(r => r.type === 'dislike').length;
 
@@ -54,20 +55,13 @@ export function useCommentQueries(eventId: string) {
 
       return processedComments as Comment[];
     },
-  });
-
-  const { data: currentUser } = useQuery({
-    queryKey: ["currentUser"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      return user;
-    },
+    enabled: !!eventId,
   });
 
   return {
     comments,
     isLoading,
     error,
-    currentUser,
+    currentUser: session?.user || null,
   };
 }
