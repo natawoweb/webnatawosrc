@@ -2,20 +2,12 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Loader2, Search } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { BlogsList } from "@/components/blogs/BlogsList";
+import { BlogSearch } from "@/components/blogs/BlogSearch";
+import { LoadingState } from "@/components/blogs/LoadingState";
+import { NoResults } from "@/components/blogs/NoResults";
 
 interface BlogsByDate {
   [year: string]: {
@@ -26,7 +18,6 @@ interface BlogsByDate {
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [searchType, setSearchType] = React.useState("title");
-  const { toast } = useToast();
   
   const { data: blogs, isLoading, error } = useQuery({
     queryKey: ["blogs", searchTerm, searchType],
@@ -99,16 +90,7 @@ const Blogs = () => {
   const hasActiveSearch = searchTerm.trim() !== '';
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto py-8 space-y-4">
-        <Skeleton className="h-12 w-48" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-64" />
-          ))}
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
@@ -128,15 +110,7 @@ const Blogs = () => {
   if (!hasBlogs) {
     return (
       <div className="container mx-auto py-8">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>No Blogs Found</AlertTitle>
-          <AlertDescription>
-            {hasActiveSearch 
-              ? `No blogs found matching your search criteria. Try different search terms.`
-              : "There are currently no approved blogs to display. Please check back later!"}
-          </AlertDescription>
-        </Alert>
+        <NoResults hasActiveSearch={hasActiveSearch} />
       </div>
     );
   }
@@ -146,79 +120,18 @@ const Blogs = () => {
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col space-y-4">
           <h1 className="text-3xl font-bold">Latest Blogs</h1>
-          <div className="flex gap-4">
-            <Select value={searchType} onValueChange={setSearchType}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Search by..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="title">Title</SelectItem>
-                <SelectItem value="author">Author</SelectItem>
-                <SelectItem value="category">Category</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={`Search by ${searchType}...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-          </div>
+          <BlogSearch
+            searchTerm={searchTerm}
+            searchType={searchType}
+            onSearchTermChange={setSearchTerm}
+            onSearchTypeChange={setSearchType}
+          />
         </div>
 
-        {Object.entries(blogs)
-          .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
-          .map(([year, months]) => (
-            <div key={year} className="space-y-6">
-              <h2 className="text-2xl font-semibold">{year}</h2>
-              {Object.entries(months)
-                .sort(([monthA], [monthB]) => {
-                  const dateA = new Date(`${monthA} 1, ${year}`);
-                  const dateB = new Date(`${monthB} 1, ${year}`);
-                  return dateB.getTime() - dateA.getTime();
-                })
-                .map(([month, monthBlogs]) => (
-                  <div key={`${year}-${month}`} className="space-y-4">
-                    <h3 className="text-xl font-medium text-muted-foreground">{month}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {monthBlogs.map((blog) => (
-                        <Card key={blog.id} className="flex flex-col">
-                          {blog.cover_image && (
-                            <img
-                              src={blog.cover_image}
-                              alt={blog.title}
-                              className="w-full h-48 object-cover rounded-t-lg"
-                            />
-                          )}
-                          <CardHeader>
-                            <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm text-muted-foreground">
-                              Category: {blog.blog_categories?.name || "Uncategorized"}
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Author: {blog.author_name}
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {new Date(blog.published_at || blog.created_at).toLocaleDateString()}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          ))}
+        <BlogsList blogs={blogs} />
       </div>
     </div>
   );
 };
 
 export default Blogs;
-
