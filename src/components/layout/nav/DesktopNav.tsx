@@ -12,6 +12,7 @@ import {
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useProfile } from "@/hooks/useProfile";
 
 interface DesktopNavProps {
   currentLanguage: string;
@@ -29,6 +30,7 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
   navigate,
 }) => {
   const location = useLocation();
+  const { profile } = useProfile();
 
   const isActiveRoute = (path: string) => {
     return location.pathname === path;
@@ -93,8 +95,10 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
         <div className="flex items-center gap-4">
           <Link to="/profile">
             <Avatar className="h-8 w-8 cursor-pointer">
-              <AvatarImage src={session?.user?.user_metadata?.avatar_url} />
-              <AvatarFallback>{session?.user?.email?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+              <AvatarImage src={profile?.avatar_url} />
+              <AvatarFallback>
+                {profile?.pseudonym ? profile.pseudonym[0].toUpperCase() : profile?.email?.[0].toUpperCase() || '?'}
+              </AvatarFallback>
             </Avatar>
           </Link>
           <Button variant="outline" onClick={handleSignOut}>
@@ -112,3 +116,4 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
     </div>
   );
 };
+

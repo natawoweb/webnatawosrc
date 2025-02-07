@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useProfile } from "@/hooks/useProfile";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -30,6 +32,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   navigate,
 }) => {
   const location = useLocation();
+  const { profile } = useProfile();
 
   const isActiveRoute = (path: string) => {
     return location.pathname === path;
@@ -98,10 +101,21 @@ export const MobileNav: React.FC<MobileNavProps> = ({
         )}
 
         {session ? (
-          <Button variant="outline" onClick={handleSignOut} className="w-full mt-4">
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          <>
+            <Link to="/profile" className="px-3 py-2 flex items-center gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={profile?.avatar_url} />
+                <AvatarFallback>
+                  {profile?.pseudonym ? profile.pseudonym[0].toUpperCase() : profile?.email?.[0].toUpperCase() || '?'}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm">Profile</span>
+            </Link>
+            <Button variant="outline" onClick={handleSignOut} className="w-full mt-4">
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </>
         ) : (
           <Link to="/auth">
             <Button variant="outline" className="w-full mt-4">
@@ -113,3 +127,4 @@ export const MobileNav: React.FC<MobileNavProps> = ({
     </div>
   );
 };
+
