@@ -31,7 +31,7 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
 }) => {
   const location = useLocation();
   const { profile } = useProfile();
-  const isWriter = profile?.role === "writer";
+  const isWriter = profile?.user_type === "writer";
 
   const isActiveRoute = (path: string) => {
     return location.pathname === path;

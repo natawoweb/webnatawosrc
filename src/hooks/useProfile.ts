@@ -33,7 +33,6 @@ export const useProfile = () => {
         return;
       }
 
-      // First try to get the existing profile
       let { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
@@ -45,9 +44,8 @@ export const useProfile = () => {
         throw fetchError;
       }
 
-      // If no profile exists, create a new one with default values
       if (!existingProfile) {
-        const newProfile = {
+        const newProfile: Profile = {
           id: session.user.id,
           email: session.user.email,
           full_name: null,
@@ -59,8 +57,14 @@ export const useProfile = () => {
           date_of_birth: null,
           pseudonym: null,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        } as Profile;
+          updated_at: new Date().toISOString(),
+          level: null,
+          location: null,
+          status: null,
+          county: null,
+          state: null,
+          user_id: session.user.id
+        };
 
         const { error: insertError } = await supabase
           .from('profiles')

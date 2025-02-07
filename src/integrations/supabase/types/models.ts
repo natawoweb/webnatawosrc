@@ -1,7 +1,27 @@
 
 import { Database } from './database'
 
-export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Profile = {
+  id: string
+  full_name: string | null
+  bio: string | null
+  avatar_url: string | null
+  created_at: string | null
+  updated_at: string | null
+  email: string | null
+  level: string | null
+  location: string | null
+  status: string | null
+  user_type: string
+  date_of_birth: string | null
+  gender: string | null
+  pseudonym: string | null
+  county: string | null
+  state: string | null
+  social_links?: { [key: string]: string }
+  user_id?: string | null
+}
+
 export type Writer = Database['public']['Tables']['writers']['Row']
 export type AppRole = Database['public']['Enums']['app_role']
 export type UserRole = Database['public']['Tables']['user_roles']['Row']

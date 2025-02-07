@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
@@ -26,12 +27,12 @@ export function NotificationsDropdown() {
     },
   });
 
-  const unreadCount = notifications?.filter((n) => !n.is_read).length || 0;
+  const unreadCount = notifications?.filter((n) => !n.read).length || 0;
 
   const markAsRead = async (id: string) => {
     await supabase
       .from("event_notifications")
-      .update({ is_read: true })
+      .update({ read: true })
       .eq("id", id);
   };
 
@@ -64,7 +65,7 @@ export function NotificationsDropdown() {
             >
               <div className="flex items-center gap-2 w-full">
                 <span className="font-medium flex-grow">{notification.message}</span>
-                {!notification.is_read && (
+                {!notification.read && (
                   <Badge variant="secondary" className="h-2 w-2 rounded-full p-0" />
                 )}
               </div>

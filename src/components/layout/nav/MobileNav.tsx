@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -33,7 +32,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 }) => {
   const location = useLocation();
   const { profile } = useProfile();
-  const isWriter = profile?.role === "writer";
+  const isWriter = profile?.user_type === "writer";
 
   const isActiveRoute = (path: string) => {
     return location.pathname === path;

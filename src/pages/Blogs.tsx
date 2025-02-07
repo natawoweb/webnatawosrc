@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,8 +115,8 @@ const Blogs = () => {
     }, {});
   };
 
-  const hasBlogs = blogs && Object.keys(blogs).length > 0;
-  const hasActiveSearch = searchTerm.trim() !== '' || dateFilter || ratingFilter !== 'all';
+  const hasBlogs = !!(blogs && Object.keys(blogs).length > 0);
+  const hasActiveSearch = searchTerm.trim() !== '' || !!dateFilter || ratingFilter !== 'all';
 
   if (isLoading) {
     return (
