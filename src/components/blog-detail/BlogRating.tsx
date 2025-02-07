@@ -30,11 +30,16 @@ export const BlogRating = ({ blogId, initialRating = 0 }: BlogRatingProps) => {
     try {
       const { error } = await supabase
         .from("blog_ratings")
-        .upsert({
-          blog_id: blogId,
-          user_id: session.user.id,
-          rating,
-        });
+        .upsert(
+          {
+            blog_id: blogId,
+            user_id: session.user.id,
+            rating,
+          },
+          {
+            onConflict: 'user_id,blog_id'
+          }
+        );
 
       if (error) throw error;
 
@@ -44,6 +49,7 @@ export const BlogRating = ({ blogId, initialRating = 0 }: BlogRatingProps) => {
         description: "Rating submitted successfully",
       });
     } catch (error: any) {
+      console.error('Rating error:', error);
       toast({
         variant: "destructive",
         title: "Error",
