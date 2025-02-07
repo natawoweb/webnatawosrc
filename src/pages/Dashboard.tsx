@@ -15,10 +15,12 @@ import {
 } from "@/components/ui/table";
 import { BlogStatusBadge } from "@/components/admin/blog/BlogStatusBadge";
 import { useSession } from "@/hooks/useSession";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const { session } = useSession();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: blogs, isLoading } = useQuery({
@@ -30,7 +32,7 @@ export default function Dashboard() {
         .from("blogs")
         .select(`
           *,
-          blog_comments(count),
+          blog_comments (count),
           blog_categories (
             name
           )
@@ -43,10 +45,32 @@ export default function Dashboard() {
         throw error;
       }
       
-      return data || [];
+      return data;
     },
     enabled: !!session?.user?.id,
   });
+
+  const handleDelete = async (blogId: string) => {
+    try {
+      const { error } = await supabase
+        .from("blogs")
+        .delete()
+        .eq("id", blogId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Blog deleted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
 
   const filteredBlogs = blogs?.filter((blog) =>
     blog.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -118,10 +142,7 @@ export default function Dashboard() {
                       variant="ghost"
                       size="sm"
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => {
-                        // Delete functionality will be implemented here
-                        console.log("Delete blog:", blog.id);
-                      }}
+                      onClick={() => handleDelete(blog.id)}
                     >
                       Delete
                     </Button>
