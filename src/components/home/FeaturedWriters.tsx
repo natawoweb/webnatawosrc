@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ export function FeaturedWriters() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   
-  const { data: writers } = useQuery({
+  const { data: writers, isLoading } = useQuery({
     queryKey: ["writers", searchQuery],
     queryFn: async () => {
       let query = supabase
@@ -21,12 +22,14 @@ export function FeaturedWriters() {
         query = query.or(`name.ilike.%${searchQuery}%,genre.ilike.%${searchQuery}%`);
       } else {
         query = query.eq("featured", true)
-          .order("featured_month", { ascending: false })
-          .limit(3);
+          .order("featured_month", { ascending: false });
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching writers:", error);
+        throw error;
+      }
       return data;
     },
   });
@@ -53,38 +56,50 @@ export function FeaturedWriters() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {writers?.map((writer) => (
-            <div
-              key={writer.id}
-              className="glass-card p-6 transition-all duration-300 hover:scale-[1.02]"
-            >
-              <div className="flex items-center space-x-4">
-                {writer.image_url ? (
-                  <img
-                    src={writer.image_url}
-                    alt={writer.name}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-full bg-accent" />
-                )}
-                <div>
-                  <h3 className="font-semibold">{writer.name}</h3>
-                  <p className="text-sm text-muted-foreground">{writer.genre}</p>
-                </div>
-              </div>
-              <p className="mt-4 text-sm text-muted-foreground line-clamp-3">
-                {writer.bio}
-              </p>
-              <Button
-                variant="ghost"
-                className="mt-4 w-full"
-                onClick={() => navigate(`/writer/${writer.id}`)}
+          {isLoading ? (
+            <div className="col-span-full text-center">Loading writers...</div>
+          ) : writers && writers.length > 0 ? (
+            writers.map((writer) => (
+              <div
+                key={writer.id}
+                className="glass-card p-6 transition-all duration-300 hover:scale-[1.02]"
               >
-                View Profile
-              </Button>
+                <div className="flex items-center space-x-4">
+                  {writer.image_url ? (
+                    <img
+                      src={writer.image_url}
+                      alt={writer.name}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
+                      <span className="text-2xl font-semibold text-muted-foreground">
+                        {writer.name.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-semibold">{writer.name}</h3>
+                    <p className="text-sm text-muted-foreground">{writer.genre}</p>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm text-muted-foreground line-clamp-3">
+                  {writer.bio}
+                </p>
+                <Button
+                  variant="ghost"
+                  className="mt-4 w-full"
+                  onClick={() => navigate(`/writer/${writer.id}`)}
+                >
+                  View Profile
+                </Button>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center text-muted-foreground">
+              No writers found
             </div>
-          ))}
+          )}
         </div>
       </div>
     </section>
