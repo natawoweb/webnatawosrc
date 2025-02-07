@@ -4,17 +4,25 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Search } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+
+interface BlogsByDate {
+  [year: string]: {
+    [month: string]: Array<any>;
+  };
+}
 
 const Blogs = () => {
+  const [searchQuery, setSearchQuery] = React.useState("");
+  
   const { data: blogs, isLoading, error } = useQuery({
-    queryKey: ["blogs"],
+    queryKey: ["blogs", searchQuery],
     queryFn: async () => {
       console.log("Fetching blogs...");
       
-      // Fetch blogs with their categories and authors
-      const { data, error } = await supabase
+      let query = supabase
         .from("blogs")
         .select(`
           *,
@@ -25,7 +33,14 @@ const Blogs = () => {
             full_name
           )
         `)
-        .eq("status", "approved");
+        .eq("status", "approved")
+        .order('published_at', { ascending: false });
+
+      if (searchQuery) {
+        query = query.ilike('title', `%${searchQuery}%`);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error("Error fetching blogs:", error);
@@ -34,11 +49,28 @@ const Blogs = () => {
 
       console.log("Fetched blogs:", data);
       
-      // Transform the data to match our expected format
-      return data?.map(blog => ({
-        ...blog,
-        author_name: blog.profiles?.full_name || "Anonymous"
-      })) || [];
+      // Transform and group the data by date
+      const groupedBlogs = (data || []).reduce((acc: BlogsByDate, blog) => {
+        const date = new Date(blog.published_at || blog.created_at);
+        const year = date.getFullYear().toString();
+        const month = date.toLocaleString('default', { month: 'long' });
+        
+        if (!acc[year]) {
+          acc[year] = {};
+        }
+        if (!acc[year][month]) {
+          acc[year][month] = [];
+        }
+        
+        acc[year][month].push({
+          ...blog,
+          author_name: blog.profiles?.full_name || "Anonymous"
+        });
+        
+        return acc;
+      }, {});
+
+      return groupedBlogs;
     },
   });
 
@@ -69,7 +101,9 @@ const Blogs = () => {
     );
   }
 
-  if (!blogs?.length) {
+  const hasBlogs = blogs && Object.keys(blogs).length > 0;
+
+  if (!hasBlogs) {
     return (
       <div className="container mx-auto py-8">
         <Alert>
@@ -85,30 +119,65 @@ const Blogs = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Latest Blogs</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {blogs.map((blog) => (
-          <Card key={blog.id} className="flex flex-col">
-            {blog.cover_image && (
-              <img
-                src={blog.cover_image}
-                alt={blog.title}
-                className="w-full h-48 object-cover rounded-t-lg"
-              />
-            )}
-            <CardHeader>
-              <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Category: {blog.blog_categories?.name || "Uncategorized"}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Author: {blog.author_name}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="flex flex-col space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Latest Blogs</h1>
+          <div className="relative w-72">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search blogs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+        </div>
+
+        {Object.entries(blogs)
+          .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
+          .map(([year, months]) => (
+            <div key={year} className="space-y-6">
+              <h2 className="text-2xl font-semibold">{year}</h2>
+              {Object.entries(months)
+                .sort(([monthA], [monthB]) => {
+                  const dateA = new Date(`${monthA} 1, ${year}`);
+                  const dateB = new Date(`${monthB} 1, ${year}`);
+                  return dateB.getTime() - dateA.getTime();
+                })
+                .map(([month, monthBlogs]) => (
+                  <div key={`${year}-${month}`} className="space-y-4">
+                    <h3 className="text-xl font-medium text-muted-foreground">{month}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {monthBlogs.map((blog) => (
+                        <Card key={blog.id} className="flex flex-col">
+                          {blog.cover_image && (
+                            <img
+                              src={blog.cover_image}
+                              alt={blog.title}
+                              className="w-full h-48 object-cover rounded-t-lg"
+                            />
+                          )}
+                          <CardHeader>
+                            <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                              Category: {blog.blog_categories?.name || "Uncategorized"}
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Author: {blog.author_name}
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {new Date(blog.published_at || blog.created_at).toLocaleDateString()}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ))}
       </div>
     </div>
   );

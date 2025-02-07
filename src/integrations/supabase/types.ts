@@ -505,6 +505,12 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_month_year: {
+        Args: {
+          published_at: string
+        }
+        Returns: string
+      }
       has_role:
         | {
             Args: {
