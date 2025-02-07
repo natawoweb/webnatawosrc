@@ -82,7 +82,7 @@ export const BlogComments = ({
 
     try {
       const { error } = await supabase
-        .from("comment_reactions")
+        .from("blog_comment_reactions")
         .upsert(
           {
             comment_id: commentId,
@@ -218,3 +218,4 @@ export const BlogComments = ({
     </div>
   );
 };
+
