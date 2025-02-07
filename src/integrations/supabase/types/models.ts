@@ -1,5 +1,6 @@
 
 import { Database } from './database'
+import { Json } from './shared'
 
 export type Profile = {
   id: string
@@ -18,8 +19,8 @@ export type Profile = {
   pseudonym: string | null
   county: string | null
   state: string | null
-  social_links?: { [key: string]: string }
-  user_id?: string | null
+  social_links: { [key: string]: string } | null
+  user_id: string | null
 }
 
 export type Writer = Database['public']['Tables']['writers']['Row']

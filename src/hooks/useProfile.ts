@@ -78,8 +78,8 @@ export const useProfile = () => {
         existingProfile = newProfile;
       }
 
-      setProfile(existingProfile);
-      setEditedProfile(existingProfile);
+      setProfile(existingProfile as Profile);
+      setEditedProfile(existingProfile as Profile);
     } catch (error: any) {
       console.error('Error loading profile:', error);
       toast({
@@ -143,7 +143,7 @@ export const useProfile = () => {
     setEditedProfile((prev) => ({
       ...prev!,
       social_links: {
-        ...prev!.social_links,
+        ...(prev?.social_links || {}),
         [platform]: value
       }
     }));
