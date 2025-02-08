@@ -1,9 +1,6 @@
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import TextAlign from '@tiptap/extension-text-align';
-import { useRef, useEffect } from 'react';
-import { EditorToolbar } from './editor/EditorToolbar';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 interface RichTextEditorProps {
   content: string;
@@ -11,73 +8,43 @@ interface RichTextEditorProps {
   language?: "english" | "tamil";
 }
 
+const modules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'align': [] }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    ['link', 'blockquote'],
+    [{ 'color': [] }, { 'background': [] }],
+    ['clean']
+  ],
+};
+
+const formats = [
+  'header',
+  'bold', 'italic', 'underline', 'strike',
+  'align',
+  'list', 'bullet',
+  'link', 'blockquote',
+  'color', 'background'
+];
+
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
-  const parseContent = (contentString: string) => {
-    try {
-      if (!contentString) {
-        return {
-          type: 'doc',
-          content: [{
-            type: 'paragraph',
-            content: []
-          }]
-        };
-      }
-
-      const parsed = JSON.parse(contentString);
-      
-      if (!parsed.type || parsed.type !== 'doc') {
-        return {
-          type: 'doc',
-          content: [{
-            type: 'paragraph',
-            content: parsed.content?.[0]?.content || []
-          }]
-        };
-      }
-
-      return parsed;
-    } catch (error) {
-      console.warn('Error parsing editor content:', error);
-      return {
-        type: 'doc',
-        content: [{
-          type: 'paragraph',
-          content: []
-        }]
-      };
-    }
-  };
-
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-        alignments: ['left', 'center', 'right', 'justify'],
-      }),
-    ],
-    content: parseContent(content),
-    onUpdate: ({ editor }) => {
-      onChange(JSON.stringify(editor.getJSON()));
-    },
-    autofocus: 'end',
-    editable: true,
-  });
-
-  if (!editor) {
-    return null;
-  }
+  const placeholder = language === "english" 
+    ? "Start writing your blog post..."
+    : "உங்கள் வலைப்பதிவை எழுத தொடங்குங்கள்...";
 
   return (
-    <div className="border rounded-lg flex flex-col h-full">
-      <EditorToolbar editor={editor} language={language} />
-      <div className="flex-1 overflow-auto relative bg-white">
-        <EditorContent 
-          editor={editor} 
-          className="prose max-w-none min-h-full p-6 focus:outline-none cursor-text" 
-        />
-      </div>
+    <div className="border rounded-lg flex flex-col h-full bg-white">
+      <ReactQuill
+        theme="snow"
+        value={content}
+        onChange={onChange}
+        modules={modules}
+        formats={formats}
+        placeholder={placeholder}
+        className="flex-1 flex flex-col"
+      />
     </div>
   );
 }

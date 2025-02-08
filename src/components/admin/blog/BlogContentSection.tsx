@@ -69,7 +69,7 @@ export function BlogContentSection({
           <label className="text-sm font-medium block mb-2">
             Content
           </label>
-          <div className="h-[calc(100%-2rem)]">
+          <div className="h-[calc(100%-2rem)] [&_.ql-container.ql-snow]:h-[calc(100%-42px)]">
             <RichTextEditor
               content={content}
               onChange={onContentChange}
