@@ -26,7 +26,7 @@ interface RichTextEditorProps {
 
 interface ImageComponentState {
   width: number;
-  height: number;
+  height: number | 'auto';
 }
 
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
