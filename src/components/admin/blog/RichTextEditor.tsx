@@ -12,9 +12,6 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
-  const editorRef = useRef<HTMLDivElement>(null);
-  const cursorRef = useRef<HTMLDivElement>(null);
-
   const parseContent = (contentString: string) => {
     try {
       if (!contentString) {
@@ -68,56 +65,19 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     editable: true,
   });
 
-  useEffect(() => {
-    if (!editor || !cursorRef.current || !editorRef.current) return;
-
-    const updateCursorPosition = () => {
-      const { view } = editor;
-      const { state } = view;
-      const { selection } = state;
-      const dom = view.domAtPos(selection.anchor);
-      
-      if (!dom.node || !(dom.node instanceof HTMLElement)) return;
-
-      const editorBounds = editorRef.current?.getBoundingClientRect();
-      const nodeBounds = dom.node.getBoundingClientRect();
-      
-      if (!editorBounds || !cursorRef.current) return;
-
-      const relativeTop = nodeBounds.top - editorBounds.top;
-      const relativeLeft = nodeBounds.left - editorBounds.left;
-
-      cursorRef.current.style.transform = `translate(${relativeLeft}px, ${relativeTop}px)`;
-      cursorRef.current.style.opacity = '1';
-    };
-
-    editor.on('selectionUpdate', updateCursorPosition);
-    return () => {
-      editor.off('selectionUpdate', updateCursorPosition);
-    };
-  }, [editor]);
-
   if (!editor) {
     return null;
   }
 
   return (
-    <div className="border rounded-lg h-full flex flex-col relative" ref={editorRef}>
+    <div className="border rounded-lg flex flex-col h-full">
       <EditorToolbar editor={editor} language={language} />
-      <div className="relative flex-grow overflow-hidden">
-        <div 
-          ref={cursorRef}
-          className="absolute w-0.5 h-5 bg-blue-500 transition-transform duration-100 pointer-events-none opacity-0"
-          style={{ zIndex: 50 }}
+      <div className="flex-1 overflow-auto relative bg-white">
+        <EditorContent 
+          editor={editor} 
+          className="prose max-w-none min-h-full p-6 focus:outline-none cursor-text" 
         />
-        <div className="h-full overflow-y-auto">
-          <EditorContent 
-            editor={editor} 
-            className="prose max-w-none p-6 min-h-full cursor-text bg-white focus:outline-none" 
-          />
-        </div>
       </div>
     </div>
   );
 }
-
