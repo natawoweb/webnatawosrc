@@ -24,7 +24,36 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     try {
       const parsedContent = JSON.parse(content);
       
-      // Validate if parsedContent has the required Draft.js structure
+      // Handle ProseMirror/TipTap format
+      if (parsedContent.type === 'doc' && Array.isArray(parsedContent.content)) {
+        const textContent = parsedContent.content
+          .map((node: any) => {
+            if (node.type === 'paragraph') {
+              return node.content?.map((textNode: any) => textNode.text).join('') || '';
+            }
+            return '';
+          })
+          .filter((text: string) => text.trim())
+          .join('\n');
+
+        // Convert to Draft.js format
+        const draftContent = {
+          blocks: textContent.split('\n').map((text: string, index: number) => ({
+            key: `imported-${index}`,
+            text: text.trim(),
+            type: 'unstyled',
+            depth: 0,
+            inlineStyleRanges: [],
+            entityRanges: [],
+            data: {}
+          })),
+          entityMap: {}
+        };
+        
+        return EditorState.createWithContent(convertFromRaw(draftContent));
+      }
+      
+      // Handle Draft.js format
       if (parsedContent && 
           typeof parsedContent === 'object' && 
           Array.isArray(parsedContent.blocks) && 
@@ -32,7 +61,7 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
         return EditorState.createWithContent(convertFromRaw(parsedContent));
       }
       
-      // If not valid Draft.js format, create with plain text
+      // If not in either format, create with plain text
       return EditorState.createWithContent(
         ContentState.createFromText(content)
       );
@@ -48,9 +77,41 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     try {
       const parsedContent = JSON.parse(content);
       
-      // Validate parsed content structure
+      // Handle ProseMirror/TipTap format
+      if (parsedContent.type === 'doc' && Array.isArray(parsedContent.content)) {
+        const textContent = parsedContent.content
+          .map((node: any) => {
+            if (node.type === 'paragraph') {
+              return node.content?.map((textNode: any) => textNode.text).join('') || '';
+            }
+            return '';
+          })
+          .filter((text: string) => text.trim())
+          .join('\n');
+
+        // Convert to Draft.js format
+        const draftContent = {
+          blocks: textContent.split('\n').map((text: string, index: number) => ({
+            key: `imported-${index}`,
+            text: text.trim(),
+            type: 'unstyled',
+            depth: 0,
+            inlineStyleRanges: [],
+            entityRanges: [],
+            data: {}
+          })),
+          entityMap: {}
+        };
+
+        const contentState = convertFromRaw(draftContent);
+        const newEditorState = EditorState.createWithContent(contentState);
+        setEditorState(newEditorState);
+        return;
+      }
+      
+      // Handle Draft.js format
       if (!parsedContent || !Array.isArray(parsedContent.blocks) || !parsedContent.entityMap) {
-        console.error('Invalid content structure:', parsedContent);
+        console.error('Invalid Draft.js content structure:', parsedContent);
         return;
       }
 
