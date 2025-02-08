@@ -17,6 +17,7 @@ import { EditBlogDialog } from "./EditBlogDialog";
 import { DeleteBlogDialog } from "./DeleteBlogDialog";
 import { Database } from "@/integrations/supabase/types";
 import { useState } from "react";
+import { useSession } from "@/hooks/useSession";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -28,6 +29,7 @@ export function BlogList({ blogs }: BlogListProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
+  const { session } = useSession();
 
   // Add query to fetch author names
   const { data: profiles } = useQuery({
@@ -36,6 +38,21 @@ export function BlogList({ blogs }: BlogListProps) {
       const { data, error } = await supabase
         .from("profiles")
         .select("id, full_name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Get current user's profile to check permissions
+  const { data: userProfile } = useQuery({
+    queryKey: ["user-profile"],
+    queryFn: async () => {
+      if (!session?.user?.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_type")
+        .eq("id", session.user.id)
+        .single();
       if (error) throw error;
       return data;
     },
@@ -63,12 +80,23 @@ export function BlogList({ blogs }: BlogListProps) {
       });
       setBlogToDelete(null);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Delete mutation error:", error);
+      
+      // Handle specific error cases
+      let errorMessage = "Failed to delete blog.";
+      if (error?.message?.includes("row-level security")) {
+        if (userProfile?.user_type === "admin" || userProfile?.user_type === "manager") {
+          errorMessage = "You can only delete approved or published blogs";
+        } else {
+          errorMessage = "You can only delete your own blogs";
+        }
+      }
+      
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete blog. Make sure you have the required permissions.",
+        description: errorMessage,
       });
       setBlogToDelete(null);
     },
@@ -83,6 +111,23 @@ export function BlogList({ blogs }: BlogListProps) {
   const handleDelete = (blog: Blog) => {
     console.log("Setting blog to delete:", blog);
     setBlogToDelete(blog);
+  };
+
+  const canDeleteBlog = (blog: Blog) => {
+    if (!session?.user?.id) return false;
+    
+    // Blog owner can always delete their own blog
+    if (blog.author_id === session.user.id) return true;
+    
+    // Admins and managers can delete approved/published blogs
+    if (
+      (userProfile?.user_type === "admin" || userProfile?.user_type === "manager") &&
+      (blog.status === "approved" || blog.status === "published")
+    ) {
+      return true;
+    }
+    
+    return false;
   };
 
   return (
@@ -108,13 +153,15 @@ export function BlogList({ blogs }: BlogListProps) {
               <TableCell>{new Date(blog.updated_at || "").toLocaleDateString()}</TableCell>
               <TableCell className="space-x-2">
                 <EditBlogDialog blog={blog} />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(blog)}
-                >
-                  <Trash2 className="h-4 w-4 text-red-500" />
-                </Button>
+                {canDeleteBlog(blog) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(blog)}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                )}
               </TableCell>
             </TableRow>
           ))}
