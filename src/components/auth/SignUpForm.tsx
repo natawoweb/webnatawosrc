@@ -29,6 +29,7 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
     setLoading(true);
     
     try {
+      // First try to sign up the user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -77,6 +78,8 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
       if (!data.user) {
         throw new Error('Signup failed - no user returned');
       }
+
+      console.log('Sign up successful, sending notifications...');
 
       // Only proceed with notifications if signup was successful
       await handleSignupNotifications(role, email, fullName);
