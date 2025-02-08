@@ -20,38 +20,55 @@ interface RichTextEditorProps {
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
   const [editorState, setEditorState] = useState(() => {
     try {
-      // If content is a string that needs to be parsed
-      const contentObj = typeof content === 'string' ? JSON.parse(content) : content;
-      
-      // Check if it's already in Draft.js format
+      let contentObj;
+      try {
+        // First try parsing it as JSON
+        contentObj = JSON.parse(content);
+        // If it's still a string, try parsing it again (handles double encoding)
+        if (typeof contentObj === 'string') {
+          contentObj = JSON.parse(contentObj);
+        }
+      } catch (e) {
+        // If parsing fails, assume it's plain text
+        return EditorState.createWithContent(ContentState.createFromText(content || ''));
+      }
+
+      // Check if it's in Draft.js format
       if (contentObj && contentObj.blocks) {
         return EditorState.createWithContent(convertFromRaw(contentObj));
       }
       
-      // If it's plain text or empty, create with plain text
+      // If not in Draft.js format, create from plain text
       return EditorState.createWithContent(
-        ContentState.createFromText(typeof content === 'string' ? content : '')
+        ContentState.createFromText(typeof contentObj === 'string' ? contentObj : '')
       );
     } catch (e) {
-      console.error('Error parsing initial content:', e);
-      return EditorState.createWithContent(ContentState.createFromText(''));
+      console.error('Error initializing editor state:', e);
+      return EditorState.createEmpty();
     }
   });
 
   useEffect(() => {
     try {
-      const contentObj = typeof content === 'string' ? JSON.parse(content) : content;
-      
+      let contentObj;
+      try {
+        contentObj = JSON.parse(content);
+        if (typeof contentObj === 'string') {
+          contentObj = JSON.parse(contentObj);
+        }
+      } catch (e) {
+        // If parsing fails, treat as plain text
+        const contentState = ContentState.createFromText(content || '');
+        setEditorState(EditorState.createWithContent(contentState));
+        return;
+      }
+
       if (contentObj && contentObj.blocks) {
         const contentState = convertFromRaw(contentObj);
-        const newEditorState = EditorState.createWithContent(contentState);
-        setEditorState(newEditorState);
+        setEditorState(EditorState.createWithContent(contentState));
       }
     } catch (e) {
       console.error('Error updating editor state:', e);
-      // If parsing fails, set content as plain text
-      const contentState = ContentState.createFromText(typeof content === 'string' ? content : '');
-      setEditorState(EditorState.createWithContent(contentState));
     }
   }, [content]);
 

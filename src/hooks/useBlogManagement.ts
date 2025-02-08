@@ -26,33 +26,19 @@ export function useBlogManagement() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Parse content if it's a string and not already parsed
+      // Parse content
       let parsedContent;
       try {
-        parsedContent = typeof blogData.content === 'string' 
-          ? JSON.parse(blogData.content)
-          : blogData.content;
-
-        // Check if content is double-encoded
-        if (typeof parsedContent === 'string') {
-          parsedContent = JSON.parse(parsedContent);
-        }
+        parsedContent = JSON.parse(blogData.content);
       } catch (error) {
         console.error('Error parsing content:', error);
         parsedContent = blogData.content;
       }
 
-      // Parse Tamil content if it exists
+      // Parse Tamil content
       let parsedContentTamil;
       try {
-        parsedContentTamil = blogData.content_tamil && typeof blogData.content_tamil === 'string'
-          ? JSON.parse(blogData.content_tamil)
-          : blogData.content_tamil;
-
-        // Check if Tamil content is double-encoded
-        if (typeof parsedContentTamil === 'string') {
-          parsedContentTamil = JSON.parse(parsedContentTamil);
-        }
+        parsedContentTamil = blogData.content_tamil ? JSON.parse(blogData.content_tamil) : null;
       } catch (error) {
         console.error('Error parsing Tamil content:', error);
         parsedContentTamil = blogData.content_tamil;

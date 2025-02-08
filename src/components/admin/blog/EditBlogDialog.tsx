@@ -23,21 +23,27 @@ interface EditBlogDialogProps {
 export function EditBlogDialog({ blog }: EditBlogDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState(blog.title);
-  const [content, setContent] = useState(JSON.stringify(blog.content));
+  const [content, setContent] = useState(
+    typeof blog.content === 'string' ? blog.content : JSON.stringify(blog.content)
+  );
   const [titleTamil, setTitleTamil] = useState(blog.title_tamil || "");
   const [contentTamil, setContentTamil] = useState(
-    blog.content_tamil ? JSON.stringify(blog.content_tamil) : JSON.stringify({
-      blocks: [{ 
-        key: 'initial', 
-        text: '', 
-        type: 'unstyled',
-        depth: 0,
-        inlineStyleRanges: [],
-        entityRanges: [],
-        data: {}
-      }],
-      entityMap: {}
-    })
+    blog.content_tamil
+      ? typeof blog.content_tamil === 'string'
+        ? blog.content_tamil
+        : JSON.stringify(blog.content_tamil)
+      : JSON.stringify({
+          blocks: [{ 
+            key: 'initial', 
+            text: '', 
+            type: 'unstyled',
+            depth: 0,
+            inlineStyleRanges: [],
+            entityRanges: [],
+            data: {}
+          }],
+          entityMap: {}
+        })
   );
   const [selectedCategory, setSelectedCategory] = useState<string>(blog.category_id || "");
 
