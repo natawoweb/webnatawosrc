@@ -16,7 +16,14 @@ export default function Auth() {
     // Check if user is already logged in
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        if (profile?.user_type === 'writer') {
+        const { data: isAdmin } = await supabase.rpc('has_role', {
+          user_id: session.user.id,
+          required_role: 'admin'
+        });
+        
+        if (isAdmin) {
+          navigate("/admin");
+        } else if (profile?.user_type === 'writer') {
           navigate("/dashboard");
         } else {
           navigate("/");
@@ -29,7 +36,14 @@ export default function Auth() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        if (profile?.user_type === 'writer') {
+        const { data: isAdmin } = await supabase.rpc('has_role', {
+          user_id: session.user.id,
+          required_role: 'admin'
+        });
+        
+        if (isAdmin) {
+          navigate("/admin");
+        } else if (profile?.user_type === 'writer') {
           navigate("/dashboard");
         } else {
           navigate("/");

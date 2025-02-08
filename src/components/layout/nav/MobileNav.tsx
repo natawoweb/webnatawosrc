@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProfile } from "@/hooks/useProfile";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -34,6 +37,19 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   const { profile } = useProfile();
   const isWriter = profile?.user_type === "writer";
 
+  const { data: isAdmin } = useQuery({
+    queryKey: ["isAdmin", session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user?.id) return false;
+      const { data } = await supabase.rpc('has_role', {
+        user_id: session.user.id,
+        required_role: 'admin'
+      });
+      return data;
+    },
+    enabled: !!session?.user?.id,
+  });
+
   const isActiveRoute = (path: string) => {
     return location.pathname === path;
   };
@@ -41,6 +57,19 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   return (
     <div className={cn("md:hidden", isOpen ? "block" : "hidden")}>
       <div className="px-2 pt-2 pb-3 space-y-1">
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className={cn(
+              "block px-3 py-2 rounded-md transition-colors",
+              isActiveRoute("/admin")
+                ? "text-foreground font-medium bg-accent"
+                : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
+            )}
+          >
+            Admin Dashboard
+          </Link>
+        )}
         {isWriter && (
           <Link
             to="/dashboard"

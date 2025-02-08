@@ -13,6 +13,8 @@ import { NotificationsDropdown } from "@/components/notifications/NotificationsD
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DesktopNavProps {
   currentLanguage: string;
@@ -33,12 +35,38 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
   const { profile } = useProfile();
   const isWriter = profile?.user_type === "writer";
 
+  const { data: isAdmin } = useQuery({
+    queryKey: ["isAdmin", session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user?.id) return false;
+      const { data } = await supabase.rpc('has_role', {
+        user_id: session.user.id,
+        required_role: 'admin'
+      });
+      return data;
+    },
+    enabled: !!session?.user?.id,
+  });
+
   const isActiveRoute = (path: string) => {
     return location.pathname === path;
   };
 
   return (
     <div className="hidden md:flex md:items-center md:space-x-4">
+      {isAdmin && (
+        <Link 
+          to="/admin" 
+          className={cn(
+            "px-3 py-2 rounded-md transition-colors",
+            isActiveRoute("/admin")
+              ? "text-foreground font-medium bg-accent"
+              : "text-foreground/80 hover:text-foreground"
+          )}
+        >
+          Admin Dashboard
+        </Link>
+      )}
       {isWriter && (
         <Link 
           to="/dashboard" 
