@@ -19,9 +19,20 @@ export function useUserQueries() {
           schema: 'public',
           table: 'profiles'
         },
-        () => {
-          // Invalidate and refetch when any change occurs
-          queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+        (payload) => {
+          // Handle DELETE events by removing the user from the cache
+          if (payload.eventType === 'DELETE') {
+            queryClient.setQueryData(
+              ["users-with-roles"],
+              (oldData: UserWithRole[] | undefined) => {
+                if (!oldData) return [];
+                return oldData.filter(user => user.id !== payload.old.id);
+              }
+            );
+          } else {
+            // For INSERT and UPDATE, invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
+          }
         }
       )
       .subscribe();
@@ -37,7 +48,6 @@ export function useUserQueries() {
           table: 'user_roles'
         },
         () => {
-          // Invalidate and refetch when any change occurs
           queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
         }
       )
@@ -74,9 +84,6 @@ export function useUserQueries() {
         throw rolesError;
       }
 
-      console.log('Fetched profiles:', profiles);
-      console.log('Fetched user roles:', userRoles);
-
       // Map each profile to include its role
       const usersWithRoles = profiles.map(profile => {
         // Find the role for this profile (if it exists)
@@ -88,11 +95,6 @@ export function useUserQueries() {
           role: userRole?.role || "reader"
         };
       });
-
-      console.log('Number of profiles:', profiles.length);
-      console.log('Number of roles:', userRoles.length);
-      console.log('Number of combined users:', usersWithRoles.length);
-      console.log('Combined users with roles:', usersWithRoles);
       
       return usersWithRoles as UserWithRole[];
     },
