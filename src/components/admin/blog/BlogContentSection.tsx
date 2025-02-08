@@ -32,6 +32,19 @@ export function BlogContentSection({
 }: BlogContentSectionProps) {
   const isEnglish = language === "english";
 
+  const checkHasContent = () => {
+    try {
+      if (!title) return false;
+      const contentObj = JSON.parse(content);
+      // Check if there's any text content in the Draft.js blocks
+      return contentObj.blocks && contentObj.blocks.some((block: any) => block.text.trim().length > 0);
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const shouldEnableTranslate = isEnglish && onTranslate && checkHasContent();
+
   return (
     <Card className="h-[calc(100vh-12rem)] flex flex-col">
       <CardHeader className="space-y-2">
@@ -49,7 +62,7 @@ export function BlogContentSection({
           {isEnglish && onTranslate && (
             <Button
               onClick={onTranslate}
-              disabled={!hasContent}
+              disabled={!shouldEnableTranslate}
               className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white"
             >
               <Globe className="mr-2 h-4 w-4" />
