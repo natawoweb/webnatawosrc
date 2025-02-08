@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,60 +20,84 @@ export const useProfile = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    getProfile();
-  }, []);
+    let mounted = true;
+    
+    const getProfile = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
 
-  async function getProfile() {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          if (mounted) {
+            setLoading(false);
+            navigate('/auth');
+          }
+          return;
+        }
 
-      if (!session) {
-        navigate('/auth');
-        return;
-      }
-
-      let { data: existingProfile, error: fetchError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .maybeSingle();
-
-      if (fetchError) {
-        console.error('Error loading profile:', fetchError);
-        throw fetchError;
-      }
-
-      // If profile doesn't exist, wait a moment and try again
-      // This helps in case the auth trigger hasn't completed yet
-      if (!existingProfile) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const { data: retryProfile, error: retryError } = await supabase
+        let { data: existingProfile, error: fetchError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .maybeSingle();
 
-        if (retryError) throw retryError;
-        if (!retryProfile) {
-          console.error('Profile not found after retry');
-          throw new Error('Profile not found. Please try logging out and back in.');
+        if (fetchError) {
+          console.error('Error loading profile:', fetchError);
+          throw fetchError;
         }
-        existingProfile = retryProfile;
-      }
 
-      setProfile(existingProfile as Profile);
-      setEditedProfile(existingProfile as Profile);
-    } catch (error: any) {
-      console.error('Error loading profile:', error);
-      toast({
-        variant: "destructive",
-        title: "Error loading profile",
-        description: error.message || "Please try again later.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
+        // If profile doesn't exist, wait a moment and try again
+        if (!existingProfile) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const { data: retryProfile, error: retryError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          if (retryError) throw retryError;
+          if (!retryProfile) {
+            console.error('Profile not found after retry');
+            throw new Error('Profile not found. Please try logging out and back in.');
+          }
+          existingProfile = retryProfile;
+        }
+
+        if (mounted) {
+          setProfile(existingProfile as Profile);
+          setEditedProfile(existingProfile as Profile);
+          setLoading(false);
+        }
+      } catch (error: any) {
+        console.error('Error loading profile:', error);
+        if (mounted) {
+          toast({
+            variant: "destructive",
+            title: "Error loading profile",
+            description: error.message || "Please try again later.",
+          });
+          setLoading(false);
+        }
+      }
+    };
+
+    getProfile();
+
+    // Set up auth state listener for profile changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        getProfile();
+      } else if (mounted) {
+        setProfile(null);
+        setEditedProfile(null);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate, toast]);
 
   async function updateProfile(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

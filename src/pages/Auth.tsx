@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { profile } = useProfile();
+  const { profile, loading } = useProfile();
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const [isResetPassword, setIsResetPassword] = useState(false);
 
@@ -32,7 +32,7 @@ export default function Auth() {
       // Check if user is already logged in
       const checkSessionAndRedirect = async () => {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
+        if (session && !loading) {  // Only proceed if profile loading is complete
           console.log("Session found, checking roles...");
           const { data: isAdmin } = await supabase.rpc('has_role', {
             user_id: session.user.id,
@@ -64,7 +64,7 @@ export default function Auth() {
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        if (session) {
+        if (session && !loading) { // Only proceed if profile loading is complete
           console.log("Auth state changed, checking roles...");
           const { data: isAdmin } = await supabase.rpc('has_role', {
             user_id: session.user.id,
@@ -92,7 +92,7 @@ export default function Auth() {
 
       return () => subscription.unsubscribe();
     }
-  }, [navigate, profile, isResetPassword]);
+  }, [navigate, profile, isResetPassword, loading]); // Added loading to dependency array
 
   const handleExistingAccount = () => {
     setActiveTab('signin');
