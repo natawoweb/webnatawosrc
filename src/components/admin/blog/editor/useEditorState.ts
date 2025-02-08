@@ -17,7 +17,8 @@ export const useEditorState = (content: string, onChange: (content: string) => v
       }
 
       if (contentObj && contentObj.blocks) {
-        return EditorState.createWithContent(convertFromRaw(contentObj));
+        const contentState = convertFromRaw(contentObj);
+        return EditorState.createWithContent(contentState);
       }
       
       return EditorState.createWithContent(
@@ -31,6 +32,7 @@ export const useEditorState = (content: string, onChange: (content: string) => v
 
   const [imageStates, setImageStates] = useState<{ [key: string]: ImageComponentState }>({});
 
+  // Update editor state when content prop changes
   useEffect(() => {
     try {
       let contentObj;
@@ -54,10 +56,12 @@ export const useEditorState = (content: string, onChange: (content: string) => v
     }
   }, [content]);
 
+  // Update content when editor state changes
   useEffect(() => {
     const contentState = editorState.getCurrentContent();
     const rawContent = convertToRaw(contentState);
     
+    // Update image dimensions in the raw content
     rawContent.blocks.forEach(block => {
       if (block.type === 'atomic') {
         const entityKey = block.entityRanges[0]?.key;
@@ -75,7 +79,7 @@ export const useEditorState = (content: string, onChange: (content: string) => v
     });
     
     onChange(JSON.stringify(rawContent));
-  }, [editorState, onChange, imageStates]);
+  }, [editorState, imageStates]);
 
   return {
     editorState,
