@@ -62,11 +62,11 @@ export function useBlogManagement() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (_, { blogData: { status } }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
       toast({
         title: "Success",
-        description: "Blog updated successfully",
+        description: `Blog ${status === 'draft' ? 'saved as draft' : 'submitted for review'} successfully`,
       });
     },
     onError: (error) => {

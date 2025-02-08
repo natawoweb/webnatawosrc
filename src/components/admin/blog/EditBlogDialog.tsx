@@ -85,7 +85,32 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
         status,
       }
     }, {
-      onSuccess: () => setIsOpen(false)
+      onSuccess: () => {
+        setIsOpen(false);
+        // Clear form state
+        setTitle(blog.title);
+        setContent(typeof blog.content === 'string' ? blog.content : JSON.stringify(blog.content));
+        setTitleTamil(blog.title_tamil || "");
+        setContentTamil(
+          blog.content_tamil
+            ? typeof blog.content_tamil === 'string'
+              ? blog.content_tamil
+              : JSON.stringify(blog.content_tamil)
+            : JSON.stringify({
+                blocks: [{ 
+                  key: 'initial', 
+                  text: '', 
+                  type: 'unstyled',
+                  depth: 0,
+                  inlineStyleRanges: [],
+                  entityRanges: [],
+                  data: {}
+                }],
+                entityMap: {}
+              })
+        );
+        setSelectedCategory(blog.category_id || "");
+      }
     });
   };
 
