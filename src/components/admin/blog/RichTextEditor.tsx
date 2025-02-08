@@ -24,8 +24,11 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     try {
       const parsedContent = JSON.parse(content);
       
-      // Validate if the content has the required Draft.js structure
-      if (parsedContent && parsedContent.blocks) {
+      // Validate if parsedContent has the required Draft.js structure
+      if (parsedContent && 
+          typeof parsedContent === 'object' && 
+          Array.isArray(parsedContent.blocks) && 
+          typeof parsedContent.entityMap === 'object') {
         return EditorState.createWithContent(convertFromRaw(parsedContent));
       }
       
@@ -34,7 +37,7 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
         ContentState.createFromText(content)
       );
     } catch (e) {
-      console.error('Error parsing content:', e);
+      console.error('Error parsing initial content:', e);
       return EditorState.createEmpty();
     }
   });
@@ -45,9 +48,18 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     try {
       const parsedContent = JSON.parse(content);
       
+      // Validate parsed content structure
+      if (!parsedContent || !Array.isArray(parsedContent.blocks) || !parsedContent.entityMap) {
+        console.error('Invalid content structure:', parsedContent);
+        return;
+      }
+
       // Only update if content is different
-      const currentRawContent = convertToRaw(editorState.getCurrentContent());
+      const currentContent = editorState.getCurrentContent();
+      const currentRawContent = convertToRaw(currentContent);
+      
       if (JSON.stringify(currentRawContent) !== JSON.stringify(parsedContent)) {
+        console.log('Updating editor state with new content:', parsedContent);
         const contentState = convertFromRaw(parsedContent);
         const newEditorState = EditorState.createWithContent(contentState);
         setEditorState(newEditorState);

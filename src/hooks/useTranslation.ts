@@ -41,7 +41,7 @@ export function useTranslation() {
       
       console.log('Translation results:', { translatedTitle, translatedText });
 
-      // Create new Draft.js content with translated text
+      // Create valid Draft.js content structure
       const newContent = {
         blocks: translatedText.split('\n').map((text: string, index: number) => ({
           key: `translated-${index}`,
@@ -54,6 +54,8 @@ export function useTranslation() {
         })).filter((block: any) => block.text.length > 0),
         entityMap: {}
       };
+
+      console.log('Generated Draft.js content:', newContent);
 
       toast({
         title: "Translation Complete",
