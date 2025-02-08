@@ -1,33 +1,12 @@
 
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
   language?: "english" | "tamil";
 }
-
-const modules = {
-  toolbar: [
-    [{ 'header': [1, 2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ 'align': [] }],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    ['link', 'blockquote'],
-    [{ 'color': [] }, { 'background': [] }],
-    ['clean']
-  ],
-};
-
-const formats = [
-  'header',
-  'bold', 'italic', 'underline', 'strike',
-  'align',
-  'list', 'bullet',
-  'link', 'blockquote',
-  'color', 'background'
-];
 
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
   const placeholder = language === "english" 
@@ -36,14 +15,31 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
 
   return (
     <div className="border rounded-lg flex flex-col h-full bg-white">
-      <ReactQuill
-        theme="snow"
-        value={content}
-        onChange={onChange}
-        modules={modules}
-        formats={formats}
-        placeholder={placeholder}
-        className="flex-1 flex flex-col"
+      <CKEditor
+        editor={ClassicEditor}
+        data={content}
+        onChange={(event, editor) => {
+          const data = editor.getData();
+          onChange(data);
+        }}
+        config={{
+          placeholder,
+          toolbar: [
+            'heading',
+            '|',
+            'bold',
+            'italic',
+            'link',
+            'bulletedList',
+            'numberedList',
+            '|',
+            'blockQuote',
+            'insertTable',
+            '|',
+            'undo',
+            'redo'
+          ]
+        }}
       />
     </div>
   );
