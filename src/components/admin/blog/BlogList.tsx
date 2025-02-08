@@ -43,14 +43,19 @@ export function BlogList({ blogs }: BlogListProps) {
 
   const deleteBlogMutation = useMutation({
     mutationFn: async (blogId: string) => {
+      console.log("Deleting blog with ID:", blogId);
       const { error } = await supabase
         .from("blogs")
         .delete()
         .eq("id", blogId);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error deleting blog:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
+      console.log("Blog deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
       toast({
         title: "Success",
@@ -59,6 +64,7 @@ export function BlogList({ blogs }: BlogListProps) {
       setBlogToDelete(null);
     },
     onError: (error) => {
+      console.error("Delete mutation error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -71,6 +77,11 @@ export function BlogList({ blogs }: BlogListProps) {
   const getAuthorName = (authorId: string) => {
     const profile = profiles?.find(p => p.id === authorId);
     return profile?.full_name || 'Unknown Author';
+  };
+
+  const handleDelete = (blog: Blog) => {
+    console.log("Setting blog to delete:", blog);
+    setBlogToDelete(blog);
   };
 
   return (
@@ -99,7 +110,7 @@ export function BlogList({ blogs }: BlogListProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setBlogToDelete(blog)}
+                  onClick={() => handleDelete(blog)}
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
@@ -111,9 +122,12 @@ export function BlogList({ blogs }: BlogListProps) {
 
       <DeleteBlogDialog
         open={!!blogToDelete}
-        onOpenChange={() => setBlogToDelete(null)}
+        onOpenChange={(open) => {
+          if (!open) setBlogToDelete(null);
+        }}
         onConfirm={() => {
           if (blogToDelete) {
+            console.log("Confirming delete for blog:", blogToDelete.id);
             deleteBlogMutation.mutate(blogToDelete.id);
           }
         }}
