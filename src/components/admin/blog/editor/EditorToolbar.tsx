@@ -1,11 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Editor } from '@tiptap/react';
-import Bold from '@tiptap/extension-bold';
-import Italic from '@tiptap/extension-italic';
-import BulletList from '@tiptap/extension-bullet-list';
-import OrderedList from '@tiptap/extension-ordered-list';
-import TextAlign from '@tiptap/extension-text-align';
+import { EditorState } from 'draft-js';
 import { 
   Bold as BoldIcon, 
   Italic as ItalicIcon, 
@@ -18,50 +13,56 @@ import {
 } from "lucide-react";
 
 interface EditorToolbarProps {
-  editor: Editor | null;
+  editorState: EditorState;
+  onInlineStyle: (style: string) => void;
+  onBlockType: (blockType: string) => void;
   language?: "english" | "tamil";
 }
 
-export function EditorToolbar({ editor }: EditorToolbarProps) {
-  if (!editor) {
-    return null;
-  }
+export function EditorToolbar({ 
+  editorState, 
+  onInlineStyle, 
+  onBlockType, 
+  language 
+}: EditorToolbarProps) {
+  const currentStyle = editorState.getCurrentInlineStyle();
+  const selection = editorState.getSelection();
+  const blockType = editorState
+    .getCurrentContent()
+    .getBlockForKey(selection.getStartKey())
+    .getType();
 
   return (
     <div className="border-b p-2 flex gap-2 flex-wrap">
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        disabled={!editor.can().chain().focus().toggleBold().run()}
-        className={editor.isActive('bold') ? 'bg-muted' : ''}
+        onClick={() => onInlineStyle('BOLD')}
+        className={currentStyle.has('BOLD') ? 'bg-muted' : ''}
       >
         <BoldIcon className="h-4 w-4" />
       </Button>
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        disabled={!editor.can().chain().focus().toggleItalic().run()}
-        className={editor.isActive('italic') ? 'bg-muted' : ''}
+        onClick={() => onInlineStyle('ITALIC')}
+        className={currentStyle.has('ITALIC') ? 'bg-muted' : ''}
       >
         <ItalicIcon className="h-4 w-4" />
       </Button>
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        disabled={!editor.can().chain().focus().toggleBulletList().run()}
-        className={editor.isActive('bulletList') ? 'bg-muted' : ''}
+        onClick={() => onBlockType('unordered-list-item')}
+        className={blockType === 'unordered-list-item' ? 'bg-muted' : ''}
       >
         <List className="h-4 w-4" />
       </Button>
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        disabled={!editor.can().chain().focus().toggleOrderedList().run()}
-        className={editor.isActive('orderedList') ? 'bg-muted' : ''}
+        onClick={() => onBlockType('ordered-list-item')}
+        className={blockType === 'ordered-list-item' ? 'bg-muted' : ''}
       >
         <ListOrdered className="h-4 w-4" />
       </Button>
@@ -69,36 +70,32 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().setTextAlign('left').run()}
-        disabled={!editor.can().chain().focus().setTextAlign('left').run()}
-        className={editor.isActive({ textAlign: 'left' }) ? 'bg-muted' : ''}
+        onClick={() => onBlockType('left')}
+        className={blockType === 'left' ? 'bg-muted' : ''}
       >
         <AlignLeft className="h-4 w-4" />
       </Button>
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().setTextAlign('center').run()}
-        disabled={!editor.can().chain().focus().setTextAlign('center').run()}
-        className={editor.isActive({ textAlign: 'center' }) ? 'bg-muted' : ''}
+        onClick={() => onBlockType('center')}
+        className={blockType === 'center' ? 'bg-muted' : ''}
       >
         <AlignCenter className="h-4 w-4" />
       </Button>
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().setTextAlign('right').run()}
-        disabled={!editor.can().chain().focus().setTextAlign('right').run()}
-        className={editor.isActive({ textAlign: 'right' }) ? 'bg-muted' : ''}
+        onClick={() => onBlockType('right')}
+        className={blockType === 'right' ? 'bg-muted' : ''}
       >
         <AlignRight className="h-4 w-4" />
       </Button>
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-        disabled={!editor.can().chain().focus().setTextAlign('justify').run()}
-        className={editor.isActive({ textAlign: 'justify' }) ? 'bg-muted' : ''}
+        onClick={() => onBlockType('justify')}
+        className={blockType === 'justify' ? 'bg-muted' : ''}
       >
         <AlignJustify className="h-4 w-4" />
       </Button>
