@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Profile } from "@/integrations/supabase/types/models";
@@ -17,6 +18,7 @@ export const useProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState<Profile | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -26,10 +28,21 @@ export const useProfile = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
 
-        if (!session) {
+        // Only redirect to auth if not on the home page and user needs to be authenticated
+        const needsAuth = !['/', '/auth'].includes(location.pathname);
+        
+        if (!session && needsAuth) {
           if (mounted) {
             setLoading(false);
             navigate('/auth');
+          }
+          return;
+        }
+
+        // If there's no session and we're on a public route, just set loading to false
+        if (!session) {
+          if (mounted) {
+            setLoading(false);
           }
           return;
         }
@@ -97,7 +110,7 @@ export const useProfile = () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, toast]);
+  }, [navigate, toast, location.pathname]);
 
   async function updateProfile(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
