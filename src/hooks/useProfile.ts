@@ -63,7 +63,6 @@ export const useProfile = () => {
           status: null,
           county: null,
           state: null,
-          user_id: session.user.id,
           approval_status: 'pending'
         };
 
@@ -174,4 +173,3 @@ export const useProfile = () => {
     handleCancel,
   };
 };
-
