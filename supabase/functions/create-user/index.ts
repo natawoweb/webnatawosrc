@@ -147,6 +147,34 @@ serve(async (req: Request) => {
 
     console.log('Auth user created successfully:', authUser.user.id);
 
+    // Explicitly create user role
+    const { error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .upsert({
+        user_id: authUser.user.id,
+        role: payload.role,
+        created_at: new Date().toISOString()
+      });
+
+    if (roleError) {
+      console.error('Error creating user role:', roleError);
+      return createErrorResponse(500, `Failed to create user role: ${roleError.message}`);
+    }
+
+    // Explicitly update profile with level
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .update({ 
+        level: payload.level,
+        user_type: payload.role 
+      })
+      .eq('id', authUser.user.id);
+
+    if (profileError) {
+      console.error('Error updating profile:', profileError);
+      return createErrorResponse(500, `Failed to update profile: ${profileError.message}`);
+    }
+
     // Send welcome notification
     try {
       const notificationType = payload.role === 'writer' ? 'writer_welcome' : 'reader_welcome';
