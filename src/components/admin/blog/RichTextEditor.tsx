@@ -69,20 +69,22 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
   });
 
   useEffect(() => {
-    if (!editor || !cursorRef.current) return;
+    if (!editor || !cursorRef.current || !editorRef.current) return;
 
     const updateCursorPosition = () => {
       const { view } = editor;
       const { state } = view;
       const { selection } = state;
       const dom = view.domAtPos(selection.anchor);
-      const node = dom.node as HTMLElement;
       
-      if (!node || !editorRef.current || !cursorRef.current) return;
+      // Check if the node is an HTMLElement before accessing getBoundingClientRect
+      if (!dom.node || !(dom.node instanceof HTMLElement)) return;
 
-      const editorBounds = editorRef.current.getBoundingClientRect();
-      const nodeBounds = node.getBoundingClientRect();
+      const editorBounds = editorRef.current?.getBoundingClientRect();
+      const nodeBounds = dom.node.getBoundingClientRect();
       
+      if (!editorBounds || !cursorRef.current) return;
+
       const relativeTop = nodeBounds.top - editorBounds.top;
       const relativeLeft = nodeBounds.left - editorBounds.left;
 
