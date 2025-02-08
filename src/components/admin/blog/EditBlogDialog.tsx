@@ -25,7 +25,20 @@ export function EditBlogDialog({ blog }: EditBlogDialogProps) {
   const [title, setTitle] = useState(blog.title);
   const [content, setContent] = useState(JSON.stringify(blog.content));
   const [titleTamil, setTitleTamil] = useState(blog.title_tamil || "");
-  const [contentTamil, setContentTamil] = useState(JSON.stringify(blog.content_tamil || {}));
+  const [contentTamil, setContentTamil] = useState(
+    blog.content_tamil ? JSON.stringify(blog.content_tamil) : JSON.stringify({
+      blocks: [{ 
+        key: 'initial', 
+        text: '', 
+        type: 'unstyled',
+        depth: 0,
+        inlineStyleRanges: [],
+        entityRanges: [],
+        data: {}
+      }],
+      entityMap: {}
+    })
+  );
   const [selectedCategory, setSelectedCategory] = useState<string>(blog.category_id || "");
 
   const { updateBlog, isUpdating } = useBlogManagement();

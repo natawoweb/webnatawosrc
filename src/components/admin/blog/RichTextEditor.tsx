@@ -19,116 +19,38 @@ interface RichTextEditorProps {
 
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
   const [editorState, setEditorState] = useState(() => {
-    if (!content) return EditorState.createEmpty();
-
     try {
-      const parsedContent = JSON.parse(content);
+      // If content is a string that needs to be parsed
+      const contentObj = typeof content === 'string' ? JSON.parse(content) : content;
       
-      // Handle ProseMirror/TipTap format
-      if (parsedContent.type === 'doc' && Array.isArray(parsedContent.content)) {
-        const textContent = parsedContent.content
-          .map((node: any) => {
-            if (node.type === 'paragraph') {
-              return node.content?.map((textNode: any) => textNode.text).join('') || '';
-            }
-            return '';
-          })
-          .filter((text: string) => text.trim())
-          .join('\n');
-
-        // Convert to Draft.js format
-        const draftContent = {
-          blocks: textContent.split('\n').map((text: string, index: number) => ({
-            key: `imported-${index}`,
-            text: text.trim(),
-            type: 'unstyled',
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {}
-          })),
-          entityMap: {}
-        };
-        
-        return EditorState.createWithContent(convertFromRaw(draftContent));
+      // Check if it's already in Draft.js format
+      if (contentObj && contentObj.blocks) {
+        return EditorState.createWithContent(convertFromRaw(contentObj));
       }
       
-      // Handle Draft.js format
-      if (parsedContent && 
-          typeof parsedContent === 'object' && 
-          Array.isArray(parsedContent.blocks) && 
-          typeof parsedContent.entityMap === 'object') {
-        return EditorState.createWithContent(convertFromRaw(parsedContent));
-      }
-      
-      // If not in either format, create with plain text
+      // If it's plain text or empty, create with plain text
       return EditorState.createWithContent(
-        ContentState.createFromText(content)
+        ContentState.createFromText(typeof content === 'string' ? content : '')
       );
     } catch (e) {
       console.error('Error parsing initial content:', e);
-      return EditorState.createEmpty();
+      return EditorState.createWithContent(ContentState.createFromText(''));
     }
   });
 
   useEffect(() => {
-    if (!content) return;
-
     try {
-      const parsedContent = JSON.parse(content);
+      const contentObj = typeof content === 'string' ? JSON.parse(content) : content;
       
-      // Handle ProseMirror/TipTap format
-      if (parsedContent.type === 'doc' && Array.isArray(parsedContent.content)) {
-        const textContent = parsedContent.content
-          .map((node: any) => {
-            if (node.type === 'paragraph') {
-              return node.content?.map((textNode: any) => textNode.text).join('') || '';
-            }
-            return '';
-          })
-          .filter((text: string) => text.trim())
-          .join('\n');
-
-        // Convert to Draft.js format
-        const draftContent = {
-          blocks: textContent.split('\n').map((text: string, index: number) => ({
-            key: `imported-${index}`,
-            text: text.trim(),
-            type: 'unstyled',
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {}
-          })),
-          entityMap: {}
-        };
-
-        const contentState = convertFromRaw(draftContent);
-        const newEditorState = EditorState.createWithContent(contentState);
-        setEditorState(newEditorState);
-        return;
-      }
-      
-      // Handle Draft.js format
-      if (!parsedContent || !Array.isArray(parsedContent.blocks) || !parsedContent.entityMap) {
-        console.error('Invalid Draft.js content structure:', parsedContent);
-        return;
-      }
-
-      // Only update if content is different
-      const currentContent = editorState.getCurrentContent();
-      const currentRawContent = convertToRaw(currentContent);
-      
-      if (JSON.stringify(currentRawContent) !== JSON.stringify(parsedContent)) {
-        console.log('Updating editor state with new content:', parsedContent);
-        const contentState = convertFromRaw(parsedContent);
+      if (contentObj && contentObj.blocks) {
+        const contentState = convertFromRaw(contentObj);
         const newEditorState = EditorState.createWithContent(contentState);
         setEditorState(newEditorState);
       }
     } catch (e) {
       console.error('Error updating editor state:', e);
-      // If parsing fails, try to set content as plain text
-      const contentState = ContentState.createFromText(content);
+      // If parsing fails, set content as plain text
+      const contentState = ContentState.createFromText(typeof content === 'string' ? content : '');
       setEditorState(EditorState.createWithContent(contentState));
     }
   }, [content]);

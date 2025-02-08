@@ -26,13 +26,23 @@ export function useBlogManagement() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
+      // Parse content if it's a string
+      const parsedContent = typeof blogData.content === 'string' 
+        ? JSON.parse(blogData.content)
+        : blogData.content;
+
+      // Parse Tamil content if it exists and is a string
+      const parsedContentTamil = blogData.content_tamil && typeof blogData.content_tamil === 'string'
+        ? JSON.parse(blogData.content_tamil)
+        : blogData.content_tamil || {};
+
       const { data, error } = await supabase
         .from("blogs")
         .update({
           title: blogData.title,
-          content: JSON.parse(blogData.content),
+          content: parsedContent,
           title_tamil: blogData.title_tamil || null,
-          content_tamil: blogData.content_tamil ? JSON.parse(blogData.content_tamil) : {},
+          content_tamil: parsedContentTamil,
           category_id: blogData.category_id || null,
           status: blogData.status,
           author_id: user.id,
