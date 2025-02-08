@@ -1,6 +1,7 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, BookPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 export function ContentManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const queryClient = useQueryClient();
 
   const { data: blogs, isLoading } = useQuery({
     queryKey: ["admin-blogs"],
@@ -32,6 +34,29 @@ export function ContentManagement() {
       return data as Blog[];
     },
   });
+
+  // Setup real-time subscription for blogs
+  useEffect(() => {
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'blogs'
+        },
+        () => {
+          // Invalidate and refetch blogs when any change occurs
+          queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const filteredBlogs = blogs?.filter((blog) => {
     const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase());
