@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
@@ -20,6 +21,7 @@ serve(async (req) => {
     }
 
     console.log('Translating text:', text)
+    console.log('Text length:', text.length)
 
     const response = await fetch(
       `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,

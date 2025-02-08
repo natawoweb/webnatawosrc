@@ -7,6 +7,7 @@ export function useTranslation() {
 
   const translateContent = async (title: string, content: string) => {
     try {
+      console.log('Starting translation with:', { title, content });
       const contentObj = JSON.parse(content);
       
       // Extract text content from Draft.js blocks
@@ -15,23 +16,31 @@ export function useTranslation() {
         .filter((text: string) => text.trim())
         .join('\n');
 
+      console.log('Extracted text content:', textContent);
+
       // First translate the title
+      console.log('Translating title:', title);
       const titleResponse = await supabase.functions.invoke('translate', {
         body: { text: title }
       });
 
+      console.log('Title translation response:', titleResponse);
       if (titleResponse.error) throw new Error(titleResponse.error.message);
       
       // Then translate the content
+      console.log('Translating content:', textContent);
       const contentResponse = await supabase.functions.invoke('translate', {
         body: { text: textContent }
       });
 
+      console.log('Content translation response:', contentResponse);
       if (contentResponse.error) throw new Error(contentResponse.error.message);
 
       const translatedTitle = titleResponse.data.data.translations[0].translatedText;
       const translatedText = contentResponse.data.data.translations[0].translatedText;
       
+      console.log('Translation results:', { translatedTitle, translatedText });
+
       // Create new Draft.js content with translated text
       const newContent = {
         blocks: [{
