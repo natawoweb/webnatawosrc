@@ -131,14 +131,21 @@ export function useUserMutations() {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase.auth.admin.deleteUser(userId);
-      if (error) throw error;
+      // First, delete the user from auth.users which will trigger cascade deletes
+      const { error: deleteError } = await supabase.functions.invoke('delete-user', {
+        body: { userId }
+      });
+
+      if (deleteError) {
+        console.error('Error deleting user:', deleteError);
+        throw deleteError;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
       toast({
         title: "Success",
-        description: "User deleted successfully",
+        description: "User and all associated data deleted successfully",
       });
     },
     onError: (error) => {
