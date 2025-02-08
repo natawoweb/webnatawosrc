@@ -20,6 +20,11 @@ export function ProfileView({ profile }: ProfileViewProps) {
   return (
     <div className="space-y-6">
       <div>
+        <Label className="text-muted-foreground">Email</Label>
+        <p className="mt-1 text-muted-foreground">{profile.email}</p>
+      </div>
+
+      <div>
         <Label className="text-muted-foreground">Full Name</Label>
         <p className="mt-1">{profile.full_name || 'Not set'}</p>
       </div>
