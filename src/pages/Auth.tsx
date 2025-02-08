@@ -19,8 +19,11 @@ export default function Auth() {
     // Check if this is a password reset request
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const type = hashParams.get('type');
-    if (type === 'recovery') {
+    const accessToken = hashParams.get('access_token');
+
+    if (type === 'recovery' && accessToken) {
       setIsResetPassword(true);
+      return; // Exit early to prevent redirect
     }
 
     // Check if user is already logged in
