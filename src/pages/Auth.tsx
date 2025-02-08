@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useProfile } from "@/hooks/useProfile";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -84,6 +85,8 @@ export default function Auth() {
           </Tabs>
         </CardContent>
       </Card>
+      <Toaster />
     </div>
   );
 }
+
