@@ -50,14 +50,19 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
             error.message?.toLowerCase().includes('already') || 
             error.message?.toLowerCase().includes('registered') ||
             error.message?.toLowerCase().includes('exists')) {
+          // First show the toast message
           toast({
             variant: "destructive",
-            title: "Account exists",
+            title: "Account Already Exists",
             description: "An account with this email already exists. Please sign in instead.",
+            duration: 5000, // Keep the message visible for 5 seconds
           });
           
-          // Call the callback to switch tabs
-          onExistingAccount();
+          // Then switch to sign in tab after a short delay to ensure toast is visible
+          setTimeout(() => {
+            onExistingAccount();
+          }, 100);
+          
           setLoading(false);
           return;
         }
