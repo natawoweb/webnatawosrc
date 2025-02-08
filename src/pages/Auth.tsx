@@ -39,11 +39,17 @@ export default function Auth() {
           
           if (isAdmin) {
             navigate("/admin");
-          } else if (profile?.user_type === 'writer') {
-            navigate("/dashboard");
-          } else {
-            navigate("/");
+            return;
           }
+
+          // Check if user is a writer
+          if (profile?.user_type === 'writer') {
+            navigate("/dashboard");
+            return;
+          }
+
+          // Default navigation for other users
+          navigate("/");
         }
       });
 
@@ -59,11 +65,17 @@ export default function Auth() {
           
           if (isAdmin) {
             navigate("/admin");
-          } else if (profile?.user_type === 'writer') {
-            navigate("/dashboard");
-          } else {
-            navigate("/");
+            return;
           }
+
+          // Check if user is a writer
+          if (profile?.user_type === 'writer') {
+            navigate("/dashboard");
+            return;
+          }
+
+          // Default navigation for other users
+          navigate("/");
         }
       });
 
