@@ -517,6 +517,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approval_status: Database["public"]["Enums"]["writer_status"] | null
           avatar_url: string | null
           bio: string | null
           county: string | null
@@ -537,6 +538,7 @@ export type Database = {
           user_type: string
         }
         Insert: {
+          approval_status?: Database["public"]["Enums"]["writer_status"] | null
           avatar_url?: string | null
           bio?: string | null
           county?: string | null
@@ -557,6 +559,7 @@ export type Database = {
           user_type: string
         }
         Update: {
+          approval_status?: Database["public"]["Enums"]["writer_status"] | null
           avatar_url?: string | null
           bio?: string | null
           county?: string | null
@@ -771,6 +774,7 @@ export type Database = {
         | "NATAWO Students Writers"
         | "Subscriber"
         | "Technical"
+      writer_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
