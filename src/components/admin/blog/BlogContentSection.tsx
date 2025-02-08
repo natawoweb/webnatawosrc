@@ -33,11 +33,13 @@ export function BlogContentSection({
   const isEnglish = language === "english";
 
   return (
-    <Card className="h-[600px] flex flex-col">
-      <CardHeader>
+    <Card className="h-[calc(100vh-12rem)] flex flex-col">
+      <CardHeader className="space-y-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>{isEnglish ? "English Content" : "Tamil Content"}</CardTitle>
+            <CardTitle className="text-xl font-bold">
+              {isEnglish ? "English Content" : "Tamil Content"}
+            </CardTitle>
             <CardDescription>
               {isEnglish 
                 ? "Write your blog post in English" 
@@ -56,7 +58,7 @@ export function BlogContentSection({
           )}
         </div>
       </CardHeader>
-      <CardContent className="flex-1 overflow-hidden flex flex-col space-y-4">
+      <CardContent className="flex-1 overflow-hidden flex flex-col space-y-4 pb-6">
         <ContentInput
           language={language}
           title={title}
@@ -64,10 +66,10 @@ export function BlogContentSection({
           placeholder={isEnglish ? "Enter blog title" : "தலைப்பை உள்ளிடவும்"}
         />
         <div className="flex-1 min-h-0">
-          <label htmlFor={`content-${language}`} className="text-sm font-medium block mb-2">
+          <label className="text-sm font-medium block mb-2">
             Content
           </label>
-          <div className="h-[400px]">
+          <div className="h-[calc(100%-2rem)]">
             <RichTextEditor
               content={content}
               onChange={onContentChange}

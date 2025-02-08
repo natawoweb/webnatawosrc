@@ -1,7 +1,8 @@
+
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { EditorToolbar } from './editor/EditorToolbar';
 
 interface RichTextEditorProps {
@@ -12,6 +13,7 @@ interface RichTextEditorProps {
 
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
 
   const parseContent = (contentString: string) => {
     try {
@@ -66,17 +68,52 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     editable: true,
   });
 
+  useEffect(() => {
+    if (!editor || !cursorRef.current) return;
+
+    const updateCursorPosition = () => {
+      const { view } = editor;
+      const { state } = view;
+      const { selection } = state;
+      const dom = view.domAtPos(selection.anchor);
+      const node = dom.node as HTMLElement;
+      
+      if (!node || !editorRef.current || !cursorRef.current) return;
+
+      const editorBounds = editorRef.current.getBoundingClientRect();
+      const nodeBounds = node.getBoundingClientRect();
+      
+      const relativeTop = nodeBounds.top - editorBounds.top;
+      const relativeLeft = nodeBounds.left - editorBounds.left;
+
+      cursorRef.current.style.transform = `translate(${relativeLeft}px, ${relativeTop}px)`;
+      cursorRef.current.style.opacity = '1';
+    };
+
+    editor.on('selectionUpdate', updateCursorPosition);
+    return () => {
+      editor.off('selectionUpdate', updateCursorPosition);
+    };
+  }, [editor]);
+
   if (!editor) {
     return null;
   }
 
   return (
-    <div className="border rounded-lg h-full flex flex-col" ref={editorRef}>
+    <div className="border rounded-lg h-full flex flex-col relative" ref={editorRef}>
       <EditorToolbar editor={editor} language={language} />
-      <EditorContent 
-        editor={editor} 
-        className="prose max-w-none p-4 flex-grow overflow-y-auto focus:outline-none cursor-text" 
-      />
+      <div className="relative flex-grow">
+        <div 
+          ref={cursorRef}
+          className="absolute w-0.5 h-5 bg-blue-500 transition-transform duration-100 pointer-events-none opacity-0"
+          style={{ zIndex: 50 }}
+        />
+        <EditorContent 
+          editor={editor} 
+          className="prose max-w-none p-6 h-full overflow-y-auto focus:outline-none cursor-text bg-white" 
+        />
+      </div>
     </div>
   );
 }

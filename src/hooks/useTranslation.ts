@@ -8,7 +8,17 @@ export function useTranslation() {
   const translateContent = async (title: string, content: string) => {
     try {
       const contentObj = JSON.parse(content || '{}');
-      const textContent = contentObj.content?.[0]?.content?.[0]?.text || '';
+      
+      // Extract all text content from the document
+      const extractText = (node: any): string => {
+        if (node.text) return node.text;
+        if (node.content) {
+          return node.content.map((child: any) => extractText(child)).join(' ');
+        }
+        return '';
+      };
+
+      const textContent = extractText(contentObj);
 
       // First translate the title
       const titleResponse = await supabase.functions.invoke('translate', {
@@ -27,6 +37,7 @@ export function useTranslation() {
       const translatedTitle = titleResponse.data.data.translations[0].translatedText;
       const translatedText = contentResponse.data.data.translations[0].translatedText;
       
+      // Create a new document structure with the translated text
       const newContent = {
         type: 'doc',
         content: [{
@@ -47,7 +58,7 @@ export function useTranslation() {
         translatedTitle,
         translatedContent: JSON.stringify(newContent)
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Translation error:', error);
       toast({
         variant: "destructive",
