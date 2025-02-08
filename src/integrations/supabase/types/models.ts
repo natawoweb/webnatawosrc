@@ -20,7 +20,6 @@ export type Profile = {
   county: string | null
   state: string | null
   social_links: Json | null
-  user_id: string | null
   approval_status: 'pending' | 'approved' | 'rejected' | null
 }
 
