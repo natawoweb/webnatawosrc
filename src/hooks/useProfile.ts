@@ -44,38 +44,22 @@ export const useProfile = () => {
         throw fetchError;
       }
 
+      // If profile doesn't exist, wait a moment and try again
+      // This helps in case the auth trigger hasn't completed yet
       if (!existingProfile) {
-        const newProfile: Profile = {
-          id: session.user.id,
-          email: session.user.email,
-          full_name: null,
-          bio: null,
-          avatar_url: null,
-          user_type: 'reader',
-          social_links: null,
-          gender: null,
-          date_of_birth: null,
-          pseudonym: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          level: null,
-          location: null,
-          status: null,
-          county: null,
-          state: null,
-          approval_status: 'pending'
-        };
-
-        const { error: insertError } = await supabase
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const { data: retryProfile, error: retryError } = await supabase
           .from('profiles')
-          .insert([newProfile]);
+          .select('*')
+          .eq('id', session.user.id)
+          .maybeSingle();
 
-        if (insertError) {
-          console.error('Error creating profile:', insertError);
-          throw insertError;
+        if (retryError) throw retryError;
+        if (!retryProfile) {
+          console.error('Profile not found after retry');
+          throw new Error('Profile not found. Please try logging out and back in.');
         }
-
-        existingProfile = newProfile;
+        existingProfile = retryProfile;
       }
 
       setProfile(existingProfile as Profile);
@@ -111,7 +95,8 @@ export const useProfile = () => {
 
       let { error } = await supabase
         .from('profiles')
-        .upsert(updates);
+        .update(updates)
+        .eq('id', session.user.id);
 
       if (error) throw error;
       
