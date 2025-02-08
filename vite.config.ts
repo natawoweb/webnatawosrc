@@ -21,7 +21,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   define: {
-    global: 'globalThis',
+    global: "globalThis",
+    "process.env": {},
+    "global.TYPED_ARRAY_SUPPORT": true
   },
 }));
-
