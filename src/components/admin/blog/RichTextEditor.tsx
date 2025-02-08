@@ -1,6 +1,12 @@
 
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Bold from '@tiptap/extension-bold';
+import Italic from '@tiptap/extension-italic';
+import BulletList from '@tiptap/extension-bullet-list';
+import OrderedList from '@tiptap/extension-ordered-list';
+import TextAlign from '@tiptap/extension-text-align';
+import { EditorToolbar } from './editor/EditorToolbar';
 
 interface RichTextEditorProps {
   content: string;
@@ -9,37 +15,40 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
-  const placeholder = language === "english" 
-    ? "Start writing your blog post..."
-    : "உங்கள் வலைப்பதிவை எழுத தொடங்குங்கள்...";
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Bold,
+      Italic,
+      BulletList,
+      OrderedList,
+      TextAlign.configure({
+        types: ['paragraph', 'heading']
+      }),
+    ],
+    content: content ? JSON.parse(content) : {
+      type: 'doc',
+      content: [{
+        type: 'paragraph',
+        content: []
+      }]
+    },
+    onUpdate: ({ editor }) => {
+      onChange(JSON.stringify(editor.getJSON()));
+    },
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none p-4',
+      },
+    },
+  });
 
   return (
     <div className="border rounded-lg flex flex-col h-full bg-white">
-      <CKEditor
-        editor={ClassicEditor}
-        data={content}
-        onChange={(event, editor) => {
-          const data = editor.getData();
-          onChange(data);
-        }}
-        config={{
-          placeholder,
-          toolbar: [
-            'heading',
-            '|',
-            'bold',
-            'italic',
-            'link',
-            'bulletedList',
-            'numberedList',
-            '|',
-            'blockQuote',
-            'insertTable',
-            '|',
-            'undo',
-            'redo'
-          ]
-        }}
+      <EditorToolbar editor={editor} language={language} />
+      <EditorContent 
+        editor={editor} 
+        className="flex-1 overflow-y-auto"
       />
     </div>
   );
