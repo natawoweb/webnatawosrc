@@ -8,6 +8,7 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 interface NotificationPayload {
@@ -18,17 +19,28 @@ interface NotificationPayload {
 }
 
 serve(async (req: Request) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { 
+      headers: corsHeaders,
+      status: 204
+    })
   }
 
   try {
+    if (req.method !== 'POST') {
+      throw new Error('Method not allowed');
+    }
+
     const { type, email, fullName, adminEmails = [] }: NotificationPayload = await req.json()
+
+    console.log(`Processing ${type} notification for ${email}`);
 
     switch(type) {
       case 'writer_request':
         // Notify admins about new writer request
         for (const adminEmail of adminEmails) {
+          console.log(`Sending writer request notification to admin: ${adminEmail}`);
           await resend.emails.send({
             from: "NATAWO <notifications@natawo.com>",
             to: adminEmail,
@@ -45,6 +57,7 @@ serve(async (req: Request) => {
         break;
 
       case 'reader_welcome':
+        console.log(`Sending welcome email to reader: ${email}`);
         // Send welcome email to new reader
         await resend.emails.send({
           from: "NATAWO <notifications@natawo.com>",
@@ -60,6 +73,7 @@ serve(async (req: Request) => {
         break;
 
       case 'request_submitted':
+        console.log(`Sending confirmation to writer: ${email}`);
         // Send confirmation to writer about their request
         await resend.emails.send({
           from: "NATAWO <notifications@natawo.com>",
@@ -75,6 +89,7 @@ serve(async (req: Request) => {
         break;
 
       case 'writer_welcome':
+        console.log(`Sending welcome email to approved writer: ${email}`);
         // Send welcome email to approved writer
         await resend.emails.send({
           from: "NATAWO <notifications@natawo.com>",
@@ -96,6 +111,7 @@ serve(async (req: Request) => {
     })
 
   } catch (error) {
+    console.error('Error in signup-notifications:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
