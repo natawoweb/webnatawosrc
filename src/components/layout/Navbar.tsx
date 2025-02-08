@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,11 @@ export const Navbar: React.FC = () => {
     }
   };
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate("/", { replace: true });
+  };
+
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
@@ -53,7 +59,7 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2">
               <img 
                 src="/lovable-uploads/2e998827-54b8-4981-b796-0eaa5c1cd8e2.png" 
                 alt="NATAWO Logo" 
