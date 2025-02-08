@@ -147,6 +147,28 @@ serve(async (req: Request) => {
 
     console.log('Auth user created successfully:', authUser.user.id);
 
+    // Send welcome notification
+    try {
+      const notificationType = payload.role === 'writer' ? 'writer_welcome' : 'reader_welcome';
+      const { error: notificationError } = await supabaseAdmin.functions.invoke('signup-notifications', {
+        body: {
+          type: notificationType,
+          email: payload.email,
+          fullName: payload.fullName,
+        }
+      });
+
+      if (notificationError) {
+        console.error('Error sending welcome notification:', notificationError);
+        // Don't return error here, as the user was created successfully
+      } else {
+        console.log('Welcome notification sent successfully');
+      }
+    } catch (notificationError) {
+      console.error('Error invoking signup-notifications function:', notificationError);
+      // Don't return error here, as the user was created successfully
+    }
+
     return createSuccessResponse({
       user: authUser.user,
       message: 'User created successfully'
