@@ -42,14 +42,13 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
       });
 
       if (error) {
-        // Check for user already exists error in multiple ways since the error format can vary
-        const isUserExistsError = 
-          error.message?.includes("registered") || 
-          error.message?.includes("already exists") ||
-          (typeof error === 'object' && 'code' in error && 
-           (error.code === 'user_already_exists' || error.code === '422'));
-
-        if (isUserExistsError) {
+        console.error('Signup error details:', error);
+        
+        // Check for user already exists error in multiple ways
+        if (error.status === 422 || 
+            error.message?.toLowerCase().includes('already') || 
+            error.message?.toLowerCase().includes('registered') ||
+            error.message?.toLowerCase().includes('exists')) {
           toast({
             variant: "destructive",
             title: "Account exists",
@@ -59,8 +58,13 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
           return;
         }
 
-        // For other errors, throw them
-        throw error;
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message || "Failed to sign up. Please try again.",
+        });
+        setLoading(false);
+        return;
       }
 
       if (!data.user) {
