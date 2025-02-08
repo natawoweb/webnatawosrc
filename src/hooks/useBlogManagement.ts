@@ -23,6 +23,9 @@ export function useBlogManagement() {
     mutationFn: async ({ blogId, blogData }: { blogId: string; blogData: BlogUpdateData }) => {
       console.log("Updating blog with status:", blogData.status);
       
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       const { data, error } = await supabase
         .from("blogs")
         .update({
@@ -32,6 +35,7 @@ export function useBlogManagement() {
           content_tamil: blogData.content_tamil ? JSON.parse(blogData.content_tamil) : {},
           category_id: blogData.category_id || null,
           status: blogData.status,
+          author_id: user.id,
           updated_at: new Date().toISOString(),
         })
         .eq("id", blogId)
