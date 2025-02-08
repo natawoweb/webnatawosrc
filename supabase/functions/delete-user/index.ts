@@ -50,12 +50,34 @@ serve(async (req) => {
       throw new Error('User ID is required')
     }
 
-    // Delete the user from auth.users - this will trigger cascade deletes
+    // First delete from profiles and user_roles (with new RLS policies)
+    const { error: profileError } = await supabaseClient
+      .from('profiles')
+      .delete()
+      .eq('id', userId)
+
+    if (profileError) {
+      console.error('Error deleting profile:', profileError)
+      throw new Error('Failed to delete user profile')
+    }
+
+    const { error: roleError } = await supabaseClient
+      .from('user_roles')
+      .delete()
+      .eq('user_id', userId)
+
+    if (roleError) {
+      console.error('Error deleting user role:', roleError)
+      throw new Error('Failed to delete user role')
+    }
+
+    // Finally delete the user from auth.users
     const { error: deleteError } = await supabaseClient.auth.admin.deleteUser(
       userId
     )
 
     if (deleteError) {
+      console.error('Error deleting auth user:', deleteError)
       throw deleteError
     }
 
