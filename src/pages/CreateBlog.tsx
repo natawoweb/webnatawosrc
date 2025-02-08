@@ -146,8 +146,10 @@ export default function CreateBlog() {
   const hasContent = () => {
     try {
       const contentObj = JSON.parse(content);
-      return contentObj.blocks && contentObj.blocks.some((block: any) => block.text.trim().length > 0);
+      // Check if there's any text content in the blocks
+      return contentObj.blocks.some((block: any) => block.text.trim().length > 0);
     } catch (error) {
+      console.error('Error parsing content:', error);
       return false;
     }
   };
@@ -176,7 +178,7 @@ export default function CreateBlog() {
             onTitleChange={setTitle}
             onContentChange={setContent}
             onTranslate={handleTranslate}
-            hasContent={title.trim().length > 0}
+            hasContent={hasContent()}
           />
           <BlogContentSection
             language="tamil"
