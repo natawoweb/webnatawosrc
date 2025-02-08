@@ -41,20 +41,20 @@ export default function Auth() {
           
           if (isAdmin) {
             console.log("Admin user detected, redirecting to admin dashboard");
-            navigate("/admin");
+            navigate("/admin", { state: { from: '/auth' } });
             return;
           }
 
           // Check if user is a writer
           if (profile?.user_type === 'writer') {
             console.log("Writer detected, redirecting to dashboard");
-            navigate("/dashboard");
+            navigate("/dashboard", { state: { from: '/auth' } });
             return;
           }
 
           // Default navigation for other users
           console.log("Regular user detected, redirecting to home");
-          navigate("/");
+          navigate("/", { state: { from: '/auth' } });
         }
       };
 
@@ -73,26 +73,26 @@ export default function Auth() {
           
           if (isAdmin) {
             console.log("Admin user detected, redirecting to admin dashboard");
-            navigate("/admin");
+            navigate("/admin", { state: { from: '/auth' } });
             return;
           }
 
           // Check if user is a writer
           if (profile?.user_type === 'writer') {
             console.log("Writer detected, redirecting to dashboard");
-            navigate("/dashboard");
+            navigate("/dashboard", { state: { from: '/auth' } });
             return;
           }
 
           // Default navigation for other users
           console.log("Regular user detected, redirecting to home");
-          navigate("/");
+          navigate("/", { state: { from: '/auth' } });
         }
       });
 
       return () => subscription.unsubscribe();
     }
-  }, [navigate, profile, isResetPassword, loading]); // Added loading to dependency array
+  }, [navigate, profile, isResetPassword, loading]);
 
   const handleExistingAccount = () => {
     setActiveTab('signin');
@@ -147,3 +147,4 @@ export default function Auth() {
     </div>
   );
 }
+
