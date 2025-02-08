@@ -1,6 +1,6 @@
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedWriters } from "@/components/home/FeaturedWriters";
@@ -9,13 +9,15 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { profile, loading } = useProfile();
 
   useEffect(() => {
     const checkUserRole = async () => {
       const { data: { session } } = await supabase.auth.getSession();
 
-      if (session && !loading) {
+      // Only redirect if coming from the auth page
+      if (session && !loading && location.state?.from === '/auth') {
         // Check if user is admin
         const { data: isAdmin } = await supabase.rpc('has_role', {
           user_id: session.user.id,
@@ -38,7 +40,7 @@ const Index = () => {
     };
 
     checkUserRole();
-  }, [navigate, profile, loading]);
+  }, [navigate, profile, loading, location]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -50,3 +52,4 @@ const Index = () => {
 };
 
 export default Index;
+
