@@ -33,6 +33,13 @@ export function BlogContentSection({
   const isEnglish = language === "english";
   const shouldEnableTranslate = isEnglish && onTranslate && hasContent;
 
+  console.log('BlogContentSection Props:', {
+    language,
+    title,
+    hasContent,
+    shouldEnableTranslate
+  });
+
   return (
     <Card className="h-[calc(100vh-12rem)] flex flex-col">
       <CardHeader className="space-y-2">

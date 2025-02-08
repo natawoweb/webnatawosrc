@@ -99,7 +99,6 @@ export default function CreateBlog() {
   });
 
   const handleCreate = (status: "draft" | "pending_approval") => {
-    // For drafts, only title is required
     if (status === "draft" && !title) {
       toast({
         variant: "destructive",
@@ -109,7 +108,6 @@ export default function CreateBlog() {
       return;
     }
 
-    // For submissions, both title and content are required
     if (status === "pending_approval" && (!title || !hasContent())) {
       toast({
         variant: "destructive",
@@ -118,9 +116,6 @@ export default function CreateBlog() {
       });
       return;
     }
-
-    console.log('Handling create with status:', status);
-    console.log('Content before create:', content);
 
     createBlogMutation.mutate({
       title,
@@ -143,11 +138,17 @@ export default function CreateBlog() {
   };
 
   const hasContent = () => {
+    console.log('Checking content - Title:', title);
+    console.log('Checking content - Content:', content);
+    
     try {
-      if (!title.trim()) return false;
       const contentObj = JSON.parse(content);
-      // Check if there's any text content in any of the blocks
-      return contentObj.blocks.some((block: any) => block.text.trim().length > 0);
+      const hasText = contentObj.blocks.some((block: any) => block.text.trim().length > 0);
+      
+      console.log('Has title:', Boolean(title.trim()));
+      console.log('Has text content:', hasText);
+      
+      return title.trim().length > 0 && hasText;
     } catch (error) {
       console.error('Error parsing content:', error);
       return false;
