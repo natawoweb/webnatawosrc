@@ -99,11 +99,22 @@ export default function CreateBlog() {
   });
 
   const handleCreate = (status: "draft" | "pending_approval") => {
-    if (!title || !content) {
+    // For drafts, only title is required
+    if (status === "draft" && !title) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Title and content are required",
+        description: "Title is required even for drafts",
+      });
+      return;
+    }
+
+    // For submissions, both title and content are required
+    if (status === "pending_approval" && (!title || !hasContent())) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Title and content are required for submission",
       });
       return;
     }
@@ -134,8 +145,7 @@ export default function CreateBlog() {
 
   const hasContent = () => {
     try {
-      if (!title) return false;
-      const contentObj = JSON.parse(content || '{}');
+      const contentObj = JSON.parse(content);
       return contentObj.blocks && contentObj.blocks.some((block: any) => block.text.trim().length > 0);
     } catch (error) {
       return false;
@@ -166,7 +176,7 @@ export default function CreateBlog() {
             onTitleChange={setTitle}
             onContentChange={setContent}
             onTranslate={handleTranslate}
-            hasContent={hasContent()}
+            hasContent={title.trim().length > 0}
           />
           <BlogContentSection
             language="tamil"
