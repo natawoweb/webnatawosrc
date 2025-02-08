@@ -16,19 +16,29 @@ export default function CreateBlog() {
   
   const [title, setTitle] = useState("");
   const [content, setContent] = useState(JSON.stringify({
-    type: 'doc',
-    content: [{
-      type: 'paragraph',
-      content: []
-    }]
+    blocks: [{ 
+      key: 'initial', 
+      text: '', 
+      type: 'unstyled',
+      depth: 0,
+      inlineStyleRanges: [],
+      entityRanges: [],
+      data: {}
+    }],
+    entityMap: {}
   }));
   const [titleTamil, setTitleTamil] = useState("");
   const [contentTamil, setContentTamil] = useState(JSON.stringify({
-    type: 'doc',
-    content: [{
-      type: 'paragraph',
-      content: []
-    }]
+    blocks: [{ 
+      key: 'initial', 
+      text: '', 
+      type: 'unstyled',
+      depth: 0,
+      inlineStyleRanges: [],
+      entityRanges: [],
+      data: {}
+    }],
+    entityMap: {}
   }));
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
@@ -56,13 +66,15 @@ export default function CreateBlog() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
+      console.log('Creating blog with data:', blogData);
+
       const { error } = await supabase
         .from("blogs")
         .insert({
           title: blogData.title,
-          content: blogData.content ? JSON.parse(blogData.content) : {},
+          content: blogData.content,
           title_tamil: blogData.title_tamil || null,
-          content_tamil: blogData.content_tamil ? JSON.parse(blogData.content_tamil) : {},
+          content_tamil: blogData.content_tamil || null,
           author_id: user.id,
           status: blogData.status,
           category_id: blogData.category_id || null
@@ -87,11 +99,20 @@ export default function CreateBlog() {
   });
 
   const handleCreate = (status: "draft" | "pending_approval") => {
-    if (!title || !content) {
+    if (status === "draft" && !title) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Title and content are required",
+        description: "Title is required even for drafts",
+      });
+      return;
+    }
+
+    if (status === "pending_approval" && (!title || !hasContent())) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Title and content are required for submission",
       });
       return;
     }
@@ -112,18 +133,26 @@ export default function CreateBlog() {
       setTitleTamil(translatedTitle);
       setContentTamil(translatedContent);
     } catch (error) {
-      // Error is already handled in the hook
       console.error('Translation failed:', error);
     }
   };
 
   const hasContent = () => {
     try {
-      if (!title) return false;
-      const contentObj = JSON.parse(content || '{}');
-      const textContent = contentObj.content?.[0]?.content?.[0]?.text;
-      return Boolean(textContent);
+      const contentObj = JSON.parse(content);
+      const hasNonEmptyTitle = title.trim().length > 0;
+      const hasNonEmptyContent = contentObj.blocks.some((block: any) => block.text.trim().length > 0);
+      
+      console.log('Content check:', {
+        hasNonEmptyTitle,
+        hasNonEmptyContent,
+        title: title.trim(),
+        blocks: contentObj.blocks.map((b: any) => b.text.trim())
+      });
+      
+      return hasNonEmptyTitle && hasNonEmptyContent;
     } catch (error) {
+      console.error('Error parsing content:', error);
       return false;
     }
   };
@@ -144,7 +173,7 @@ export default function CreateBlog() {
           isLoading={createBlogMutation.isPending}
         />
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BlogContentSection
             language="english"
             title={title}
