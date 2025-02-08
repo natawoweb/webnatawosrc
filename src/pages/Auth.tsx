@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
+import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { useProfile } from "@/hooks/useProfile";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -12,8 +13,16 @@ export default function Auth() {
   const navigate = useNavigate();
   const { profile } = useProfile();
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
+  const [isResetPassword, setIsResetPassword] = useState(false);
 
   useEffect(() => {
+    // Check if this is a password reset request
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get('type');
+    if (type === 'recovery') {
+      setIsResetPassword(true);
+    }
+
     // Check if user is already logged in
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
@@ -59,6 +68,25 @@ export default function Auth() {
     setActiveTab('signin');
   };
 
+  if (isResetPassword) {
+    return (
+      <div className="container mx-auto py-10">
+        <Card className="max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle>Reset Your Password</CardTitle>
+            <CardDescription>
+              Please enter your new password below
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResetPasswordForm />
+          </CardContent>
+        </Card>
+        <Toaster />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-10">
       <Card className="max-w-md mx-auto">
@@ -89,4 +117,3 @@ export default function Auth() {
     </div>
   );
 }
-
