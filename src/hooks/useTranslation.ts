@@ -7,18 +7,13 @@ export function useTranslation() {
 
   const translateContent = async (title: string, content: string) => {
     try {
-      const contentObj = JSON.parse(content || '{}');
+      const contentObj = JSON.parse(content);
       
-      // Extract all text content from the document
-      const extractText = (node: any): string => {
-        if (node.text) return node.text;
-        if (node.content) {
-          return node.content.map((child: any) => extractText(child)).join(' ');
-        }
-        return '';
-      };
-
-      const textContent = extractText(contentObj);
+      // Extract text content from Draft.js blocks
+      const textContent = contentObj.blocks
+        .map((block: any) => block.text)
+        .filter((text: string) => text.trim())
+        .join('\n');
 
       // First translate the title
       const titleResponse = await supabase.functions.invoke('translate', {
@@ -37,16 +32,18 @@ export function useTranslation() {
       const translatedTitle = titleResponse.data.data.translations[0].translatedText;
       const translatedText = contentResponse.data.data.translations[0].translatedText;
       
-      // Create a new document structure with the translated text
+      // Create new Draft.js content with translated text
       const newContent = {
-        type: 'doc',
-        content: [{
-          type: 'paragraph',
-          content: [{
-            type: 'text',
-            text: translatedText
-          }]
-        }]
+        blocks: [{
+          key: '1',
+          text: translatedText,
+          type: 'unstyled',
+          depth: 0,
+          inlineStyleRanges: [],
+          entityRanges: [],
+          data: {}
+        }],
+        entityMap: {}
       };
 
       toast({
