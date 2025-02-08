@@ -32,36 +32,38 @@ export const useEditorState = (content: string, onChange: (content: string) => v
 
   const [imageStates, setImageStates] = useState<{ [key: string]: ImageComponentState }>({});
 
-  // Update editor state when content prop changes
+  // Only update editor state from props when content changes and it's different from current state
   useEffect(() => {
-    try {
-      let contentObj;
+    const currentContent = JSON.stringify(convertToRaw(editorState.getCurrentContent()));
+    if (content !== currentContent) {
       try {
-        contentObj = JSON.parse(content);
-        if (typeof contentObj === 'string') {
-          contentObj = JSON.parse(contentObj);
+        let contentObj;
+        try {
+          contentObj = JSON.parse(content);
+          if (typeof contentObj === 'string') {
+            contentObj = JSON.parse(contentObj);
+          }
+        } catch (e) {
+          const contentState = ContentState.createFromText(content || '');
+          setEditorState(EditorState.createWithContent(contentState));
+          return;
+        }
+
+        if (contentObj && contentObj.blocks) {
+          const contentState = convertFromRaw(contentObj);
+          setEditorState(EditorState.createWithContent(contentState));
         }
       } catch (e) {
-        const contentState = ContentState.createFromText(content || '');
-        setEditorState(EditorState.createWithContent(contentState));
-        return;
+        console.error('Error updating editor state:', e);
       }
-
-      if (contentObj && contentObj.blocks) {
-        const contentState = convertFromRaw(contentObj);
-        setEditorState(EditorState.createWithContent(contentState));
-      }
-    } catch (e) {
-      console.error('Error updating editor state:', e);
     }
   }, [content]);
 
-  // Update content when editor state changes
+  // Update content when editor state changes, but avoid unnecessary updates
   useEffect(() => {
     const contentState = editorState.getCurrentContent();
     const rawContent = convertToRaw(contentState);
     
-    // Update image dimensions in the raw content
     rawContent.blocks.forEach(block => {
       if (block.type === 'atomic') {
         const entityKey = block.entityRanges[0]?.key;
@@ -77,8 +79,11 @@ export const useEditorState = (content: string, onChange: (content: string) => v
         }
       }
     });
-    
-    onChange(JSON.stringify(rawContent));
+
+    const newContent = JSON.stringify(rawContent);
+    if (newContent !== content) {
+      onChange(newContent);
+    }
   }, [editorState, imageStates]);
 
   return {
@@ -88,3 +93,4 @@ export const useEditorState = (content: string, onChange: (content: string) => v
     setImageStates
   };
 };
+
