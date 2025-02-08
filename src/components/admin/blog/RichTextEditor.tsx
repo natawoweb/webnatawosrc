@@ -4,9 +4,8 @@ import {
   Editor, 
   EditorState, 
   RichUtils, 
-  ContentState, 
-  convertToRaw, 
-  convertFromRaw 
+  convertFromRaw,
+  convertToRaw 
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import { EditorToolbar } from './editor/EditorToolbar';
@@ -19,16 +18,29 @@ interface RichTextEditorProps {
 
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
   const [editorState, setEditorState] = useState(() => {
-    if (content) {
-      try {
+    try {
+      if (content) {
         const contentState = convertFromRaw(JSON.parse(content));
         return EditorState.createWithContent(contentState);
-      } catch (e) {
-        return EditorState.createEmpty();
       }
+    } catch (e) {
+      console.error('Error parsing content:', e);
     }
     return EditorState.createEmpty();
   });
+
+  useEffect(() => {
+    if (content) {
+      try {
+        const parsedContent = JSON.parse(content);
+        const contentState = convertFromRaw(parsedContent);
+        const newEditorState = EditorState.createWithContent(contentState);
+        setEditorState(newEditorState);
+      } catch (e) {
+        console.error('Error updating editor state:', e);
+      }
+    }
+  }, [content]);
 
   useEffect(() => {
     const contentState = editorState.getCurrentContent();

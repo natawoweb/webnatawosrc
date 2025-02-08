@@ -43,15 +43,15 @@ export function useTranslation() {
 
       // Create new Draft.js content with translated text
       const newContent = {
-        blocks: [{
-          key: '1',
-          text: translatedText,
+        blocks: translatedText.split('\n').map((text: string, index: number) => ({
+          key: `translated-${index}`,
+          text: text.trim(),
           type: 'unstyled',
           depth: 0,
           inlineStyleRanges: [],
           entityRanges: [],
           data: {}
-        }],
+        })).filter((block: any) => block.text.length > 0),
         entityMap: {}
       };
 
