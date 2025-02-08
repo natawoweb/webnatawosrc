@@ -33,11 +33,13 @@ export function BlogContentSection({
   const isEnglish = language === "english";
   const shouldEnableTranslate = isEnglish && onTranslate && hasContent;
 
-  console.log('BlogContentSection Props:', {
+  console.log('BlogContentSection:', {
     language,
-    title,
+    isEnglish,
     hasContent,
-    shouldEnableTranslate
+    shouldEnableTranslate,
+    title: title.trim(),
+    contentLength: content.length
   });
 
   return (

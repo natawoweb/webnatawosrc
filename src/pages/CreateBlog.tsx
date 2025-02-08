@@ -138,17 +138,19 @@ export default function CreateBlog() {
   };
 
   const hasContent = () => {
-    console.log('Checking content - Title:', title);
-    console.log('Checking content - Content:', content);
-    
     try {
       const contentObj = JSON.parse(content);
-      const hasText = contentObj.blocks.some((block: any) => block.text.trim().length > 0);
+      const hasNonEmptyTitle = title.trim().length > 0;
+      const hasNonEmptyContent = contentObj.blocks.some((block: any) => block.text.trim().length > 0);
       
-      console.log('Has title:', Boolean(title.trim()));
-      console.log('Has text content:', hasText);
+      console.log('Content check:', {
+        hasNonEmptyTitle,
+        hasNonEmptyContent,
+        title: title.trim(),
+        blocks: contentObj.blocks.map((b: any) => b.text.trim())
+      });
       
-      return title.trim().length > 0 && hasText;
+      return hasNonEmptyTitle && hasNonEmptyContent;
     } catch (error) {
       console.error('Error parsing content:', error);
       return false;
