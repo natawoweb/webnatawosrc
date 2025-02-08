@@ -1,3 +1,4 @@
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -13,7 +14,7 @@ import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { EditBlogDialog } from "./EditBlogDialog";
-import { DeleteUserDialog } from "../DeleteUserDialog";
+import { DeleteBlogDialog } from "./DeleteBlogDialog";
 import { Database } from "@/integrations/supabase/types";
 import { useState } from "react";
 
@@ -108,7 +109,7 @@ export function BlogList({ blogs }: BlogListProps) {
         </TableBody>
       </Table>
 
-      <DeleteUserDialog
+      <DeleteBlogDialog
         open={!!blogToDelete}
         onOpenChange={() => setBlogToDelete(null)}
         onConfirm={() => {
