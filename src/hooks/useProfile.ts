@@ -63,7 +63,8 @@ export const useProfile = () => {
           status: null,
           county: null,
           state: null,
-          user_id: session.user.id
+          user_id: session.user.id,
+          approval_status: 'pending'
         };
 
         const { error: insertError } = await supabase
@@ -173,3 +174,4 @@ export const useProfile = () => {
     handleCancel,
   };
 };
+

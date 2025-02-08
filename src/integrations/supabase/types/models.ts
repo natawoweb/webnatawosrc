@@ -21,8 +21,10 @@ export type Profile = {
   state: string | null
   social_links: Json | null
   user_id: string | null
+  approval_status: 'pending' | 'approved' | 'rejected' | null
 }
 
 export type AppRole = Database['public']['Enums']['app_role']
 export type UserRole = Database['public']['Tables']['user_roles']['Row']
 export type UserLevel = 'Literary Tamil Writers' | 'Talented Experts' | 'NATAWO Volunteers' | 'NATAWO Students Writers' | 'Subscriber' | 'Technical'
+
