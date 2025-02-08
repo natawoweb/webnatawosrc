@@ -15,7 +15,6 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
   const { toast } = useToast();
 
   const handlePasswordReset = async (e: React.MouseEvent) => {
@@ -25,6 +24,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         variant: "destructive",
         title: "Error",
         description: "Please enter your email address to reset your password.",
+        duration: 5000,
       });
       return;
     }
@@ -40,6 +40,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       toast({
         title: "Check your email",
         description: "We've sent you a password reset link.",
+        duration: 5000,
       });
     } catch (error: any) {
       console.error('Password reset error:', error);
@@ -47,6 +48,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         variant: "destructive",
         title: "Error",
         description: error.message,
+        duration: 5000,
       });
     } finally {
       setLoading(false);
@@ -64,12 +66,28 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       });
 
       if (error) {
-        throw error;
+        if (error.message.includes('Invalid login credentials')) {
+          toast({
+            variant: "destructive",
+            title: "Login Failed",
+            description: "Invalid email or password. Please try again.",
+            duration: 5000,
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.message,
+            duration: 5000,
+          });
+        }
+        return;
       }
       
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
+        duration: 3000,
       });
       
       onSuccess();
@@ -78,7 +96,8 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: "An unexpected error occurred. Please try again.",
+        duration: 5000,
       });
     } finally {
       setLoading(false);

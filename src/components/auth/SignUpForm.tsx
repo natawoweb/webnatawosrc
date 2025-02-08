@@ -50,20 +50,18 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
             error.message?.toLowerCase().includes('already') || 
             error.message?.toLowerCase().includes('registered') ||
             error.message?.toLowerCase().includes('exists')) {
-          // First show the toast message
           toast({
             variant: "destructive",
             title: "Account Already Exists",
             description: "An account with this email already exists. Please sign in instead.",
-            duration: 5000, // Keep the message visible for 5 seconds
+            duration: 5000,
           });
           
-          // Then switch to sign in tab after a short delay to ensure toast is visible
+          // Switch to sign in tab after a short delay
           setTimeout(() => {
             onExistingAccount();
           }, 100);
           
-          setLoading(false);
           return;
         }
 
@@ -71,8 +69,8 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
           variant: "destructive",
           title: "Error",
           description: error.message || "Failed to sign up. Please try again.",
+          duration: 5000,
         });
-        setLoading(false);
         return;
       }
 
@@ -88,6 +86,7 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
         description: role === 'writer' 
           ? "Your writer application has been submitted. Please check your email for confirmation."
           : "Welcome to NATAWO! Please check your email.",
+        duration: 5000,
       });
       
       onSuccess();
@@ -97,6 +96,7 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
         variant: "destructive",
         title: "Error",
         description: error.message || "Failed to sign up. Please try again.",
+        duration: 5000,
       });
     } finally {
       setLoading(false);
