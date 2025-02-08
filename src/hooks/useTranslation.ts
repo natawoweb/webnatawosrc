@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { convertToRaw } from 'draft-js';
 
 export function useTranslation() {
   const { toast } = useToast();
@@ -10,26 +11,11 @@ export function useTranslation() {
       console.log('Starting translation with:', { title, content });
       const contentObj = JSON.parse(content);
       
-      // Extract text content regardless of content structure
-      let textContent = '';
-      if (contentObj.blocks) {
-        // If it's Draft.js format
-        textContent = contentObj.blocks
-          .map((block: any) => block.text)
-          .filter((text: string) => text.trim())
-          .join('\n');
-      } else if (contentObj.content) {
-        // If it's ProseMirror/TipTap format
-        textContent = contentObj.content
-          .map((node: any) => {
-            if (node.type === 'paragraph') {
-              return node.content?.map((textNode: any) => textNode.text).join('') || '';
-            }
-            return '';
-          })
-          .filter((text: string) => text.trim())
-          .join('\n');
-      }
+      // Extract text from Draft.js content
+      const textContent = contentObj.blocks
+        .map((block: any) => block.text)
+        .filter((text: string) => text.trim())
+        .join('\n');
 
       console.log('Extracted text content:', textContent);
 
