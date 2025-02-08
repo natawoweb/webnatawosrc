@@ -30,51 +30,62 @@ export default function Auth() {
     // Only proceed with session check if not in recovery mode
     if (!isResetPassword) {
       // Check if user is already logged in
-      supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const checkSessionAndRedirect = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
         if (session) {
+          console.log("Session found, checking roles...");
           const { data: isAdmin } = await supabase.rpc('has_role', {
             user_id: session.user.id,
             required_role: 'admin'
           });
           
           if (isAdmin) {
+            console.log("Admin user detected, redirecting to admin dashboard");
             navigate("/admin");
             return;
           }
 
           // Check if user is a writer
           if (profile?.user_type === 'writer') {
+            console.log("Writer detected, redirecting to dashboard");
             navigate("/dashboard");
             return;
           }
 
           // Default navigation for other users
+          console.log("Regular user detected, redirecting to home");
           navigate("/");
         }
-      });
+      };
+
+      checkSessionAndRedirect();
 
       // Set up auth state listener
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (_event, session) => {
         if (session) {
+          console.log("Auth state changed, checking roles...");
           const { data: isAdmin } = await supabase.rpc('has_role', {
             user_id: session.user.id,
             required_role: 'admin'
           });
           
           if (isAdmin) {
+            console.log("Admin user detected, redirecting to admin dashboard");
             navigate("/admin");
             return;
           }
 
           // Check if user is a writer
           if (profile?.user_type === 'writer') {
+            console.log("Writer detected, redirecting to dashboard");
             navigate("/dashboard");
             return;
           }
 
           // Default navigation for other users
+          console.log("Regular user detected, redirecting to home");
           navigate("/");
         }
       });
