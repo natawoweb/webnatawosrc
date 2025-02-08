@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +10,7 @@ import { useProfile } from "@/hooks/useProfile";
 export default function Auth() {
   const navigate = useNavigate();
   const { profile } = useProfile();
+  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
 
   useEffect(() => {
     // Check if user is already logged in
@@ -53,6 +54,10 @@ export default function Auth() {
     return () => subscription.unsubscribe();
   }, [navigate, profile]);
 
+  const handleExistingAccount = () => {
+    setActiveTab('signin');
+  };
+
   return (
     <div className="container mx-auto py-10">
       <Card className="max-w-md mx-auto">
@@ -63,7 +68,7 @@ export default function Auth() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="signin" className="w-full" data-id="auth-tabs">
+          <Tabs value={activeTab} onValueChange={(value: 'signin' | 'signup') => setActiveTab(value)} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -74,7 +79,7 @@ export default function Auth() {
             </TabsContent>
             
             <TabsContent value="signup">
-              <AuthForm type="signup" onSuccess={() => {}} />
+              <AuthForm type="signup" onSuccess={() => {}} onExistingAccount={handleExistingAccount} />
             </TabsContent>
           </Tabs>
         </CardContent>

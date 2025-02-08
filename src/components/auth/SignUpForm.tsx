@@ -8,14 +8,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { BaseFormFields } from "./form-fields/BaseFormFields";
 import { WriterFormFields } from "./form-fields/WriterFormFields";
 import { handleSignupNotifications } from "./utils/signupNotifications";
-import { useNavigate } from "react-router-dom";
-import { Tabs } from "@/components/ui/tabs";
 
 interface SignUpFormProps {
   onSuccess: () => void;
+  onExistingAccount: () => void;
 }
 
-export function SignUpForm({ onSuccess }: SignUpFormProps) {
+export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -24,9 +23,6 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
   const [bio, setBio] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-
-  // Get access to the tabs component to programmatically switch tabs
-  const tabsRef = document.querySelector('[data-id="auth-tabs"]') as HTMLElement;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,15 +56,8 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
             description: "An account with this email already exists. Please sign in instead.",
           });
           
-          // Switch to the signin tab
-          if (tabsRef) {
-            const tabsList = tabsRef.querySelector('[role="tablist"]');
-            const signinTab = tabsList?.querySelector('[data-state="inactive"]') as HTMLButtonElement;
-            if (signinTab) {
-              signinTab.click();
-            }
-          }
-          
+          // Call the callback to switch tabs
+          onExistingAccount();
           setLoading(false);
           return;
         }
