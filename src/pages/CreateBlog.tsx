@@ -138,15 +138,15 @@ export default function CreateBlog() {
       setTitleTamil(translatedTitle);
       setContentTamil(translatedContent);
     } catch (error) {
-      // Error is already handled in the hook
       console.error('Translation failed:', error);
     }
   };
 
   const hasContent = () => {
     try {
+      if (!title.trim()) return false;
       const contentObj = JSON.parse(content);
-      // Check if there's any text content in the blocks
+      // Check if there's any text content in any of the blocks
       return contentObj.blocks.some((block: any) => block.text.trim().length > 0);
     } catch (error) {
       console.error('Error parsing content:', error);
