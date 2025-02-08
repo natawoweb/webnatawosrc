@@ -83,13 +83,11 @@ function createSuccessResponse(data: any): Response {
 }
 
 serve(async (req: Request) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Initialize Supabase admin client with service role key
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -123,7 +121,7 @@ serve(async (req: Request) => {
 
     console.log("Creating auth user for email:", payload.email);
 
-    // Create auth user with email confirmation disabled
+    // First create the auth user
     const { data: authUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
       email: payload.email,
       password: payload.password,
@@ -147,7 +145,10 @@ serve(async (req: Request) => {
 
     console.log('Auth user created successfully:', authUser.user.id);
 
-    // Explicitly create user role
+    // Wait a moment for the auth trigger to complete
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Update user role
     const { error: roleError } = await supabaseAdmin
       .from('user_roles')
       .upsert({
@@ -161,12 +162,13 @@ serve(async (req: Request) => {
       return createErrorResponse(500, `Failed to create user role: ${roleError.message}`);
     }
 
-    // Explicitly update profile with level
+    // Update profile
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .update({ 
         level: payload.level,
-        user_type: payload.role 
+        user_type: payload.role,
+        full_name: payload.fullName
       })
       .eq('id', authUser.user.id);
 
@@ -175,7 +177,7 @@ serve(async (req: Request) => {
       return createErrorResponse(500, `Failed to update profile: ${profileError.message}`);
     }
 
-    // Send welcome notification
+    // Non-critical: Send welcome notification
     try {
       const notificationType = payload.role === 'writer' ? 'writer_welcome' : 'reader_welcome';
       const { error: notificationError } = await supabaseAdmin.functions.invoke('signup-notifications', {
@@ -188,13 +190,11 @@ serve(async (req: Request) => {
 
       if (notificationError) {
         console.error('Error sending welcome notification:', notificationError);
-        // Don't return error here, as the user was created successfully
       } else {
         console.log('Welcome notification sent successfully');
       }
     } catch (notificationError) {
       console.error('Error invoking signup-notifications function:', notificationError);
-      // Don't return error here, as the user was created successfully
     }
 
     return createSuccessResponse({
