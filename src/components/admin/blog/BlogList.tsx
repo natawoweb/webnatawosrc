@@ -179,6 +179,7 @@ export function BlogList({ blogs }: BlogListProps) {
             deleteBlogMutation.mutate(blogToDelete.id);
           }
         }}
+        blog={blogToDelete}
       />
     </>
   );
