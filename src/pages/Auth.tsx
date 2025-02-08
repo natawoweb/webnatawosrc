@@ -16,56 +16,60 @@ export default function Auth() {
   const [isResetPassword, setIsResetPassword] = useState(false);
 
   useEffect(() => {
-    // Check if this is a password reset request
+    // Always check for recovery mode first
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const type = hashParams.get('type');
     const accessToken = hashParams.get('access_token');
 
     if (type === 'recovery' && accessToken) {
+      console.log('Recovery mode detected');
       setIsResetPassword(true);
-      return; // Exit early to prevent redirect
+      return; // Exit early to prevent any other auth checks
     }
 
-    // Check if user is already logged in
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
-        const { data: isAdmin } = await supabase.rpc('has_role', {
-          user_id: session.user.id,
-          required_role: 'admin'
-        });
-        
-        if (isAdmin) {
-          navigate("/admin");
-        } else if (profile?.user_type === 'writer') {
-          navigate("/dashboard");
-        } else {
-          navigate("/");
+    // Only proceed with session check if not in recovery mode
+    if (!isResetPassword) {
+      // Check if user is already logged in
+      supabase.auth.getSession().then(async ({ data: { session } }) => {
+        if (session) {
+          const { data: isAdmin } = await supabase.rpc('has_role', {
+            user_id: session.user.id,
+            required_role: 'admin'
+          });
+          
+          if (isAdmin) {
+            navigate("/admin");
+          } else if (profile?.user_type === 'writer') {
+            navigate("/dashboard");
+          } else {
+            navigate("/");
+          }
         }
-      }
-    });
+      });
 
-    // Set up auth state listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session) {
-        const { data: isAdmin } = await supabase.rpc('has_role', {
-          user_id: session.user.id,
-          required_role: 'admin'
-        });
-        
-        if (isAdmin) {
-          navigate("/admin");
-        } else if (profile?.user_type === 'writer') {
-          navigate("/dashboard");
-        } else {
-          navigate("/");
+      // Set up auth state listener
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        if (session) {
+          const { data: isAdmin } = await supabase.rpc('has_role', {
+            user_id: session.user.id,
+            required_role: 'admin'
+          });
+          
+          if (isAdmin) {
+            navigate("/admin");
+          } else if (profile?.user_type === 'writer') {
+            navigate("/dashboard");
+          } else {
+            navigate("/");
+          }
         }
-      }
-    });
+      });
 
-    return () => subscription.unsubscribe();
-  }, [navigate, profile]);
+      return () => subscription.unsubscribe();
+    }
+  }, [navigate, profile, isResetPassword]);
 
   const handleExistingAccount = () => {
     setActiveTab('signin');
