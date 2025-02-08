@@ -26,15 +26,37 @@ export function useBlogManagement() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Parse content if it's a string
-      const parsedContent = typeof blogData.content === 'string' 
-        ? JSON.parse(blogData.content)
-        : blogData.content;
+      // Parse content if it's a string and not already parsed
+      let parsedContent;
+      try {
+        parsedContent = typeof blogData.content === 'string' 
+          ? JSON.parse(blogData.content)
+          : blogData.content;
 
-      // Parse Tamil content if it exists and is a string
-      const parsedContentTamil = blogData.content_tamil && typeof blogData.content_tamil === 'string'
-        ? JSON.parse(blogData.content_tamil)
-        : blogData.content_tamil || {};
+        // Check if content is double-encoded
+        if (typeof parsedContent === 'string') {
+          parsedContent = JSON.parse(parsedContent);
+        }
+      } catch (error) {
+        console.error('Error parsing content:', error);
+        parsedContent = blogData.content;
+      }
+
+      // Parse Tamil content if it exists
+      let parsedContentTamil;
+      try {
+        parsedContentTamil = blogData.content_tamil && typeof blogData.content_tamil === 'string'
+          ? JSON.parse(blogData.content_tamil)
+          : blogData.content_tamil;
+
+        // Check if Tamil content is double-encoded
+        if (typeof parsedContentTamil === 'string') {
+          parsedContentTamil = JSON.parse(parsedContentTamil);
+        }
+      } catch (error) {
+        console.error('Error parsing Tamil content:', error);
+        parsedContentTamil = blogData.content_tamil;
+      }
 
       const { data, error } = await supabase
         .from("blogs")
