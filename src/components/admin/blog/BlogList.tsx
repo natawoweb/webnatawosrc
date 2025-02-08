@@ -68,8 +68,9 @@ export function BlogList({ blogs }: BlogListProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete blog: " + error.message,
+        description: "Failed to delete blog. Make sure you have the required permissions.",
       });
+      setBlogToDelete(null);
     },
   });
 
