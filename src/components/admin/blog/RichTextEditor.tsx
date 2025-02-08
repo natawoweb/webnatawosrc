@@ -7,7 +7,8 @@ import {
   convertFromRaw,
   convertToRaw,
   ContentState,
-  AtomicBlockUtils
+  AtomicBlockUtils,
+  DraftHandleValue
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import { EditorToolbar } from './editor/EditorToolbar';
@@ -15,11 +16,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Image } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
   language?: "english" | "tamil";
+}
+
+interface ImageComponentState {
+  width: number;
+  height: number;
 }
 
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
@@ -49,6 +56,8 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     }
   });
 
+  const [imageStates, setImageStates] = useState<{ [key: string]: ImageComponentState }>({});
+
   useEffect(() => {
     try {
       let contentObj;
@@ -75,10 +84,28 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
   useEffect(() => {
     const contentState = editorState.getCurrentContent();
     const rawContent = convertToRaw(contentState);
+    
+    // Save image states in the entity data
+    rawContent.blocks.forEach(block => {
+      if (block.type === 'atomic') {
+        const entityKey = block.entityRanges[0]?.key;
+        if (entityKey !== undefined) {
+          const entity = rawContent.entityMap[entityKey];
+          if (entity && entity.type === 'IMAGE' && imageStates[block.key]) {
+            entity.data = {
+              ...entity.data,
+              width: imageStates[block.key].width,
+              height: imageStates[block.key].height
+            };
+          }
+        }
+      }
+    });
+    
     onChange(JSON.stringify(rawContent));
-  }, [editorState, onChange]);
+  }, [editorState, onChange, imageStates]);
 
-  const handleKeyCommand = (command: string) => {
+  const handleKeyCommand = (command: string): DraftHandleValue => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
       setEditorState(newState);
@@ -120,14 +147,22 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
       const contentStateWithEntity = contentState.createEntity(
         'IMAGE',
         'IMMUTABLE',
-        { src: publicUrl }
+        { src: publicUrl, width: 300, height: 'auto' }
       );
       const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
       const newEditorState = EditorState.set(
         editorState,
         { currentContent: contentStateWithEntity }
       );
-      setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+      const nextEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
+      setEditorState(nextEditorState);
+
+      // Initialize image state
+      const block = nextEditorState.getCurrentContent().getLastBlock();
+      setImageStates(prev => ({
+        ...prev,
+        [block.getKey()]: { width: 300, height: 'auto' }
+      }));
 
       toast({
         title: "Success",
@@ -153,6 +188,14 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
         return {
           component: ImageComponent,
           editable: false,
+          props: {
+            onResizeImage: (width: number) => {
+              setImageStates(prev => ({
+                ...prev,
+                [contentBlock.getKey()]: { width, height: 'auto' }
+              }));
+            }
+          }
         };
       }
     }
@@ -162,7 +205,28 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
   const ImageComponent = (props: any) => {
     const entity = props.contentState.getEntity(props.block.getEntityAt(0));
     const { src } = entity.getData();
-    return <img src={src} alt="Blog content" className="max-w-full h-auto my-2" />;
+    const blockKey = props.block.getKey();
+    const imageState = imageStates[blockKey] || { width: 300, height: 'auto' };
+
+    return (
+      <div className="relative my-4">
+        <img 
+          src={src} 
+          alt="Blog content" 
+          style={{ width: imageState.width, height: imageState.height }}
+          className="max-w-full object-contain"
+        />
+        <div className="mt-2 w-64">
+          <Slider
+            defaultValue={[imageState.width]}
+            max={800}
+            min={100}
+            step={10}
+            onValueChange={(value) => props.blockProps.onResizeImage(value[0])}
+          />
+        </div>
+      </div>
+    );
   };
 
   return (
