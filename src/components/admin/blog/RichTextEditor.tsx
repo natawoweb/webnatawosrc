@@ -1,15 +1,20 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { 
   Editor, 
   EditorState, 
   RichUtils, 
   convertFromRaw,
   convertToRaw,
-  ContentState 
+  ContentState,
+  AtomicBlockUtils
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import { EditorToolbar } from './editor/EditorToolbar';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Image } from 'lucide-react';
 
 interface RichTextEditorProps {
   content: string;
@@ -18,27 +23,23 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
+  const { toast } = useToast();
   const [editorState, setEditorState] = useState(() => {
     try {
       let contentObj;
       try {
-        // First try parsing it as JSON
         contentObj = JSON.parse(content);
-        // If it's still a string, try parsing it again (handles double encoding)
         if (typeof contentObj === 'string') {
           contentObj = JSON.parse(contentObj);
         }
       } catch (e) {
-        // If parsing fails, assume it's plain text
         return EditorState.createWithContent(ContentState.createFromText(content || ''));
       }
 
-      // Check if it's in Draft.js format
       if (contentObj && contentObj.blocks) {
         return EditorState.createWithContent(convertFromRaw(contentObj));
       }
       
-      // If not in Draft.js format, create from plain text
       return EditorState.createWithContent(
         ContentState.createFromText(typeof contentObj === 'string' ? contentObj : '')
       );
@@ -57,7 +58,6 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
           contentObj = JSON.parse(contentObj);
         }
       } catch (e) {
-        // If parsing fails, treat as plain text
         const contentState = ContentState.createFromText(content || '');
         setEditorState(EditorState.createWithContent(contentState));
         return;
@@ -95,6 +95,76 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     setEditorState(RichUtils.toggleBlockType(editorState, blockType));
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError, data } = await supabase.storage
+        .from('blog-images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('blog-images')
+        .getPublicUrl(filePath);
+
+      const contentState = editorState.getCurrentContent();
+      const contentStateWithEntity = contentState.createEntity(
+        'IMAGE',
+        'IMMUTABLE',
+        { src: publicUrl }
+      );
+      const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+      const newEditorState = EditorState.set(
+        editorState,
+        { currentContent: contentStateWithEntity }
+      );
+      setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to upload image",
+      });
+    }
+  };
+
+  const blockRendererFn = (contentBlock: any) => {
+    if (contentBlock.getType() === 'atomic') {
+      const entityKey = contentBlock.getEntityAt(0);
+      if (!entityKey) return null;
+      
+      const entity = editorState.getCurrentContent().getEntity(entityKey);
+      if (entity.getType() === 'IMAGE') {
+        return {
+          component: ImageComponent,
+          editable: false,
+        };
+      }
+    }
+    return null;
+  };
+
+  const ImageComponent = (props: any) => {
+    const entity = props.contentState.getEntity(props.block.getEntityAt(0));
+    const { src } = entity.getData();
+    return <img src={src} alt="Blog content" className="max-w-full h-auto my-2" />;
+  };
+
   return (
     <div className="border rounded-lg flex flex-col h-full bg-white">
       <EditorToolbar 
@@ -104,10 +174,28 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
         language={language}
       />
       <div className="flex-1 overflow-y-auto p-4">
+        <div className="mb-4">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+            id={`image-upload-${language}`}
+          />
+          <label htmlFor={`image-upload-${language}`}>
+            <Button type="button" variant="outline" asChild>
+              <span className="cursor-pointer">
+                <Image className="w-4 h-4 mr-2" />
+                Add Image
+              </span>
+            </Button>
+          </label>
+        </div>
         <Editor
           editorState={editorState}
           onChange={setEditorState}
           handleKeyCommand={handleKeyCommand}
+          blockRendererFn={blockRendererFn}
         />
       </div>
     </div>
