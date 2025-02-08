@@ -53,7 +53,7 @@ serve(async (req: Request) => {
           console.log(`Sending writer request notification to admin: ${adminEmail}`);
           try {
             const result = await resend.emails.send({
-              from: "NATAWO <notifications@natawo.com>",
+              from: "NATAWO <onboarding@resend.dev>",
               to: adminEmail,
               subject: "New Writer Request",
               html: `
@@ -76,7 +76,7 @@ serve(async (req: Request) => {
         console.log(`Sending welcome email to reader: ${email}`);
         try {
           const result = await resend.emails.send({
-            from: "NATAWO <notifications@natawo.com>",
+            from: "NATAWO <onboarding@resend.dev>",
             to: email,
             subject: "Welcome to NATAWO!",
             html: `
@@ -97,7 +97,7 @@ serve(async (req: Request) => {
         console.log(`Sending confirmation to writer: ${email}`);
         try {
           const result = await resend.emails.send({
-            from: "NATAWO <notifications@natawo.com>",
+            from: "NATAWO <onboarding@resend.dev>",
             to: email,
             subject: "Writer Application Submitted",
             html: `
@@ -118,7 +118,7 @@ serve(async (req: Request) => {
         console.log(`Sending welcome email to approved writer: ${email}`);
         try {
           const result = await resend.emails.send({
-            from: "NATAWO <notifications@natawo.com>",
+            from: "NATAWO <onboarding@resend.dev>",
             to: email,
             subject: "Welcome to NATAWO Writers!",
             html: `
