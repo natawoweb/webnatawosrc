@@ -77,7 +77,6 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
       const { selection } = state;
       const dom = view.domAtPos(selection.anchor);
       
-      // Check if the node is an HTMLElement before accessing getBoundingClientRect
       if (!dom.node || !(dom.node instanceof HTMLElement)) return;
 
       const editorBounds = editorRef.current?.getBoundingClientRect();
@@ -105,17 +104,20 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
   return (
     <div className="border rounded-lg h-full flex flex-col relative" ref={editorRef}>
       <EditorToolbar editor={editor} language={language} />
-      <div className="relative flex-grow">
+      <div className="relative flex-grow overflow-hidden">
         <div 
           ref={cursorRef}
           className="absolute w-0.5 h-5 bg-blue-500 transition-transform duration-100 pointer-events-none opacity-0"
           style={{ zIndex: 50 }}
         />
-        <EditorContent 
-          editor={editor} 
-          className="prose max-w-none p-6 h-full overflow-y-auto focus:outline-none cursor-text bg-white" 
-        />
+        <div className="h-full overflow-y-auto">
+          <EditorContent 
+            editor={editor} 
+            className="prose max-w-none p-6 min-h-full cursor-text bg-white focus:outline-none" 
+          />
+        </div>
       </div>
     </div>
   );
 }
+
