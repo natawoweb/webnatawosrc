@@ -42,6 +42,15 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
       });
 
       if (error) {
+        // Handle the "User already registered" error specifically
+        if (error.message === "User already registered") {
+          toast({
+            variant: "destructive",
+            title: "Sign up failed",
+            description: "An account with this email already exists. Please sign in instead.",
+          });
+          return;
+        }
         throw error;
       }
 
@@ -49,9 +58,8 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
         throw new Error('Signup failed');
       }
 
-      // Send appropriate notifications
+      // Only proceed with notifications if signup was successful
       if (role === 'reader') {
-        // Send welcome email to reader
         await supabase.functions.invoke('signup-notifications', {
           body: {
             type: 'reader_welcome',
@@ -108,7 +116,7 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to sign up. Please try again.",
       });
     } finally {
       setLoading(false);
