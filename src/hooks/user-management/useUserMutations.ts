@@ -46,6 +46,8 @@ export function useUserMutations() {
       role: AppRole; 
       level?: UserLevel 
     }) => {
+      console.log('Updating user:', { userId, role, level });
+      
       // First, update the user role
       const { error: roleError } = await supabase
         .from('user_roles')
@@ -62,7 +64,7 @@ export function useUserMutations() {
         throw roleError;
       }
 
-      // Then update level in profile if provided
+      // If level is provided, update it in the profile
       if (level) {
         const { error: levelError } = await supabase
           .from('profiles')
@@ -131,7 +133,6 @@ export function useUserMutations() {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      // First, delete the user from auth.users which will trigger cascade deletes
       const { error: deleteError } = await supabase.functions.invoke('delete-user', {
         body: { userId }
       });
