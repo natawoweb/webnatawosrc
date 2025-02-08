@@ -14,14 +14,17 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useToast } from "@/hooks/use-toast";
 
 export function FeaturedWriters() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
   
-  const { data: writers, isLoading } = useQuery({
+  const { data: writers, isLoading, error } = useQuery({
     queryKey: ["writers", searchQuery],
     queryFn: async () => {
+      console.log("Starting writers query...");
       let query = supabase
         .from("writers")
         .select("*");
@@ -33,16 +36,24 @@ export function FeaturedWriters() {
           .order("featured_month", { ascending: false });
       }
 
+      console.log("Executing query:", query);
       const { data, error } = await query;
-      
-      console.log("Writers query result:", { data, error }); // Debug log
       
       if (error) {
         console.error("Error fetching writers:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch writers. Please try again later.",
+        });
         throw error;
       }
+
+      console.log("Writers query result:", data);
       return data || []; // Ensure we return an empty array if data is null
     },
+    retry: 2,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const formatFeaturedMonth = (dateString: string | null) => {
@@ -56,7 +67,14 @@ export function FeaturedWriters() {
     }
   };
 
-  console.log("Current writers state:", writers); // Debug log
+  if (error) {
+    console.error("Error in featured writers component:", error);
+    return (
+      <div className="text-center py-20">
+        <p className="text-muted-foreground">Failed to load featured writers.</p>
+      </div>
+    );
+  }
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/50">
