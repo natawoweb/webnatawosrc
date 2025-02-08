@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, BookPlus } from "lucide-react";
@@ -22,6 +22,30 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
+
+  // Setup real-time subscription for blogs
+  useEffect(() => {
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'blogs'
+        },
+        () => {
+          // Invalidate and refetch blogs when any change occurs
+          queryClient.invalidateQueries({ queryKey: ["writer-blogs", session?.user?.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient, session?.user?.id]);
 
   const { data: blogs, isLoading } = useQuery({
     queryKey: ["writer-blogs", session?.user?.id],
