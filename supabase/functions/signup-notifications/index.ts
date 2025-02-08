@@ -33,7 +33,11 @@ serve(async (req: Request) => {
     }
 
     console.log('Starting signup notification process');
-    console.log('RESEND_API_KEY present:', !!Deno.env.get("RESEND_API_KEY"));
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    console.log('RESEND_API_KEY present:', !!resendKey);
+    if (!resendKey) {
+      throw new Error('RESEND_API_KEY is not configured');
+    }
 
     const payload = await req.json();
     console.log('Received payload:', JSON.stringify(payload));
@@ -130,6 +134,9 @@ serve(async (req: Request) => {
           throw error;
         }
         break;
+
+      default:
+        throw new Error(`Invalid notification type: ${type}`);
     }
 
     return new Response(JSON.stringify({ success: true }), {
