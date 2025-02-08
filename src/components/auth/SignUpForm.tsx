@@ -28,7 +28,7 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
     setLoading(true);
     
     try {
-      const { data: { user }, error } = await supabase.auth.signUp({
+      const { data: { user }, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -41,21 +41,25 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
         }
       });
 
-      if (error) {
-        // Handle the "User already registered" error specifically
-        if (error.message === "User already registered") {
+      // Check if there's an error in the response
+      if (signUpError) {
+        // Handle the user already exists error by checking both error message and code
+        if (signUpError.message === "User already registered" || 
+            (typeof signUpError === 'object' && 
+             'code' in signUpError && 
+             signUpError.code === 'user_already_exists')) {
           toast({
             variant: "destructive",
-            title: "Sign up failed",
+            title: "Account exists",
             description: "An account with this email already exists. Please sign in instead.",
           });
           return;
         }
-        throw error;
+        throw signUpError;
       }
 
       if (!user) {
-        throw new Error('Signup failed');
+        throw new Error('Signup failed - no user returned');
       }
 
       // Only proceed with notifications if signup was successful
