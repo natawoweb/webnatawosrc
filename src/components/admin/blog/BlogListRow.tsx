@@ -6,8 +6,6 @@ import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -37,35 +35,14 @@ export function BlogListRow({
   const navigate = useNavigate();
   const status = blog.status as BlogStatus;
 
-  // Query to check if user has manager role
-  const { data: hasManagerRole = false } = useQuery({
-    queryKey: ["hasManagerRole"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return false;
-      
-      const { data, error } = await supabase.rpc('has_role', {
-        user_id: user.id,
-        required_role: 'manager'
-      });
-      
-      if (error) {
-        console.error("Error checking manager role:", error);
-        return false;
-      }
-      
-      return data;
-    },
-  });
-
   const handleView = () => {
     navigate(`/blog/${blog.id}`);
   };
 
   const renderActionButtons = () => {
-    // Show delete button if user is admin, manager, or has explicit delete permission
-    const showDeleteButton = isAdmin || hasManagerRole || canDelete;
-    console.log('Show delete button:', { isAdmin, hasManagerRole, canDelete, showDeleteButton });
+    // Show delete button only for admin users
+    const showDeleteButton = isAdmin;
+    console.log('Show delete button:', { isAdmin, showDeleteButton });
 
     return (
       <div className="flex gap-2">
