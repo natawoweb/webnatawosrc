@@ -21,7 +21,6 @@ import Blogs from "./pages/Blogs";
 import BlogDetail from "./pages/BlogDetail";
 import Dashboard from "./pages/Dashboard";
 import EditBlog from "./pages/EditBlog";
-import BlogPreview from "./pages/BlogPreview";
 
 // Create a wrapper component for the redirect
 const BlogRedirect = () => {
@@ -45,7 +44,6 @@ const App: React.FC = () => {
           <Route path="search" element={<SearchWriters />} />
           <Route path="blogs" element={<Blogs />} />
           <Route path="blogs/:id" element={<BlogDetail />} />
-          <Route path="preview/:id" element={<BlogPreview />} />
           {/* Add redirect for old /blog/:id URLs */}
           <Route path="blog/:id" element={<BlogRedirect />} />
           <Route path="events" element={<Events />} />
