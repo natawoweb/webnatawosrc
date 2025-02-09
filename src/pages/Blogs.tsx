@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BlogsList } from "@/components/blogs/BlogsList";
-import { BlogSearch } from "@/components/home/BlogSearch";
+import { BlogSearch } from "@/components/blogs/BlogSearch";
 import { LoadingState } from "@/components/blogs/LoadingState";
 import { NoResults } from "@/components/blogs/NoResults";
 import { startOfDay, endOfDay } from "date-fns";
