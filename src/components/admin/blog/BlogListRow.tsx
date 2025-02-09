@@ -55,7 +55,7 @@ export function BlogListRow({
   };
 
   const renderActionButtons = () => {
-    const canDeleteBlog = canDelete || isAdmin || isManager;
+    const showDeleteButton = isAdmin || isManager || canDelete;
 
     return (
       <div className="flex gap-2">
@@ -75,7 +75,7 @@ export function BlogListRow({
         >
           <Pencil className="h-4 w-4" />
         </Button>
-        {canDeleteBlog && (
+        {showDeleteButton && (
           <Button
             variant="ghost"
             size="icon"
