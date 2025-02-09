@@ -27,6 +27,7 @@ interface BlogDialogContentProps {
 }
 
 export function BlogDialogContent({
+  blog,
   title,
   content,
   titleTamil,
