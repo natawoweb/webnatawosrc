@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Trash2, Edit, Eye, CheckSquare, XSquare, Upload } from "lucide-react";
+import { Trash2, Edit, Eye, CheckSquare, XSquare } from "lucide-react";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
