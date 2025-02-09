@@ -1,4 +1,5 @@
 
+import React, { memo, useMemo } from 'react';
 import { RichTextEditor } from "./RichTextEditor";
 import { ContentInput } from "./editor/ContentInput";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ interface BlogContentSectionProps {
   hasContent?: boolean;
 }
 
-export function BlogContentSection({
+const BlogContentSection = memo(({
   language,
   title,
   content,
@@ -29,18 +30,12 @@ export function BlogContentSection({
   onContentChange,
   onTranslate,
   hasContent,
-}: BlogContentSectionProps) {
+}: BlogContentSectionProps) => {
   const isEnglish = language === "english";
-  const shouldEnableTranslate = isEnglish && onTranslate && hasContent;
-
-  console.log('BlogContentSection:', {
-    language,
-    isEnglish,
-    hasContent,
-    shouldEnableTranslate,
-    title: title.trim(),
-    contentLength: content.length
-  });
+  const shouldEnableTranslate = useMemo(() => 
+    isEnglish && onTranslate && hasContent, 
+    [isEnglish, onTranslate, hasContent]
+  );
 
   return (
     <Card className="h-[calc(100vh-12rem)] flex flex-col">
@@ -90,4 +85,8 @@ export function BlogContentSection({
       </CardContent>
     </Card>
   );
-}
+});
+
+BlogContentSection.displayName = 'BlogContentSection';
+
+export { BlogContentSection };
