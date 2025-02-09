@@ -38,6 +38,20 @@ export function BlogListRow({
 
   console.log('BlogListRow - Props:', { isAdmin, canDelete, blog });
 
+  const handleApprove = () => {
+    if (onApprove) {
+      onApprove();
+      setIsPreviewOpen(false);
+    }
+  };
+
+  const handleReject = () => {
+    if (onReject) {
+      onReject();
+      setIsPreviewOpen(false);
+    }
+  };
+
   const renderActionButtons = () => {
     const showDeleteButton = isAdmin;
     console.log('Show delete button:', { isAdmin, showDeleteButton });
@@ -77,7 +91,7 @@ export function BlogListRow({
               variant="ghost"
               size="icon"
               className="text-green-500 hover:text-green-700"
-              onClick={onApprove}
+              onClick={handleApprove}
               title="Approve Blog"
             >
               <CheckCircle className="h-4 w-4" />
@@ -86,7 +100,7 @@ export function BlogListRow({
               variant="ghost"
               size="icon"
               className="text-red-500 hover:text-red-700"
-              onClick={onReject}
+              onClick={handleReject}
               title="Reject Blog"
             >
               <XCircle className="h-4 w-4" />
@@ -125,8 +139,8 @@ export function BlogListRow({
         blog={blog}
         open={isPreviewOpen}
         onOpenChange={setIsPreviewOpen}
-        onApprove={onApprove}
-        onReject={onReject}
+        onApprove={handleApprove}
+        onReject={handleReject}
       />
     </>
   );
