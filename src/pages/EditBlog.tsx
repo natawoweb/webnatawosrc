@@ -6,12 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { BlogDialogContent } from "@/components/admin/blog/BlogDialogContent";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useBlogManagement } from "@/hooks/useBlogManagement";
+import { useToast } from "@/hooks/use-toast";
 
 export default function EditBlog() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
   const { updateBlog, isUpdating } = useBlogManagement();
+  const { toast } = useToast();
 
   // State for form data
   const [title, setTitle] = useState("");
@@ -50,9 +52,29 @@ export default function EditBlog() {
   useEffect(() => {
     if (blog) {
       setTitle(blog.title || "");
-      setContent(blog.content ? JSON.stringify(blog.content) : "");
+      // Handle content based on whether it's already JSON or needs to be parsed
+      try {
+        const parsedContent = typeof blog.content === 'string' 
+          ? JSON.parse(blog.content)
+          : blog.content;
+        setContent(JSON.stringify(parsedContent));
+      } catch (error) {
+        console.error('Error parsing content:', error);
+        setContent(blog.content || "");
+      }
+
       setTitleTamil(blog.title_tamil || "");
-      setContentTamil(blog.content_tamil ? JSON.stringify(blog.content_tamil) : "");
+      // Handle Tamil content similarly
+      try {
+        const parsedTamilContent = typeof blog.content_tamil === 'string'
+          ? JSON.parse(blog.content_tamil)
+          : blog.content_tamil;
+        setContentTamil(parsedTamilContent ? JSON.stringify(parsedTamilContent) : "");
+      } catch (error) {
+        console.error('Error parsing Tamil content:', error);
+        setContentTamil(blog.content_tamil ? JSON.stringify(blog.content_tamil) : "");
+      }
+      
       setSelectedCategory(blog.category_id || "");
     }
   }, [blog]);
@@ -64,7 +86,9 @@ export default function EditBlog() {
   }, [isOpen, navigate]);
 
   const handleSaveDraft = () => {
-    if (id) {
+    if (!id) return;
+    
+    try {
       updateBlog({
         blogId: id,
         blogData: {
@@ -76,11 +100,20 @@ export default function EditBlog() {
           status: "draft"
         }
       });
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save draft. Please try again.",
+      });
     }
   };
 
   const handleSubmit = () => {
-    if (id) {
+    if (!id) return;
+
+    try {
       updateBlog({
         blogId: id,
         blogData: {
@@ -91,6 +124,13 @@ export default function EditBlog() {
           category_id: selectedCategory,
           status: "pending_approval"
         }
+      });
+    } catch (error) {
+      console.error('Error submitting blog:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to submit blog. Please try again.",
       });
     }
   };

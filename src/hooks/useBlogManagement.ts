@@ -26,19 +26,25 @@ export function useBlogManagement() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Parse content
+      // Parse content if it's a string
       let parsedContent;
       try {
-        parsedContent = JSON.parse(blogData.content);
+        parsedContent = typeof blogData.content === 'string' 
+          ? JSON.parse(blogData.content)
+          : blogData.content;
       } catch (error) {
         console.error('Error parsing content:', error);
         parsedContent = blogData.content;
       }
 
-      // Parse Tamil content
+      // Parse Tamil content if it exists and is a string
       let parsedContentTamil;
       try {
-        parsedContentTamil = blogData.content_tamil ? JSON.parse(blogData.content_tamil) : null;
+        parsedContentTamil = blogData.content_tamil 
+          ? (typeof blogData.content_tamil === 'string'
+              ? JSON.parse(blogData.content_tamil)
+              : blogData.content_tamil)
+          : null;
       } catch (error) {
         console.error('Error parsing Tamil content:', error);
         parsedContentTamil = blogData.content_tamil;
@@ -57,19 +63,21 @@ export function useBlogManagement() {
           updated_at: new Date().toISOString(),
         })
         .eq("id", blogId)
-        .select("*");
+        .select();
 
       if (error) throw error;
       return data;
     },
     onSuccess: (_, { blogData: { status } }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["blog"] });
       toast({
         title: "Success",
         description: `Blog ${status === 'draft' ? 'saved as draft' : 'submitted for review'} successfully`,
       });
     },
     onError: (error) => {
+      console.error('Update error:', error);
       toast({
         variant: "destructive",
         title: "Error",
