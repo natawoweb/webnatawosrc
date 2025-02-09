@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,9 +41,12 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
 
   const createEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       const { error } = await supabase
         .from("events")
-        .insert([data]);
+        .insert([{ ...data, created_by: user.id }]);
 
       if (error) throw error;
     },
