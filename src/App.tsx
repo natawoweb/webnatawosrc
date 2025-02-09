@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -38,6 +38,8 @@ const App: React.FC = () => {
           <Route path="search" element={<SearchWriters />} />
           <Route path="blogs" element={<Blogs />} />
           <Route path="blogs/:id" element={<BlogDetail />} />
+          {/* Add redirect for old /blog/:id URLs */}
+          <Route path="blog/:id" element={<Navigate to={location => `/blogs${location.pathname.substring(5)}`} replace />} />
           <Route path="events" element={<Events />} />
           <Route path="events/:id" element={<EventDetails />} />
           <Route path="admin" element={<AdminDashboard />} />
