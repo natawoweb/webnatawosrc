@@ -1,10 +1,11 @@
 
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Trash2, Eye, CheckSquare, XSquare, Upload } from "lucide-react";
+import { Trash2, Eye, Pencil, CheckSquare, XSquare, Upload } from "lucide-react";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
+import { useNavigate } from "react-router-dom";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -31,18 +32,32 @@ export function BlogListRow({
   onReject,
   onPublish,
 }: BlogListRowProps) {
-  const renderActionButtons = () => {
-    const status = blog.status as BlogStatus;
+  const navigate = useNavigate();
+  const status = blog.status as BlogStatus;
 
+  const handleView = () => {
+    navigate(`/blog/${blog.id}`);
+  };
+
+  const renderActionButtons = () => {
     if (isAdmin) {
       return (
         <>
           <Button
             variant="ghost"
             size="icon"
-            onClick={onEdit}
+            onClick={handleView}
+            title="View Blog"
           >
             <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onEdit}
+            title="Edit Blog"
+          >
+            <Pencil className="h-4 w-4" />
           </Button>
           {status === 'pending_approval' && (
             <>
@@ -67,8 +82,9 @@ export function BlogListRow({
           {canDelete && (
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={onDelete}
+              title="Delete Blog"
             >
               <Trash2 className="h-4 w-4 text-red-500" />
             </Button>
@@ -82,7 +98,8 @@ export function BlogListRow({
         <Button
           variant="ghost"
           size="icon"
-          onClick={onEdit}
+          onClick={handleView}
+          title="View Blog"
         >
           <Eye className="h-4 w-4" />
         </Button>
@@ -99,8 +116,9 @@ export function BlogListRow({
         {canDelete && (
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={onDelete}
+            title="Delete Blog"
           >
             <Trash2 className="h-4 w-4 text-red-500" />
           </Button>
