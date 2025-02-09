@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Trash2, Eye, Pencil } from "lucide-react";
+import { Trash2, Eye, Pencil, CheckCircle, XCircle } from "lucide-react";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
@@ -79,19 +79,21 @@ export function BlogListRow({
           <>
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               className="text-green-500 hover:text-green-700"
               onClick={onApprove}
+              title="Approve Blog"
             >
-              Approve
+              <CheckCircle className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               className="text-red-500 hover:text-red-700"
               onClick={onReject}
+              title="Reject Blog"
             >
-              Reject
+              <XCircle className="h-4 w-4" />
             </Button>
           </>
         )}
@@ -123,3 +125,4 @@ export function BlogListRow({
     </TableRow>
   );
 }
+
