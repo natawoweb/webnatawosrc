@@ -24,37 +24,40 @@ export function useBlogManagement() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Ensure content is valid JSON
-      const validateAndParseContent = (content: string) => {
+      // Ensure content is in Draft.js format
+      const ensureDraftJsFormat = (content: string) => {
         try {
-          const parsed = typeof content === 'string' ? JSON.parse(content) : content;
-          // Verify it's in Draft.js format
-          if (!parsed.blocks) {
-            return {
-              blocks: [{ 
-                key: 'initial', 
-                text: JSON.stringify(parsed), 
-                type: 'unstyled',
-                depth: 0,
-                inlineStyleRanges: [],
-                entityRanges: [],
-                data: {}
-              }],
-              entityMap: {}
-            };
+          const contentObj = typeof content === 'string' ? JSON.parse(content) : content;
+          
+          // If it's already in Draft.js format
+          if (contentObj.blocks && Array.isArray(contentObj.blocks)) {
+            return contentObj;
           }
-          return parsed;
+
+          // Convert to Draft.js format
+          return {
+            blocks: [{ 
+              key: 'initial', 
+              text: typeof contentObj === 'string' ? contentObj : JSON.stringify(contentObj), 
+              type: 'unstyled',
+              depth: 0,
+              inlineStyleRanges: [],
+              entityRanges: [],
+              data: {}
+            }],
+            entityMap: {}
+          };
         } catch (error) {
-          console.error('Error parsing content:', error);
+          console.error('Error processing content:', error);
           return null;
         }
       };
 
-      const parsedContent = validateAndParseContent(blogData.content);
+      const parsedContent = ensureDraftJsFormat(blogData.content);
       if (!parsedContent) throw new Error("Invalid content format");
 
       const parsedContentTamil = blogData.content_tamil 
-        ? validateAndParseContent(blogData.content_tamil)
+        ? ensureDraftJsFormat(blogData.content_tamil)
         : null;
 
       const { data, error } = await supabase

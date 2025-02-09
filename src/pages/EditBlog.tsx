@@ -48,12 +48,10 @@ export default function EditBlog() {
     },
   });
 
-  // Initialize form data when blog data is loaded
-  useEffect(() => {
-    if (!blog) return;
-
-    const initializeContent = (rawContent: any) => {
-      if (!rawContent) return JSON.stringify({
+  // Function to ensure content is in Draft.js format
+  const ensureDraftJsFormat = (rawContent: any) => {
+    if (!rawContent) {
+      return JSON.stringify({
         blocks: [{ 
           key: 'initial', 
           text: '', 
@@ -65,67 +63,57 @@ export default function EditBlog() {
         }],
         entityMap: {}
       });
+    }
 
-      try {
-        // If it's already a string, try to parse it to validate
-        if (typeof rawContent === 'string') {
-          const parsed = JSON.parse(rawContent);
-          // If it's not in Draft.js format, convert it
-          if (!parsed.blocks) {
-            return JSON.stringify({
-              blocks: [{ 
-                key: 'initial', 
-                text: parsed, 
-                type: 'unstyled',
-                depth: 0,
-                inlineStyleRanges: [],
-                entityRanges: [],
-                data: {}
-              }],
-              entityMap: {}
-            });
-          }
-          return JSON.stringify(parsed);
-        }
-        
-        // If it's an object, ensure it's in Draft.js format
-        if (!rawContent.blocks) {
-          return JSON.stringify({
-            blocks: [{ 
-              key: 'initial', 
-              text: JSON.stringify(rawContent), 
-              type: 'unstyled',
-              depth: 0,
-              inlineStyleRanges: [],
-              entityRanges: [],
-              data: {}
-            }],
-            entityMap: {}
-          });
-        }
-        
-        return JSON.stringify(rawContent);
-      } catch (error) {
-        console.error('Error parsing content:', error);
-        return JSON.stringify({
-          blocks: [{ 
-            key: 'initial', 
-            text: '', 
-            type: 'unstyled',
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {}
-          }],
-          entityMap: {}
-        });
+    try {
+      // If it's a string, try to parse it
+      const contentObj = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
+
+      // If it's already in Draft.js format
+      if (contentObj.blocks && Array.isArray(contentObj.blocks)) {
+        return JSON.stringify(contentObj);
       }
-    };
 
+      // If it's plain text or another format, convert to Draft.js format
+      return JSON.stringify({
+        blocks: [{ 
+          key: 'initial', 
+          text: typeof contentObj === 'string' ? contentObj : JSON.stringify(contentObj), 
+          type: 'unstyled',
+          depth: 0,
+          inlineStyleRanges: [],
+          entityRanges: [],
+          data: {}
+        }],
+        entityMap: {}
+      });
+    } catch (error) {
+      console.error('Error processing content:', error);
+      return JSON.stringify({
+        blocks: [{ 
+          key: 'initial', 
+          text: '', 
+          type: 'unstyled',
+          depth: 0,
+          inlineStyleRanges: [],
+          entityRanges: [],
+          data: {}
+        }],
+        entityMap: {}
+      });
+    }
+  };
+
+  // Initialize form data when blog data is loaded
+  useEffect(() => {
+    if (!blog) return;
+
+    console.log('Initializing blog data:', blog);
+    
     setTitle(blog.title || "");
-    setContent(initializeContent(blog.content));
+    setContent(ensureDraftJsFormat(blog.content));
     setTitleTamil(blog.title_tamil || "");
-    setContentTamil(initializeContent(blog.content_tamil));
+    setContentTamil(ensureDraftJsFormat(blog.content_tamil));
     setSelectedCategory(blog.category_id || "");
   }, [blog]);
 
