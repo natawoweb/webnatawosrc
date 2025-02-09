@@ -31,12 +31,15 @@ export function useEditBlogForm(blogId: string | undefined) {
     }
 
     try {
+      // First try to parse the content if it's a string
       const contentObj = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
 
+      // If it's already in Draft.js format, return it stringified
       if (contentObj.blocks && Array.isArray(contentObj.blocks)) {
         return JSON.stringify(contentObj);
       }
 
+      // If it's not in Draft.js format, create a new Draft.js content structure
       return JSON.stringify({
         blocks: [{ 
           key: 'initial', 
