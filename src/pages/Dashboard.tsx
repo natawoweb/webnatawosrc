@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, BookPlus, Eye, Pencil, Trash2, Upload } from "lucide-react";
+import { Loader2, BookPlus, Eye, Pencil, Trash2, RocketLaunch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -13,6 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { BlogStatusBadge } from "@/components/admin/blog/BlogStatusBadge";
 import { useSession } from "@/hooks/useSession";
 import { useToast } from "@/hooks/use-toast";
@@ -173,42 +179,71 @@ export default function Dashboard() {
                 <TableCell>{blog.blog_comments?.[0]?.count || 0}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => navigate(`/blogs/${blog.id}`)}
-                      title="View Blog"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => navigate(`/edit/${blog.id}`)}
-                      title="Edit Blog"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(blog.id)}
-                      title="Delete Blog"
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    {blog.status === 'approved' && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-blue-500 hover:text-blue-700"
-                        onClick={() => handlePublish(blog.id)}
-                        title="Publish Blog"
-                      >
-                        <Upload className="h-4 w-4" />
-                      </Button>
-                    )}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate(`/blogs/${blog.id}`)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>View Blog</p>
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate(`/edit/${blog.id}`)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Edit Blog</p>
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(blog.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Delete Blog</p>
+                        </TooltipContent>
+                      </Tooltip>
+
+                      {blog.status === 'approved' && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-blue-500 hover:text-blue-700"
+                              onClick={() => handlePublish(blog.id)}
+                            >
+                              <RocketLaunch className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Publish Blog</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </TooltipProvider>
                   </div>
                 </TableCell>
               </TableRow>
