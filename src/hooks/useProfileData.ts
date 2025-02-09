@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/integrations/supabase/types/models";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +9,8 @@ export const useProfileData = (mounted: boolean) => {
   const { toast } = useToast();
 
   const fetchProfile = async (session: any) => {
+    if (!mounted) return null;
+    
     try {
       let { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
@@ -42,6 +44,7 @@ export const useProfileData = (mounted: boolean) => {
         setProfile(existingProfile as Profile);
         return existingProfile as Profile;
       }
+      return null;
     } catch (error: any) {
       console.error('Error in fetchProfile:', error);
       if (mounted) {

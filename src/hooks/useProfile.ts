@@ -10,11 +10,11 @@ import { useToast } from "@/hooks/use-toast";
 
 export const useProfile = () => {
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   
-  let mounted = true;
   const { profile, setProfile, fetchProfile } = useProfileData(mounted);
   const {
     isEditing,
@@ -31,20 +31,18 @@ export const useProfile = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
+        if (!mounted) return;
+
         // If there's no session and we're on a public route, just set loading to false
         if (!session && isPublicRoute(location.pathname)) {
-          if (mounted) {
-            setLoading(false);
-          }
+          setLoading(false);
           return;
         }
 
         // Only redirect to auth if not on a public route and user needs to be authenticated
         if (!session && !isPublicRoute(location.pathname)) {
-          if (mounted) {
-            setLoading(false);
-            navigate('/auth');
-          }
+          setLoading(false);
+          navigate('/auth');
           return;
         }
 
@@ -52,9 +50,7 @@ export const useProfile = () => {
           await fetchProfile(session);
         }
 
-        if (mounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       } catch (error: any) {
         console.error('Error in getProfile:', error);
         if (mounted) {
@@ -72,19 +68,21 @@ export const useProfile = () => {
 
     // Set up auth state listener for profile changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      
       if (session) {
         getProfile();
-      } else if (mounted) {
+      } else {
         setProfile(null);
         setLoading(false);
       }
     });
 
     return () => {
-      mounted = false;
+      setMounted(false);
       subscription.unsubscribe();
     };
-  }, [navigate, toast, location.pathname]);
+  }, [navigate, toast, location.pathname, fetchProfile, mounted]);
 
   return {
     loading,
