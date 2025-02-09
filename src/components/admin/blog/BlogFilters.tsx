@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -6,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { BlogStatus } from "@/integrations/supabase/types/content";
 
 interface BlogFiltersProps {
   searchQuery: string;
@@ -20,6 +22,14 @@ export function BlogFilters({
   statusFilter,
   onStatusFilterChange,
 }: BlogFiltersProps) {
+  const blogStatuses: BlogStatus[] = [
+    "draft",
+    "pending_approval",
+    "approved",
+    "rejected",
+    "published"
+  ];
+
   return (
     <div className="flex gap-4 items-center">
       <div className="flex-1">
@@ -36,10 +46,13 @@ export function BlogFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Status</SelectItem>
-          <SelectItem value="draft">Draft</SelectItem>
-          <SelectItem value="submitted">Submitted</SelectItem>
-          <SelectItem value="approved">Approved</SelectItem>
-          <SelectItem value="rejected">Rejected</SelectItem>
+          {blogStatuses.map((status) => (
+            <SelectItem key={status} value={status}>
+              {status.split('_').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+              ).join(' ')}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
