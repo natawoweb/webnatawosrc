@@ -48,23 +48,77 @@ export default function EditBlog() {
     },
   });
 
-  // Initialize form data when blog data is loaded - using useEffect with proper dependency array
+  // Initialize form data when blog data is loaded
   useEffect(() => {
     if (!blog) return;
 
     const initializeContent = (rawContent: any) => {
-      if (!rawContent) return "";
+      if (!rawContent) return JSON.stringify({
+        blocks: [{ 
+          key: 'initial', 
+          text: '', 
+          type: 'unstyled',
+          depth: 0,
+          inlineStyleRanges: [],
+          entityRanges: [],
+          data: {}
+        }],
+        entityMap: {}
+      });
+
       try {
+        // If it's already a string, try to parse it to validate
         if (typeof rawContent === 'string') {
-          // If it's already a JSON string, parse it to validate and re-stringify
           const parsed = JSON.parse(rawContent);
+          // If it's not in Draft.js format, convert it
+          if (!parsed.blocks) {
+            return JSON.stringify({
+              blocks: [{ 
+                key: 'initial', 
+                text: parsed, 
+                type: 'unstyled',
+                depth: 0,
+                inlineStyleRanges: [],
+                entityRanges: [],
+                data: {}
+              }],
+              entityMap: {}
+            });
+          }
           return JSON.stringify(parsed);
         }
-        // If it's an object, just stringify it
+        
+        // If it's an object, ensure it's in Draft.js format
+        if (!rawContent.blocks) {
+          return JSON.stringify({
+            blocks: [{ 
+              key: 'initial', 
+              text: JSON.stringify(rawContent), 
+              type: 'unstyled',
+              depth: 0,
+              inlineStyleRanges: [],
+              entityRanges: [],
+              data: {}
+            }],
+            entityMap: {}
+          });
+        }
+        
         return JSON.stringify(rawContent);
       } catch (error) {
         console.error('Error parsing content:', error);
-        return "";
+        return JSON.stringify({
+          blocks: [{ 
+            key: 'initial', 
+            text: '', 
+            type: 'unstyled',
+            depth: 0,
+            inlineStyleRanges: [],
+            entityRanges: [],
+            data: {}
+          }],
+          entityMap: {}
+        });
       }
     };
 
@@ -73,7 +127,7 @@ export default function EditBlog() {
     setTitleTamil(blog.title_tamil || "");
     setContentTamil(initializeContent(blog.content_tamil));
     setSelectedCategory(blog.category_id || "");
-  }, [blog]); // Only re-run when blog data changes
+  }, [blog]);
 
   useEffect(() => {
     if (!isOpen) {

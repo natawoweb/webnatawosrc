@@ -27,7 +27,23 @@ export function useBlogManagement() {
       // Ensure content is valid JSON
       const validateAndParseContent = (content: string) => {
         try {
-          return typeof content === 'string' ? JSON.parse(content) : content;
+          const parsed = typeof content === 'string' ? JSON.parse(content) : content;
+          // Verify it's in Draft.js format
+          if (!parsed.blocks) {
+            return {
+              blocks: [{ 
+                key: 'initial', 
+                text: JSON.stringify(parsed), 
+                type: 'unstyled',
+                depth: 0,
+                inlineStyleRanges: [],
+                entityRanges: [],
+                data: {}
+              }],
+              entityMap: {}
+            };
+          }
+          return parsed;
         } catch (error) {
           console.error('Error parsing content:', error);
           return null;
