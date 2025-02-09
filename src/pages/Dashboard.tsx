@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, BookPlus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Loader2, BookPlus, Eye, Pencil, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -96,6 +96,31 @@ export default function Dashboard() {
     }
   };
 
+  const handlePublish = async (blogId: string) => {
+    try {
+      const { error } = await supabase
+        .from("blogs")
+        .update({ 
+          status: 'published',
+          published_at: new Date().toISOString()
+        })
+        .eq("id", blogId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Blog published successfully",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
   const filteredBlogs = blogs?.filter((blog) =>
     blog.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -173,6 +198,17 @@ export default function Dashboard() {
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
+                    {blog.status === 'approved' && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-blue-500 hover:text-blue-700"
+                        onClick={() => handlePublish(blog.id)}
+                        title="Publish Blog"
+                      >
+                        <Upload className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

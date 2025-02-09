@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Trash2, Eye, Pencil, CheckCircle, XCircle, Upload } from "lucide-react";
+import { Trash2, Eye, Pencil, CheckCircle, XCircle } from "lucide-react";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
@@ -18,7 +18,6 @@ interface BlogListRowProps {
   onEdit: () => void;
   onApprove?: () => void;
   onReject?: () => void;
-  onPublish?: () => void;
 }
 
 export function BlogListRow({
@@ -30,7 +29,6 @@ export function BlogListRow({
   onEdit,
   onApprove,
   onReject,
-  onPublish,
 }: BlogListRowProps) {
   const navigate = useNavigate();
   const status = blog.status as BlogStatus;
@@ -91,17 +89,6 @@ export function BlogListRow({
               <XCircle className="h-4 w-4" />
             </Button>
           </>
-        )}
-        {status === 'approved' && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-blue-500 hover:text-blue-700"
-            onClick={onPublish}
-            title="Publish Blog"
-          >
-            <Upload className="h-4 w-4" />
-          </Button>
         )}
       </div>
     );
