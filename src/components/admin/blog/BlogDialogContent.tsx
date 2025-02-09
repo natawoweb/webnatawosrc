@@ -47,7 +47,7 @@ export function BlogDialogContent({
 
   const hasContent = () => {
     try {
-      if (!title) return false;
+      if (!title.trim()) return false;
       const contentObj = JSON.parse(content || '{}');
       // Handle both new Draft.js and old content formats
       if (contentObj.blocks) {

@@ -4,15 +4,21 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { BlogDialogContent } from "@/components/admin/blog/BlogDialogContent";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useBlogManagement } from "@/hooks/useBlogManagement";
 
 export default function EditBlog() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
+  const { updateBlog, isUpdating } = useBlogManagement();
+
+  // State for form data
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [titleTamil, setTitleTamil] = useState("");
+  const [contentTamil, setContentTamil] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const { data: blog, isLoading } = useQuery({
     queryKey: ["blog", id],
@@ -40,11 +46,54 @@ export default function EditBlog() {
     },
   });
 
+  // Initialize form data when blog data is loaded
+  useEffect(() => {
+    if (blog) {
+      setTitle(blog.title || "");
+      setContent(blog.content ? JSON.stringify(blog.content) : "");
+      setTitleTamil(blog.title_tamil || "");
+      setContentTamil(blog.content_tamil ? JSON.stringify(blog.content_tamil) : "");
+      setSelectedCategory(blog.category_id || "");
+    }
+  }, [blog]);
+
   useEffect(() => {
     if (!isOpen) {
       navigate("/dashboard");
     }
   }, [isOpen, navigate]);
+
+  const handleSaveDraft = () => {
+    if (id) {
+      updateBlog({
+        blogId: id,
+        blogData: {
+          title,
+          content,
+          title_tamil: titleTamil,
+          content_tamil: contentTamil,
+          category_id: selectedCategory,
+          status: "draft"
+        }
+      });
+    }
+  };
+
+  const handleSubmit = () => {
+    if (id) {
+      updateBlog({
+        blogId: id,
+        blogData: {
+          title,
+          content,
+          title_tamil: titleTamil,
+          content_tamil: contentTamil,
+          category_id: selectedCategory,
+          status: "pending_approval"
+        }
+      });
+    }
+  };
 
   if (!blog || isLoading) return null;
 
@@ -58,20 +107,20 @@ export default function EditBlog() {
         <div className="h-full overflow-y-auto">
           <BlogDialogContent
             blog={blog}
-            title={blog.title || ""}
-            content={blog.content ? JSON.stringify(blog.content) : ""}
-            titleTamil={blog.title_tamil || ""}
-            contentTamil={blog.content_tamil ? JSON.stringify(blog.content_tamil) : ""}
-            selectedCategory={blog.category_id || ""}
+            title={title}
+            content={content}
+            titleTamil={titleTamil}
+            contentTamil={contentTamil}
+            selectedCategory={selectedCategory}
             categories={categories || []}
-            onTitleChange={(value) => console.log("Title changed:", value)}
-            onContentChange={(value) => console.log("Content changed:", value)}
-            onTitleTamilChange={(value) => console.log("Tamil title changed:", value)}
-            onContentTamilChange={(value) => console.log("Tamil content changed:", value)}
-            onCategoryChange={(value) => console.log("Category changed:", value)}
-            onSaveDraft={() => console.log("Save as draft")}
-            onSubmit={() => console.log("Submit for review")}
-            isLoading={false}
+            onTitleChange={setTitle}
+            onContentChange={setContent}
+            onTitleTamilChange={setTitleTamil}
+            onContentTamilChange={setContentTamil}
+            onCategoryChange={setSelectedCategory}
+            onSaveDraft={handleSaveDraft}
+            onSubmit={handleSubmit}
+            isLoading={isUpdating}
           />
         </div>
       </DialogContent>
