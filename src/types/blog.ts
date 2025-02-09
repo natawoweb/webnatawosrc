@@ -10,7 +10,7 @@ export interface Blog {
   views_count: number | null;
   published_at: string | null;
   blog_comments?: Array<{ count: number }>;
-  blog_categories?: Array<{ name: string }>;
+  blog_categories?: { name: string };
   cover_image?: string | null;
   category_id?: string | null;
 }
