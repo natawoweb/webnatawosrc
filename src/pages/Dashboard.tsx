@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, BookPlus } from "lucide-react";
+import { Loader2, BookPlus, Eye, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -150,25 +150,28 @@ export default function Dashboard() {
                   <div className="flex gap-2">
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
                       onClick={() => navigate(`/blogs/${blog.id}`)}
+                      title="View Blog"
                     >
-                      View
+                      <Eye className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
                       onClick={() => navigate(`/edit/${blog.id}`)}
+                      title="Edit Blog"
                     >
-                      Edit
+                      <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="text-red-500 hover:text-red-700"
+                      size="icon"
                       onClick={() => handleDelete(blog.id)}
+                      title="Delete Blog"
+                      className="text-red-500 hover:text-red-700"
                     >
-                      Delete
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>
