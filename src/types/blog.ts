@@ -11,4 +11,6 @@ export interface Blog {
   published_at: string | null;
   blog_comments?: Array<{ count: number }>;
   blog_categories?: Array<{ name: string }>;
+  cover_image?: string | null;
+  category_id?: string | null;
 }
