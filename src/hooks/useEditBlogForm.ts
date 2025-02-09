@@ -32,7 +32,16 @@ export function useEditBlogForm(blogId: string | undefined) {
 
     try {
       // If content is a string, try to parse it
-      const contentObj = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
+      let contentObj;
+      try {
+        contentObj = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
+        // Handle double-stringified content
+        if (typeof contentObj === 'string') {
+          contentObj = JSON.parse(contentObj);
+        }
+      } catch (e) {
+        contentObj = rawContent;
+      }
       
       // Check if it's already in Draft.js format
       if (contentObj.blocks && Array.isArray(contentObj.blocks)) {
