@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, BookPlus, Eye, Pencil, Trash2, RocketLaunch } from "lucide-react";
+import { Loader2, BookPlus, Eye, Pencil, Trash2, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -30,7 +29,6 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
-  // Setup real-time subscription for blogs
   useEffect(() => {
     const channel = supabase
       .channel('schema-db-changes')
@@ -42,7 +40,6 @@ export default function Dashboard() {
           table: 'blogs'
         },
         () => {
-          // Invalidate and refetch blogs when any change occurs
           queryClient.invalidateQueries({ queryKey: ["writer-blogs", session?.user?.id] });
         }
       )
@@ -235,7 +232,7 @@ export default function Dashboard() {
                               className="text-blue-500 hover:text-blue-700"
                               onClick={() => handlePublish(blog.id)}
                             >
-                              <RocketLaunch className="h-4 w-4" />
+                              <Rocket className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
