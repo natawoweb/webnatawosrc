@@ -6,6 +6,8 @@ import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -35,11 +37,25 @@ export function BlogListRow({
   const navigate = useNavigate();
   const status = blog.status as BlogStatus;
 
+  // Query to check if user has manager role
+  const { data: isManager } = useQuery({
+    queryKey: ["isManager", blog.id],
+    queryFn: async () => {
+      const { data } = await supabase.rpc('has_role', {
+        user_id: supabase.auth.getUser().then(({ data }) => data.user?.id),
+        required_role: 'manager'
+      });
+      return data;
+    },
+  });
+
   const handleView = () => {
     navigate(`/blog/${blog.id}`);
   };
 
   const renderActionButtons = () => {
+    const canDeleteBlog = canDelete || isAdmin || isManager;
+
     return (
       <div className="flex gap-2">
         <Button
@@ -58,7 +74,7 @@ export function BlogListRow({
         >
           <Pencil className="h-4 w-4" />
         </Button>
-        {canDelete && (
+        {canDeleteBlog && (
           <Button
             variant="ghost"
             size="icon"
