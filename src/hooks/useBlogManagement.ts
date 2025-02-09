@@ -21,34 +21,25 @@ export function useBlogManagement() {
 
   const updateBlogMutation = useMutation({
     mutationFn: async ({ blogId, blogData }: { blogId: string; blogData: BlogUpdateData }) => {
-      console.log("Updating blog with status:", blogData.status);
-      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Parse content if it's a string
-      let parsedContent;
-      try {
-        parsedContent = typeof blogData.content === 'string' 
-          ? JSON.parse(blogData.content)
-          : blogData.content;
-      } catch (error) {
-        console.error('Error parsing content:', error);
-        parsedContent = blogData.content;
-      }
+      // Ensure content is valid JSON
+      const validateAndParseContent = (content: string) => {
+        try {
+          return typeof content === 'string' ? JSON.parse(content) : content;
+        } catch (error) {
+          console.error('Error parsing content:', error);
+          return null;
+        }
+      };
 
-      // Parse Tamil content if it exists and is a string
-      let parsedContentTamil;
-      try {
-        parsedContentTamil = blogData.content_tamil 
-          ? (typeof blogData.content_tamil === 'string'
-              ? JSON.parse(blogData.content_tamil)
-              : blogData.content_tamil)
-          : null;
-      } catch (error) {
-        console.error('Error parsing Tamil content:', error);
-        parsedContentTamil = blogData.content_tamil;
-      }
+      const parsedContent = validateAndParseContent(blogData.content);
+      if (!parsedContent) throw new Error("Invalid content format");
+
+      const parsedContentTamil = blogData.content_tamil 
+        ? validateAndParseContent(blogData.content_tamil)
+        : null;
 
       const { data, error } = await supabase
         .from("blogs")
@@ -63,14 +54,16 @@ export function useBlogManagement() {
           updated_at: new Date().toISOString(),
         })
         .eq("id", blogId)
-        .select();
+        .select()
+        .single();
 
       if (error) throw error;
       return data;
     },
     onSuccess: (_, { blogData: { status } }) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
       queryClient.invalidateQueries({ queryKey: ["blog"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
+      
       toast({
         title: "Success",
         description: `Blog ${status === 'draft' ? 'saved as draft' : 'submitted for review'} successfully`,

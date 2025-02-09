@@ -48,36 +48,32 @@ export default function EditBlog() {
     },
   });
 
-  // Initialize form data when blog data is loaded
+  // Initialize form data when blog data is loaded - using useEffect with proper dependency array
   useEffect(() => {
-    if (blog) {
-      setTitle(blog.title || "");
-      // Handle content based on whether it's already JSON or needs to be parsed
+    if (!blog) return;
+
+    const initializeContent = (rawContent: any) => {
+      if (!rawContent) return "";
       try {
-        const parsedContent = typeof blog.content === 'string' 
-          ? JSON.parse(blog.content)
-          : blog.content;
-        setContent(JSON.stringify(parsedContent));
+        if (typeof rawContent === 'string') {
+          // If it's already a JSON string, parse it to validate and re-stringify
+          const parsed = JSON.parse(rawContent);
+          return JSON.stringify(parsed);
+        }
+        // If it's an object, just stringify it
+        return JSON.stringify(rawContent);
       } catch (error) {
         console.error('Error parsing content:', error);
-        setContent(blog.content || "");
+        return "";
       }
+    };
 
-      setTitleTamil(blog.title_tamil || "");
-      // Handle Tamil content similarly
-      try {
-        const parsedTamilContent = typeof blog.content_tamil === 'string'
-          ? JSON.parse(blog.content_tamil)
-          : blog.content_tamil;
-        setContentTamil(parsedTamilContent ? JSON.stringify(parsedTamilContent) : "");
-      } catch (error) {
-        console.error('Error parsing Tamil content:', error);
-        setContentTamil(blog.content_tamil ? JSON.stringify(blog.content_tamil) : "");
-      }
-      
-      setSelectedCategory(blog.category_id || "");
-    }
-  }, [blog]);
+    setTitle(blog.title || "");
+    setContent(initializeContent(blog.content));
+    setTitleTamil(blog.title_tamil || "");
+    setContentTamil(initializeContent(blog.content_tamil));
+    setSelectedCategory(blog.category_id || "");
+  }, [blog]); // Only re-run when blog data changes
 
   useEffect(() => {
     if (!isOpen) {
@@ -88,51 +84,33 @@ export default function EditBlog() {
   const handleSaveDraft = () => {
     if (!id) return;
     
-    try {
-      updateBlog({
-        blogId: id,
-        blogData: {
-          title,
-          content,
-          title_tamil: titleTamil,
-          content_tamil: contentTamil,
-          category_id: selectedCategory,
-          status: "draft"
-        }
-      });
-    } catch (error) {
-      console.error('Error saving draft:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to save draft. Please try again.",
-      });
-    }
+    updateBlog({
+      blogId: id,
+      blogData: {
+        title,
+        content,
+        title_tamil: titleTamil,
+        content_tamil: contentTamil,
+        category_id: selectedCategory,
+        status: "draft"
+      }
+    });
   };
 
   const handleSubmit = () => {
     if (!id) return;
 
-    try {
-      updateBlog({
-        blogId: id,
-        blogData: {
-          title,
-          content,
-          title_tamil: titleTamil,
-          content_tamil: contentTamil,
-          category_id: selectedCategory,
-          status: "pending_approval"
-        }
-      });
-    } catch (error) {
-      console.error('Error submitting blog:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to submit blog. Please try again.",
-      });
-    }
+    updateBlog({
+      blogId: id,
+      blogData: {
+        title,
+        content,
+        title_tamil: titleTamil,
+        content_tamil: contentTamil,
+        category_id: selectedCategory,
+        status: "pending_approval"
+      }
+    });
   };
 
   if (!blog || isLoading) return null;
