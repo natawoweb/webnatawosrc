@@ -1,3 +1,4 @@
+
 import { EventFormHeader } from "./form/EventFormHeader";
 import { EventDateTime } from "./form/EventDateTime";
 import { EventLocation } from "./form/EventLocation";
@@ -5,6 +6,7 @@ import { EventGallery } from "./form/EventGallery";
 import { EventCategories } from "./form/EventCategories";
 import { useEventForm, EventFormData } from "./hooks/useEventForm";
 import { uploadImages } from "./hooks/useImageUpload";
+import { Button } from "@/components/ui/button";
 
 interface EventFormProps {
   initialData?: Partial<EventFormData>;
@@ -23,10 +25,16 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.title || !formData.description || !formData.date || !formData.time || !formData.location) {
+      console.error("Missing required fields");
+      return;
+    }
 
     try {
       const uploadedUrls = await uploadImages(selectedImages);
-      const galleryUrls = [...formData.gallery, ...uploadedUrls];
+      const galleryUrls = [...(formData.gallery || []), ...uploadedUrls];
 
       const eventData = {
         ...formData,
@@ -85,13 +93,12 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
       />
 
       <div className="flex justify-end">
-        <button
+        <Button
           type="submit"
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
           disabled={createEventMutation.isPending || updateEventMutation.isPending}
         >
           {formData.id ? "Update Event" : "Create Event"}
-        </button>
+        </Button>
       </div>
     </form>
   );
