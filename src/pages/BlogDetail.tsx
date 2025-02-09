@@ -39,10 +39,10 @@ const BlogDetail = () => {
     },
   });
 
-  const { data: userRoles } = useUserRoles(session?.user.id);
+  const { data: userRoles } = useUserRoles(session?.user?.id);
   const { data: blog, isLoading, error } = useBlogDetail(id);
   const comments = useBlogComments(id!, session);
-  const { data: userCurrentRating } = useBlogRating(id!, session?.user.id);
+  const { data: userCurrentRating } = useBlogRating(id!, session?.user?.id);
 
   const isAdminOrManager = userRoles?.some(
     (role) => role.role === "admin" || role.role === "manager"
