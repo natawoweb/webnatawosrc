@@ -31,19 +31,19 @@ export function useEditBlogForm(blogId: string | undefined) {
     }
 
     try {
-      // First try to parse the content if it's a string
+      // If content is a string, try to parse it
       const contentObj = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
-
-      // If it's already in Draft.js format, return it stringified
+      
+      // Check if it's already in Draft.js format
       if (contentObj.blocks && Array.isArray(contentObj.blocks)) {
-        return JSON.stringify(contentObj);
+        return typeof contentObj === 'string' ? contentObj : JSON.stringify(contentObj);
       }
 
-      // If it's not in Draft.js format, create a new Draft.js content structure
+      // If it's plain text or another format, convert to Draft.js format
       return JSON.stringify({
         blocks: [{ 
           key: 'initial', 
-          text: typeof contentObj === 'string' ? contentObj : JSON.stringify(contentObj), 
+          text: typeof contentObj === 'string' ? contentObj : String(contentObj), 
           type: 'unstyled',
           depth: 0,
           inlineStyleRanges: [],
@@ -54,6 +54,7 @@ export function useEditBlogForm(blogId: string | undefined) {
       });
     } catch (error) {
       console.error('Error processing content:', error);
+      // Return empty Draft.js content if there's an error
       return JSON.stringify({
         blocks: [{ 
           key: 'initial', 
