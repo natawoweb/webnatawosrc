@@ -1,4 +1,3 @@
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -30,6 +29,8 @@ export function BlogList({ blogs }: BlogListProps) {
   const queryClient = useQueryClient();
   const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
   const { session } = useSession();
+  const [blogToEdit, setBlogToEdit] = useState<Blog | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Add query to fetch author names
   const { data: profiles } = useQuery({
@@ -152,7 +153,16 @@ export function BlogList({ blogs }: BlogListProps) {
               </TableCell>
               <TableCell>{new Date(blog.updated_at || "").toLocaleDateString()}</TableCell>
               <TableCell className="space-x-2">
-                <EditBlogDialog blog={blog} />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setBlogToEdit(blog);
+                    setIsEditDialogOpen(true);
+                  }}
+                >
+                  Edit
+                </Button>
                 {canDeleteBlog(blog) && (
                   <Button
                     variant="ghost"
@@ -167,6 +177,28 @@ export function BlogList({ blogs }: BlogListProps) {
           ))}
         </TableBody>
       </Table>
+
+      {blogToEdit && (
+        <EditBlogDialog
+          isOpen={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          blog={blogToEdit}
+          title={blogToEdit.title}
+          content={blogToEdit.content}
+          titleTamil={blogToEdit.title_tamil}
+          contentTamil={blogToEdit.content_tamil || ""}
+          selectedCategory={blogToEdit.category_id}
+          categories={[]} // This will be populated by the EditBlogDialog component
+          onTitleChange={() => {}}
+          onContentChange={() => {}}
+          onTitleTamilChange={() => {}}
+          onContentTamilChange={() => {}}
+          onCategoryChange={() => {}}
+          onSaveDraft={() => {}}
+          onSubmit={() => {}}
+          isLoading={false}
+        />
+      )}
 
       <DeleteBlogDialog
         open={!!blogToDelete}
