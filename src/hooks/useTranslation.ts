@@ -9,7 +9,18 @@ export function useTranslation() {
   const translateContent = async (title: string, content: string) => {
     try {
       console.log('Starting translation with:', { title, content });
-      const contentObj = JSON.parse(content);
+      let contentObj;
+      
+      try {
+        contentObj = JSON.parse(content);
+        // Handle double-stringified content
+        if (typeof contentObj === 'string') {
+          contentObj = JSON.parse(contentObj);
+        }
+      } catch (e) {
+        console.error('Error parsing content in translation:', e);
+        contentObj = { blocks: [{ text: content }] };
+      }
       
       // Extract text from Draft.js content
       const textContent = contentObj.blocks
@@ -17,7 +28,7 @@ export function useTranslation() {
         .filter((text: string) => text.trim())
         .join('\n');
 
-      console.log('Extracted text content:', textContent);
+      console.log('Extracted text content for translation:', textContent);
 
       // First translate the title
       console.log('Translating title:', title);
@@ -42,7 +53,7 @@ export function useTranslation() {
       
       console.log('Translation results:', { translatedTitle, translatedText });
 
-      // Create valid Draft.js content structure
+      // Create Draft.js content structure
       const newContent = {
         blocks: translatedText.split('\n').map((text: string, index: number) => ({
           key: `translated-${index}`,
@@ -56,7 +67,9 @@ export function useTranslation() {
         entityMap: {}
       };
 
-      console.log('Generated Draft.js content:', newContent);
+      // Ensure we're returning a properly stringified Draft.js content
+      const stringifiedContent = JSON.stringify(newContent);
+      console.log('Final translated content structure:', stringifiedContent);
 
       toast({
         title: "Translation Complete",
@@ -65,7 +78,7 @@ export function useTranslation() {
 
       return {
         translatedTitle,
-        translatedContent: JSON.stringify(newContent)
+        translatedContent: stringifiedContent
       };
     } catch (error: any) {
       console.error('Translation error:', error);
