@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Trash2, Eye, Pencil, CheckCircle, XCircle } from "lucide-react";
+import { Trash2, Eye, Pencil, CheckCircle, XCircle, Upload } from "lucide-react";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
@@ -92,14 +92,15 @@ export function BlogListRow({
             </Button>
           </>
         )}
-        {status === 'approved' && !isAdmin && (
+        {status === 'approved' && (
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             className="text-blue-500 hover:text-blue-700"
             onClick={onPublish}
+            title="Publish Blog"
           >
-            Publish
+            <Upload className="h-4 w-4" />
           </Button>
         )}
       </div>
