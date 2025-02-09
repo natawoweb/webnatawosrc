@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Trash2, Edit, Eye, CheckSquare, XSquare, Upload } from "lucide-react";
+import { Trash2, Eye, CheckSquare, XSquare, Upload } from "lucide-react";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
@@ -39,10 +39,10 @@ export function BlogListRow({
         <>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={onEdit}
           >
-            <Eye className="h-4 w-4 mr-1" /> View
+            <Eye className="h-4 w-4" />
           </Button>
           {status === 'pending_approval' && (
             <>
@@ -81,10 +81,10 @@ export function BlogListRow({
       <>
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={onEdit}
         >
-          <Edit className="h-4 w-4 mr-1" /> Edit
+          <Eye className="h-4 w-4" />
         </Button>
         {status === 'approved' && (
           <Button
