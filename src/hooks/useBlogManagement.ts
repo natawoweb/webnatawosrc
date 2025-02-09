@@ -60,13 +60,15 @@ export function useBlogManagement() {
         ? ensureDraftJsFormat(blogData.content_tamil)
         : null;
 
+      console.log('Saving blog with content:', parsedContent);
+
       const { data, error } = await supabase
         .from("blogs")
         .update({
           title: blogData.title,
-          content: parsedContent,
+          content: JSON.stringify(parsedContent),
           title_tamil: blogData.title_tamil || null,
-          content_tamil: parsedContentTamil,
+          content_tamil: parsedContentTamil ? JSON.stringify(parsedContentTamil) : null,
           category_id: blogData.category_id || null,
           status: blogData.status,
           author_id: user.id,
@@ -79,7 +81,7 @@ export function useBlogManagement() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, { blogData: { status } }) => {
+    onSuccess: (data, { blogData: { status } }) => {
       queryClient.invalidateQueries({ queryKey: ["blog"] });
       queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
       
@@ -87,6 +89,8 @@ export function useBlogManagement() {
         title: "Success",
         description: `Blog ${status === 'draft' ? 'saved as draft' : 'submitted for review'} successfully`,
       });
+
+      return data;
     },
     onError: (error) => {
       console.error('Update error:', error);
@@ -99,7 +103,7 @@ export function useBlogManagement() {
   });
 
   return {
-    updateBlog: updateBlogMutation.mutate,
+    updateBlog: updateBlogMutation.mutateAsync,
     isUpdating: updateBlogMutation.isPending,
   };
 }

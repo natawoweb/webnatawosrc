@@ -32,6 +32,7 @@ export default function EditBlog() {
         .single();
 
       if (error) throw error;
+      console.log('Retrieved blog data:', data);
       return data;
     },
   });
@@ -108,7 +109,12 @@ export default function EditBlog() {
   useEffect(() => {
     if (!blog) return;
 
-    console.log('Initializing blog data:', blog);
+    console.log('Initializing blog data:', {
+      title: blog.title,
+      content: blog.content,
+      titleTamil: blog.title_tamil,
+      contentTamil: blog.content_tamil
+    });
     
     setTitle(blog.title || "");
     setContent(ensureDraftJsFormat(blog.content));
@@ -123,39 +129,49 @@ export default function EditBlog() {
     }
   }, [isOpen, navigate]);
 
-  const handleSaveDraft = () => {
+  const handleSaveDraft = async () => {
     if (!id) return;
     
-    updateBlog({
-      blogId: id,
-      blogData: {
-        title,
-        content,
-        title_tamil: titleTamil,
-        content_tamil: contentTamil,
-        category_id: selectedCategory,
-        status: "draft"
-      }
-    });
+    try {
+      await updateBlog({
+        blogId: id,
+        blogData: {
+          title,
+          content,
+          title_tamil: titleTamil,
+          content_tamil: contentTamil,
+          category_id: selectedCategory,
+          status: "draft"
+        }
+      });
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error saving draft:', error);
+    }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!id) return;
 
-    updateBlog({
-      blogId: id,
-      blogData: {
-        title,
-        content,
-        title_tamil: titleTamil,
-        content_tamil: contentTamil,
-        category_id: selectedCategory,
-        status: "pending_approval"
-      }
-    });
+    try {
+      await updateBlog({
+        blogId: id,
+        blogData: {
+          title,
+          content,
+          title_tamil: titleTamil,
+          content_tamil: contentTamil,
+          category_id: selectedCategory,
+          status: "pending_approval"
+        }
+      });
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error submitting blog:', error);
+    }
   };
 
-  if (!blog || isLoading) return null;
+  if (isLoading) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
