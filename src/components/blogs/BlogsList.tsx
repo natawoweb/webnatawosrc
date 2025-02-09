@@ -14,6 +14,7 @@ interface Blog {
   };
   profiles?: {
     full_name: string;
+    pseudonym?: string;
   };
   author_name: string;
 }

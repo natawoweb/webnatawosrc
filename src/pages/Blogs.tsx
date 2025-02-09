@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,7 +39,8 @@ const Blogs = () => {
             name
           ),
           profiles (
-            full_name
+            full_name,
+            pseudonym
           ),
           blog_ratings (
             rating
@@ -55,7 +55,7 @@ const Blogs = () => {
             query = query.ilike('title', `%${searchTerm}%`);
             break;
           case "author":
-            query = query.ilike('profiles.full_name', `%${searchTerm}%`);
+            query = query.or(`profiles.full_name.ilike.%${searchTerm}%,profiles.pseudonym.ilike.%${searchTerm}%`);
             break;
           case "category":
             query = query.ilike('blog_categories.name', `%${searchTerm}%`);
@@ -109,7 +109,7 @@ const Blogs = () => {
       
       acc[year][month].push({
         ...blog,
-        author_name: blog.profiles?.full_name || "Anonymous"
+        author_name: blog.profiles?.pseudonym || blog.profiles?.full_name || "Anonymous"
       });
       
       return acc;
