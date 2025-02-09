@@ -41,11 +41,12 @@ export function BlogListRow({
   const { data: isManager } = useQuery({
     queryKey: ["isManager", blog.id],
     queryFn: async () => {
+      const user = await supabase.auth.getUser();
       const { data } = await supabase.rpc('has_role', {
-        user_id: supabase.auth.getUser().then(({ data }) => data.user?.id),
+        user_id: user.data.user?.id || '',
         required_role: 'manager'
       });
-      return data;
+      return !!data;
     },
   });
 
