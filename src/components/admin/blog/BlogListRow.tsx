@@ -39,6 +39,8 @@ export function BlogListRow({
     navigate(`/blog/${blog.id}`);
   };
 
+  console.log('BlogListRow - Props:', { isAdmin, canDelete, blog });
+
   const renderActionButtons = () => {
     // Show delete button only for admin users
     const showDeleteButton = isAdmin;

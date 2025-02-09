@@ -14,6 +14,8 @@ import { useBlogListManagement } from "@/hooks/useBlogListManagement";
 import { Database } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserRoles } from "@/hooks/useUserRoles";
+import { useSession } from "@/hooks/useSession";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -26,6 +28,8 @@ export function BlogList({ blogs }: BlogListProps) {
   const [blogToEdit, setBlogToEdit] = useState<Blog | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { session } = useSession();
+  const { data: userRoles } = useUserRoles(session?.user?.id);
 
   const { 
     deleteBlogMutation, 
@@ -34,7 +38,9 @@ export function BlogList({ blogs }: BlogListProps) {
     userProfile,
   } = useBlogListManagement();
 
-  const isAdmin = userProfile?.user_type === 'admin' || userProfile?.user_type === 'manager';
+  const isAdmin = userRoles?.some(role => role.role === 'admin') || false;
+  console.log('BlogList - User Roles:', userRoles);
+  console.log('BlogList - Is Admin:', isAdmin);
 
   const handleDelete = (blog: Blog) => {
     console.log("Setting blog to delete:", blog);
