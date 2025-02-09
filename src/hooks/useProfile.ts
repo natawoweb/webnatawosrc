@@ -28,10 +28,16 @@ export const useProfile = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
 
-        // Only redirect to auth if not on the home page and user needs to be authenticated
-        const needsAuth = !['/', '/auth'].includes(location.pathname);
+        // Define public routes that don't require authentication
+        const publicRoutes = ['/', '/auth', '/blogs', '/events', '/search', '/writer'];
         
-        if (!session && needsAuth) {
+        // Check if current path starts with any of the public routes
+        const isPublicRoute = publicRoutes.some(route => 
+          location.pathname === route || location.pathname.startsWith(`${route}/`)
+        );
+        
+        // Only redirect to auth if not on a public route and user needs to be authenticated
+        if (!session && !isPublicRoute) {
           if (mounted) {
             setLoading(false);
             navigate('/auth');
