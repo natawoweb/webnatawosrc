@@ -38,7 +38,7 @@ export function BlogListRow({
   const status = blog.status as BlogStatus;
 
   // Query to check if user has manager role
-  const { data: hasManagerRole } = useQuery({
+  const { data: hasManagerRole = false } = useQuery({
     queryKey: ["hasManagerRole"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -54,7 +54,7 @@ export function BlogListRow({
         return false;
       }
       
-      return !!data;
+      return data;
     },
   });
 
@@ -65,6 +65,7 @@ export function BlogListRow({
   const renderActionButtons = () => {
     // Show delete button if user is admin, manager, or has explicit delete permission
     const showDeleteButton = isAdmin || hasManagerRole || canDelete;
+    console.log('Show delete button:', { isAdmin, hasManagerRole, canDelete, showDeleteButton });
 
     return (
       <div className="flex gap-2">
