@@ -1,3 +1,4 @@
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -131,6 +132,13 @@ export function BlogList({ blogs }: BlogListProps) {
     return false;
   };
 
+  // Helper function to safely convert content_tamil to string
+  const getContentTamilString = (contentTamil: any): string => {
+    if (!contentTamil) return "";
+    if (typeof contentTamil === "string") return contentTamil;
+    return JSON.stringify(contentTamil);
+  };
+
   return (
     <>
       <Table>
@@ -185,9 +193,9 @@ export function BlogList({ blogs }: BlogListProps) {
           blog={blogToEdit}
           title={blogToEdit.title}
           content={blogToEdit.content}
-          titleTamil={blogToEdit.title_tamil}
-          contentTamil={blogToEdit.content_tamil || ""}
-          selectedCategory={blogToEdit.category_id}
+          titleTamil={blogToEdit.title_tamil || ""}
+          contentTamil={getContentTamilString(blogToEdit.content_tamil)}
+          selectedCategory={blogToEdit.category_id || ""}
           categories={[]} // This will be populated by the EditBlogDialog component
           onTitleChange={() => {}}
           onContentChange={() => {}}
