@@ -6,19 +6,25 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SearchWriters() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("name");
-  const navigate = useNavigate();
+  const [selectedWriter, setSelectedWriter] = useState<any>(null);
   const { toast } = useToast();
 
   const { data: writers, isLoading } = useQuery({
@@ -139,7 +145,7 @@ export default function SearchWriters() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => navigate(`/writer/${writer.id}`)}
+                  onClick={() => setSelectedWriter(writer)}
                 >
                   View Profile
                 </Button>
@@ -148,6 +154,96 @@ export default function SearchWriters() {
           ))
         )}
       </div>
+
+      <Dialog open={!!selectedWriter} onOpenChange={() => setSelectedWriter(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedWriter(null)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <DialogTitle className="text-2xl font-bold">
+                Writer Profile
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+
+          {selectedWriter && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-6">
+                {selectedWriter.image_url ? (
+                  <img
+                    src={selectedWriter.image_url}
+                    alt={selectedWriter.name}
+                    className="w-24 h-24 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-accent" />
+                )}
+                <div>
+                  <h2 className="text-2xl font-bold">{selectedWriter.name}</h2>
+                  <p className="text-muted-foreground">{selectedWriter.genre}</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Biography</h3>
+                <p className="text-muted-foreground whitespace-pre-wrap">
+                  {selectedWriter.bio}
+                </p>
+              </div>
+
+              {selectedWriter.published_works && selectedWriter.published_works.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Published Works</h3>
+                  <ul className="space-y-2">
+                    {selectedWriter.published_works.map((work: any, index: number) => (
+                      <li key={index} className="flex justify-between items-center">
+                        <span>{work.title}</span>
+                        <span className="text-muted-foreground">{work.year}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedWriter.accomplishments && selectedWriter.accomplishments.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Accomplishments</h3>
+                  <ul className="list-disc list-inside space-y-1">
+                    {selectedWriter.accomplishments.map((accomplishment: string, index: number) => (
+                      <li key={index}>{accomplishment}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedWriter.social_links && Object.keys(selectedWriter.social_links).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Social Links</h3>
+                  <div className="flex gap-4">
+                    {Object.entries(selectedWriter.social_links).map(([platform, url]) => (
+                      <a
+                        key={platform}
+                        href={url as string}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline capitalize"
+                      >
+                        {platform}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
