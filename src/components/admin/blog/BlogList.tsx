@@ -91,31 +91,6 @@ export function BlogList({ blogs }: BlogListProps) {
     }
   };
 
-  const handlePublish = async (blog: Blog) => {
-    try {
-      const { error } = await supabase
-        .from('blogs')
-        .update({ 
-          status: 'published',
-          published_at: new Date().toISOString()
-        })
-        .eq('id', blog.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Blog has been published",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    }
-  };
-
   // Helper function to safely convert content_tamil to string
   const getContentTamilString = (contentTamil: any): string => {
     if (!contentTamil) return "";
@@ -150,7 +125,6 @@ export function BlogList({ blogs }: BlogListProps) {
               }}
               onApprove={() => handleApprove(blog)}
               onReject={() => handleReject(blog)}
-              onPublish={() => handlePublish(blog)}
             />
           ))}
         </TableBody>
@@ -195,3 +169,4 @@ export function BlogList({ blogs }: BlogListProps) {
     </>
   );
 }
+
