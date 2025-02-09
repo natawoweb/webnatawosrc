@@ -41,8 +41,20 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
 
   const createEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
+      console.log("Starting event creation mutation", { data });
+      
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+      console.log("Current user fetched", { userId: user?.id });
+      
+      if (!user) {
+        console.error("No authenticated user found");
+        throw new Error("User not authenticated");
+      }
+
+      console.log("Inserting event into database", {
+        ...data,
+        created_by: user.id
+      });
 
       const { data: result, error } = await supabase
         .from("events")
@@ -50,10 +62,16 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Database error during event creation:", error);
+        throw error;
+      }
+
+      console.log("Event created successfully", { result });
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Event creation success callback", { data });
       queryClient.invalidateQueries({ queryKey: ["admin-events"] });
       toast({
         title: "Success",
@@ -73,7 +91,12 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
 
   const updateEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
-      if (!data.id) throw new Error("Event ID is required for updates");
+      console.log("Starting event update mutation", { data });
+      
+      if (!data.id) {
+        console.error("No event ID provided for update");
+        throw new Error("Event ID is required for updates");
+      }
       
       const { data: result, error } = await supabase
         .from("events")
@@ -82,10 +105,16 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Database error during event update:", error);
+        throw error;
+      }
+
+      console.log("Event updated successfully", { result });
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Event update success callback", { data });
       queryClient.invalidateQueries({ queryKey: ["admin-events"] });
       toast({
         title: "Success",

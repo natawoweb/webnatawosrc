@@ -25,29 +25,43 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submission started", { formData });
     
     // Validate required fields
     if (!formData.title || !formData.description || !formData.date || !formData.time || !formData.location) {
-      console.error("Missing required fields");
+      console.error("Missing required fields", {
+        title: !!formData.title,
+        description: !!formData.description,
+        date: !!formData.date,
+        time: !!formData.time,
+        location: !!formData.location
+      });
       return;
     }
 
     try {
+      console.log("Uploading images...", { selectedImages });
       const uploadedUrls = await uploadImages(selectedImages);
+      console.log("Images uploaded successfully", { uploadedUrls });
+      
       const galleryUrls = [...(formData.gallery || []), ...uploadedUrls];
+      console.log("Combined gallery URLs", { galleryUrls });
 
       const eventData = {
         ...formData,
         gallery: galleryUrls,
       };
+      console.log("Preparing to submit event data", { eventData });
 
       if (formData.id) {
+        console.log("Updating existing event", { id: formData.id });
         await updateEventMutation.mutateAsync(eventData);
       } else {
+        console.log("Creating new event");
         await createEventMutation.mutateAsync(eventData);
       }
     } catch (error) {
-      console.error("Error handling form submission:", error);
+      console.error("Error in form submission:", error);
     }
   };
 
