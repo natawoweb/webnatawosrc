@@ -37,21 +37,31 @@ export default function Dashboard() {
 
   const handlePublish = async (blogId: string) => {
     try {
+      console.log("Publishing blog:", blogId);
+      const now = new Date().toISOString();
       const { error } = await supabase
         .from("blogs")
         .update({ 
           status: 'published',
-          published_at: new Date().toISOString()
+          published_at: now
         })
-        .eq("id", blogId);
+        .eq("id", blogId)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error publishing blog:", error);
+        throw error;
+      }
 
       toast({
         title: "Success",
         description: "Blog published successfully",
       });
+      
+      // Invalidate the dashboard data to refresh the UI
+      window.location.reload();
     } catch (error: any) {
+      console.error("Publish error:", error);
       toast({
         variant: "destructive",
         title: "Error",
