@@ -13,49 +13,73 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SearchWriters() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("name");
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const { data: writers, isLoading } = useQuery({
     queryKey: ["writers", searchTerm, searchType],
     queryFn: async () => {
       console.log("Starting writers search query...");
-      if (!searchTerm) {
-        const { data, error } = await supabase
-          .from("writers")
-          .select("*")
-          .limit(10);
-        
+      try {
+        if (!searchTerm) {
+          const { data, error } = await supabase
+            .from("writers")
+            .select("*")
+            .limit(10);
+          
+          if (error) {
+            console.error("Error fetching writers:", error);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to fetch writers. Please try again.",
+            });
+            throw error;
+          }
+          console.log("Writers data:", data);
+          return data;
+        }
+
+        let query = supabase.from("writers").select("*");
+
+        switch (searchType) {
+          case "name":
+            query = query.ilike("name", `%${searchTerm}%`);
+            break;
+          case "genre":
+            query = query.ilike("genre", `%${searchTerm}%`);
+            break;
+          case "title":
+            query = query.contains("published_works", [{ title: searchTerm }]);
+            break;
+        }
+
+        const { data, error } = await query;
         if (error) {
-          console.error("Error fetching writers:", error);
+          console.error("Error searching writers:", error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to search writers. Please try again.",
+          });
           throw error;
         }
+        console.log("Search results:", data);
         return data;
-      }
-
-      let query = supabase.from("writers").select("*");
-
-      switch (searchType) {
-        case "name":
-          query = query.ilike("name", `%${searchTerm}%`);
-          break;
-        case "genre":
-          query = query.ilike("genre", `%${searchTerm}%`);
-          break;
-        case "title":
-          query = query.contains("published_works", [{ title: searchTerm }]);
-          break;
-      }
-
-      const { data, error } = await query;
-      if (error) {
-        console.error("Error searching writers:", error);
+      } catch (error) {
+        console.error("Error in writers query:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "An error occurred while fetching writers.",
+        });
         throw error;
       }
-      return data;
     },
   });
 
@@ -85,7 +109,7 @@ export default function SearchWriters() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
-          <p>Loading...</p>
+          <p className="col-span-full text-center">Loading writers...</p>
         ) : writers?.length === 0 ? (
           <p className="col-span-full text-center text-muted-foreground">
             No writers found. Try adjusting your search.
