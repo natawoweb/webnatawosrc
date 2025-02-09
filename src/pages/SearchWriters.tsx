@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,12 +22,17 @@ export default function SearchWriters() {
   const { data: writers, isLoading } = useQuery({
     queryKey: ["writers", searchTerm, searchType],
     queryFn: async () => {
+      console.log("Starting writers search query...");
       if (!searchTerm) {
         const { data, error } = await supabase
           .from("writers")
           .select("*")
           .limit(10);
-        if (error) throw error;
+        
+        if (error) {
+          console.error("Error fetching writers:", error);
+          throw error;
+        }
         return data;
       }
 
@@ -42,11 +48,13 @@ export default function SearchWriters() {
         case "title":
           query = query.contains("published_works", [{ title: searchTerm }]);
           break;
-        // Add more search types as needed
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error("Error searching writers:", error);
+        throw error;
+      }
       return data;
     },
   });
@@ -78,6 +86,10 @@ export default function SearchWriters() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           <p>Loading...</p>
+        ) : writers?.length === 0 ? (
+          <p className="col-span-full text-center text-muted-foreground">
+            No writers found. Try adjusting your search.
+          </p>
         ) : (
           writers?.map((writer) => (
             <Card key={writer.id} className="hover:shadow-lg transition-shadow">

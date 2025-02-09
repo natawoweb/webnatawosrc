@@ -36,6 +36,14 @@ export const useProfile = () => {
           location.pathname === route || location.pathname.startsWith(`${route}/`)
         );
         
+        // If there's no session and we're on a public route, just set loading to false
+        if (!session && isPublicRoute) {
+          if (mounted) {
+            setLoading(false);
+          }
+          return;
+        }
+
         // Only redirect to auth if not on a public route and user needs to be authenticated
         if (!session && !isPublicRoute) {
           if (mounted) {
@@ -45,45 +53,42 @@ export const useProfile = () => {
           return;
         }
 
-        // If there's no session and we're on a public route, just set loading to false
-        if (!session) {
-          if (mounted) {
-            setLoading(false);
-          }
-          return;
-        }
-
-        let { data: existingProfile, error: fetchError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .maybeSingle();
-
-        if (fetchError) {
-          console.error('Error loading profile:', fetchError);
-          throw fetchError;
-        }
-
-        // If profile doesn't exist, wait a moment and try again
-        if (!existingProfile) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          const { data: retryProfile, error: retryError } = await supabase
+        if (session) {
+          let { data: existingProfile, error: fetchError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .maybeSingle();
 
-          if (retryError) throw retryError;
-          if (!retryProfile) {
-            console.error('Profile not found after retry');
-            throw new Error('Profile not found. Please try logging out and back in.');
+          if (fetchError) {
+            console.error('Error loading profile:', fetchError);
+            throw fetchError;
           }
-          existingProfile = retryProfile;
+
+          // If profile doesn't exist, wait a moment and try again
+          if (!existingProfile) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            const { data: retryProfile, error: retryError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .maybeSingle();
+
+            if (retryError) throw retryError;
+            if (!retryProfile) {
+              console.error('Profile not found after retry');
+              throw new Error('Profile not found. Please try logging out and back in.');
+            }
+            existingProfile = retryProfile;
+          }
+
+          if (mounted) {
+            setProfile(existingProfile as Profile);
+            setEditedProfile(existingProfile as Profile);
+          }
         }
 
         if (mounted) {
-          setProfile(existingProfile as Profile);
-          setEditedProfile(existingProfile as Profile);
           setLoading(false);
         }
       } catch (error: any) {
