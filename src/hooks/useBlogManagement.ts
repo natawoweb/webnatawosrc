@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
+import type { BlogStatus } from "@/integrations/supabase/types/content";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -12,7 +13,7 @@ interface BlogUpdateData {
   title_tamil?: string;
   content_tamil?: string;
   category_id?: string;
-  status: string;
+  status: BlogStatus;
 }
 
 export function useBlogManagement() {

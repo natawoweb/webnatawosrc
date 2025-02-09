@@ -8,6 +8,7 @@ import { BlogContentSection } from "@/components/admin/blog/BlogContentSection";
 import { CreateBlogHeader } from "@/components/admin/blog/CreateBlogHeader";
 import { CreateBlogActions } from "@/components/admin/blog/CreateBlogActions";
 import { useTranslation } from "@/hooks/useTranslation";
+import type { BlogStatus } from "@/integrations/supabase/types/content";
 
 export default function CreateBlog() {
   const { toast } = useToast();
@@ -60,7 +61,7 @@ export default function CreateBlog() {
       content: string;
       title_tamil?: string;
       content_tamil?: string;
-      status: string;
+      status: BlogStatus;
       category_id?: string;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -98,7 +99,7 @@ export default function CreateBlog() {
     },
   });
 
-  const handleCreate = (status: "draft" | "pending_approval") => {
+  const handleCreate = (status: BlogStatus) => {
     if (status === "draft" && !title) {
       toast({
         variant: "destructive",
