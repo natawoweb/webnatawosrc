@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -22,6 +22,12 @@ import BlogDetail from "./pages/BlogDetail";
 import Dashboard from "./pages/Dashboard";
 import EditBlog from "./pages/EditBlog";
 
+// Create a wrapper component for the redirect
+const BlogRedirect = () => {
+  const { id } = useParams();
+  return <Navigate to={`/blogs/${id}`} replace />;
+};
+
 const App: React.FC = () => {
   return (
     <Router>
@@ -39,10 +45,7 @@ const App: React.FC = () => {
           <Route path="blogs" element={<Blogs />} />
           <Route path="blogs/:id" element={<BlogDetail />} />
           {/* Add redirect for old /blog/:id URLs */}
-          <Route 
-            path="blog/:id" 
-            element={<Navigate to={(params: { id: string }) => `/blogs/${params.id}`} replace />} 
-          />
+          <Route path="blog/:id" element={<BlogRedirect />} />
           <Route path="events" element={<Events />} />
           <Route path="events/:id" element={<EventDetails />} />
           <Route path="admin" element={<AdminDashboard />} />
