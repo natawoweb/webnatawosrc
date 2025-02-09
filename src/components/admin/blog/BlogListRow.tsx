@@ -5,7 +5,8 @@ import { Trash2, Eye, Pencil, CheckCircle, XCircle } from "lucide-react";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
-import { useNavigate } from "react-router-dom";
+import { BlogPreviewDialog } from "./BlogPreviewDialog";
+import { useState } from "react";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -32,17 +33,12 @@ export function BlogListRow({
   onReject,
   onPublish,
 }: BlogListRowProps) {
-  const navigate = useNavigate();
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const status = blog.status as BlogStatus;
-
-  const handleView = () => {
-    navigate(`/blog/${blog.id}`);
-  };
 
   console.log('BlogListRow - Props:', { isAdmin, canDelete, blog });
 
   const renderActionButtons = () => {
-    // Show delete button only for admin users
     const showDeleteButton = isAdmin;
     console.log('Show delete button:', { isAdmin, showDeleteButton });
 
@@ -51,7 +47,7 @@ export function BlogListRow({
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleView}
+          onClick={() => setIsPreviewOpen(true)}
           title="View Blog"
         >
           <Eye className="h-4 w-4" />
@@ -112,17 +108,24 @@ export function BlogListRow({
   };
 
   return (
-    <TableRow>
-      <TableCell className="font-medium">{blog.title}</TableCell>
-      <TableCell>{getAuthorName(blog.author_id)}</TableCell>
-      <TableCell>
-        <BlogStatusBadge status={blog.status || 'draft'} />
-      </TableCell>
-      <TableCell>{new Date(blog.updated_at || "").toLocaleDateString()}</TableCell>
-      <TableCell>
-        {renderActionButtons()}
-      </TableCell>
-    </TableRow>
+    <>
+      <TableRow>
+        <TableCell className="font-medium">{blog.title}</TableCell>
+        <TableCell>{getAuthorName(blog.author_id)}</TableCell>
+        <TableCell>
+          <BlogStatusBadge status={blog.status || 'draft'} />
+        </TableCell>
+        <TableCell>{new Date(blog.updated_at || "").toLocaleDateString()}</TableCell>
+        <TableCell>
+          {renderActionButtons()}
+        </TableCell>
+      </TableRow>
+
+      <BlogPreviewDialog
+        blog={blog}
+        open={isPreviewOpen}
+        onOpenChange={setIsPreviewOpen}
+      />
+    </>
   );
 }
-
