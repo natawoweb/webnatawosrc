@@ -39,7 +39,10 @@ const App: React.FC = () => {
           <Route path="blogs" element={<Blogs />} />
           <Route path="blogs/:id" element={<BlogDetail />} />
           {/* Add redirect for old /blog/:id URLs */}
-          <Route path="blog/:id" element={<Navigate to={location => `/blogs${location.pathname.substring(5)}`} replace />} />
+          <Route 
+            path="blog/:id" 
+            element={<Navigate to={(params: { id: string }) => `/blogs/${params.id}`} replace />} 
+          />
           <Route path="events" element={<Events />} />
           <Route path="events/:id" element={<EventDetails />} />
           <Route path="admin" element={<AdminDashboard />} />

@@ -5,12 +5,16 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { BlogContent } from "@/components/blog-detail/BlogContent";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Database } from "@/integrations/supabase/types";
-import { Globe } from "lucide-react";
+import { Globe, CheckCircle, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useUserRoles } from "@/hooks/useUserRoles";
+import { useSession } from "@/hooks/useSession";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -18,14 +22,24 @@ interface BlogPreviewDialogProps {
   blog: Blog | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onApprove?: (blog: Blog) => void;
+  onReject?: (blog: Blog) => void;
 }
 
 export function BlogPreviewDialog({
   blog,
   open,
   onOpenChange,
+  onApprove,
+  onReject,
 }: BlogPreviewDialogProps) {
+  const { session } = useSession();
+  const { data: userRoles } = useUserRoles(session?.user?.id);
+  const isAdmin = userRoles?.some(role => role.role === 'admin') || false;
+
   if (!blog) return null;
+
+  const showActions = isAdmin && blog.status === 'pending_approval';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -67,6 +81,26 @@ export function BlogPreviewDialog({
             </TabsContent>
           </Tabs>
         </ScrollArea>
+        {showActions && (
+          <DialogFooter className="sm:justify-end gap-2 border-t pt-4">
+            <Button
+              variant="ghost"
+              className="text-green-500 hover:text-green-700 hover:bg-green-100"
+              onClick={() => onApprove?.(blog)}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Approve
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-red-500 hover:text-red-700 hover:bg-red-100"
+              onClick={() => onReject?.(blog)}
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Reject
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -125,6 +125,8 @@ export function BlogListRow({
         blog={blog}
         open={isPreviewOpen}
         onOpenChange={setIsPreviewOpen}
+        onApprove={onApprove}
+        onReject={onReject}
       />
     </>
   );
