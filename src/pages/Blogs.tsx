@@ -1,10 +1,11 @@
+
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BlogsList } from "@/components/blogs/BlogsList";
-import { BlogSearch } from "@/components/blogs/BlogSearch";
+import { BlogSearch } from "@/components/home/BlogSearch";
 import { LoadingState } from "@/components/blogs/LoadingState";
 import { NoResults } from "@/components/blogs/NoResults";
 import { startOfDay, endOfDay } from "date-fns";
@@ -41,11 +42,11 @@ const Blogs = () => {
           profiles (
             full_name
           ),
-          ratings (
+          blog_ratings (
             rating
           )
         `)
-        .eq("status", "approved")
+        .eq("status", "published")
         .order('published_at', { ascending: false });
 
       if (searchTerm) {
@@ -77,7 +78,7 @@ const Blogs = () => {
       // If rating filter is applied, filter blogs by average rating
       if (ratingFilter !== 'all' && blogsData) {
         const filteredBlogs = blogsData.filter(blog => {
-          const ratings = blog.ratings || [];
+          const ratings = blog.blog_ratings || [];
           if (ratings.length === 0) return false;
           
           const averageRating = ratings.reduce((acc: number, curr: any) => 
