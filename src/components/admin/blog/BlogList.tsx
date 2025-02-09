@@ -12,6 +12,8 @@ import { EditBlogDialog } from "./EditBlogDialog";
 import { BlogListRow } from "./BlogListRow";
 import { useBlogListManagement } from "@/hooks/useBlogListManagement";
 import { Database } from "@/integrations/supabase/types";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -23,16 +25,89 @@ export function BlogList({ blogs }: BlogListProps) {
   const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
   const [blogToEdit, setBlogToEdit] = useState<Blog | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const { 
     deleteBlogMutation, 
     canDeleteBlog, 
-    getAuthorName 
+    getAuthorName,
+    userProfile,
   } = useBlogListManagement();
+
+  const isAdmin = userProfile?.user_type === 'admin' || userProfile?.user_type === 'manager';
 
   const handleDelete = (blog: Blog) => {
     console.log("Setting blog to delete:", blog);
     setBlogToDelete(blog);
+  };
+
+  const handleApprove = async (blog: Blog) => {
+    try {
+      const { error } = await supabase
+        .from('blogs')
+        .update({ status: 'approved' })
+        .eq('id', blog.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Blog has been approved",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleReject = async (blog: Blog) => {
+    try {
+      const { error } = await supabase
+        .from('blogs')
+        .update({ status: 'rejected' })
+        .eq('id', blog.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Blog has been rejected",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
+  const handlePublish = async (blog: Blog) => {
+    try {
+      const { error } = await supabase
+        .from('blogs')
+        .update({ 
+          status: 'published',
+          published_at: new Date().toISOString()
+        })
+        .eq('id', blog.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Blog has been published",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
   };
 
   // Helper function to safely convert content_tamil to string
@@ -61,11 +136,15 @@ export function BlogList({ blogs }: BlogListProps) {
               blog={blog}
               getAuthorName={getAuthorName}
               canDelete={canDeleteBlog(blog)}
+              isAdmin={isAdmin}
               onDelete={() => handleDelete(blog)}
               onEdit={() => {
                 setBlogToEdit(blog);
                 setIsEditDialogOpen(true);
               }}
+              onApprove={() => handleApprove(blog)}
+              onReject={() => handleReject(blog)}
+              onPublish={() => handlePublish(blog)}
             />
           ))}
         </TableBody>

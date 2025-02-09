@@ -163,7 +163,7 @@ export type Database = {
           created_at: string | null
           id: string
           published_at: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["blog_status"] | null
           title: string
           title_tamil: string | null
           updated_at: string | null
@@ -178,7 +178,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           published_at?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["blog_status"] | null
           title: string
           title_tamil?: string | null
           updated_at?: string | null
@@ -193,7 +193,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           published_at?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["blog_status"] | null
           title?: string
           title_tamil?: string | null
           updated_at?: string | null
@@ -755,6 +755,12 @@ export type Database = {
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
+      blog_status:
+        | "draft"
+        | "pending_approval"
+        | "approved"
+        | "rejected"
+        | "published"
       registration_status: "pending" | "approved" | "rejected"
       user_level:
         | "Literary Tamil Writers"

@@ -2,13 +2,15 @@
 import { Database } from './database'
 import { Json } from './shared'
 
+export type BlogStatus = 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'published';
+
 export interface BlogsTable {
   Row: {
     id: string
     title: string
     content: string
     author_id: string
-    status: string | null
+    status: BlogStatus | null
     created_at: string | null
     updated_at: string | null
     views_count: number | null
@@ -23,7 +25,7 @@ export interface BlogsTable {
     title: string
     content: string
     author_id: string
-    status?: string | null
+    status?: BlogStatus | null
     created_at?: string | null
     updated_at?: string | null
     views_count?: number | null
@@ -38,7 +40,7 @@ export interface BlogsTable {
     title?: string
     content?: string
     author_id?: string
-    status?: string | null
+    status?: BlogStatus | null
     created_at?: string | null
     updated_at?: string | null
     views_count?: number | null

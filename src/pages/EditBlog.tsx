@@ -4,12 +4,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useBlogManagement } from "@/hooks/useBlogManagement";
 import { useEditBlogForm } from "@/hooks/useEditBlogForm";
 import { EditBlogDialog } from "@/components/admin/blog/EditBlogDialog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function EditBlog() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
   const { updateBlog, isUpdating } = useBlogManagement();
+  const { toast } = useToast();
 
   const {
     title,
@@ -48,9 +50,17 @@ export default function EditBlog() {
           status: "draft"
         }
       });
+      toast({
+        title: "Success",
+        description: "Blog saved as draft",
+      });
       setIsOpen(false);
-    } catch (error) {
-      console.error('Error saving draft:', error);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
     }
   };
 
@@ -69,9 +79,17 @@ export default function EditBlog() {
           status: "pending_approval"
         }
       });
+      toast({
+        title: "Success",
+        description: "Blog submitted for approval",
+      });
       setIsOpen(false);
-    } catch (error) {
-      console.error('Error submitting blog:', error);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
     }
   };
 
