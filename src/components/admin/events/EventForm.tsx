@@ -27,11 +27,11 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submission started", { formData });
+    console.log("Form submission started:", { formData });
     
     // Validate required fields
     if (!formData.title || !formData.description || !formData.date || !formData.time || !formData.location || !formData.max_participants) {
-      console.error("Missing required fields", {
+      console.error("Missing required fields:", {
         title: !!formData.title,
         description: !!formData.description,
         date: !!formData.date,
@@ -48,28 +48,28 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
     }
 
     try {
-      console.log("Uploading images...", { selectedImages });
+      console.log("Starting image upload process:", { selectedImages });
       const uploadedUrls = selectedImages.length > 0 ? await uploadImages(selectedImages) : [];
-      console.log("Images uploaded successfully", { uploadedUrls });
+      console.log("Image upload completed:", { uploadedUrls });
       
       const galleryUrls = [...(formData.gallery || []), ...uploadedUrls];
-      console.log("Combined gallery URLs", { galleryUrls });
+      console.log("Final gallery URLs:", { galleryUrls });
 
       const eventData = {
         ...formData,
         gallery: galleryUrls,
       };
-      console.log("Preparing to submit event data", { eventData });
+      console.log("Final event data:", { eventData });
 
       if (formData.id) {
-        console.log("Updating existing event", { id: formData.id });
+        console.log("Updating existing event:", { id: formData.id });
         await updateEventMutation.mutateAsync(eventData);
       } else {
         console.log("Creating new event");
         await createEventMutation.mutateAsync(eventData);
       }
     } catch (error) {
-      console.error("Error in form submission:", error);
+      console.error("Form submission error:", error);
       toast({
         variant: "destructive",
         title: "Error",
