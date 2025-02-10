@@ -6,12 +6,16 @@ export async function uploadImages(files: File[]) {
   const { toast } = useToast();
   
   try {
+    console.log("Starting image upload process", { numberOfFiles: files.length });
+    
     const uploadPromises = files.map(async (file) => {
       const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      console.log("Uploading file", { fileName, fileType: file.type });
+
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from("event-images")
         .upload(filePath, file);
 
@@ -25,14 +29,20 @@ export async function uploadImages(files: File[]) {
         throw uploadError;
       }
 
+      console.log("File uploaded successfully", { filePath, uploadData });
+
       const { data } = supabase.storage
         .from("event-images")
         .getPublicUrl(filePath);
 
+      console.log("Generated public URL", { publicUrl: data.publicUrl });
+      
       return data.publicUrl;
     });
 
-    return Promise.all(uploadPromises);
+    const results = await Promise.all(uploadPromises);
+    console.log("All images uploaded successfully", { urls: results });
+    return results;
   } catch (error) {
     console.error("Error in uploadImages:", error);
     toast({

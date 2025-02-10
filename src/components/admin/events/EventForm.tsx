@@ -49,7 +49,7 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
 
     try {
       console.log("Uploading images...", { selectedImages });
-      const uploadedUrls = await uploadImages(selectedImages);
+      const uploadedUrls = selectedImages.length > 0 ? await uploadImages(selectedImages) : [];
       console.log("Images uploaded successfully", { uploadedUrls });
       
       const galleryUrls = [...(formData.gallery || []), ...uploadedUrls];
