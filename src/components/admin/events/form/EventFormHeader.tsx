@@ -19,25 +19,29 @@ export function EventFormHeader({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="title" className="flex items-center gap-1">
+        <Label htmlFor="event-title" className="flex items-center gap-1">
           Title<span className="text-red-500">*</span>
         </Label>
         <Input
-          id="title"
+          id="event-title"
+          name="event-title"
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
+          autoComplete="off"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description" className="flex items-center gap-1">
+        <Label htmlFor="event-description" className="flex items-center gap-1">
           Description<span className="text-red-500">*</span>
         </Label>
         <Textarea
-          id="description"
+          id="event-description"
+          name="event-description"
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
+          autoComplete="off"
           required
         />
       </div>

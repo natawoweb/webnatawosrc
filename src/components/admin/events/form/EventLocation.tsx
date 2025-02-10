@@ -18,27 +18,31 @@ export function EventLocation({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="location" className="flex items-center gap-1">
+        <Label htmlFor="event-location" className="flex items-center gap-1">
           Location<span className="text-red-500">*</span>
         </Label>
         <Input
-          id="location"
+          id="event-location"
+          name="event-location"
           value={location}
           onChange={(e) => onLocationChange(e.target.value)}
+          autoComplete="street-address"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="max_participants" className="flex items-center gap-1">
+        <Label htmlFor="event-max-participants" className="flex items-center gap-1">
           Maximum Participants<span className="text-red-500">*</span>
         </Label>
         <Input
-          id="max_participants"
+          id="event-max-participants"
+          name="event-max-participants"
           type="number"
           min="1"
           value={maxParticipants}
           onChange={(e) => onMaxParticipantsChange(parseInt(e.target.value))}
+          autoComplete="off"
           required
         />
       </div>
