@@ -27,42 +27,51 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submission started:", { formData });
+    console.log("Form submission started");
+    console.log("Current form data:", formData);
     
     // Validate required fields
-    if (!formData.title || !formData.description || !formData.date || !formData.time || !formData.location || !formData.max_participants) {
-      console.error("Missing required fields:", {
-        title: !!formData.title,
-        description: !!formData.description,
-        date: !!formData.date,
-        time: !!formData.time,
-        location: !!formData.location,
-        max_participants: !!formData.max_participants
-      });
+    const requiredFields = {
+      title: formData.title,
+      description: formData.description,
+      date: formData.date,
+      time: formData.time,
+      location: formData.location,
+      max_participants: formData.max_participants
+    };
+
+    console.log("Checking required fields:", requiredFields);
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => !value)
+      .map(([field]) => field);
+
+    if (missingFields.length > 0) {
+      console.error("Missing required fields:", missingFields);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please fill in all required fields",
+        description: `Please fill in all required fields: ${missingFields.join(", ")}`,
       });
       return;
     }
 
     try {
-      console.log("Starting image upload process:", { selectedImages });
+      console.log("Processing selected images:", selectedImages);
       const uploadedUrls = selectedImages.length > 0 ? await uploadImages(selectedImages) : [];
-      console.log("Image upload completed:", { uploadedUrls });
+      console.log("Uploaded image URLs:", uploadedUrls);
       
       const galleryUrls = [...(formData.gallery || []), ...uploadedUrls];
-      console.log("Final gallery URLs:", { galleryUrls });
+      console.log("Final gallery URLs:", galleryUrls);
 
       const eventData = {
         ...formData,
         gallery: galleryUrls,
       };
-      console.log("Final event data:", { eventData });
+      console.log("Final event data being submitted:", eventData);
 
       if (formData.id) {
-        console.log("Updating existing event:", { id: formData.id });
+        console.log("Updating existing event:", formData.id);
         await updateEventMutation.mutateAsync(eventData);
       } else {
         console.log("Creating new event");
@@ -124,7 +133,7 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
           type="submit"
           disabled={createEventMutation.isPending || updateEventMutation.isPending}
         >
-          {formData.id ? "Update Event" : "Create Event"}
+          {createEventMutation.isPending ? 'Creating...' : formData.id ? 'Update Event' : 'Create Event'}
         </Button>
       </div>
     </form>

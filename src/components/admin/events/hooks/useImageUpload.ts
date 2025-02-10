@@ -8,6 +8,23 @@ export async function uploadImages(files: File[]) {
   try {
     console.log("Starting image upload process", { numberOfFiles: files.length });
     
+    // Create storage bucket if it doesn't exist
+    const { data: bucketExists } = await supabase
+      .storage
+      .getBucket('event-images');
+      
+    if (!bucketExists) {
+      console.log("Creating event-images bucket");
+      const { error: createBucketError } = await supabase
+        .storage
+        .createBucket('event-images', { public: true });
+        
+      if (createBucketError) {
+        console.error("Error creating bucket:", createBucketError);
+        throw createBucketError;
+      }
+    }
+
     const uploadPromises = files.map(async (file) => {
       const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random()}.${fileExt}`;

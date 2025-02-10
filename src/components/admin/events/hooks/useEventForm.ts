@@ -41,19 +41,32 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
 
   const createEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
-      console.log("Creating event with data:", { data });
+      console.log("Starting event creation process...");
+      console.log("Form data being submitted:", data);
       
       const { data: { user } } = await supabase.auth.getUser();
-      console.log("Current user context:", { userId: user?.id });
-      
       if (!user) {
         console.error("No authenticated user found");
         throw new Error("User not authenticated");
       }
+      console.log("Authenticated user:", user.id);
 
-      // Log the exact data being sent to Supabase
-      const eventData = { ...data, created_by: user.id };
-      console.log("Sending to Supabase:", eventData);
+      // Prepare event data
+      const eventData = {
+        title: data.title,
+        description: data.description,
+        date: data.date,
+        time: data.time,
+        location: data.location,
+        max_participants: data.max_participants,
+        gallery: data.gallery,
+        created_by: user.id,
+        category_id: data.category_id,
+        current_participants: 0,
+        is_upcoming: true
+      };
+
+      console.log("Sending event data to Supabase:", eventData);
 
       const { data: result, error } = await supabase
         .from("events")
@@ -66,17 +79,20 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         throw error;
       }
 
-      console.log("Event created successfully:", { result });
+      console.log("Event created successfully:", result);
       return result;
     },
     onSuccess: (data) => {
-      console.log("Event creation success callback:", { data });
+      console.log("Event creation success. Invalidating queries...");
       queryClient.invalidateQueries({ queryKey: ["admin-events"] });
       toast({
         title: "Success",
         description: "Event created successfully",
       });
-      onSuccess?.();
+      if (onSuccess) {
+        console.log("Calling onSuccess callback...");
+        onSuccess();
+      }
     },
     onError: (error: any) => {
       console.error("Event creation error:", error);
@@ -90,10 +106,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
 
   const updateEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
-      console.log("Updating event with data:", { data });
-      
       if (!data.id) {
-        console.error("No event ID provided for update");
         throw new Error("Event ID is required for updates");
       }
       
@@ -105,15 +118,12 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         .single();
 
       if (error) {
-        console.error("Database error during event update:", error);
         throw error;
       }
 
-      console.log("Event updated successfully:", { result });
       return result;
     },
     onSuccess: (data) => {
-      console.log("Event update success callback:", { data });
       queryClient.invalidateQueries({ queryKey: ["admin-events"] });
       toast({
         title: "Success",
@@ -122,7 +132,6 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
       onSuccess?.();
     },
     onError: (error: any) => {
-      console.error("Event update error:", error);
       toast({
         variant: "destructive",
         title: "Error",
