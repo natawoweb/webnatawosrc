@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,7 +19,9 @@ export function EventFormHeader({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="title">Title</Label>
+        <Label htmlFor="title" className="flex items-center gap-1">
+          Title<span className="text-red-500">*</span>
+        </Label>
         <Input
           id="title"
           value={title}
@@ -28,7 +31,9 @@ export function EventFormHeader({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description" className="flex items-center gap-1">
+          Description<span className="text-red-500">*</span>
+        </Label>
         <Textarea
           id="description"
           value={description}

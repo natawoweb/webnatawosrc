@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
@@ -17,7 +18,9 @@ export function EventDateTime({
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="date">Date</Label>
+        <Label htmlFor="date" className="flex items-center gap-1">
+          Date<span className="text-red-500">*</span>
+        </Label>
         <Input
           id="date"
           type="date"
@@ -28,7 +31,9 @@ export function EventDateTime({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="time">Time</Label>
+        <Label htmlFor="time" className="flex items-center gap-1">
+          Time<span className="text-red-500">*</span>
+        </Label>
         <Input
           id="time"
           type="time"

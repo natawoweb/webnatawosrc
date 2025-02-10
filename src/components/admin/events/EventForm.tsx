@@ -7,6 +7,7 @@ import { EventCategories } from "./form/EventCategories";
 import { useEventForm, EventFormData } from "./hooks/useEventForm";
 import { uploadImages } from "./hooks/useImageUpload";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface EventFormProps {
   initialData?: Partial<EventFormData>;
@@ -14,6 +15,7 @@ interface EventFormProps {
 }
 
 export function EventForm({ initialData, onSuccess }: EventFormProps) {
+  const { toast } = useToast();
   const {
     formData,
     setFormData,
@@ -28,13 +30,19 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
     console.log("Form submission started", { formData });
     
     // Validate required fields
-    if (!formData.title || !formData.description || !formData.date || !formData.time || !formData.location) {
+    if (!formData.title || !formData.description || !formData.date || !formData.time || !formData.location || !formData.max_participants) {
       console.error("Missing required fields", {
         title: !!formData.title,
         description: !!formData.description,
         date: !!formData.date,
         time: !!formData.time,
-        location: !!formData.location
+        location: !!formData.location,
+        max_participants: !!formData.max_participants
+      });
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all required fields",
       });
       return;
     }
@@ -62,6 +70,11 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
       }
     } catch (error) {
       console.error("Error in form submission:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save event. Please try again.",
+      });
     }
   };
 
