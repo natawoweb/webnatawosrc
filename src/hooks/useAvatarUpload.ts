@@ -26,21 +26,32 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Please upload an image file (jpg, jpeg, png, or gif).');
       }
 
+      if (!profile?.id) {
+        throw new Error('Profile ID is required for upload.');
+      }
+
       // Generate a unique file name to prevent collisions
-      const fileName = `${profile?.id}-${Math.random()}.${fileExt}`;
+      const fileName = `${profile.id}-${Math.random()}.${fileExt}`;
 
       // Delete old avatar if it exists
-      if (profile?.avatar_url) {
+      if (profile.avatar_url) {
         const oldFileName = profile.avatar_url.split('/').pop();
         if (oldFileName) {
           console.log('Removing old avatar:', oldFileName);
-          await supabase.storage
+          const { error: removeError } = await supabase.storage
             .from('avatars')
             .remove([oldFileName]);
+            
+          if (removeError) {
+            console.error('Error removing old avatar:', removeError);
+            // Continue with upload even if delete fails
+          }
         }
       }
 
-      console.log('Uploading new avatar:', fileName);
+      console.log('Starting avatar upload for user:', profile.id);
+      console.log('New avatar filename:', fileName);
+      
       const { error: uploadError, data } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, {
@@ -58,11 +69,13 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Upload failed: No data returned');
       }
 
+      console.log('Upload successful:', data);
+
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      console.log('Getting public URL:', publicUrl);
+      console.log('Generated public URL:', publicUrl);
 
       const { error: updateError } = await supabase
         .from('profiles')
@@ -70,12 +83,14 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
           avatar_url: publicUrl,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', profile?.id);
+        .eq('id', profile.id);
 
       if (updateError) {
         console.error('Profile update error:', updateError);
         throw updateError;
       }
+
+      console.log('Profile updated successfully with new avatar URL');
 
       // Update the local profile state
       onSuccess(publicUrl);
