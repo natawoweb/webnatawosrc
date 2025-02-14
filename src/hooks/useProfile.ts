@@ -7,6 +7,7 @@ import { useProfileData } from "./useProfileData";
 import { useProfileUpdates } from "./useProfileUpdates";
 import { isPublicRoute } from "@/utils/routeUtils";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useProfile = () => {
   const [loading, setLoading] = useState(true);
@@ -14,6 +15,7 @@ export const useProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const { profile, setProfile, fetchProfile } = useProfileData(mounted);
   const {
@@ -67,11 +69,13 @@ export const useProfile = () => {
     getProfile();
 
     // Set up auth state listener for profile changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
       
       if (session) {
-        getProfile();
+        await getProfile();
+        // Invalidate and refetch profile data when auth state changes
+        queryClient.invalidateQueries({ queryKey: ['profile'] });
       } else {
         setProfile(null);
         setLoading(false);
@@ -82,7 +86,7 @@ export const useProfile = () => {
       setMounted(false);
       subscription.unsubscribe();
     };
-  }, [navigate, toast, location.pathname, fetchProfile, mounted]);
+  }, [navigate, toast, location.pathname, fetchProfile, mounted, queryClient]);
 
   return {
     loading,
@@ -91,7 +95,7 @@ export const useProfile = () => {
     editedProfile,
     setIsEditing,
     updateProfile,
-    setProfile, // Add setProfile to the returned object
+    setProfile,
     handleProfileChange,
     handleSocialLinkChange,
     handleCancel,
