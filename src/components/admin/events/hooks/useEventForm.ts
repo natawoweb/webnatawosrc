@@ -89,7 +89,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
 
       const { data: result, error } = await supabase
         .from("events")
-        .insert([eventData])
+        .insert(eventData)
         .select()
         .single();
 
