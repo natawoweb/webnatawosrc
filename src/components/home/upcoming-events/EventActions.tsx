@@ -1,12 +1,14 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Share2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Database } from "@/integrations/supabase/types";
-import { zonedTimeToUtc } from 'date-fns-tz';
+import { useEventRegistration } from "@/hooks/useEventRegistration";
+import { useEventShare } from "@/hooks/useEventShare";
+import { parseISO, isBefore } from "date-fns";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
@@ -16,13 +18,11 @@ interface EventActionsProps {
 
 export function EventActions({ event }: EventActionsProps) {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
+  const handleShare = useEventShare();
   
-  const eventDateTime = `${event.date}T${event.time}`;
-  const eventInUTC = zonedTimeToUtc(eventDateTime, 'America/New_York');
-  const isPastEvent = new Date() > eventInUTC;
+  const eventDateTime = parseISO(`${event.date}T${event.time}`);
+  const isPastEvent = isBefore(eventDateTime, new Date());
 
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -47,103 +47,7 @@ export function EventActions({ event }: EventActionsProps) {
     enabled: !!session?.user.id,
   });
 
-  const registerMutation = useMutation({
-    mutationFn: async () => {
-      if (!session?.user.id) throw new Error("Must be logged in to register");
-      
-      const { data, error } = await supabase.rpc('register_for_event', {
-        p_event_id: event.id,
-        p_user_id: session.user.id
-      });
-      
-      if (error) throw error;
-      return data;
-    },
-    onMutate: () => {
-      // Optimistically update UI
-      queryClient.setQueryData(["registration", event.id, session?.user.id], { id: 'temp' });
-      queryClient.setQueryData(
-        ["event", event.id],
-        (oldData: Event | undefined) => oldData ? {
-          ...oldData,
-          current_participants: (oldData.current_participants || 0) + 1
-        } : oldData
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["registration"] });
-      queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
-      queryClient.invalidateQueries({ queryKey: ["events"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
-      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
-      toast({
-        title: "Success",
-        description: "You have successfully registered for this event",
-      });
-    },
-    onError: (error) => {
-      // Revert optimistic updates on error
-      queryClient.invalidateQueries({ queryKey: ["registration", event.id, session?.user.id] });
-      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-    onSettled: () => {
-      setIsProcessing(false);
-    }
-  });
-
-  const unregisterMutation = useMutation({
-    mutationFn: async () => {
-      if (!session?.user.id) throw new Error("Must be logged in to unregister");
-      
-      const { data, error } = await supabase.rpc('unregister_from_event', {
-        p_event_id: event.id,
-        p_user_id: session.user.id
-      });
-      
-      if (error) throw error;
-      return data;
-    },
-    onMutate: () => {
-      // Optimistically update UI
-      queryClient.setQueryData(["registration", event.id, session?.user.id], null);
-      queryClient.setQueryData(
-        ["event", event.id],
-        (oldData: Event | undefined) => oldData ? {
-          ...oldData,
-          current_participants: Math.max((oldData.current_participants || 1) - 1, 0)
-        } : oldData
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["registration"] });
-      queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
-      queryClient.invalidateQueries({ queryKey: ["events"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
-      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
-      toast({
-        title: "Success",
-        description: "You have successfully unregistered from this event",
-      });
-    },
-    onError: (error) => {
-      // Revert optimistic updates on error
-      queryClient.invalidateQueries({ queryKey: ["registration", event.id, session?.user.id] });
-      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-    onSettled: () => {
-      setIsProcessing(false);
-    }
-  });
+  const { registerMutation, unregisterMutation } = useEventRegistration(event, session, setIsProcessing);
 
   const handleRegistration = async () => {
     if (!session) {
@@ -151,7 +55,7 @@ export function EventActions({ event }: EventActionsProps) {
       return;
     }
     
-    if (isProcessing) return; // Prevent multiple clicks
+    if (isProcessing) return;
     setIsProcessing(true);
     
     try {
@@ -162,28 +66,6 @@ export function EventActions({ event }: EventActionsProps) {
       }
     } catch (error) {
       setIsProcessing(false);
-    }
-  };
-
-  const handleShare = async () => {
-    const shareData = {
-      title: event.title,
-      text: event.description,
-      url: window.location.origin + `/events/${event.id}`,
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(shareData.url);
-        toast({
-          title: "Link copied",
-          description: "Event link has been copied to clipboard",
-        });
-      }
-    } catch (error) {
-      console.error("Error sharing:", error);
     }
   };
 
@@ -219,7 +101,7 @@ export function EventActions({ event }: EventActionsProps) {
       <Button
         variant="outline"
         size="icon"
-        onClick={handleShare}
+        onClick={() => handleShare(event.title, event.description, event.id)}
       >
         <Share2 className="h-4 w-4" />
       </Button>
