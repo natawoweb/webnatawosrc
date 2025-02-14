@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Database } from "@/integrations/supabase/types";
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
@@ -20,8 +20,9 @@ export function EventActions({ event }: EventActionsProps) {
   const queryClient = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
   
-  const eventDateTime = new Date(`${event.date}T${event.time}`);
-  const isPastEvent = new Date() > eventDateTime;
+  const eventDateTime = `${event.date}T${event.time}`;
+  const eventInUTC = zonedTimeToUtc(eventDateTime, 'America/New_York');
+  const isPastEvent = new Date() > eventInUTC;
 
   const { data: session } = useQuery({
     queryKey: ["session"],
