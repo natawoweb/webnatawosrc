@@ -51,6 +51,24 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
       }
       console.log("Authenticated user:", user.id);
 
+      // Check admin role
+      const { data: hasAdminRole, error: roleError } = await supabase.rpc('has_role', {
+        user_id: user.id,
+        required_role: 'admin'
+      });
+
+      if (roleError) {
+        console.error("Error checking admin role:", roleError);
+        throw new Error("Error verifying admin permissions");
+      }
+
+      if (!hasAdminRole) {
+        console.error("User does not have admin role");
+        throw new Error("Insufficient permissions");
+      }
+
+      console.log("Admin role verified:", hasAdminRole);
+
       // Prepare event data
       const eventData = {
         title: data.title,
@@ -63,7 +81,8 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         created_by: user.id,
         category_id: data.category_id,
         current_participants: 0,
-        is_upcoming: true
+        is_upcoming: true,
+        tags: data.tags
       };
 
       console.log("Sending event data to Supabase:", eventData);
@@ -112,15 +131,27 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
       
       const { data: result, error } = await supabase
         .from("events")
-        .update(data)
+        .update({
+          title: data.title,
+          description: data.description,
+          date: data.date,
+          time: data.time,
+          location: data.location,
+          max_participants: data.max_participants,
+          gallery: data.gallery,
+          category_id: data.category_id,
+          tags: data.tags
+        })
         .eq("id", data.id)
         .select()
         .single();
 
       if (error) {
+        console.error("Error updating event:", error);
         throw error;
       }
 
+      console.log("Event updated successfully:", result);
       return result;
     },
     onSuccess: (data) => {
@@ -132,6 +163,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
       onSuccess?.();
     },
     onError: (error: any) => {
+      console.error("Event update error:", error);
       toast({
         variant: "destructive",
         title: "Error",
