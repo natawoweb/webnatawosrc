@@ -36,18 +36,17 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Profile ID is required for upload.');
       }
 
+      // Create a unique filename for the avatar including the extension
+      const fileName = `${profile.id}.${fileExt}`;
+
       // First remove any existing avatar for this user
       try {
-        const fileName = `${profile.id}.${fileExt}`;
         await supabase.storage
           .from('avatars')
           .remove([fileName]);
       } catch (error) {
         console.log('No existing avatar to remove or error removing:', error);
       }
-
-      // Create a unique filename for the avatar including the extension
-      const fileName = `${profile.id}.${fileExt}`;
 
       console.log('Starting avatar upload:', {
         fileName: fileName,
@@ -83,14 +82,14 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
 
       console.log('Generated public URL:', publicUrl);
 
-      // Update profile with new avatar URL
+      // Update the user's profile with the new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
           avatar_url: publicUrl,
-          updated_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         })
-        .eq('id', profile.id);
+        .eq('id', session.user.id); // Use session.user.id to ensure we're updating the current user's profile
 
       if (updateError) {
         console.error('Profile update error:', updateError);
