@@ -29,6 +29,7 @@ export function EventFormHeader({
           onChange={(e) => onTitleChange(e.target.value)}
           autoComplete="off"
           required
+          aria-required="true"
         />
       </div>
 
@@ -43,6 +44,7 @@ export function EventFormHeader({
           onChange={(e) => onDescriptionChange(e.target.value)}
           autoComplete="off"
           required
+          aria-required="true"
         />
       </div>
     </div>

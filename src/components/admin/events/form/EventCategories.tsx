@@ -61,9 +61,9 @@ export function EventCategories({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>Category</Label>
+        <Label htmlFor="event-category">Category</Label>
         <Select value={categoryId || ""} onValueChange={onCategoryChange}>
-          <SelectTrigger>
+          <SelectTrigger id="event-category">
             <SelectValue placeholder="Select a category (optional)" />
           </SelectTrigger>
           <SelectContent>
@@ -87,10 +87,13 @@ export function EventCategories({
       </div>
 
       <div className="space-y-2">
-        <Label>Tags (Press Enter to add)</Label>
+        <Label htmlFor="event-tags">Tags (Press Enter to add)</Label>
         <Input
+          id="event-tags"
+          name="event-tags"
           placeholder="Add optional tags..."
           onKeyDown={handleAddTag}
+          autoComplete="off"
         />
         <div className="flex flex-wrap gap-2 mt-2">
           {tags.map((tag) => (

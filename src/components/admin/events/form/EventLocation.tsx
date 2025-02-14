@@ -28,6 +28,7 @@ export function EventLocation({
           onChange={(e) => onLocationChange(e.target.value)}
           autoComplete="street-address"
           required
+          aria-required="true"
         />
       </div>
 
@@ -44,6 +45,7 @@ export function EventLocation({
           onChange={(e) => onMaxParticipantsChange(parseInt(e.target.value))}
           autoComplete="off"
           required
+          aria-required="true"
         />
       </div>
     </div>

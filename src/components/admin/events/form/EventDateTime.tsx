@@ -29,6 +29,7 @@ export function EventDateTime({
           onChange={(e) => onDateChange(e.target.value)}
           autoComplete="off"
           required
+          aria-required="true"
         />
       </div>
 
@@ -44,6 +45,7 @@ export function EventDateTime({
           onChange={(e) => onTimeChange(e.target.value)}
           autoComplete="off"
           required
+          aria-required="true"
         />
       </div>
     </div>
