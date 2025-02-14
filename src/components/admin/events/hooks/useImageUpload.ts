@@ -8,6 +8,27 @@ export async function uploadImages(files: File[]) {
   try {
     console.log("Starting image upload process", { numberOfFiles: files.length });
     
+    // Check user role
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    // Check if user has admin or manager role
+    const { data: hasAdminRole } = await supabase.rpc('has_role', {
+      user_id: user.id,
+      required_role: 'admin'
+    });
+
+    const { data: hasManagerRole } = await supabase.rpc('has_role', {
+      user_id: user.id,
+      required_role: 'manager'
+    });
+
+    if (!hasAdminRole && !hasManagerRole) {
+      throw new Error("You don't have permission to upload event images");
+    }
+    
     // Create storage bucket if it doesn't exist
     const { data: bucketExists } = await supabase
       .storage
@@ -65,7 +86,7 @@ export async function uploadImages(files: File[]) {
     toast({
       variant: "destructive",
       title: "Upload Error",
-      description: "Failed to upload images. Please try again.",
+      description: error.message || "Failed to upload images. Please try again.",
     });
     throw error;
   }
