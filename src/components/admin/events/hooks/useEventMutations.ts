@@ -1,43 +1,17 @@
 
-import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { EventFormData } from "../types/event.types";
+import { uploadImages } from "./useImageUpload";
 
-export interface EventFormData {
-  id?: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  max_participants: number;
-  gallery: string[];
-  category_id: string | null;
-  tags: string[];
-}
-
-interface UseEventFormProps {
-  initialData?: Partial<EventFormData>;
-  onSuccess?: () => void;
-}
-
-export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
+export function useEventMutations(
+  selectedImages: File[],
+  setSelectedImages: (images: File[]) => void,
+  onSuccess?: () => void
+) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<EventFormData>({
-    title: initialData?.title || "",
-    description: initialData?.description || "",
-    date: initialData?.date || "",
-    time: initialData?.time || "",
-    location: initialData?.location || "",
-    max_participants: initialData?.max_participants || 0,
-    gallery: initialData?.gallery || [],
-    category_id: initialData?.category_id || null,
-    tags: initialData?.tags || [],
-    ...(initialData?.id ? { id: initialData.id } : {}),
-  });
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
   const createEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
@@ -51,23 +25,34 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
       }
       console.log("Authenticated user:", user.id);
 
-      // Check admin role
-      const { data: hasAdminRole, error: roleError } = await supabase.rpc('has_role', {
+      // Check admin or manager role
+      const { data: hasRole, error: roleError } = await supabase.rpc('has_role', {
         user_id: user.id,
         required_role: 'admin'
       });
 
-      if (roleError) {
-        console.error("Error checking admin role:", roleError);
-        throw new Error("Error verifying admin permissions");
+      const { data: hasManagerRole, error: managerRoleError } = await supabase.rpc('has_role', {
+        user_id: user.id,
+        required_role: 'manager'
+      });
+
+      if (roleError || managerRoleError) {
+        console.error("Error checking user roles:", roleError || managerRoleError);
+        throw new Error("Error verifying permissions");
       }
 
-      if (!hasAdminRole) {
-        console.error("User does not have admin role");
+      if (!hasRole && !hasManagerRole) {
+        console.error("User does not have required role");
         throw new Error("Insufficient permissions");
       }
 
-      console.log("Admin role verified:", hasAdminRole);
+      console.log("User role verified:", hasRole || hasManagerRole);
+
+      // Upload new images if any
+      let uploadedUrls: string[] = [];
+      if (selectedImages.length > 0) {
+        uploadedUrls = await uploadImages(selectedImages);
+      }
 
       // Prepare event data
       const eventData = {
@@ -77,7 +62,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         time: data.time,
         location: data.location,
         max_participants: data.max_participants,
-        gallery: data.gallery,
+        gallery: [...(data.gallery || []), ...uploadedUrls],
         created_by: user.id,
         category_id: data.category_id,
         current_participants: 0,
@@ -108,6 +93,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         title: "Success",
         description: "Event created successfully",
       });
+      setSelectedImages([]); // Clear selected images after successful creation
       if (onSuccess) {
         console.log("Calling onSuccess callback...");
         onSuccess();
@@ -125,9 +111,22 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
 
   const updateEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
+      console.log("Starting event update process...");
       if (!data.id) {
         throw new Error("Event ID is required for updates");
       }
+
+      // Upload new images if any
+      let uploadedUrls: string[] = [];
+      if (selectedImages.length > 0) {
+        console.log("Uploading new images for event update...");
+        uploadedUrls = await uploadImages(selectedImages);
+        console.log("New images uploaded successfully:", uploadedUrls);
+      }
+
+      // Combine existing gallery with new uploaded images
+      const updatedGallery = [...(data.gallery || []), ...uploadedUrls];
+      console.log("Updated gallery:", updatedGallery);
       
       const { data: result, error } = await supabase
         .from("events")
@@ -138,7 +137,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
           time: data.time,
           location: data.location,
           max_participants: data.max_participants,
-          gallery: data.gallery,
+          gallery: updatedGallery,
           category_id: data.category_id,
           tags: data.tags
         })
@@ -160,6 +159,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         title: "Success",
         description: "Event updated successfully",
       });
+      setSelectedImages([]); // Clear selected images after successful update
       onSuccess?.();
     },
     onError: (error: any) => {
@@ -173,10 +173,6 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
   });
 
   return {
-    formData,
-    setFormData,
-    selectedImages,
-    setSelectedImages,
     createEventMutation,
     updateEventMutation,
   };

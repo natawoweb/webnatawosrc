@@ -1,10 +1,10 @@
-
 import { EventFormHeader } from "./form/EventFormHeader";
 import { EventDateTime } from "./form/EventDateTime";
 import { EventLocation } from "./form/EventLocation";
 import { EventGallery } from "./form/EventGallery";
 import { EventCategories } from "./form/EventCategories";
-import { useEventForm, EventFormData } from "./hooks/useEventForm";
+import { useEventForm } from "@/hooks/useEventForm";
+import type { EventFormData } from "@/components/admin/events/types/event.types";
 import { uploadImages } from "./hooks/useImageUpload";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
