@@ -1,3 +1,4 @@
+
 import { EventFormHeader } from "./form/EventFormHeader";
 import { EventDateTime } from "./form/EventDateTime";
 import { EventLocation } from "./form/EventLocation";
@@ -5,7 +6,6 @@ import { EventGallery } from "./form/EventGallery";
 import { EventCategories } from "./form/EventCategories";
 import { useEventForm } from "@/hooks/useEventForm";
 import type { EventFormData } from "@/components/admin/events/types/event.types";
-import { uploadImages } from "./hooks/useImageUpload";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
@@ -22,6 +22,7 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
     setFormData,
     selectedImages,
     setSelectedImages,
+    handleExistingImageRemove,
     createEventMutation,
     updateEventMutation,
   } = useEventForm({ initialData, onSuccess });
@@ -57,25 +58,12 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
     }
 
     try {
-      console.log("Processing selected images:", selectedImages);
-      const uploadedUrls = selectedImages.length > 0 ? await uploadImages(selectedImages) : [];
-      console.log("Uploaded image URLs:", uploadedUrls);
-      
-      const galleryUrls = [...(formData.gallery || []), ...uploadedUrls];
-      console.log("Final gallery URLs:", galleryUrls);
-
-      const eventData = {
-        ...formData,
-        gallery: galleryUrls,
-      };
-      console.log("Final event data being submitted:", eventData);
-
       if (formData.id) {
         console.log("Updating existing event:", formData.id);
-        await updateEventMutation.mutateAsync(eventData);
+        await updateEventMutation.mutateAsync(formData);
       } else {
         console.log("Creating new event");
-        await createEventMutation.mutateAsync(eventData);
+        await createEventMutation.mutateAsync(formData);
       }
     } catch (error) {
       console.error("Form submission error:", error);
@@ -86,11 +74,6 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
       });
     }
   };
-
-  console.log("Current form state:", {
-    isPending: createEventMutation.isPending || updateEventMutation.isPending,
-    formData
-  });
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -131,6 +114,7 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
           newImages.splice(index, 1);
           setSelectedImages(newImages);
         }}
+        onExistingImageRemove={handleExistingImageRemove}
       />
 
       <div className="flex justify-end">

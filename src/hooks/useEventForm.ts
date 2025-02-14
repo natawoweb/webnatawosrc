@@ -24,11 +24,17 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
     onSuccess
   );
 
+  const handleExistingImageRemove = (index: number) => {
+    const newGallery = formData.gallery.filter((_, i) => i !== index);
+    setFormData({ ...formData, gallery: newGallery });
+  };
+
   return {
     formData,
     setFormData,
     selectedImages,
     setSelectedImages,
+    handleExistingImageRemove,
     createEventMutation,
     updateEventMutation,
   };

@@ -16,16 +16,18 @@ interface EventGalleryProps {
   selectedImages: File[];
   onImageSelect: (files: File[]) => void;
   onImageRemove: (index: number) => void;
+  onExistingImageRemove?: (index: number) => void;
 }
 
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per image
 
 export function EventGallery({
-  initialGallery,
+  initialGallery = [],
   selectedImages,
   onImageSelect,
   onImageRemove,
+  onExistingImageRemove,
 }: EventGalleryProps) {
   const [error, setError] = useState<string | null>(null);
 
@@ -97,12 +99,12 @@ export function EventGallery({
         Allowed formats: JPEG, PNG, GIF (max 5MB per image)
       </p>
 
-      {initialGallery && initialGallery.length > 0 && (
+      {initialGallery?.length > 0 && (
         <div className="space-y-2">
           <Label>Current Gallery</Label>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {initialGallery.map((url, index) => (
-              <div key={index} className="relative group aspect-square">
+              <div key={url} className="relative group aspect-square">
                 <Dialog>
                   <DialogTrigger asChild>
                     <div className="cursor-pointer w-full h-full">
@@ -121,13 +123,15 @@ export function EventGallery({
                     />
                   </DialogContent>
                 </Dialog>
-                <button
-                  type="button"
-                  onClick={() => onImageRemove(index)}
-                  className="absolute top-2 right-2 bg-background/80 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                {onExistingImageRemove && (
+                  <button
+                    type="button"
+                    onClick={() => onExistingImageRemove(index)}
+                    className="absolute top-2 right-2 bg-background/80 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             ))}
           </div>
