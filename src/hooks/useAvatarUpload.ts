@@ -30,9 +30,8 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Profile ID is required for upload.');
       }
 
-      // Simplified filename - just use timestamp and extension
-      const timestamp = Date.now();
-      const fileName = `${timestamp}.${fileExt}`;
+      // Create a simple filename with user ID and extension
+      const fileName = `${profile.id}.${fileExt}`;
 
       console.log('Starting avatar upload:', {
         fileName: fileName,
@@ -41,27 +40,12 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         bucketName: 'avatars'
       });
 
-      // Delete old avatar if it exists
-      if (profile.avatar_url) {
-        try {
-          const oldUrl = new URL(profile.avatar_url);
-          const oldFileName = oldUrl.pathname.split('/avatars/')[1];
-          if (oldFileName) {
-            console.log('Removing old avatar:', oldFileName);
-            await supabase.storage
-              .from('avatars')
-              .remove([oldFileName]);
-          }
-        } catch (error) {
-          console.error('Error removing old avatar:', error);
-          // Continue with upload even if delete fails
-        }
-      }
-      
-      // Simplified upload with minimal options
+      // Upload new avatar, overwriting if exists
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+          upsert: true // This will overwrite any existing file
+        });
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
