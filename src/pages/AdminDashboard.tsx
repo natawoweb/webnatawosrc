@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -19,9 +20,16 @@ export default function AdminDashboard() {
   const { data: isAdmin, isLoading: checkingAdmin } = useQuery({
     queryKey: ["checkAdminRole"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return false;
+      console.log("Checking admin role...");
       
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log("Current user:", user);
+      
+      if (!user) {
+        console.log("No user found");
+        return false;
+      }
+
       const { data, error } = await supabase.rpc('has_role', {
         user_id: user.id,
         required_role: 'admin'
@@ -32,12 +40,16 @@ export default function AdminDashboard() {
         return false;
       }
       
+      console.log("Admin check result:", data);
       return data;
     },
   });
 
   useEffect(() => {
+    console.log("Admin status:", { isAdmin, checkingAdmin });
+    
     if (!checkingAdmin && !isAdmin) {
+      console.log("Access denied - redirecting to home");
       toast({
         title: "Access Denied",
         description: "You don't have permission to access this page.",
