@@ -30,6 +30,11 @@ export async function uploadImages(files: File[]) {
     }
 
     const uploadPromises = files.map(async (file) => {
+      if (!(file instanceof File)) {
+        console.error("Invalid file object:", file);
+        throw new Error("Invalid file object provided");
+      }
+
       // Create a unique filename with timestamp and random string
       const timestamp = new Date().getTime();
       const randomString = Math.random().toString(36).substring(2, 15);
@@ -38,23 +43,12 @@ export async function uploadImages(files: File[]) {
 
       console.log("Uploading file", { fileName, fileType: file.type });
 
-      // Convert blob URL to File object if needed
-      let fileToUpload = file;
-      if (file.type === "" && typeof file !== 'string' && 'toString' in file) {
-        const blobUrl = file.toString();
-        if (blobUrl.startsWith('blob:')) {
-          const response = await fetch(blobUrl);
-          const blob = await response.blob();
-          fileToUpload = new File([blob], fileName, { type: blob.type });
-        }
-      }
-
       const { error: uploadError } = await supabase.storage
         .from("event-images")
-        .upload(fileName, fileToUpload, {
+        .upload(fileName, file, {
           cacheControl: '3600',
           upsert: false,
-          contentType: fileToUpload.type
+          contentType: file.type || 'application/octet-stream'
         });
 
       if (uploadError) {
