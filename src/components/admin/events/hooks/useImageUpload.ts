@@ -1,13 +1,10 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
-export async function uploadImages(files: File[]) {
-  const { toast } = useToast();
+export async function uploadImages(files: File[]): Promise<string[]> {
+  console.log("Starting image upload process", { numberOfFiles: files.length });
   
   try {
-    console.log("Starting image upload process", { numberOfFiles: files.length });
-    
     // Check user role
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -72,11 +69,6 @@ export async function uploadImages(files: File[]) {
     return results;
   } catch (error: any) {
     console.error("Error in uploadImages:", error);
-    toast({
-      variant: "destructive",
-      title: "Upload Error",
-      description: error.message || "Failed to upload images. Please try again.",
-    });
     throw error;
   }
 }

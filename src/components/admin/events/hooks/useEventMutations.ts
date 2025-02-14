@@ -49,9 +49,16 @@ export function useEventMutations(
       console.log("User role verified:", hasRole || hasManagerRole);
 
       // Upload new images if any
-      let uploadedUrls: string[] = [];
+      let galleryUrls: string[] = [];
       if (selectedImages.length > 0) {
-        uploadedUrls = await uploadImages(selectedImages);
+        console.log("Uploading new images...");
+        try {
+          galleryUrls = await uploadImages(selectedImages);
+          console.log("Images uploaded successfully:", galleryUrls);
+        } catch (error) {
+          console.error("Error uploading images:", error);
+          throw new Error("Failed to upload images");
+        }
       }
 
       // Prepare event data
@@ -62,7 +69,7 @@ export function useEventMutations(
         time: data.time,
         location: data.location,
         max_participants: data.max_participants,
-        gallery: [...(data.gallery || []), ...uploadedUrls],
+        gallery: [...(data.gallery || []), ...galleryUrls],
         created_by: user.id,
         category_id: data.category_id,
         current_participants: 0,
@@ -117,15 +124,20 @@ export function useEventMutations(
       }
 
       // Upload new images if any
-      let uploadedUrls: string[] = [];
+      let galleryUrls: string[] = [];
       if (selectedImages.length > 0) {
         console.log("Uploading new images for event update...");
-        uploadedUrls = await uploadImages(selectedImages);
-        console.log("New images uploaded successfully:", uploadedUrls);
+        try {
+          galleryUrls = await uploadImages(selectedImages);
+          console.log("New images uploaded successfully:", galleryUrls);
+        } catch (error) {
+          console.error("Error uploading images:", error);
+          throw new Error("Failed to upload images");
+        }
       }
 
       // Combine existing gallery with new uploaded images
-      const updatedGallery = [...(data.gallery || []), ...uploadedUrls];
+      const updatedGallery = [...(data.gallery || []), ...galleryUrls];
       console.log("Updated gallery:", updatedGallery);
       
       const { data: result, error } = await supabase
