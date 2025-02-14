@@ -69,23 +69,20 @@ export const useProfileData = (mounted: boolean) => {
     }
   };
 
-  // Updated useQuery configuration to use meta for callbacks
-  useQuery({
+  const { data: queryProfile } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return null;
       return fetchProfile(session);
     },
-    enabled: mounted,
-    meta: {
-      onSuccess: (data: Profile | null) => {
-        if (data) {
-          setProfile(data);
-        }
-      }
-    }
+    enabled: mounted
   });
+
+  // Update profile state when query data changes
+  if (queryProfile && mounted) {
+    setProfile(queryProfile);
+  }
 
   return { profile, setProfile, fetchProfile };
 };
