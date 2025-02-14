@@ -30,10 +30,9 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Profile ID is required for upload.');
       }
 
-      // Generate a unique filename that includes the user ID
+      // Structure the filename with user ID as the folder name for RLS
       const timestamp = Date.now();
-      const randomString = Math.random().toString().substring(2, 8);
-      const fileName = `${profile.id}-${timestamp}-${randomString}.${fileExt}`;
+      const fileName = `${profile.id}/${timestamp}.${fileExt}`;
 
       console.log('Starting avatar upload:', {
         profileId: profile.id,
@@ -45,7 +44,8 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
       // Delete old avatar if it exists
       if (profile.avatar_url) {
         try {
-          const oldFileName = profile.avatar_url.split('/').pop();
+          const oldUrl = new URL(profile.avatar_url);
+          const oldFileName = oldUrl.pathname.split('/avatars/')[1];
           if (oldFileName) {
             console.log('Removing old avatar:', oldFileName);
             await supabase.storage
