@@ -19,23 +19,31 @@ export function EventManagement() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
 
-  const { data: userRole } = useQuery({
+  const { data: userRole, isLoading } = useQuery({
     queryKey: ["userRole"],
     queryFn: async () => {
+      console.log("Fetching user role...");
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      if (!user) {
+        console.log("No user found");
+        return null;
+      }
+      console.log("Current user:", user);
 
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      const { data: hasAdminRole, error } = await supabase.rpc('has_role', {
+        user_id: user.id,
+        required_role: 'admin'
+      });
 
-      return roles?.role;
+      if (error) {
+        console.error("Error checking admin role:", error);
+        return null;
+      }
+
+      console.log("Has admin role:", hasAdminRole);
+      return hasAdminRole ? 'admin' : null;
     },
   });
-
-  const canCreateEvents = userRole === 'admin' || userRole === 'manager';
 
   const handleEdit = (event: any) => {
     setEditingEvent({
@@ -57,6 +65,16 @@ export function EventManagement() {
     setIsOpen(false);
     setEditingEvent(null);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  const canCreateEvents = userRole === 'admin';
 
   if (!canCreateEvents) {
     return (
