@@ -1,8 +1,10 @@
+
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { X, Plus, Image as ImageIcon } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { X, Plus, Image as ImageIcon, AlertCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,20 +18,46 @@ interface EventGalleryProps {
   onImageRemove: (index: number) => void;
 }
 
+const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per image
+
 export function EventGallery({
   initialGallery,
   selectedImages,
   onImageSelect,
   onImageRemove,
 }: EventGalleryProps) {
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      onImageSelect(filesArray);
+  const [error, setError] = useState<string | null>(null);
+
+  const validateFiles = (files: FileList) => {
+    const filesArray = Array.from(files);
+    
+    // Check file types
+    const invalidTypeFile = filesArray.find(file => !ALLOWED_FILE_TYPES.includes(file.type));
+    if (invalidTypeFile) {
+      setError(`File "${invalidTypeFile.name}" is not a valid image format. Please use JPEG, PNG, or GIF.`);
+      return null;
     }
+
+    // Check file sizes
+    const oversizedFile = filesArray.find(file => file.size > MAX_FILE_SIZE);
+    if (oversizedFile) {
+      setError(`File "${oversizedFile.name}" exceeds the 5MB size limit.`);
+      return null;
+    }
+
+    return filesArray;
   };
 
-  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
+    if (!e.target.files?.length) return;
+
+    const validatedFiles = validateFiles(e.target.files);
+    if (validatedFiles) {
+      onImageSelect(validatedFiles);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -39,7 +67,7 @@ export function EventGallery({
           <Input
             id="images"
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/gif"
             multiple
             onChange={handleFileChange}
             className="hidden"
@@ -47,13 +75,27 @@ export function EventGallery({
           <Button
             type="button"
             variant="outline"
-            onClick={() => document.getElementById("images")?.click()}
+            onClick={() => {
+              setError(null);
+              document.getElementById("images")?.click();
+            }}
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Images
           </Button>
         </div>
       </div>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <p className="text-sm text-muted-foreground">
+        Allowed formats: JPEG, PNG, GIF (max 5MB per image)
+      </p>
 
       {initialGallery && initialGallery.length > 0 && (
         <div className="space-y-2">

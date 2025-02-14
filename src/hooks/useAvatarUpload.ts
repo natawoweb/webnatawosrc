@@ -3,10 +3,12 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Profile } from "@/integrations/supabase/types/models";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string) => void) => {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   async function uploadAvatar(event: React.ChangeEvent<HTMLInputElement>) {
     try {
@@ -75,7 +77,12 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw updateError;
       }
 
+      // Update the local profile state
       onSuccess(publicUrl);
+      
+      // Invalidate and refetch profile queries to update all components
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      
       toast({
         title: "Success",
         description: "Avatar updated successfully.",
