@@ -30,9 +30,10 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Profile ID is required for upload.');
       }
 
-      // Generate a clean filename with just timestamp and extension
-      const timestamp = new Date().getTime();
-      const fileName = `avatar-${timestamp}.${fileExt}`;
+      // Generate a unique filename that includes the user ID
+      const timestamp = Date.now();
+      const randomString = Math.random().toString().substring(2, 8);
+      const fileName = `${profile.id}-${timestamp}-${randomString}.${fileExt}`;
 
       console.log('Starting avatar upload:', {
         profileId: profile.id,
