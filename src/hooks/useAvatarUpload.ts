@@ -30,38 +30,40 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Profile ID is required for upload.');
       }
 
-      // Generate a unique file name using timestamp for versioning
+      // Generate a clean filename with just timestamp and extension
       const timestamp = new Date().getTime();
-      const fileName = `${profile.id}-${timestamp}.${fileExt}`;
+      const fileName = `avatar-${timestamp}.${fileExt}`;
 
       console.log('Starting avatar upload:', {
         profileId: profile.id,
         fileName: fileName,
-        fileType: file.type
+        fileType: file.type,
+        bucketName: 'avatars'
       });
 
       // Delete old avatar if it exists
       if (profile.avatar_url) {
-        const oldFileName = profile.avatar_url.split('/').pop();
-        if (oldFileName) {
-          console.log('Removing old avatar:', oldFileName);
-          const { error: removeError } = await supabase.storage
-            .from('avatars')
-            .remove([oldFileName]);
-            
-          if (removeError) {
-            console.error('Error removing old avatar:', removeError);
-            // Continue with upload even if delete fails
+        try {
+          const oldFileName = profile.avatar_url.split('/').pop();
+          if (oldFileName) {
+            console.log('Removing old avatar:', oldFileName);
+            await supabase.storage
+              .from('avatars')
+              .remove([oldFileName]);
           }
+        } catch (error) {
+          console.error('Error removing old avatar:', error);
+          // Continue with upload even if delete fails
         }
       }
       
-      const { error: uploadError } = await supabase.storage
+      // Upload new avatar
+      const { data, error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, {
           cacheControl: '3600',
-          contentType: file.type || 'image/jpeg',
-          upsert: true // Allow overwriting in case of concurrent uploads
+          contentType: file.type,
+          upsert: true
         });
 
       if (uploadError) {
@@ -69,14 +71,20 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw uploadError;
       }
 
-      console.log('Upload successful, generating public URL');
+      if (!data) {
+        throw new Error('Upload failed: No data returned');
+      }
 
+      console.log('Upload successful, getting public URL');
+
+      // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
       console.log('Generated public URL:', publicUrl);
 
+      // Update profile with new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -92,10 +100,8 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
 
       console.log('Profile updated successfully with new avatar URL');
 
-      // Update the local profile state
+      // Update local state and invalidate queries
       onSuccess(publicUrl);
-      
-      // Invalidate and refetch profile queries to update all components
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       
       toast({
