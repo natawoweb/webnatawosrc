@@ -439,7 +439,7 @@ export type Database = {
           current_participants: number | null
           date: string
           description: string
-          gallery: Json[] | null
+          gallery: string[] | null
           id: string
           is_upcoming: boolean | null
           location: string
@@ -455,7 +455,7 @@ export type Database = {
           current_participants?: number | null
           date: string
           description: string
-          gallery?: Json[] | null
+          gallery?: string[] | null
           id?: string
           is_upcoming?: boolean | null
           location: string
@@ -471,7 +471,7 @@ export type Database = {
           current_participants?: number | null
           date?: string
           description?: string
-          gallery?: Json[] | null
+          gallery?: string[] | null
           id?: string
           is_upcoming?: boolean | null
           location?: string
