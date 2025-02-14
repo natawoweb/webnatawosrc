@@ -18,7 +18,7 @@ export function EventActions({ event }: EventActionsProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const eventDateTime = new Date(`${event.date}T${event.time}`);
   const isPastEvent = new Date() > eventDateTime;
@@ -31,12 +31,12 @@ export function EventActions({ event }: EventActionsProps) {
     },
   });
 
-  const { data: registration } = useQuery({
+  const { data: registration, isLoading: isRegistrationLoading } = useQuery({
     queryKey: ["registration", event.id, session?.user.id],
     queryFn: async () => {
       if (!session?.user.id) return null;
       const { data } = await supabase
-        .from("events_registrations")
+        .from("event_registrations")
         .select("*")
         .eq("event_id", event.id)
         .eq("user_id", session.user.id)
@@ -58,6 +58,17 @@ export function EventActions({ event }: EventActionsProps) {
       if (error) throw error;
       return data;
     },
+    onMutate: () => {
+      // Optimistically update UI
+      queryClient.setQueryData(["registration", event.id, session?.user.id], { id: 'temp' });
+      queryClient.setQueryData(
+        ["event", event.id],
+        (oldData: Event | undefined) => oldData ? {
+          ...oldData,
+          current_participants: (oldData.current_participants || 0) + 1
+        } : oldData
+      );
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["registration"] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
@@ -70,12 +81,18 @@ export function EventActions({ event }: EventActionsProps) {
       });
     },
     onError: (error) => {
+      // Revert optimistic updates on error
+      queryClient.invalidateQueries({ queryKey: ["registration", event.id, session?.user.id] });
+      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message,
       });
     },
+    onSettled: () => {
+      setIsProcessing(false);
+    }
   });
 
   const unregisterMutation = useMutation({
@@ -90,6 +107,17 @@ export function EventActions({ event }: EventActionsProps) {
       if (error) throw error;
       return data;
     },
+    onMutate: () => {
+      // Optimistically update UI
+      queryClient.setQueryData(["registration", event.id, session?.user.id], null);
+      queryClient.setQueryData(
+        ["event", event.id],
+        (oldData: Event | undefined) => oldData ? {
+          ...oldData,
+          current_participants: Math.max((oldData.current_participants || 1) - 1, 0)
+        } : oldData
+      );
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["registration"] });
       queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
@@ -102,12 +130,18 @@ export function EventActions({ event }: EventActionsProps) {
       });
     },
     onError: (error) => {
+      // Revert optimistic updates on error
+      queryClient.invalidateQueries({ queryKey: ["registration", event.id, session?.user.id] });
+      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message,
       });
     },
+    onSettled: () => {
+      setIsProcessing(false);
+    }
   });
 
   const handleRegistration = async () => {
@@ -116,15 +150,17 @@ export function EventActions({ event }: EventActionsProps) {
       return;
     }
     
-    setIsRegistering(true);
+    if (isProcessing) return; // Prevent multiple clicks
+    setIsProcessing(true);
+    
     try {
       if (registration) {
         await unregisterMutation.mutateAsync();
       } else {
         await registerMutation.mutateAsync();
       }
-    } finally {
-      setIsRegistering(false);
+    } catch (error) {
+      setIsProcessing(false);
     }
   };
 
@@ -150,6 +186,18 @@ export function EventActions({ event }: EventActionsProps) {
     }
   };
 
+  const isButtonDisabled = 
+    isProcessing || 
+    isRegistrationLoading || 
+    isPastEvent || 
+    (!registration && event.current_participants >= (event.max_participants || 0));
+
+  const buttonText = isPastEvent ? "Event Ended" : 
+    isProcessing ? "Processing..." : 
+    registration ? "Unregister" : 
+    event.current_participants >= (event.max_participants || 0) ? "Full" :
+    "Register";
+
   return (
     <div className="flex gap-2">
       <Button
@@ -162,14 +210,10 @@ export function EventActions({ event }: EventActionsProps) {
       <Button
         variant={registration ? "destructive" : "default"}
         onClick={handleRegistration}
-        disabled={isRegistering || isPastEvent || (event.current_participants >= (event.max_participants || 0) && !registration)}
+        disabled={isButtonDisabled}
         className="flex-1"
       >
-        {isPastEvent ? "Event Ended" : 
-          isRegistering ? "Processing..." : 
-          registration ? "Unregister" : 
-          event.current_participants >= (event.max_participants || 0) ? "Full" :
-          "Register"}
+        {buttonText}
       </Button>
       <Button
         variant="outline"
