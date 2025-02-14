@@ -38,15 +38,16 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
 
       // First remove any existing avatar for this user
       try {
+        const fileName = `${profile.id}.${fileExt}`;
         await supabase.storage
           .from('avatars')
-          .remove([`${profile.id}`]);
+          .remove([fileName]);
       } catch (error) {
         console.log('No existing avatar to remove or error removing:', error);
       }
 
-      // Create a unique filename for the avatar
-      const fileName = `${profile.id}`;
+      // Create a unique filename for the avatar including the extension
+      const fileName = `${profile.id}.${fileExt}`;
 
       console.log('Starting avatar upload:', {
         fileName: fileName,
@@ -55,7 +56,7 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         bucketName: 'avatars'
       });
 
-      // Upload the file to Supabase storage
+      // Upload the file to Supabase storage with explicit content type
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, {
