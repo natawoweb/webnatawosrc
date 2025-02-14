@@ -40,6 +40,16 @@ export const useProfileData = (mounted: boolean) => {
         existingProfile = retryProfile;
       }
 
+      // Ensure social_links is properly parsed
+      if (existingProfile.social_links && typeof existingProfile.social_links === 'string') {
+        try {
+          existingProfile.social_links = JSON.parse(existingProfile.social_links);
+        } catch (e) {
+          console.error('Error parsing social links:', e);
+          existingProfile.social_links = {};
+        }
+      }
+
       if (mounted) {
         setProfile(existingProfile as Profile);
         return existingProfile as Profile;
