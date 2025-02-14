@@ -69,6 +69,7 @@ export const useProfileData = (mounted: boolean) => {
     }
   };
 
+  // Add useQuery to cache and automatically refetch profile data
   const { data: queryProfile } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
@@ -76,13 +77,13 @@ export const useProfileData = (mounted: boolean) => {
       if (!session) return null;
       return fetchProfile(session);
     },
-    enabled: mounted
+    enabled: mounted,
+    onSuccess: (data) => {
+      if (data) {
+        setProfile(data);
+      }
+    }
   });
-
-  // Update profile state when query data changes
-  if (queryProfile && mounted) {
-    setProfile(queryProfile);
-  }
 
   return { profile, setProfile, fetchProfile };
 };
