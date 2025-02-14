@@ -30,14 +30,14 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Profile ID is required for upload.');
       }
 
-      // Generate a unique filename
+      // Generate a unique filename with timestamp to prevent conflicts
       const timestamp = Date.now();
-      const fileName = `${timestamp}.${fileExt}`;
-      const filePath = `${profile.id}/${fileName}`;
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const fileName = `${profile.id}-${timestamp}-${randomId}.${fileExt}`;
 
       console.log('Starting avatar upload:', {
         profileId: profile.id,
-        filePath: filePath,
+        fileName: fileName,
         fileType: file.type,
         bucketName: 'avatars'
       });
@@ -46,12 +46,12 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
       if (profile.avatar_url) {
         try {
           const oldUrl = new URL(profile.avatar_url);
-          const oldPath = decodeURIComponent(oldUrl.pathname.split('/avatars/')[1]);
-          if (oldPath) {
-            console.log('Removing old avatar:', oldPath);
+          const oldFileName = oldUrl.pathname.split('/avatars/')[1];
+          if (oldFileName) {
+            console.log('Removing old avatar:', oldFileName);
             await supabase.storage
               .from('avatars')
-              .remove([oldPath]);
+              .remove([oldFileName]);
           }
         } catch (error) {
           console.error('Error removing old avatar:', error);
@@ -59,10 +59,12 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         }
       }
       
-      // Upload new avatar
+      // Upload new avatar with simplified options
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file);
+        .upload(fileName, file, {
+          contentType: file.type
+        });
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
@@ -78,7 +80,7 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
       // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
 
       console.log('Generated public URL:', publicUrl);
 
