@@ -30,31 +30,31 @@ export async function uploadImages(files: File[]) {
     }
 
     const uploadPromises = files.map(async (file) => {
+      // Create a unique filename with timestamp and random string
+      const timestamp = new Date().getTime();
+      const randomString = Math.random().toString(36).substring(2, 15);
       const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const fileName = `${timestamp}-${randomString}.${fileExt}`;
 
       console.log("Uploading file", { fileName, fileType: file.type });
 
-      const { error: uploadError, data: uploadData } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("event-images")
-        .upload(filePath, file);
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (uploadError) {
         console.error("Error uploading file:", uploadError);
-        toast({
-          variant: "destructive",
-          title: "Upload Error",
-          description: "Failed to upload image. Please try again.",
-        });
         throw uploadError;
       }
 
-      console.log("File uploaded successfully", { filePath, uploadData });
+      console.log("File uploaded successfully", { fileName });
 
       const { data } = supabase.storage
         .from("event-images")
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
 
       console.log("Generated public URL", { publicUrl: data.publicUrl });
       
@@ -64,7 +64,7 @@ export async function uploadImages(files: File[]) {
     const results = await Promise.all(uploadPromises);
     console.log("All images uploaded successfully", { urls: results });
     return results;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in uploadImages:", error);
     toast({
       variant: "destructive",
