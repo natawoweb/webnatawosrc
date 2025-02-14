@@ -30,8 +30,15 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Profile ID is required for upload.');
       }
 
-      // Generate a unique file name to prevent collisions
-      const fileName = `${profile.id}-${Math.random()}.${fileExt}`;
+      // Generate a unique file name using timestamp for versioning
+      const timestamp = new Date().getTime();
+      const fileName = `${profile.id}-${timestamp}.${fileExt}`;
+
+      console.log('Starting avatar upload:', {
+        profileId: profile.id,
+        fileName: fileName,
+        fileType: file.type
+      });
 
       // Delete old avatar if it exists
       if (profile.avatar_url) {
@@ -48,16 +55,13 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
           }
         }
       }
-
-      console.log('Starting avatar upload for user:', profile.id);
-      console.log('New avatar filename:', fileName);
       
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, {
           cacheControl: '3600',
-          contentType: file.type,
-          upsert: false
+          contentType: file.type || 'image/jpeg',
+          upsert: true // Allow overwriting in case of concurrent uploads
         });
 
       if (uploadError) {
@@ -65,11 +69,7 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw uploadError;
       }
 
-      if (!data) {
-        throw new Error('Upload failed: No data returned');
-      }
-
-      console.log('Upload successful:', data);
+      console.log('Upload successful, generating public URL');
 
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
