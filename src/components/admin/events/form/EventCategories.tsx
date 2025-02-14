@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Label } from "@/components/ui/label";
@@ -25,7 +26,7 @@ export function EventCategories({
   onCategoryChange,
   onTagsChange,
 }: EventCategoriesProps) {
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading } = useQuery({
     queryKey: ["event-categories"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -33,7 +34,11 @@ export function EventCategories({
         .select("*")
         .order("name");
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching categories:", error);
+        throw error;
+      }
+      console.log("Fetched categories:", data);
       return data;
     },
   });
@@ -59,14 +64,24 @@ export function EventCategories({
         <Label>Category</Label>
         <Select value={categoryId || ""} onValueChange={onCategoryChange}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a category" />
+            <SelectValue placeholder="Select a category (optional)" />
           </SelectTrigger>
           <SelectContent>
-            {categories?.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.name}
+            {isLoading ? (
+              <SelectItem value="loading" disabled>
+                Loading categories...
               </SelectItem>
-            ))}
+            ) : categories?.length === 0 ? (
+              <SelectItem value="none" disabled>
+                No categories available
+              </SelectItem>
+            ) : (
+              categories?.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
       </div>
@@ -74,7 +89,7 @@ export function EventCategories({
       <div className="space-y-2">
         <Label>Tags (Press Enter to add)</Label>
         <Input
-          placeholder="Add tags..."
+          placeholder="Add optional tags..."
           onKeyDown={handleAddTag}
         />
         <div className="flex flex-wrap gap-2 mt-2">
