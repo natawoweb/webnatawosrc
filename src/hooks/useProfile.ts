@@ -91,7 +91,6 @@ export const useProfile = () => {
     editedProfile,
     setIsEditing,
     updateProfile,
-    setProfile, // Add setProfile to the returned object
     handleProfileChange,
     handleSocialLinkChange,
     handleCancel,

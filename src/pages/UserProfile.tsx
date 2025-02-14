@@ -16,20 +16,13 @@ export default function UserProfile() {
     editedProfile,
     setIsEditing,
     updateProfile,
-    setProfile, // Make sure we have access to setProfile
     handleProfileChange,
     handleSocialLinkChange,
     handleCancel,
   } = useProfile();
 
   const { uploading, uploadAvatar } = useAvatarUpload(profile, (url) => {
-    if (profile) {
-      // Update the local profile state immediately
-      setProfile({
-        ...profile,
-        avatar_url: url
-      });
-    }
+    profile && (profile.avatar_url = url);
   });
 
   if (loading) {
