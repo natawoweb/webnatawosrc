@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -13,13 +13,13 @@ interface SocialLinks {
 }
 
 export const useProfileUpdates = (profile: Profile | null, setProfile: (profile: Profile | null) => void) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editedProfile, setEditedProfile] = useState<Profile | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Initialize editedProfile whenever profile changes
-  useEffect(() => {
+  // Initialize editedProfile whenever profile changes using useCallback
+  const initializeEditedProfile = useCallback(() => {
     if (profile) {
       setEditedProfile({
         ...profile,
@@ -29,6 +29,11 @@ export const useProfileUpdates = (profile: Profile | null, setProfile: (profile:
       });
     }
   }, [profile]);
+
+  // Use useEffect for initialization
+  useEffect(() => {
+    initializeEditedProfile();
+  }, [initializeEditedProfile]);
 
   const updateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,15 +79,15 @@ export const useProfileUpdates = (profile: Profile | null, setProfile: (profile:
     }
   };
 
-  const handleProfileChange = (field: string, value: any) => {
+  const handleProfileChange = useCallback((field: string, value: any) => {
     if (!editedProfile) return;
-    setEditedProfile({
-      ...editedProfile,
+    setEditedProfile(prev => prev ? {
+      ...prev,
       [field]: value
-    });
-  };
+    } : null);
+  }, [editedProfile]);
 
-  const handleSocialLinkChange = (platform: keyof SocialLinks, value: string) => {
+  const handleSocialLinkChange = useCallback((platform: keyof SocialLinks, value: string) => {
     if (!editedProfile) return;
     
     const currentSocialLinks = editedProfile.social_links || {};
@@ -90,19 +95,19 @@ export const useProfileUpdates = (profile: Profile | null, setProfile: (profile:
       ? JSON.parse(currentSocialLinks) 
       : currentSocialLinks;
 
-    setEditedProfile({
-      ...editedProfile,
+    setEditedProfile(prev => prev ? {
+      ...prev,
       social_links: {
         ...parsedSocialLinks,
         [platform]: value
       }
-    });
-  };
+    } : null);
+  }, [editedProfile]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setEditedProfile(profile);
     setIsEditing(false);
-  };
+  }, [profile]);
 
   return {
     isEditing,
