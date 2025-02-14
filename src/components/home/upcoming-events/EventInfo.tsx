@@ -1,7 +1,7 @@
 
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { format } from "date-fns";
-import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { Database } from "@/integrations/supabase/types";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
@@ -16,7 +16,7 @@ export function EventInfo({ event }: EventInfoProps) {
   
   // Convert event time to UTC
   const eventDateTime = `${event.date}T${event.time}`;
-  const eventInUTC = zonedTimeToUtc(eventDateTime, 'America/New_York'); // Events are stored in EST
+  const eventInUTC = fromZonedTime(eventDateTime, 'America/New_York'); // Events are stored in EST
   
   // Format the date and time in user's local timezone
   const localDate = formatInTimeZone(eventInUTC, userTimeZone, 'MMMM d, yyyy');
