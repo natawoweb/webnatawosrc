@@ -69,8 +69,8 @@ export const useProfileData = (mounted: boolean) => {
     }
   };
 
-  // Add useQuery to cache and automatically refetch profile data
-  const { data: queryProfile } = useQuery({
+  // Updated useQuery configuration to use meta for callbacks
+  useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -78,9 +78,11 @@ export const useProfileData = (mounted: boolean) => {
       return fetchProfile(session);
     },
     enabled: mounted,
-    onSuccess: (data) => {
-      if (data) {
-        setProfile(data);
+    meta: {
+      onSuccess: (data: Profile | null) => {
+        if (data) {
+          setProfile(data);
+        }
       }
     }
   });
