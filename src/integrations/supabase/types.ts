@@ -433,6 +433,7 @@ export type Database = {
       }
       events: {
         Row: {
+          category_id: string | null
           created_at: string | null
           created_by: string | null
           current_participants: number | null
@@ -443,10 +444,12 @@ export type Database = {
           is_upcoming: boolean | null
           location: string
           max_participants: number | null
+          tags: string[] | null
           time: string
           title: string
         }
         Insert: {
+          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           current_participants?: number | null
@@ -457,10 +460,12 @@ export type Database = {
           is_upcoming?: boolean | null
           location: string
           max_participants?: number | null
+          tags?: string[] | null
           time: string
           title: string
         }
         Update: {
+          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           current_participants?: number | null
@@ -471,10 +476,19 @@ export type Database = {
           is_upcoming?: boolean | null
           location?: string
           max_participants?: number | null
+          tags?: string[] | null
           time?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "event_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       events_registrations: {
         Row: {
