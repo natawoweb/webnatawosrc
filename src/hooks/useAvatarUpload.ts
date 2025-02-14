@@ -30,13 +30,14 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Profile ID is required for upload.');
       }
 
-      // Structure the filename with user ID as the folder name for RLS
+      // Generate a unique filename
       const timestamp = Date.now();
-      const fileName = `${profile.id}/${timestamp}.${fileExt}`;
+      const fileName = `${timestamp}.${fileExt}`;
+      const filePath = `${profile.id}/${fileName}`;
 
       console.log('Starting avatar upload:', {
         profileId: profile.id,
-        fileName: fileName,
+        filePath: filePath,
         fileType: file.type,
         bucketName: 'avatars'
       });
@@ -45,12 +46,12 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
       if (profile.avatar_url) {
         try {
           const oldUrl = new URL(profile.avatar_url);
-          const oldFileName = oldUrl.pathname.split('/avatars/')[1];
-          if (oldFileName) {
-            console.log('Removing old avatar:', oldFileName);
+          const oldPath = decodeURIComponent(oldUrl.pathname.split('/avatars/')[1]);
+          if (oldPath) {
+            console.log('Removing old avatar:', oldPath);
             await supabase.storage
               .from('avatars')
-              .remove([oldFileName]);
+              .remove([oldPath]);
           }
         } catch (error) {
           console.error('Error removing old avatar:', error);
@@ -61,11 +62,7 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
       // Upload new avatar
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          contentType: file.type,
-          upsert: true
-        });
+        .upload(filePath, file);
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
@@ -81,7 +78,7 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
       // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
-        .getPublicUrl(fileName);
+        .getPublicUrl(filePath);
 
       console.log('Generated public URL:', publicUrl);
 
