@@ -40,10 +40,13 @@ export async function uploadImages(files: File[]) {
 
       // Convert blob URL to File object if needed
       let fileToUpload = file;
-      if (file.type === "") {
-        const response = await fetch(file);
-        const blob = await response.blob();
-        fileToUpload = new File([blob], fileName, { type: blob.type });
+      if (file.type === "" && typeof file !== 'string' && 'toString' in file) {
+        const blobUrl = file.toString();
+        if (blobUrl.startsWith('blob:')) {
+          const response = await fetch(blobUrl);
+          const blob = await response.blob();
+          fileToUpload = new File([blob], fileName, { type: blob.type });
+        }
       }
 
       const { error: uploadError } = await supabase.storage
