@@ -14,6 +14,12 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
     try {
       setUploading(true);
 
+      // First check if we have an authenticated user
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('You must be logged in to upload an avatar.');
+      }
+
       if (!event.target.files || event.target.files.length === 0) {
         throw new Error('You must select an image to upload.');
       }
