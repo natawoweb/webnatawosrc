@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Upload, User, AlertCircle } from "lucide-react";
+import { Loader2, Upload, User, AlertCircle, ImageIcon } from "lucide-react";
 import { useState } from "react";
 
 interface AvatarUploadProps {
@@ -13,6 +13,9 @@ interface AvatarUploadProps {
   uploading: boolean;
   onAvatarChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
+const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export function AvatarUpload({ avatarUrl, fullName, isEditing, uploading, onAvatarChange }: AvatarUploadProps) {
   const [error, setError] = useState<string | null>(null);
@@ -26,11 +29,13 @@ export function AvatarUpload({ avatarUrl, fullName, isEditing, uploading, onAvat
       return;
     }
 
-    const fileExt = file.name.split('.').pop()?.toLowerCase();
-    const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      setError("Please upload a valid image file (JPEG, PNG, or GIF)");
+      return;
+    }
 
-    if (!fileExt || !allowedExtensions.includes(fileExt)) {
-      setError("Please upload an image file (jpg, jpeg, png, or gif)");
+    if (file.size > MAX_FILE_SIZE) {
+      setError("File size must be less than 5MB");
       return;
     }
 
@@ -58,31 +63,36 @@ export function AvatarUpload({ avatarUrl, fullName, isEditing, uploading, onAvat
       )}
 
       {isEditing && (
-        <div className="flex items-center gap-2">
-          <Input
-            type="file"
-            accept="image/jpeg,image/png,image/gif"
-            onChange={handleFileChange}
-            disabled={uploading}
-            className="hidden"
-            id="avatar-upload"
-          />
-          <Button
-            variant="outline"
-            onClick={() => {
-              setError(null);
-              document.getElementById('avatar-upload')?.click();
-            }}
-            disabled={uploading}
-            className="w-[200px]"
-          >
-            {uploading ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <Upload className="h-4 w-4 mr-2" />
-            )}
-            {uploading ? "Uploading..." : "Change Avatar"}
-          </Button>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-sm text-muted-foreground">
+            Allowed formats: JPEG, PNG, GIF (max 5MB)
+          </p>
+          <div className="flex items-center gap-2">
+            <Input
+              type="file"
+              accept="image/jpeg,image/png,image/gif"
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="hidden"
+              id="avatar-upload"
+            />
+            <Button
+              variant="outline"
+              onClick={() => {
+                setError(null);
+                document.getElementById('avatar-upload')?.click();
+              }}
+              disabled={uploading}
+              className="w-[200px]"
+            >
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <ImageIcon className="h-4 w-4 mr-2" />
+              )}
+              {uploading ? "Uploading..." : "Change Avatar"}
+            </Button>
+          </div>
         </div>
       )}
     </div>
