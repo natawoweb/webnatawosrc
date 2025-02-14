@@ -8,6 +8,7 @@ import { useEventForm, EventFormData } from "./hooks/useEventForm";
 import { uploadImages } from "./hooks/useImageUpload";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface EventFormProps {
   initialData?: Partial<EventFormData>;
@@ -27,8 +28,7 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submission started");
-    console.log("Current form data:", formData);
+    console.log("Form submission started - EventForm component");
     
     // Validate required fields
     const requiredFields = {
@@ -74,8 +74,9 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
         console.log("Updating existing event:", formData.id);
         await updateEventMutation.mutateAsync(eventData);
       } else {
-        console.log("Creating new event");
+        console.log("Creating new event - about to call mutateAsync");
         await createEventMutation.mutateAsync(eventData);
+        console.log("Mutation called successfully");
       }
     } catch (error) {
       console.error("Form submission error:", error);
@@ -133,7 +134,14 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
           type="submit"
           disabled={createEventMutation.isPending || updateEventMutation.isPending}
         >
-          {createEventMutation.isPending ? 'Creating...' : formData.id ? 'Update Event' : 'Create Event'}
+          {createEventMutation.isPending || updateEventMutation.isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {formData.id ? 'Updating...' : 'Creating...'}
+            </>
+          ) : (
+            formData.id ? 'Update Event' : 'Create Event'
+          )}
         </Button>
       </div>
     </form>
