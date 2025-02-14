@@ -26,7 +26,7 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
     updateEventMutation,
   } = useEventForm({ initialData, onSuccess });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submission started - EventForm component");
     
@@ -56,37 +56,47 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
       return;
     }
 
-    try {
-      console.log("Processing selected images:", selectedImages);
-      const uploadedUrls = selectedImages.length > 0 ? await uploadImages(selectedImages) : [];
-      console.log("Uploaded image URLs:", uploadedUrls);
-      
-      const galleryUrls = [...(formData.gallery || []), ...uploadedUrls];
-      console.log("Final gallery URLs:", galleryUrls);
+    const processSubmission = async () => {
+      try {
+        console.log("Processing selected images:", selectedImages);
+        const uploadedUrls = selectedImages.length > 0 ? await uploadImages(selectedImages) : [];
+        console.log("Uploaded image URLs:", uploadedUrls);
+        
+        const galleryUrls = [...(formData.gallery || []), ...uploadedUrls];
+        console.log("Final gallery URLs:", galleryUrls);
 
-      const eventData = {
-        ...formData,
-        gallery: galleryUrls,
-      };
-      console.log("Final event data being submitted:", eventData);
+        const eventData = {
+          ...formData,
+          gallery: galleryUrls,
+        };
+        console.log("Final event data being submitted:", eventData);
 
-      if (formData.id) {
-        console.log("Updating existing event:", formData.id);
-        await updateEventMutation.mutateAsync(eventData);
-      } else {
-        console.log("Creating new event - about to call mutateAsync");
-        await createEventMutation.mutateAsync(eventData);
-        console.log("Mutation called successfully");
+        if (formData.id) {
+          console.log("Updating existing event:", formData.id);
+          await updateEventMutation.mutateAsync(eventData);
+        } else {
+          console.log("Creating new event - about to call mutateAsync");
+          await createEventMutation.mutateAsync(eventData);
+          console.log("Mutation called successfully");
+        }
+      } catch (error) {
+        console.error("Form submission error:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to save event. Please try again.",
+        });
       }
-    } catch (error) {
-      console.error("Form submission error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to save event. Please try again.",
-      });
-    }
+    };
+
+    // Execute the submission
+    processSubmission();
   };
+
+  console.log("Current form state:", {
+    isPending: createEventMutation.isPending || updateEventMutation.isPending,
+    formData
+  });
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -133,6 +143,7 @@ export function EventForm({ initialData, onSuccess }: EventFormProps) {
         <Button
           type="submit"
           disabled={createEventMutation.isPending || updateEventMutation.isPending}
+          onClick={() => console.log("Button clicked")}
         >
           {createEventMutation.isPending || updateEventMutation.isPending ? (
             <>
