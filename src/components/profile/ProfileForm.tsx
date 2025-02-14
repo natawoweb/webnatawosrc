@@ -35,6 +35,24 @@ export function ProfileForm({
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor="county">Country</Label>
+        <Select 
+          value={editedProfile?.county || ''} 
+          onValueChange={(value) => onProfileChange('county', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select your country" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="USA">USA</SelectItem>
+            <SelectItem value="Canada">Canada</SelectItem>
+            <SelectItem value="Mexico">Mexico</SelectItem>
+            <SelectItem value="Others">Others</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="pseudonym">Pseudonym</Label>
         <Input
           id="pseudonym"

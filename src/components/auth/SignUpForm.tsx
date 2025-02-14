@@ -21,15 +21,24 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
   const [role, setRole] = useState<'reader' | 'writer'>('reader');
   const [pseudonym, setPseudonym] = useState("");
   const [bio, setBio] = useState("");
+  const [county, setCounty] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!county) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please select your country",
+      });
+      return;
+    }
+    
     setLoading(true);
     
     try {
-      // First try to sign up the user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -39,6 +48,7 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
             role: role,
             pseudonym: pseudonym,
             bio: bio,
+            county: county,
           }
         }
       });
@@ -46,7 +56,6 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
       if (error) {
         console.error('Signup error details:', error);
         
-        // Check for user already exists error in multiple ways
         if (error.status === 422 || 
             error.message?.toLowerCase().includes('already') || 
             error.message?.toLowerCase().includes('registered') ||
@@ -58,7 +67,6 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
             duration: 5000,
           });
           
-          // Switch to sign in tab after a short delay
           setTimeout(() => {
             onExistingAccount();
           }, 100);
@@ -81,7 +89,6 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
 
       console.log('Sign up successful, sending notifications...');
 
-      // Only proceed with notifications if signup was successful
       await handleSignupNotifications(role, email, fullName);
       
       toast({
@@ -115,6 +122,8 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
         setPassword={setPassword}
         fullName={fullName}
         setFullName={setFullName}
+        county={county}
+        setCounty={setCounty}
       />
 
       <div className="space-y-2">

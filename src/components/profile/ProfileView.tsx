@@ -30,6 +30,11 @@ export function ProfileView({ profile }: ProfileViewProps) {
       </div>
 
       <div>
+        <Label className="text-muted-foreground">Country</Label>
+        <p className="mt-1">{profile.county || 'Not set'}</p>
+      </div>
+
+      <div>
         <Label className="text-muted-foreground">Pseudonym</Label>
         <p className="mt-1">{profile.pseudonym || 'Not set'}</p>
       </div>

@@ -1,15 +1,17 @@
 
-import { Mail, Lock, UserCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface BaseFormFieldsProps {
   email: string;
-  setEmail: (value: string) => void;
+  setEmail: (email: string) => void;
   password: string;
-  setPassword: (value: string) => void;
+  setPassword: (password: string) => void;
   fullName: string;
-  setFullName: (value: string) => void;
+  setFullName: (name: string) => void;
+  county: string;
+  setCounty: (county: string) => void;
 }
 
 export function BaseFormFields({
@@ -19,55 +21,63 @@ export function BaseFormFields({
   setPassword,
   fullName,
   setFullName,
+  county,
+  setCounty
 }: BaseFormFieldsProps) {
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="fullName">Full Name</Label>
-        <div className="relative">
-          <UserCircle className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="fullName"
-            type="text"
-            placeholder="Enter your full name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="pl-10"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="email"
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="pl-10"
-            required
-          />
-        </div>
+        <Input
+          id="email"
+          placeholder="Enter your email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
       </div>
-
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="password"
-            type="password"
-            placeholder="Choose a password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="pl-10"
-            required
-          />
-        </div>
+        <Input
+          id="password"
+          placeholder="Enter your password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="fullName">Full Name</Label>
+        <Input
+          id="fullName"
+          placeholder="Enter your full name"
+          type="text"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          required
+          minLength={2}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="county">Country</Label>
+        <Select 
+          value={county} 
+          onValueChange={setCounty}
+          required
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select your country" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="USA">USA</SelectItem>
+            <SelectItem value="Canada">Canada</SelectItem>
+            <SelectItem value="Mexico">Mexico</SelectItem>
+            <SelectItem value="Others">Others</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </>
   );
