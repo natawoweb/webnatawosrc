@@ -38,11 +38,20 @@ export async function uploadImages(files: File[]) {
 
       console.log("Uploading file", { fileName, fileType: file.type });
 
+      // Convert blob URL to File object if needed
+      let fileToUpload = file;
+      if (file.type === "") {
+        const response = await fetch(file);
+        const blob = await response.blob();
+        fileToUpload = new File([blob], fileName, { type: blob.type });
+      }
+
       const { error: uploadError } = await supabase.storage
         .from("event-images")
-        .upload(fileName, file, {
+        .upload(fileName, fileToUpload, {
           cacheControl: '3600',
-          upsert: false
+          upsert: false,
+          contentType: fileToUpload.type
         });
 
       if (uploadError) {
