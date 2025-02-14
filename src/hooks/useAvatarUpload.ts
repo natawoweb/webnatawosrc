@@ -30,15 +30,14 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Profile ID is required for upload.');
       }
 
-      // Generate a unique filename with timestamp to prevent conflicts
+      // Simplified filename - just use timestamp and extension
       const timestamp = Date.now();
-      const randomId = Math.random().toString(36).substring(2, 15);
-      const fileName = `${profile.id}-${timestamp}-${randomId}.${fileExt}`;
+      const fileName = `${timestamp}.${fileExt}`;
 
       console.log('Starting avatar upload:', {
-        profileId: profile.id,
         fileName: fileName,
         fileType: file.type,
+        fileSize: file.size,
         bucketName: 'avatars'
       });
 
@@ -59,12 +58,10 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         }
       }
       
-      // Upload new avatar with simplified options
+      // Simplified upload with minimal options
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file, {
-          contentType: file.type
-        });
+        .upload(fileName, file);
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
