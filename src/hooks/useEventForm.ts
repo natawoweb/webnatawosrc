@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { uploadImages } from "@/components/admin/events/hooks/useImageUpload";
 
 export interface EventFormData {
   id?: string;
@@ -74,6 +75,12 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
 
       console.log("User role verified:", hasRole || hasManagerRole);
 
+      // Upload new images if any
+      let uploadedUrls: string[] = [];
+      if (selectedImages.length > 0) {
+        uploadedUrls = await uploadImages(selectedImages);
+      }
+
       // Prepare event data
       const eventData = {
         title: data.title,
@@ -82,7 +89,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         time: data.time,
         location: data.location,
         max_participants: data.max_participants,
-        gallery: data.gallery,
+        gallery: [...(data.gallery || []), ...uploadedUrls],
         created_by: user.id,
         category_id: data.category_id,
         current_participants: 0,
@@ -113,6 +120,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         title: "Success",
         description: "Event created successfully",
       });
+      setSelectedImages([]); // Clear selected images after successful creation
       if (onSuccess) {
         console.log("Calling onSuccess callback...");
         onSuccess();
@@ -130,9 +138,22 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
 
   const updateEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
+      console.log("Starting event update process...");
       if (!data.id) {
         throw new Error("Event ID is required for updates");
       }
+
+      // Upload new images if any
+      let uploadedUrls: string[] = [];
+      if (selectedImages.length > 0) {
+        console.log("Uploading new images for event update...");
+        uploadedUrls = await uploadImages(selectedImages);
+        console.log("New images uploaded successfully:", uploadedUrls);
+      }
+
+      // Combine existing gallery with new uploaded images
+      const updatedGallery = [...(data.gallery || []), ...uploadedUrls];
+      console.log("Updated gallery:", updatedGallery);
       
       const { data: result, error } = await supabase
         .from("events")
@@ -143,7 +164,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
           time: data.time,
           location: data.location,
           max_participants: data.max_participants,
-          gallery: data.gallery,
+          gallery: updatedGallery,
           category_id: data.category_id,
           tags: data.tags
         })
@@ -165,6 +186,7 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
         title: "Success",
         description: "Event updated successfully",
       });
+      setSelectedImages([]); // Clear selected images after successful update
       onSuccess?.();
     },
     onError: (error: any) => {
@@ -186,4 +208,3 @@ export function useEventForm({ initialData, onSuccess }: UseEventFormProps) {
     updateEventMutation,
   };
 }
-
