@@ -174,9 +174,12 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
 
   const submitBlog = useMutation({
     mutationFn: async () => {
-      if (!currentBlogId && !title) {
-        throw new Error("Blog must be saved as draft first");
+      if (!title) {
+        throw new Error("Title is required");
       }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
 
       const updateData = {
         status: "pending_approval" as const,
@@ -185,6 +188,7 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
         title_tamil: titleTamil || null,
         content_tamil: contentTamil || null,
         category_id: selectedCategory || null,
+        updated_at: new Date().toISOString(),
       };
 
       if (currentBlogId) {
@@ -195,9 +199,6 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
 
         if (error) throw error;
       } else {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error("No user found");
-
         const { error } = await supabase
           .from("blogs")
           .insert({
@@ -209,6 +210,8 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
       }
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["writer-blogs"] });
       toast({
         title: "Success",
         description: "Blog submitted for approval",
