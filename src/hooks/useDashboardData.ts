@@ -7,22 +7,35 @@ export function useDashboardData(userId: string | undefined) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    if (!userId) return;
+
+    // Subscribe to all blog changes for this user
     const channel = supabase
-      .channel('schema-db-changes')
+      .channel('blogs-changes')
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
-          table: 'blogs'
+          table: 'blogs',
+          filter: `author_id=eq.${userId}` // Only listen to changes for this user's blogs
         },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["writer-blogs", userId] });
+        (payload) => {
+          console.log('Received real-time update:', payload);
+          // Immediately invalidate the query to trigger a refresh
+          queryClient.invalidateQueries({ 
+            queryKey: ["writer-blogs", userId],
+            exact: true
+          });
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
 
+    // Cleanup subscription when component unmounts or userId changes
     return () => {
+      console.log('Cleaning up subscription');
       supabase.removeChannel(channel);
     };
   }, [queryClient, userId]);
@@ -30,6 +43,7 @@ export function useDashboardData(userId: string | undefined) {
   return useQuery({
     queryKey: ["writer-blogs", userId],
     queryFn: async () => {
+      console.log('Fetching blogs for user:', userId);
       if (!userId) return [];
       
       const { data, error } = await supabase
@@ -49,6 +63,7 @@ export function useDashboardData(userId: string | undefined) {
         throw error;
       }
       
+      console.log('Fetched blogs:', data);
       return data;
     },
     enabled: !!userId,
