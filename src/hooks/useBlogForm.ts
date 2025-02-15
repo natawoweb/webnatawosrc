@@ -54,27 +54,6 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
     setIsSaving
   );
 
-  // Update form data when initialData changes
-  useEffect(() => {
-    console.log('Initial data changed:', initialData);
-    console.log('Initial blog ID:', initialBlogId);
-    
-    if (initialData) {
-      setTitle(initialData.title || "");
-      setContent(initialData.content || emptyContent);
-      setTitleTamil(initialData.title_tamil || "");
-      setContentTamil(initialData.content_tamil ? 
-        typeof initialData.content_tamil === 'string' ? 
-          initialData.content_tamil : 
-          JSON.stringify(initialData.content_tamil) 
-        : emptyContent);
-      setSelectedCategory(initialData.category_id || "");
-      if (initialBlogId) {
-        setCurrentBlogId(initialBlogId);
-      }
-    }
-  }, [initialData, initialBlogId]);
-
   const debouncedSave = useDebouncedCallback(async () => {
     if (isSaving) return;
     if (!title && !hasContent(content, title)) return;
