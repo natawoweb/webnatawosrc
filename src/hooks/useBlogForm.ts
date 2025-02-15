@@ -54,13 +54,16 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
     setIsSaving
   );
 
+  // Increase debounce time to 2 seconds and add leading edge trigger
   const debouncedSave = useDebouncedCallback(async () => {
     if (isSaving) return;
     if (!title && !hasContent(content, title)) return;
 
     try {
       setIsSaving(true);
-      console.log('Saving blog with ID:', currentBlogId);
+      console.log('Auto-saving blog with ID:', currentBlogId);
+      console.log('Content being saved:', content);
+      
       await saveBlog.mutateAsync({
         title,
         content,
@@ -70,12 +73,18 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
       });
     } catch (error) {
       console.error('Auto-save failed:', error);
+    } finally {
       setIsSaving(false);
     }
-  }, 1000);
+  }, 2000, { leading: true, trailing: true });
 
+  // Only trigger auto-save when content actually changes
   useEffect(() => {
-    if (title || content !== emptyContent || titleTamil || contentTamil !== emptyContent) {
+    const hasRealContent = content !== emptyContent;
+    const shouldSave = hasRealContent || title || titleTamil || contentTamil !== emptyContent;
+    
+    if (shouldSave) {
+      console.log('Content changed, triggering auto-save');
       debouncedSave();
     }
   }, [title, content, titleTamil, contentTamil, selectedCategory]);
