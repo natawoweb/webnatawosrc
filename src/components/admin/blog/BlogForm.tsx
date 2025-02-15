@@ -2,6 +2,9 @@
 import { BlogContentSection } from "./BlogContentSection";
 import { CreateBlogHeader } from "./CreateBlogHeader";
 import { CreateBlogActions } from "./CreateBlogActions";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Globe } from "lucide-react";
 
 interface BlogFormProps {
   title?: string;
@@ -64,15 +67,60 @@ export function BlogForm({
           isLoading={isSubmitting}
         />
 
-        <BlogContentSection
-          language={selectedLanguage}
-          title={selectedLanguage === "english" ? currentTitle : titleTamil}
-          content={selectedLanguage === "english" ? content : contentTamil}
-          onTitleChange={selectedLanguage === "english" ? setTitle : setTitleTamil}
-          onContentChange={selectedLanguage === "english" ? setContent : setContentTamil}
-          onTranslate={selectedLanguage === "english" ? handleTranslate : undefined}
-          hasContent={hasContent()}
-        />
+        <Tabs 
+          defaultValue="english" 
+          value={selectedLanguage}
+          onValueChange={(value) => setSelectedLanguage(value as "english" | "tamil")}
+          className="w-full"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <TabsList>
+              <TabsTrigger value="english">Write in English</TabsTrigger>
+              <TabsTrigger value="tamil">Write in Tamil</TabsTrigger>
+            </TabsList>
+            {selectedLanguage === "english" ? (
+              <Button
+                onClick={handleTranslate}
+                disabled={!hasContent()}
+                className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white"
+              >
+                <Globe className="mr-2 h-4 w-4" />
+                Translate to Tamil
+              </Button>
+            ) : (
+              <Button
+                onClick={handleTranslate}
+                disabled={!hasContent()}
+                className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white"
+              >
+                <Globe className="mr-2 h-4 w-4" />
+                Translate to English
+              </Button>
+            )}
+          </div>
+
+          <TabsContent value="english" className="mt-0">
+            <BlogContentSection
+              language="english"
+              title={currentTitle}
+              content={content}
+              onTitleChange={setTitle}
+              onContentChange={setContent}
+              hasContent={hasContent()}
+            />
+          </TabsContent>
+
+          <TabsContent value="tamil" className="mt-0">
+            <BlogContentSection
+              language="tamil"
+              title={titleTamil}
+              content={contentTamil}
+              onTitleChange={setTitleTamil}
+              onContentChange={setContentTamil}
+              hasContent={hasContent()}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

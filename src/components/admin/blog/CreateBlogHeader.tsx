@@ -25,8 +25,6 @@ export function CreateBlogHeader({
   categories,
   selectedCategory,
   onCategoryChange,
-  selectedLanguage,
-  onLanguageChange,
   onBack,
 }: CreateBlogHeaderProps) {
   return (
@@ -52,15 +50,6 @@ export function CreateBlogHeader({
                   {category.name}
                 </SelectItem>
               ))}
-            </SelectContent>
-          </Select>
-          <Select value={selectedLanguage} onValueChange={onLanguageChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select language" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="english">Write in English</SelectItem>
-              <SelectItem value="tamil">Write in Tamil</SelectItem>
             </SelectContent>
           </Select>
         </div>
