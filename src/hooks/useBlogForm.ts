@@ -38,21 +38,20 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
   const queryClient = useQueryClient();
   
   const [selectedLanguage, setSelectedLanguage] = useState<"english" | "tamil">("english");
-  const [title, setTitle] = useState(initialData?.title || "");
-  const [content, setContent] = useState(initialData?.content || emptyContent);
-  const [titleTamil, setTitleTamil] = useState(initialData?.title_tamil || "");
-  const [contentTamil, setContentTamil] = useState(initialData?.content_tamil ? 
-    typeof initialData.content_tamil === 'string' ? 
-      initialData.content_tamil : 
-      JSON.stringify(initialData.content_tamil) 
-    : emptyContent);
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialData?.category_id || "");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState(emptyContent);
+  const [titleTamil, setTitleTamil] = useState("");
+  const [contentTamil, setContentTamil] = useState(emptyContent);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [currentBlogId, setCurrentBlogId] = useState<string | undefined>(initialBlogId);
+  const [currentBlogId, setCurrentBlogId] = useState<string | undefined>(undefined);
 
   // Update form data when initialData changes
   useEffect(() => {
+    console.log('Initial data changed:', initialData);
+    console.log('Initial blog ID:', initialBlogId);
+    
     if (initialData) {
       setTitle(initialData.title || "");
       setContent(initialData.content || emptyContent);
@@ -63,9 +62,9 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
           JSON.stringify(initialData.content_tamil) 
         : emptyContent);
       setSelectedCategory(initialData.category_id || "");
-    }
-    if (initialBlogId) {
-      setCurrentBlogId(initialBlogId);
+      if (initialBlogId) {
+        setCurrentBlogId(initialBlogId);
+      }
     }
   }, [initialData, initialBlogId]);
 
@@ -80,6 +79,7 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
+      // Only update if we have a currentBlogId
       if (currentBlogId) {
         console.log('Updating existing blog:', currentBlogId);
         const { error } = await supabase
@@ -100,6 +100,7 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
         }
         return currentBlogId;
       } else {
+        // Create new blog
         console.log('Creating new blog');
         const { data, error } = await supabase
           .from("blogs")
@@ -119,11 +120,13 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
           console.error('Error creating blog:', error);
           throw error;
         }
+
+        console.log('New blog created with ID:', data.id);
         setCurrentBlogId(data.id);
         return data.id;
       }
     },
-    onSuccess: () => {
+    onSuccess: (blogId) => {
       setLastSaved(new Date());
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       queryClient.invalidateQueries({ queryKey: ["writer-blogs"] });
