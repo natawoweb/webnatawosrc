@@ -46,6 +46,8 @@ export function UserManagement() {
     updateUserProfile,
   } = useUserManagement();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   if (isLoading) {
@@ -55,10 +57,6 @@ export function UserManagement() {
       </div>
     );
   }
-
-  const handleLevelChange = (level: UserLevel) => {
-    setEditLevel(level);
-  };
 
   return (
     <div className="space-y-6">
@@ -93,6 +91,11 @@ export function UserManagement() {
           setSelectedUser(user);
           setProfileDialogOpen(true);
         }}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        totalItems={users?.length || 0}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
       />
 
       <DeleteUserDialog
