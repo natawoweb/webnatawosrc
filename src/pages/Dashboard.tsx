@@ -7,11 +7,14 @@ import { useSession } from "@/hooks/useSession";
 import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 export default function Dashboard() {
   const { session } = useSession();
   const { toast } = useToast();
   const { data: blogs, isLoading } = useDashboardData(session?.user?.id);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const handleDelete = async (blogId: string) => {
     try {
@@ -58,7 +61,6 @@ export default function Dashboard() {
         description: "Blog published successfully",
       });
       
-      // Invalidate the dashboard data to refresh the UI
       window.location.reload();
     } catch (error: any) {
       console.error("Publish error:", error);
@@ -69,6 +71,11 @@ export default function Dashboard() {
       });
     }
   };
+
+  const paginatedBlogs = blogs?.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   if (isLoading) {
     return (
@@ -92,9 +99,14 @@ export default function Dashboard() {
         </div>
 
         <BlogTable 
-          blogs={blogs || []} 
+          blogs={paginatedBlogs || []} 
           onDelete={handleDelete}
           onPublish={handlePublish}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          totalItems={blogs?.length || 0}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
         />
       </div>
     </div>
