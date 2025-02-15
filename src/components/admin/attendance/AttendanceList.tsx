@@ -1,165 +1,69 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// Temporarily commented out while fixing type issues
-/*
-interface EventAttendance {
-  id: string;
-  event_id: string;
-  user_id: string;
-  check_in_time: string;
-  status: string;
-  created_at: string;
-  profiles: {
-    id: string;
-    full_name: string;
-    email: string;
-    avatar_url: string | null;
-  };
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
+
+interface AttendanceListProps {
+  eventId: string;
+  participants: any[];
+  isLoading: boolean;
 }
 
-interface EventRegistration {
-  id: string;
-  event_id: string;
-  user_id: string;
-  status: string;
-  created_at: string;
-  profiles: {
-    id: string;
-    full_name: string;
-    email: string;
-    avatar_url: string | null;
-  };
-}
-*/
-
-export function AttendanceList() {
-  const [selectedEvent, setSelectedEvent] = useState<string>("");
-
-  // Temporarily commented out while fixing type issues
-  /*
-  const { data: events } = useQuery({
-    queryKey: ["events"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("events")
-        .select("*");
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: attendance } = useQuery({
-    queryKey: ["attendance", selectedEvent],
-    enabled: !!selectedEvent,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("event_attendance")
-        .select(`
-          *,
-          profiles (*)
-        `)
-        .eq("event_id", selectedEvent);
-
-      if (error) throw error;
-      return data as unknown as EventAttendance[];
-    },
-  });
-
-  const { data: registrations } = useQuery({
-    queryKey: ["registrations", selectedEvent],
-    enabled: !!selectedEvent,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("event_registrations")
-        .select(`
-          *,
-          profiles (*)
-        `)
-        .eq("event_id", selectedEvent);
-
-      if (error) throw error;
-      return data as unknown as EventRegistration[];
-    },
-  });
-  */
+export function AttendanceList({ participants, isLoading }: AttendanceListProps) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-48">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Select event" />
-          </SelectTrigger>
-          <SelectContent>
-            {/* Temporarily commented out while fixing type issues */}
-            {/*events?.map((event) => (
-              <SelectItem key={event.id} value={event.id}>
-                {event.title}
-              </SelectItem>
-            ))*/}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {selectedEvent && (
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Attendance</h3>
-              <div className="space-y-4">
-                {/* Temporarily commented out while fixing type issues */}
-                {/*attendance?.map((record) => (
-                  <div key={record.id} className="flex items-center space-x-4">
-                    <Avatar>
-                      <AvatarImage src={record.profiles.avatar_url || undefined} />
-                      <AvatarFallback>
-                        {record.profiles.full_name?.charAt(0) || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{record.profiles.full_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {record.profiles.email}
-                      </p>
-                    </div>
-                  </div>
-                ))*/}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Registrations</h3>
-              <div className="space-y-4">
-                {/* Temporarily commented out while fixing type issues */}
-                {/*registrations?.map((record) => (
-                  <div key={record.id} className="flex items-center space-x-4">
-                    <Avatar>
-                      <AvatarImage src={record.profiles.avatar_url || undefined} />
-                      <AvatarFallback>
-                        {record.profiles.full_name?.charAt(0) || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{record.profiles.full_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {record.profiles.email}
-                      </p>
-                    </div>
-                  </div>
-                ))*/}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+    <div className="rounded-md border mt-4">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Level</TableHead>
+            <TableHead>Registration Date</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {participants.length > 0 ? (
+            participants.map((participant) => (
+              <TableRow key={participant.registration_id}>
+                <TableCell className="font-medium">
+                  {participant.full_name}
+                </TableCell>
+                <TableCell>{participant.email}</TableCell>
+                <TableCell>
+                  <Badge variant="secondary">{participant.level}</Badge>
+                </TableCell>
+                <TableCell>
+                  {format(
+                    new Date(participant.registration_date),
+                    "MMM d, yyyy HH:mm"
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center h-24">
+                No participants registered for this event
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }

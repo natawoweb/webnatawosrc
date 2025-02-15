@@ -67,6 +67,13 @@ export type Database = {
             foreignKeyName: "blog_comment_reactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "blog_comment_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -109,6 +116,13 @@ export type Database = {
             foreignKeyName: "blog_comments_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "blog_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -143,6 +157,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "blogs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "blog_ratings_user_id_fkey"
@@ -204,6 +225,13 @@ export type Database = {
             foreignKeyName: "blogs_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "blogs_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -248,6 +276,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "blogs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "comments_user_id_fkey"
@@ -310,6 +345,13 @@ export type Database = {
             foreignKeyName: "event_comment_reactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "event_comment_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -347,6 +389,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "events"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "event_comments_user_id_fkey"
@@ -421,6 +470,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "events"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "event_ratings_user_id_fkey"
@@ -553,6 +609,13 @@ export type Database = {
             foreignKeyName: "events_registrations_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "events_registrations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -655,6 +718,13 @@ export type Database = {
             foreignKeyName: "ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -725,7 +795,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      event_participants: {
+        Row: {
+          email: string | null
+          event_date: string | null
+          event_id: string | null
+          event_time: string | null
+          event_title: string | null
+          full_name: string | null
+          has_access: boolean | null
+          level: string | null
+          participant_id: string | null
+          registration_date: string | null
+          registration_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       create_user_with_role: {
