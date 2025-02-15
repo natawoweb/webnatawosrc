@@ -29,6 +29,7 @@ export function useBlogMutations(
 
       if (currentBlogId) {
         console.log('Updating existing blog:', currentBlogId);
+        console.log('Blog data:', blogData);
         
         const { error } = await supabase
           .from("blogs")
@@ -42,7 +43,10 @@ export function useBlogMutations(
           })
           .eq('id', currentBlogId);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
         return currentBlogId;
       } else {
         console.log('Creating new blog');
@@ -60,7 +64,10 @@ export function useBlogMutations(
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
 
         console.log('New blog created with ID:', data.id);
         setCurrentBlogId(data.id);
