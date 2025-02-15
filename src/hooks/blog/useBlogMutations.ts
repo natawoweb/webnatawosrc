@@ -27,28 +27,16 @@ export function useBlogMutations(
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      // Ensure content is in proper format
-      const formattedContent = typeof blogData.content === 'string' ? 
-        blogData.content : 
-        JSON.stringify(blogData.content);
-
-      const formattedContentTamil = blogData.content_tamil ? 
-        typeof blogData.content_tamil === 'string' ? 
-          blogData.content_tamil : 
-          JSON.stringify(blogData.content_tamil) 
-        : null;
-
       if (currentBlogId) {
         console.log('Updating existing blog:', currentBlogId);
-        console.log('With content:', formattedContent);
         
         const { error } = await supabase
           .from("blogs")
           .update({
             title: blogData.title,
-            content: formattedContent,
+            content: blogData.content,
             title_tamil: blogData.title_tamil || null,
-            content_tamil: formattedContentTamil,
+            content_tamil: blogData.content_tamil || null,
             category_id: blogData.category_id || null,
             updated_at: new Date().toISOString(),
           })
@@ -62,9 +50,9 @@ export function useBlogMutations(
           .from("blogs")
           .insert({
             title: blogData.title,
-            content: formattedContent,
+            content: blogData.content,
             title_tamil: blogData.title_tamil || null,
-            content_tamil: formattedContentTamil,
+            content_tamil: blogData.content_tamil || null,
             category_id: blogData.category_id || null,
             author_id: user.id,
             status: "draft",
@@ -108,22 +96,12 @@ export function useBlogMutations(
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      const formattedContent = typeof blogData.content === 'string' ? 
-        blogData.content : 
-        JSON.stringify(blogData.content);
-
-      const formattedContentTamil = blogData.content_tamil ? 
-        typeof blogData.content_tamil === 'string' ? 
-          blogData.content_tamil : 
-          JSON.stringify(blogData.content_tamil) 
-        : null;
-
       const updateData = {
         status: "pending_approval" as const,
         title: blogData.title,
-        content: formattedContent,
+        content: blogData.content,
         title_tamil: blogData.title_tamil || null,
-        content_tamil: formattedContentTamil,
+        content_tamil: blogData.content_tamil || null,
         category_id: blogData.category_id || null,
         updated_at: new Date().toISOString(),
       };

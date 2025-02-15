@@ -30,37 +30,23 @@ export function useBlogState({ initialData, initialBlogId }: UseBlogStateProps =
   const [title, setTitle] = useState(initialData?.title || "");
   const [content, setContent] = useState(initialData?.content || emptyContent);
   const [titleTamil, setTitleTamil] = useState(initialData?.title_tamil || "");
-  const [contentTamil, setContentTamil] = useState(
-    initialData?.content_tamil ? 
-      typeof initialData.content_tamil === 'string' ? 
-        initialData.content_tamil : 
-        JSON.stringify(initialData.content_tamil) 
-      : emptyContent
-  );
+  const [contentTamil, setContentTamil] = useState(initialData?.content_tamil || emptyContent);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialData?.category_id || "");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentBlogId, setCurrentBlogId] = useState<string | undefined>(initialBlogId);
 
-  // Only update the state from initialData when it changes significantly
+  // Only update state when initialBlogId changes (i.e., when loading a different blog)
   useEffect(() => {
-    if (initialData && initialData.title !== undefined) {
-      setTitle(initialData.title);
+    if (initialBlogId && initialData) {
+      setTitle(initialData.title || "");
       setContent(initialData.content || emptyContent);
       setTitleTamil(initialData.title_tamil || "");
-      setContentTamil(
-        initialData.content_tamil ? 
-          typeof initialData.content_tamil === 'string' ? 
-            initialData.content_tamil : 
-            JSON.stringify(initialData.content_tamil) 
-          : emptyContent
-      );
+      setContentTamil(initialData.content_tamil || emptyContent);
       setSelectedCategory(initialData.category_id || "");
-    }
-    if (initialBlogId) {
       setCurrentBlogId(initialBlogId);
     }
-  }, [initialBlogId, initialData]); // Add initialData as a dependency to update when data is loaded
+  }, [initialBlogId]);
 
   return {
     selectedLanguage,
