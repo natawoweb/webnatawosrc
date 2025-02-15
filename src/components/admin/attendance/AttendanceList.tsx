@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useState } from "react";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 interface AttendanceListProps {
   eventId: string;
@@ -21,12 +22,19 @@ interface AttendanceListProps {
 
 export function AttendanceList({ participants, isLoading }: AttendanceListProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const filteredParticipants = participants.filter(
     (participant) =>
       participant.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       participant.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       participant.level.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const paginatedParticipants = filteredParticipants.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
   );
 
   if (isLoading) {
@@ -60,8 +68,8 @@ export function AttendanceList({ participants, isLoading }: AttendanceListProps)
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredParticipants.length > 0 ? (
-              filteredParticipants.map((participant) => (
+            {paginatedParticipants.length > 0 ? (
+              paginatedParticipants.map((participant) => (
                 <TableRow key={participant.registration_id}>
                   <TableCell className="font-medium">
                     {participant.full_name}
@@ -90,6 +98,14 @@ export function AttendanceList({ participants, isLoading }: AttendanceListProps)
           </TableBody>
         </Table>
       </div>
+
+      <DataTablePagination
+        currentPage={currentPage}
+        pageSize={pageSize}
+        totalItems={filteredParticipants.length}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
     </div>
   );
 }
