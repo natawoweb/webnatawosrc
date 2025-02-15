@@ -27,6 +27,7 @@ export function BlogTableRow({ blog, onDelete, onPublish }: BlogTableRowProps) {
       <TableCell>
         <BlogTableActions
           blogId={blog.id}
+          blog={blog}
           status={blog.status || 'draft'}
           onDelete={onDelete}
           onPublish={onPublish}
