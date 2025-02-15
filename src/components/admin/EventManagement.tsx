@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { Calendar, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function EventManagement() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: userRole, isLoading } = useQuery({
     queryKey: ["userRole"],
@@ -111,7 +113,17 @@ export function EventManagement() {
         </Dialog>
       </div>
 
-      <EventList onEdit={handleEdit} />
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search events..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
+      <EventList onEdit={handleEdit} searchQuery={searchQuery} />
     </div>
   );
 }

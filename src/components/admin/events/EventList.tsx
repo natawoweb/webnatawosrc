@@ -18,22 +18,42 @@ import { useState } from "react";
 
 interface EventListProps {
   onEdit: (event: any) => void;
+  searchQuery?: string;
 }
 
-export function EventList({ onEdit }: EventListProps) {
+export function EventList({ onEdit, searchQuery = "" }: EventListProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const { data: events, isLoading } = useQuery({
-    queryKey: ["admin-events"],
+    queryKey: ["admin-events", searchQuery],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const query = supabase
         .from("events")
         .select("*")
-        .order("date", { ascending: true });
+        .order('date', { ascending: false })
+        .order('time', { ascending: false });
+
+      // Apply search filter if search query exists
+      if (searchQuery) {
+        query.ilike('title', `%${searchQuery}%`);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
-      return data;
+      
+      // Sort with upcoming events first, then by date desc
+      return data.sort((a, b) => {
+        // First sort by upcoming status
+        if (a.is_upcoming && !b.is_upcoming) return -1;
+        if (!a.is_upcoming && b.is_upcoming) return 1;
+        
+        // Then sort by date
+        const dateA = new Date(a.date + ' ' + a.time);
+        const dateB = new Date(b.date + ' ' + b.time);
+        return dateB.getTime() - dateA.getTime();
+      });
     },
   });
 
