@@ -50,6 +50,10 @@ export function UserManagement() {
   const [pageSize, setPageSize] = useState(10);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
+  const handleLevelChange = (level: UserLevel) => {
+    setEditLevel(level);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
