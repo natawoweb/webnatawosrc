@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Trash2, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Trash2, Eye, Pencil, CheckCircle, XCircle } from "lucide-react";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
@@ -46,6 +46,14 @@ export function BlogListRow({
           title="View Blog"
         >
           <Eye className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate(`/edit/${blog.id}`)}
+          title="Edit Blog"
+        >
+          <Pencil className="h-4 w-4" />
         </Button>
         {showDeleteButton && (
           <Button

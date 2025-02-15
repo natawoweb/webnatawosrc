@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 
 interface CreateBlogHeaderProps {
+  title?: string;
   categories: Array<{ id: string; name: string }>;
   selectedCategory: string;
   onCategoryChange: (value: string) => void;
@@ -20,6 +21,7 @@ interface CreateBlogHeaderProps {
 }
 
 export function CreateBlogHeader({
+  title = "Create New Blog",
   categories,
   selectedCategory,
   onCategoryChange,
@@ -35,7 +37,7 @@ export function CreateBlogHeader({
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-            Create New Blog
+            {title}
           </h1>
         </div>
         <div className="flex items-center gap-2">

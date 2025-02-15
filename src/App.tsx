@@ -16,6 +16,7 @@ import SearchWriters from "./pages/SearchWriters";
 import Events from "./pages/Events";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateBlog from "./pages/CreateBlog";
+import EditBlog from "./pages/EditBlog";
 import EventDetails from "./pages/EventDetails";
 import Blogs from "./pages/Blogs";
 import BlogDetail from "./pages/BlogDetail";
@@ -52,6 +53,7 @@ const App: React.FC = () => {
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/user-profile" element={<AdminUserProfile />} />
           <Route path="write" element={<CreateBlog />} />
+          <Route path="edit/:id" element={<EditBlog />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Route>
