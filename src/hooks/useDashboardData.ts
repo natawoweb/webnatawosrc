@@ -15,14 +15,45 @@ export function useDashboardData(userId: string | undefined) {
       .on(
         'postgres_changes',
         {
-          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          event: 'INSERT', // Listen specifically for new blogs/drafts
           schema: 'public',
           table: 'blogs',
-          filter: `author_id=eq.${userId}` // Only listen to changes for this user's blogs
+          filter: `author_id=eq.${userId}`
         },
         (payload) => {
-          console.log('Received real-time update:', payload);
-          // Immediately invalidate the query to trigger a refresh
+          console.log('Received new blog/draft:', payload);
+          queryClient.invalidateQueries({ 
+            queryKey: ["writer-blogs", userId],
+            exact: true
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'blogs',
+          filter: `author_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('Received blog update:', payload);
+          queryClient.invalidateQueries({ 
+            queryKey: ["writer-blogs", userId],
+            exact: true
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'blogs',
+          filter: `author_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('Received blog deletion:', payload);
           queryClient.invalidateQueries({ 
             queryKey: ["writer-blogs", userId],
             exact: true
