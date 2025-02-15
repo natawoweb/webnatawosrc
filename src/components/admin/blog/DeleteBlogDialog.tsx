@@ -43,12 +43,12 @@ export function DeleteBlogDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>No, Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             className="bg-red-600 hover:bg-red-700"
           >
-            Delete Blog
+            Yes, Delete Blog
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
