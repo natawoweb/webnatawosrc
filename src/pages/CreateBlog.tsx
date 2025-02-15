@@ -7,40 +7,33 @@ import { useToast } from "@/hooks/use-toast";
 import { BlogContentSection } from "@/components/admin/blog/BlogContentSection";
 import { CreateBlogHeader } from "@/components/admin/blog/CreateBlogHeader";
 import { CreateBlogActions } from "@/components/admin/blog/CreateBlogActions";
+import { LanguageSelector } from "@/components/admin/blog/LanguageSelector";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
+
+const emptyContent = JSON.stringify({
+  blocks: [{ 
+    key: 'initial', 
+    text: '', 
+    type: 'unstyled',
+    depth: 0,
+    inlineStyleRanges: [],
+    entityRanges: [],
+    data: {}
+  }],
+  entityMap: {}
+});
 
 export default function CreateBlog() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { translateContent } = useTranslation();
   
+  const [selectedLanguage, setSelectedLanguage] = useState<"english" | "tamil" | null>(null);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState(JSON.stringify({
-    blocks: [{ 
-      key: 'initial', 
-      text: '', 
-      type: 'unstyled',
-      depth: 0,
-      inlineStyleRanges: [],
-      entityRanges: [],
-      data: {}
-    }],
-    entityMap: {}
-  }));
+  const [content, setContent] = useState(emptyContent);
   const [titleTamil, setTitleTamil] = useState("");
-  const [contentTamil, setContentTamil] = useState(JSON.stringify({
-    blocks: [{ 
-      key: 'initial', 
-      text: '', 
-      type: 'unstyled',
-      depth: 0,
-      inlineStyleRanges: [],
-      entityRanges: [],
-      data: {}
-    }],
-    entityMap: {}
-  }));
+  const [contentTamil, setContentTamil] = useState(emptyContent);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   const { data: categories } = useQuery({
@@ -67,8 +60,6 @@ export default function CreateBlog() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      console.log('Creating blog with data:', blogData);
-
       const { error } = await supabase
         .from("blogs")
         .insert({
@@ -78,7 +69,8 @@ export default function CreateBlog() {
           content_tamil: blogData.content_tamil || null,
           author_id: user.id,
           status: blogData.status,
-          category_id: blogData.category_id || null
+          category_id: blogData.category_id || null,
+          content_type: 'draft-js'
         });
 
       if (error) throw error;
@@ -143,20 +135,16 @@ export default function CreateBlog() {
       const contentObj = JSON.parse(content);
       const hasNonEmptyTitle = title.trim().length > 0;
       const hasNonEmptyContent = contentObj.blocks.some((block: any) => block.text.trim().length > 0);
-      
-      console.log('Content check:', {
-        hasNonEmptyTitle,
-        hasNonEmptyContent,
-        title: title.trim(),
-        blocks: contentObj.blocks.map((b: any) => b.text.trim())
-      });
-      
       return hasNonEmptyTitle && hasNonEmptyContent;
     } catch (error) {
       console.error('Error parsing content:', error);
       return false;
     }
   };
+
+  if (!selectedLanguage) {
+    return <LanguageSelector onLanguageSelect={setSelectedLanguage} />;
+  }
 
   return (
     <div className="container max-w-[1400px] py-8">
@@ -174,22 +162,15 @@ export default function CreateBlog() {
           isLoading={createBlogMutation.isPending}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           <BlogContentSection
-            language="english"
-            title={title}
-            content={content}
-            onTitleChange={setTitle}
-            onContentChange={setContent}
-            onTranslate={handleTranslate}
+            language={selectedLanguage}
+            title={selectedLanguage === "english" ? title : titleTamil}
+            content={selectedLanguage === "english" ? content : contentTamil}
+            onTitleChange={selectedLanguage === "english" ? setTitle : setTitleTamil}
+            onContentChange={selectedLanguage === "english" ? setContent : setContentTamil}
+            onTranslate={selectedLanguage === "english" ? handleTranslate : undefined}
             hasContent={hasContent()}
-          />
-          <BlogContentSection
-            language="tamil"
-            title={titleTamil}
-            content={contentTamil}
-            onTitleChange={setTitleTamil}
-            onContentChange={setContentTamil}
           />
         </div>
       </div>

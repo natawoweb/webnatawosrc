@@ -180,9 +180,11 @@ export type Database = {
           category_id: string | null
           content: string
           content_tamil: Json | null
+          content_type: string | null
           cover_image: string | null
           created_at: string | null
           id: string
+          metadata: Json | null
           published_at: string | null
           status: Database["public"]["Enums"]["blog_status"] | null
           title: string
@@ -195,9 +197,11 @@ export type Database = {
           category_id?: string | null
           content: string
           content_tamil?: Json | null
+          content_type?: string | null
           cover_image?: string | null
           created_at?: string | null
           id?: string
+          metadata?: Json | null
           published_at?: string | null
           status?: Database["public"]["Enums"]["blog_status"] | null
           title: string
@@ -210,9 +214,11 @@ export type Database = {
           category_id?: string | null
           content?: string
           content_tamil?: Json | null
+          content_type?: string | null
           cover_image?: string | null
           created_at?: string | null
           id?: string
+          metadata?: Json | null
           published_at?: string | null
           status?: Database["public"]["Enums"]["blog_status"] | null
           title?: string
