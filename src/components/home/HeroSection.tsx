@@ -33,12 +33,12 @@ export function HeroSection() {
       
       <div className="relative max-w-7xl mx-auto">
         <div className="flex flex-col items-center text-center space-y-8">
+          <img 
+            src="/lovable-uploads/2e998827-54b8-4981-b796-0eaa5c1cd8e2.png" 
+            alt="NATAWO Logo" 
+            className="h-40 w-40 object-contain mb-8 animate-in fade-in zoom-in duration-700"
+          />
           <div className="flex flex-col items-center space-y-4">
-            <img 
-              src="/lovable-uploads/2e998827-54b8-4981-b796-0eaa5c1cd8e2.png" 
-              alt="NATAWO Logo" 
-              className="h-24 w-24 animate-in fade-in zoom-in duration-700"
-            />
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight animate-in fade-in slide-in duration-1000">
               Celebrate Tamil Literature Across North America
             </h1>
