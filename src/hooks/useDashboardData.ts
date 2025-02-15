@@ -11,7 +11,7 @@ export function useDashboardData(userId: string | undefined) {
 
     // Subscribe to all blog changes for this user
     const channel = supabase
-      .channel('blogs-changes')
+      .channel(`blogs-changes-${userId}`)
       .on(
         'postgres_changes',
         {
