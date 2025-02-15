@@ -36,17 +36,19 @@ export function useBlogState({ initialData, initialBlogId }: UseBlogStateProps =
   const [isSaving, setIsSaving] = useState(false);
   const [currentBlogId, setCurrentBlogId] = useState<string | undefined>(initialBlogId);
 
-  // Only update state when initialBlogId changes (i.e., when loading a different blog)
   useEffect(() => {
-    if (initialBlogId && initialData) {
+    if (initialData) {
+      console.log('Updating state with initial data:', initialData);
       setTitle(initialData.title || "");
       setContent(initialData.content || emptyContent);
       setTitleTamil(initialData.title_tamil || "");
       setContentTamil(initialData.content_tamil || emptyContent);
       setSelectedCategory(initialData.category_id || "");
+    }
+    if (initialBlogId) {
       setCurrentBlogId(initialBlogId);
     }
-  }, [initialBlogId]);
+  }, [initialData, initialBlogId]);
 
   return {
     selectedLanguage,

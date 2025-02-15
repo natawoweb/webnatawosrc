@@ -34,14 +34,13 @@ export default function EditBlog() {
     },
   });
 
+  // Don't initialize the form until we have the blog data
   const formattedBlogData = blog ? {
-    title: blog.title,
-    content: blog.content,
-    title_tamil: blog.title_tamil,
-    content_tamil: typeof blog.content_tamil === 'string' 
-      ? blog.content_tamil 
-      : JSON.stringify(blog.content_tamil),
-    category_id: blog.category_id
+    title: blog.title || "",
+    content: blog.content || "",
+    title_tamil: blog.title_tamil || "",
+    content_tamil: blog.content_tamil || "",
+    category_id: blog.category_id || ""
   } : undefined;
 
   const {
