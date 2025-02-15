@@ -1,7 +1,11 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { EditorState, ContentState, convertFromRaw, convertToRaw } from 'draft-js';
-import { ImageComponentState } from './ImageComponent';
+
+interface ImageComponentState {
+  width: number;
+  height: string | number;
+}
 
 export const useEditorState = (content: string, onChange: (content: string) => void) => {
   const [editorState, setEditorState] = useState(() => {
@@ -43,11 +47,14 @@ export const useEditorState = (content: string, onChange: (content: string) => v
 
   const [imageStates, setImageStates] = useState<{ [key: string]: ImageComponentState }>({});
 
-  // Handle content updates from parent
+  // Only update editorState from props when content significantly changes
   useEffect(() => {
     try {
       if (!content) {
-        setEditorState(EditorState.createEmpty());
+        const newState = EditorState.createEmpty();
+        if (editorState.getCurrentContent() !== newState.getCurrentContent()) {
+          setEditorState(newState);
+        }
         return;
       }
 
@@ -58,14 +65,19 @@ export const useEditorState = (content: string, onChange: (content: string) => v
         return;
       }
 
-      // Only update if the content is significantly different
-      const currentContent = JSON.stringify(convertToRaw(editorState.getCurrentContent()));
-      if (content !== currentContent) {
-        if (typeof contentObj === 'string') {
+      if (typeof contentObj === 'string') {
+        try {
           contentObj = JSON.parse(contentObj);
+        } catch (e) {
+          return;
         }
+      }
+
+      if (contentObj && contentObj.blocks) {
+        const currentContent = convertToRaw(editorState.getCurrentContent());
+        const isSignificantlyDifferent = JSON.stringify(currentContent) !== JSON.stringify(contentObj);
         
-        if (contentObj && contentObj.blocks) {
+        if (isSignificantlyDifferent) {
           const newState = EditorState.createWithContent(convertFromRaw(contentObj));
           setEditorState(newState);
         }
@@ -76,33 +88,40 @@ export const useEditorState = (content: string, onChange: (content: string) => v
   }, [content]);
 
   // Handle editor state changes
-  const handleEditorStateChange = useCallback((newEditorState: EditorState) => {
+  const handleEditorStateChange = (newEditorState: EditorState) => {
     setEditorState(newEditorState);
     
-    const contentState = newEditorState.getCurrentContent();
-    const rawContent = convertToRaw(contentState);
-    
-    // Update image states if present
-    Object.entries(imageStates).forEach(([blockKey, state]) => {
-      const block = rawContent.blocks.find(b => b.key === blockKey);
-      if (block && block.type === 'atomic') {
-        const entityKey = block.entityRanges[0]?.key;
-        if (entityKey !== undefined) {
-          const entity = rawContent.entityMap[entityKey];
-          if (entity && entity.type === 'IMAGE') {
-            entity.data = {
-              ...entity.data,
-              width: state.width,
-              height: state.height
-            };
+    try {
+      const contentState = newEditorState.getCurrentContent();
+      const rawContent = convertToRaw(contentState);
+      
+      // Update image states if present
+      Object.entries(imageStates).forEach(([blockKey, state]) => {
+        const block = rawContent.blocks.find(b => b.key === blockKey);
+        if (block && block.type === 'atomic') {
+          const entityKey = block.entityRanges[0]?.key;
+          if (entityKey !== undefined) {
+            const entity = rawContent.entityMap[entityKey];
+            if (entity && entity.type === 'IMAGE') {
+              entity.data = {
+                ...entity.data,
+                width: state.width,
+                height: state.height
+              };
+            }
           }
         }
-      }
-    });
+      });
 
-    // Notify parent of content change
-    onChange(JSON.stringify(rawContent));
-  }, [imageStates, onChange]);
+      // Only trigger onChange if content actually changed
+      const newContent = JSON.stringify(rawContent);
+      if (newContent !== content) {
+        onChange(newContent);
+      }
+    } catch (e) {
+      console.error('Error converting editor state to raw:', e);
+    }
+  };
 
   return {
     editorState,
