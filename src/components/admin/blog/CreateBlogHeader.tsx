@@ -34,7 +34,9 @@ export function CreateBlogHeader({
           <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h2 className="text-2xl font-bold">Create New Blog</h2>
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+            Create New Blog
+          </h1>
         </div>
         <div className="flex items-center gap-2">
           <CategoryManagement categories={categories || []} />
