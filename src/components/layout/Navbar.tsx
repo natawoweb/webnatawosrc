@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DesktopNav } from "./nav/DesktopNav";
 import { MobileNav } from "./nav/MobileNav";
+import { ThemeToggle } from "../theme/ThemeToggle";
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -69,16 +70,20 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          <DesktopNav
-            currentLanguage={currentLanguage}
-            setCurrentLanguage={setCurrentLanguage}
-            session={session}
-            handleSignOut={handleSignOut}
-            navigate={navigate}
-          />
+          <div className="hidden md:flex items-center gap-4">
+            <ThemeToggle />
+            <DesktopNav
+              currentLanguage={currentLanguage}
+              setCurrentLanguage={setCurrentLanguage}
+              session={session}
+              handleSignOut={handleSignOut}
+              navigate={navigate}
+            />
+          </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={toggleMenu}>
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
