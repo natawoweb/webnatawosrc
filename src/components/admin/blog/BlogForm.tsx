@@ -74,10 +74,13 @@ export function BlogForm({
           className="w-full"
         >
           <div className="flex justify-between items-center mb-4">
-            <TabsList>
-              <TabsTrigger value="english">Write in English</TabsTrigger>
-              <TabsTrigger value="tamil">Write in Tamil</TabsTrigger>
+            <TabsList className="w-full h-12 bg-background border">
+              <TabsTrigger value="english" className="w-1/2 h-full data-[state=active]:bg-muted">Write in English</TabsTrigger>
+              <TabsTrigger value="tamil" className="w-1/2 h-full data-[state=active]:bg-muted">Write in Tamil</TabsTrigger>
             </TabsList>
+          </div>
+
+          <div className="flex justify-end mb-4">
             {selectedLanguage === "english" ? (
               <Button
                 onClick={handleTranslate}
