@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProfile } from "@/hooks/useProfile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -134,6 +135,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+
+        <div className="px-3 py-2">
+          <ThemeToggle />
         </div>
 
         {session && (

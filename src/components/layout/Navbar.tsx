@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DesktopNav } from "./nav/DesktopNav";
 import { MobileNav } from "./nav/MobileNav";
-import { ThemeToggle } from "../theme/ThemeToggle";
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -70,8 +68,7 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
-            <ThemeToggle />
+          <div className="hidden md:flex items-center">
             <DesktopNav
               currentLanguage={currentLanguage}
               setCurrentLanguage={setCurrentLanguage}
@@ -82,8 +79,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center gap-2">
-            <ThemeToggle />
+          <div className="md:hidden flex items-center">
             <Button variant="ghost" size="icon" onClick={toggleMenu}>
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>

@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 interface DesktopNavProps {
   currentLanguage: string;
@@ -130,6 +131,8 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <ThemeToggle />
 
       {session && <NotificationsDropdown />}
 
