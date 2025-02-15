@@ -208,8 +208,14 @@ export default function CreateBlog() {
 
   const handleBack = async () => {
     if (isSaving) {
-      // Wait for any ongoing save to complete
-      await debouncedSave.flush();
+      try {
+        await debouncedSave.flush();
+        if (saveDraft.isPending) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      } catch (error) {
+        console.error('Error while saving before navigation:', error);
+      }
     }
     navigate("/dashboard");
   };
