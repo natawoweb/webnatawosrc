@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -198,6 +197,28 @@ export default function CreateBlog() {
     }
   };
 
+  const handleBack = async () => {
+    if (title || content !== emptyContent || titleTamil || contentTamil !== emptyContent) {
+      try {
+        await saveDraft.mutateAsync({
+          id: draftId || undefined,
+          title,
+          content,
+          title_tamil: titleTamil,
+          content_tamil: contentTamil,
+          category_id: selectedCategory
+        });
+        toast({
+          title: "Draft saved",
+          description: "Your content has been saved before navigating back",
+        });
+      } catch (error) {
+        console.error('Save failed:', error);
+      }
+    }
+    navigate("/dashboard");
+  };
+
   return (
     <div className="container max-w-[1400px] py-8">
       <div className="space-y-6">
@@ -207,7 +228,7 @@ export default function CreateBlog() {
           onCategoryChange={setSelectedCategory}
           selectedLanguage={selectedLanguage}
           onLanguageChange={setSelectedLanguage}
-          onBack={() => navigate("/dashboard")}
+          onBack={handleBack}
         />
         
         <CreateBlogActions

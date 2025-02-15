@@ -12,7 +12,7 @@ import { useState } from "react";
 export default function Dashboard() {
   const { session } = useSession();
   const { toast } = useToast();
-  const { data: blogs, isLoading } = useDashboardData(session?.user?.id);
+  const { data: blogs, isLoading, isFetching } = useDashboardData(session?.user?.id);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -96,16 +96,22 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <BlogTable 
-          blogs={paginatedBlogs || []} 
-          onDelete={handleDelete}
-          onPublish={handlePublish}
-          currentPage={currentPage}
-          pageSize={pageSize}
-          totalItems={blogs?.length || 0}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={setPageSize}
-        />
+        {isFetching ? (
+          <div className="flex items-center justify-center p-4">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        ) : (
+          <BlogTable 
+            blogs={paginatedBlogs || []} 
+            onDelete={handleDelete}
+            onPublish={handlePublish}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            totalItems={blogs?.length || 0}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+          />
+        )}
       </div>
     </div>
   );
