@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,17 +26,19 @@ export function Footer() {
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col items-start gap-4">
               <img 
                 src="/lovable-uploads/2e998827-54b8-4981-b796-0eaa5c1cd8e2.png" 
                 alt="NATAWO Logo" 
-                className="h-10 w-10"
+                className="h-16 w-16"
               />
-              <h3 className="text-lg font-semibold">NATAWO</h3>
+              <div>
+                <h3 className="text-lg font-semibold">NATAWO</h3>
+                <p className="text-sm text-muted-foreground">
+                  North America Tamil Writers Organization - Connecting writers and readers across the globe.
+                </p>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              North America Tamil Writers Organization - Connecting writers and readers across the globe.
-            </p>
           </div>
           
           <div>
