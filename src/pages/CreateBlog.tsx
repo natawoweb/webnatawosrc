@@ -36,6 +36,7 @@ export default function CreateBlog() {
   const [contentTamil, setContentTamil] = useState(emptyContent);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [draftId, setDraftId] = useState<string | null>(null);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -70,6 +71,7 @@ export default function CreateBlog() {
             title_tamil: blogData.title_tamil || null,
             content_tamil: blogData.content_tamil || null,
             category_id: blogData.category_id || null,
+            updated_at: new Date().toISOString(),
           })
           .eq('id', blogData.id);
         if (error) throw error;
@@ -93,6 +95,21 @@ export default function CreateBlog() {
         if (error) throw error;
         return data.id;
       }
+    },
+    onSuccess: () => {
+      setLastSaved(new Date());
+      toast({
+        title: "Draft saved",
+        description: "Your content has been automatically saved",
+        duration: 2000,
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Save failed",
+        description: "Failed to save draft: " + error.message,
+      });
     },
   });
 
