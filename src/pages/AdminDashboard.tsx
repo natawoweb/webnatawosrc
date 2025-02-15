@@ -17,23 +17,21 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("users");
 
-  const { data: isAdmin, isLoading: checkingAdmin } = useQuery({
-    queryKey: ["checkAdminRole"],
+  const { data: session } = useQuery({
+    queryKey: ["session"],
     queryFn: async () => {
-      console.log("Checking admin role...");
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log("Current user:", user);
-      
-      if (!user) {
-        console.log("No user found");
-        return false;
-      }
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
 
-      const { data, error } = await supabase.rpc('has_role', {
-        user_id: user.id,
-        required_role: 'admin'
-      });
+  const { data: isAdmin, isLoading: checkingAdmin } = useQuery({
+    queryKey: ["checkAdminRole", session?.user?.id],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      console.log("Checking admin role for user:", session?.user?.id);
+      
+      const { data, error } = await supabase.rpc('is_admin');
       
       if (error) {
         console.error("Error checking admin role:", error);
@@ -46,8 +44,12 @@ export default function AdminDashboard() {
   });
 
   useEffect(() => {
-    console.log("Admin status:", { isAdmin, checkingAdmin });
-    
+    if (!session) {
+      console.log("No session - redirecting to auth");
+      navigate("/auth");
+      return;
+    }
+
     if (!checkingAdmin && !isAdmin) {
       console.log("Access denied - redirecting to home");
       toast({
@@ -57,9 +59,9 @@ export default function AdminDashboard() {
       });
       navigate("/");
     }
-  }, [isAdmin, checkingAdmin, navigate, toast]);
+  }, [isAdmin, checkingAdmin, navigate, toast, session]);
 
-  if (checkingAdmin) {
+  if (!session || checkingAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
