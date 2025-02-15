@@ -184,6 +184,7 @@ export type Database = {
           cover_image: string | null
           created_at: string | null
           id: string
+          is_published: boolean | null
           metadata: Json | null
           published_at: string | null
           status: Database["public"]["Enums"]["blog_status"] | null
@@ -201,6 +202,7 @@ export type Database = {
           cover_image?: string | null
           created_at?: string | null
           id?: string
+          is_published?: boolean | null
           metadata?: Json | null
           published_at?: string | null
           status?: Database["public"]["Enums"]["blog_status"] | null
@@ -218,6 +220,7 @@ export type Database = {
           cover_image?: string | null
           created_at?: string | null
           id?: string
+          is_published?: boolean | null
           metadata?: Json | null
           published_at?: string | null
           status?: Database["public"]["Enums"]["blog_status"] | null
