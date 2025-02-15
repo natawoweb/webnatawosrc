@@ -60,7 +60,7 @@ export function useBlogState({ initialData, initialBlogId }: UseBlogStateProps =
     if (initialBlogId) {
       setCurrentBlogId(initialBlogId);
     }
-  }, [initialBlogId]); // Only depend on initialBlogId, not initialData
+  }, [initialBlogId, initialData]); // Add initialData as a dependency to update when data is loaded
 
   return {
     selectedLanguage,
