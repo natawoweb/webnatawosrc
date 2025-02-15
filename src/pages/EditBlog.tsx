@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { BlogForm } from "@/components/admin/blog/BlogForm";
 import { useBlogForm } from "@/hooks/useBlogForm";
+import { Json } from "@/integrations/supabase/types/shared";
 
 export default function EditBlog() {
   const { id } = useParams();
@@ -34,12 +35,16 @@ export default function EditBlog() {
     },
   });
 
-  // Don't initialize the form until we have the blog data
+  // Format the blog data and ensure content_tamil is properly stringified
   const formattedBlogData = blog ? {
     title: blog.title || "",
     content: blog.content || "",
     title_tamil: blog.title_tamil || "",
-    content_tamil: blog.content_tamil || "",
+    content_tamil: typeof blog.content_tamil === 'string' 
+      ? blog.content_tamil 
+      : blog.content_tamil 
+        ? JSON.stringify(blog.content_tamil)
+        : "",
     category_id: blog.category_id || ""
   } : undefined;
 
