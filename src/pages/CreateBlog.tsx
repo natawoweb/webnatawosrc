@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -27,6 +27,7 @@ export default function CreateBlog() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { translateContent } = useTranslation();
+  const queryClient = useQueryClient();
   
   const [selectedLanguage, setSelectedLanguage] = useState<"english" | "tamil">("english");
   const [title, setTitle] = useState("");
@@ -36,6 +37,7 @@ export default function CreateBlog() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [draftId, setDraftId] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -95,8 +97,12 @@ export default function CreateBlog() {
         return data.id;
       }
     },
-    onSuccess: () => {
+    onSuccess: (id) => {
       setLastSaved(new Date());
+      if (!draftId) {
+        setDraftId(id);
+      }
+      queryClient.invalidateQueries({ queryKey: ["writer-blogs"] });
       toast({
         title: "Draft saved",
         description: "Your content has been automatically saved",
@@ -110,11 +116,16 @@ export default function CreateBlog() {
         description: "Failed to save draft: " + error.message,
       });
     },
+    onSettled: () => {
+      setIsSaving(false);
+    }
   });
 
   const debouncedSave = useDebouncedCallback(async () => {
+    if (isSaving) return;
     try {
-      const id = await saveDraft.mutateAsync({
+      setIsSaving(true);
+      await saveDraft.mutateAsync({
         id: draftId || undefined,
         title,
         content,
@@ -122,11 +133,9 @@ export default function CreateBlog() {
         content_tamil: contentTamil,
         category_id: selectedCategory
       });
-      if (!draftId) {
-        setDraftId(id);
-      }
     } catch (error) {
       console.error('Auto-save failed:', error);
+      setIsSaving(false);
     }
   }, 1000);
 
@@ -198,23 +207,9 @@ export default function CreateBlog() {
   };
 
   const handleBack = async () => {
-    if (title || content !== emptyContent || titleTamil || contentTamil !== emptyContent) {
-      try {
-        await saveDraft.mutateAsync({
-          id: draftId || undefined,
-          title,
-          content,
-          title_tamil: titleTamil,
-          content_tamil: contentTamil,
-          category_id: selectedCategory
-        });
-        toast({
-          title: "Draft saved",
-          description: "Your content has been saved before navigating back",
-        });
-      } catch (error) {
-        console.error('Save failed:', error);
-      }
+    if (isSaving) {
+      // Wait for any ongoing save to complete
+      await saveDraft.mutate.current?.promise;
     }
     navigate("/dashboard");
   };
