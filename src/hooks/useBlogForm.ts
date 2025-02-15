@@ -31,7 +31,7 @@ interface UseBlogFormProps {
   };
 }
 
-export function useBlogForm({ blogId, initialData }: UseBlogFormProps = {}) {
+export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormProps = {}) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { translateContent } = useTranslation();
@@ -49,6 +49,7 @@ export function useBlogForm({ blogId, initialData }: UseBlogFormProps = {}) {
   const [selectedCategory, setSelectedCategory] = useState<string>(initialData?.category_id || "");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [currentBlogId, setCurrentBlogId] = useState<string | undefined>(initialBlogId);
 
   useEffect(() => {
     if (initialData) {
@@ -72,7 +73,7 @@ export function useBlogForm({ blogId, initialData }: UseBlogFormProps = {}) {
       content_tamil?: string;
       category_id?: string;
     }) => {
-      if (blogId) {
+      if (currentBlogId) {
         const { error } = await supabase
           .from("blogs")
           .update({
@@ -83,14 +84,15 @@ export function useBlogForm({ blogId, initialData }: UseBlogFormProps = {}) {
             category_id: blogData.category_id || null,
             updated_at: new Date().toISOString(),
           })
-          .eq('id', blogId);
+          .eq('id', currentBlogId);
 
         if (error) throw error;
+        return currentBlogId;
       } else {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error("No user found");
 
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("blogs")
           .insert({
             title: blogData.title,
@@ -100,9 +102,13 @@ export function useBlogForm({ blogId, initialData }: UseBlogFormProps = {}) {
             category_id: blogData.category_id || null,
             author_id: user.id,
             status: "draft",
-          });
+          })
+          .select()
+          .single();
 
         if (error) throw error;
+        setCurrentBlogId(data.id);
+        return data.id;
       }
     },
     onSuccess: () => {
@@ -128,6 +134,8 @@ export function useBlogForm({ blogId, initialData }: UseBlogFormProps = {}) {
 
   const debouncedSave = useDebouncedCallback(async () => {
     if (isSaving) return;
+    if (!title && !hasContent()) return; // Don't save if there's no content
+
     try {
       setIsSaving(true);
       await saveBlog.mutateAsync({
@@ -151,11 +159,15 @@ export function useBlogForm({ blogId, initialData }: UseBlogFormProps = {}) {
 
   const submitBlog = useMutation({
     mutationFn: async () => {
-      if (blogId) {
+      if (!currentBlogId && !title) {
+        throw new Error("Blog must be saved as draft first");
+      }
+
+      if (currentBlogId) {
         const { error } = await supabase
           .from("blogs")
           .update({ status: "pending_approval" })
-          .eq('id', blogId);
+          .eq('id', currentBlogId);
 
         if (error) throw error;
       } else {
