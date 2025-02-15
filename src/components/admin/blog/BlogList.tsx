@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import { DeleteBlogDialog } from "./DeleteBlogDialog";
-import { EditBlogDialog } from "./EditBlogDialog";
 import { BlogListRow } from "./BlogListRow";
 import { useBlogListManagement } from "@/hooks/useBlogListManagement";
 import { Database } from "@/integrations/supabase/types";
@@ -25,8 +24,6 @@ interface BlogListProps {
 
 export function BlogList({ blogs }: BlogListProps) {
   const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
-  const [blogToEdit, setBlogToEdit] = useState<Blog | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
   const { session } = useSession();
   const { data: userRoles } = useUserRoles(session?.user?.id);
@@ -91,13 +88,6 @@ export function BlogList({ blogs }: BlogListProps) {
     }
   };
 
-  // Helper function to safely convert content_tamil to string
-  const getContentTamilString = (contentTamil: any): string => {
-    if (!contentTamil) return "";
-    if (typeof contentTamil === "string") return contentTamil;
-    return JSON.stringify(contentTamil);
-  };
-
   return (
     <>
       <Table>
@@ -119,38 +109,12 @@ export function BlogList({ blogs }: BlogListProps) {
               canDelete={canDeleteBlog(blog)}
               isAdmin={isAdmin}
               onDelete={() => handleDelete(blog)}
-              onEdit={() => {
-                setBlogToEdit(blog);
-                setIsEditDialogOpen(true);
-              }}
               onApprove={() => handleApprove(blog)}
               onReject={() => handleReject(blog)}
             />
           ))}
         </TableBody>
       </Table>
-
-      {blogToEdit && (
-        <EditBlogDialog
-          isOpen={isEditDialogOpen}
-          onOpenChange={setIsEditDialogOpen}
-          blog={blogToEdit}
-          title={blogToEdit.title}
-          content={blogToEdit.content}
-          titleTamil={blogToEdit.title_tamil || ""}
-          contentTamil={getContentTamilString(blogToEdit.content_tamil)}
-          selectedCategory={blogToEdit.category_id || ""}
-          categories={[]} // This will be populated by the EditBlogDialog component
-          onTitleChange={() => {}}
-          onContentChange={() => {}}
-          onTitleTamilChange={() => {}}
-          onContentTamilChange={() => {}}
-          onCategoryChange={() => {}}
-          onSaveDraft={() => {}}
-          onSubmit={() => {}}
-          isLoading={false}
-        />
-      )}
 
       <DeleteBlogDialog
         open={!!blogToDelete}
@@ -169,4 +133,3 @@ export function BlogList({ blogs }: BlogListProps) {
     </>
   );
 }
-

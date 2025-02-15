@@ -20,7 +20,6 @@ import EventDetails from "./pages/EventDetails";
 import Blogs from "./pages/Blogs";
 import BlogDetail from "./pages/BlogDetail";
 import Dashboard from "./pages/Dashboard";
-import EditBlog from "./pages/EditBlog";
 import BlogPreview from "./pages/BlogPreview";
 
 // Create a wrapper component for the redirect
@@ -53,7 +52,6 @@ const App: React.FC = () => {
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/user-profile" element={<AdminUserProfile />} />
           <Route path="write" element={<CreateBlog />} />
-          <Route path="edit/:id" element={<EditBlog />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Route>
