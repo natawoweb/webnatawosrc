@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, SendHorizontal } from "lucide-react";
 import { CategoryManagement } from "./CategoryManagement";
 import {
   Select,
@@ -18,6 +18,8 @@ interface CreateBlogHeaderProps {
   selectedLanguage: "english" | "tamil";
   onLanguageChange: (value: "english" | "tamil") => void;
   onBack: () => void;
+  onSubmit: () => void;
+  isSubmitting: boolean;
 }
 
 export function CreateBlogHeader({
@@ -26,6 +28,8 @@ export function CreateBlogHeader({
   selectedCategory,
   onCategoryChange,
   onBack,
+  onSubmit,
+  isSubmitting,
 }: CreateBlogHeaderProps) {
   return (
     <div className="space-y-4">
@@ -52,6 +56,13 @@ export function CreateBlogHeader({
               ))}
             </SelectContent>
           </Select>
+          <Button
+            onClick={onSubmit}
+            disabled={isSubmitting}
+          >
+            <SendHorizontal className="mr-2 h-4 w-4" />
+            Submit for Approval
+          </Button>
         </div>
       </div>
       <p className="text-sm text-muted-foreground">

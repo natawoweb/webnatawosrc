@@ -1,7 +1,6 @@
 
 import { BlogContentSection } from "./BlogContentSection";
 import { CreateBlogHeader } from "./CreateBlogHeader";
-import { CreateBlogActions } from "./CreateBlogActions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
@@ -60,11 +59,8 @@ export function BlogForm({
           selectedLanguage={selectedLanguage}
           onLanguageChange={setSelectedLanguage}
           onBack={handleBack}
-        />
-        
-        <CreateBlogActions
           onSubmit={handleSubmit}
-          isLoading={isSubmitting}
+          isSubmitting={isSubmitting}
         />
 
         <Tabs 
