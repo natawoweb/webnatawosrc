@@ -209,7 +209,7 @@ export default function CreateBlog() {
   const handleBack = async () => {
     if (isSaving) {
       // Wait for any ongoing save to complete
-      await saveDraft.mutate.current?.promise;
+      await debouncedSave.flush();
     }
     navigate("/dashboard");
   };
