@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { EventCard } from "./upcoming-events/EventCard";
 import { EventsHeader } from "./upcoming-events/EventsHeader";
 import { Database } from "@/integrations/supabase/types";
-import { fromZonedTime } from "date-fns-tz";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
@@ -20,13 +19,7 @@ export function UpcomingEvents() {
         .limit(3);
 
       if (error) throw error;
-
-      // Filter out past events by comparing with current time
-      return (data as Event[]).filter(event => {
-        const eventDateTime = `${event.date}T${event.time}`;
-        const eventInUTC = fromZonedTime(eventDateTime, 'America/New_York');
-        return eventInUTC > new Date();
-      });
+      return data as Event[];
     },
   });
 
