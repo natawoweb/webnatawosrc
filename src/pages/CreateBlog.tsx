@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,9 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { BlogContentSection } from "@/components/admin/blog/BlogContentSection";
 import { CreateBlogHeader } from "@/components/admin/blog/CreateBlogHeader";
 import { CreateBlogActions } from "@/components/admin/blog/CreateBlogActions";
-import { LanguageSelector } from "@/components/admin/blog/LanguageSelector";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
+import { useDebouncedCallback } from "use-debounce";
 
 const emptyContent = JSON.stringify({
   blocks: [{ 
@@ -29,12 +29,13 @@ export default function CreateBlog() {
   const navigate = useNavigate();
   const { translateContent } = useTranslation();
   
-  const [selectedLanguage, setSelectedLanguage] = useState<"english" | "tamil" | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<"english" | "tamil">("english");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState(emptyContent);
   const [titleTamil, setTitleTamil] = useState("");
   const [contentTamil, setContentTamil] = useState(emptyContent);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [draftId, setDraftId] = useState<string | null>(null);
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -48,37 +49,92 @@ export default function CreateBlog() {
     },
   });
 
-  const createBlogMutation = useMutation({
+  const saveDraft = useMutation({
     mutationFn: async (blogData: {
+      id?: string;
       title: string;
       content: string;
       title_tamil?: string;
       content_tamil?: string;
-      status: BlogStatus;
       category_id?: string;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
+      if (blogData.id) {
+        const { error } = await supabase
+          .from("blogs")
+          .update({
+            title: blogData.title,
+            content: blogData.content,
+            title_tamil: blogData.title_tamil || null,
+            content_tamil: blogData.content_tamil || null,
+            category_id: blogData.category_id || null,
+          })
+          .eq('id', blogData.id);
+        if (error) throw error;
+        return blogData.id;
+      } else {
+        const { data, error } = await supabase
+          .from("blogs")
+          .insert({
+            title: blogData.title,
+            content: blogData.content,
+            title_tamil: blogData.title_tamil || null,
+            content_tamil: blogData.content_tamil || null,
+            author_id: user.id,
+            status: "draft",
+            category_id: blogData.category_id || null,
+            content_type: 'draft-js'
+          })
+          .select('id')
+          .single();
+
+        if (error) throw error;
+        return data.id;
+      }
+    },
+  });
+
+  const debouncedSave = useDebouncedCallback(async () => {
+    try {
+      const id = await saveDraft.mutateAsync({
+        id: draftId || undefined,
+        title,
+        content,
+        title_tamil: titleTamil,
+        content_tamil: contentTamil,
+        category_id: selectedCategory
+      });
+      if (!draftId) {
+        setDraftId(id);
+      }
+    } catch (error) {
+      console.error('Auto-save failed:', error);
+    }
+  }, 1000);
+
+  useEffect(() => {
+    if (title || content !== emptyContent || titleTamil || contentTamil !== emptyContent) {
+      debouncedSave();
+    }
+  }, [title, content, titleTamil, contentTamil, selectedCategory]);
+
+  const submitBlog = useMutation({
+    mutationFn: async () => {
+      if (!draftId) throw new Error("No draft found");
+
       const { error } = await supabase
         .from("blogs")
-        .insert({
-          title: blogData.title,
-          content: blogData.content,
-          title_tamil: blogData.title_tamil || null,
-          content_tamil: blogData.content_tamil || null,
-          author_id: user.id,
-          status: blogData.status,
-          category_id: blogData.category_id || null,
-          content_type: 'draft-js'
-        });
+        .update({ status: "pending_approval" })
+        .eq('id', draftId);
 
       if (error) throw error;
     },
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Blog created successfully",
+        description: "Blog submitted for approval",
       });
       navigate("/dashboard");
     },
@@ -86,22 +142,13 @@ export default function CreateBlog() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create blog: " + error.message,
+        description: "Failed to submit blog: " + error.message,
       });
     },
   });
 
-  const handleCreate = (status: BlogStatus) => {
-    if (status === "draft" && !title) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Title is required even for drafts",
-      });
-      return;
-    }
-
-    if (status === "pending_approval" && (!title || !hasContent())) {
+  const handleSubmit = () => {
+    if (!title || !hasContent()) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -109,15 +156,7 @@ export default function CreateBlog() {
       });
       return;
     }
-
-    createBlogMutation.mutate({
-      title,
-      content,
-      title_tamil: titleTamil,
-      content_tamil: contentTamil,
-      status,
-      category_id: selectedCategory
-    });
+    submitBlog.mutate();
   };
 
   const handleTranslate = async () => {
@@ -142,10 +181,6 @@ export default function CreateBlog() {
     }
   };
 
-  if (!selectedLanguage) {
-    return <LanguageSelector onLanguageSelect={setSelectedLanguage} />;
-  }
-
   return (
     <div className="container max-w-[1400px] py-8">
       <div className="space-y-6">
@@ -153,26 +188,25 @@ export default function CreateBlog() {
           categories={categories || []}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
+          selectedLanguage={selectedLanguage}
+          onLanguageChange={setSelectedLanguage}
           onBack={() => navigate("/dashboard")}
         />
         
         <CreateBlogActions
-          onSaveDraft={() => handleCreate("draft")}
-          onSubmit={() => handleCreate("pending_approval")}
-          isLoading={createBlogMutation.isPending}
+          onSubmit={handleSubmit}
+          isLoading={submitBlog.isPending}
         />
 
-        <div className="grid grid-cols-1 gap-6">
-          <BlogContentSection
-            language={selectedLanguage}
-            title={selectedLanguage === "english" ? title : titleTamil}
-            content={selectedLanguage === "english" ? content : contentTamil}
-            onTitleChange={selectedLanguage === "english" ? setTitle : setTitleTamil}
-            onContentChange={selectedLanguage === "english" ? setContent : setContentTamil}
-            onTranslate={selectedLanguage === "english" ? handleTranslate : undefined}
-            hasContent={hasContent()}
-          />
-        </div>
+        <BlogContentSection
+          language={selectedLanguage}
+          title={selectedLanguage === "english" ? title : titleTamil}
+          content={selectedLanguage === "english" ? content : contentTamil}
+          onTitleChange={selectedLanguage === "english" ? setTitle : setTitleTamil}
+          onContentChange={selectedLanguage === "english" ? setContent : setContentTamil}
+          onTranslate={selectedLanguage === "english" ? handleTranslate : undefined}
+          hasContent={hasContent()}
+        />
       </div>
     </div>
   );

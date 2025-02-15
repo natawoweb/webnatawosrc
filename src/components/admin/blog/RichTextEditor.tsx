@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Editor, RichUtils, DraftHandleValue } from 'draft-js';
 import 'draft-js/dist/Draft.css';
@@ -11,9 +10,10 @@ interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
   language?: "english" | "tamil";
+  placeholder?: string;
 }
 
-export function RichTextEditor({ content, onChange, language = "english" }: RichTextEditorProps) {
+export function RichTextEditor({ content, onChange, language = "english", placeholder }: RichTextEditorProps) {
   const { editorState, setEditorState, imageStates, setImageStates } = useEditorState(content, onChange);
 
   const handleKeyCommand = (command: string): DraftHandleValue => {
@@ -64,6 +64,10 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
     }));
   };
 
+  const contentState = editorState.getCurrentContent();
+  const isEditorEmpty = !contentState.hasText() && 
+    contentState.getBlockMap().first().getType() === 'unstyled';
+
   return (
     <div className="border rounded-lg flex flex-col h-full bg-white">
       <EditorToolbar 
@@ -79,12 +83,19 @@ export function RichTextEditor({ content, onChange, language = "english" }: Rich
           setEditorState={setEditorState}
           onImageAdd={handleImageAdd}
         />
-        <Editor
-          editorState={editorState}
-          onChange={setEditorState}
-          handleKeyCommand={handleKeyCommand}
-          blockRendererFn={blockRendererFn}
-        />
+        <div className="relative">
+          {isEditorEmpty && (
+            <div className="absolute text-gray-400 pointer-events-none p-0">
+              {placeholder}
+            </div>
+          )}
+          <Editor
+            editorState={editorState}
+            onChange={setEditorState}
+            handleKeyCommand={handleKeyCommand}
+            blockRendererFn={blockRendererFn}
+          />
+        </div>
       </div>
     </div>
   );
