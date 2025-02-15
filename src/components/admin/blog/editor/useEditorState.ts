@@ -42,12 +42,38 @@ export const useEditorState = (content: string, onChange: (content: string) => v
 
   const [imageStates, setImageStates] = useState<{ [key: string]: ImageComponentState }>({});
 
-  // Only update from props on mount or when content is empty
+  // Update editor state when content prop changes
   useEffect(() => {
     if (!content) {
       setEditorState(EditorState.createEmpty());
+      return;
     }
-  }, []);
+
+    try {
+      let contentObj;
+      try {
+        contentObj = JSON.parse(content);
+      } catch (e) {
+        setEditorState(EditorState.createWithContent(ContentState.createFromText(content)));
+        return;
+      }
+
+      if (typeof contentObj === 'string') {
+        try {
+          contentObj = JSON.parse(contentObj);
+        } catch (e) {
+          setEditorState(EditorState.createWithContent(ContentState.createFromText(contentObj)));
+          return;
+        }
+      }
+
+      if (contentObj && contentObj.blocks) {
+        setEditorState(EditorState.createWithContent(convertFromRaw(contentObj)));
+      }
+    } catch (e) {
+      console.error('Error updating editor state from content:', e);
+    }
+  }, [content]);
 
   const handleEditorStateChange = (newEditorState: EditorState) => {
     setEditorState(newEditorState);
