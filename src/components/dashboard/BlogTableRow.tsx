@@ -4,8 +4,11 @@ import { BlogStatusBadge } from "@/components/admin/blog/BlogStatusBadge";
 import { BlogTableActions } from "./BlogTableActions";
 import { Database } from "@/integrations/supabase/types";
 
-// Use the correct type from Supabase database types
-type Blog = Database["public"]["Tables"]["blogs"]["Row"];
+// Extend the base Blog type to include the joined data
+type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
+  blog_comments?: Array<{ count: number }>;
+  blog_categories?: { name: string };
+};
 
 interface BlogTableRowProps {
   blog: Blog;
