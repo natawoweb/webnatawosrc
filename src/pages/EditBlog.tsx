@@ -36,6 +36,16 @@ export default function EditBlog() {
     },
   });
 
+  const formattedBlogData = blog ? {
+    title: blog.title,
+    content: blog.content,
+    title_tamil: blog.title_tamil,
+    content_tamil: typeof blog.content_tamil === 'string' 
+      ? blog.content_tamil 
+      : JSON.stringify(blog.content_tamil),
+    category_id: blog.category_id
+  } : undefined;
+
   const {
     selectedLanguage,
     setSelectedLanguage,
@@ -56,7 +66,7 @@ export default function EditBlog() {
     isSubmitting,
   } = useBlogForm({
     blogId: id,
-    initialData: blog,
+    initialData: formattedBlogData,
   });
 
   if (isBlogLoading) {
