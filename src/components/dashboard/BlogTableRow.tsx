@@ -2,7 +2,10 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { BlogStatusBadge } from "@/components/admin/blog/BlogStatusBadge";
 import { BlogTableActions } from "./BlogTableActions";
-import { Blog } from "@/types/blog";
+import { Database } from "@/integrations/supabase/types";
+
+// Use the correct type from Supabase database types
+type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
 interface BlogTableRowProps {
   blog: Blog;
