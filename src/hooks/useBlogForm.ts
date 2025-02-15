@@ -51,6 +51,7 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
   const [isSaving, setIsSaving] = useState(false);
   const [currentBlogId, setCurrentBlogId] = useState<string | undefined>(initialBlogId);
 
+  // Update form data when initialData changes
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title || "");
@@ -63,7 +64,10 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
         : emptyContent);
       setSelectedCategory(initialData.category_id || "");
     }
-  }, [initialData]);
+    if (initialBlogId) {
+      setCurrentBlogId(initialBlogId);
+    }
+  }, [initialData, initialBlogId]);
 
   const saveBlog = useMutation({
     mutationFn: async (blogData: {
@@ -73,7 +77,11 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
       content_tamil?: string;
       category_id?: string;
     }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       if (currentBlogId) {
+        console.log('Updating existing blog:', currentBlogId);
         const { error } = await supabase
           .from("blogs")
           .update({
@@ -86,12 +94,13 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
           })
           .eq('id', currentBlogId);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error updating blog:', error);
+          throw error;
+        }
         return currentBlogId;
       } else {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error("No user found");
-
+        console.log('Creating new blog');
         const { data, error } = await supabase
           .from("blogs")
           .insert({
@@ -106,13 +115,17 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error creating blog:', error);
+          throw error;
+        }
         setCurrentBlogId(data.id);
         return data.id;
       }
     },
     onSuccess: () => {
       setLastSaved(new Date());
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
       queryClient.invalidateQueries({ queryKey: ["writer-blogs"] });
       toast({
         title: "Changes saved",
@@ -121,6 +134,7 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
       });
     },
     onError: (error) => {
+      console.error('Save error:', error);
       toast({
         variant: "destructive",
         title: "Save failed",
@@ -134,10 +148,11 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
 
   const debouncedSave = useDebouncedCallback(async () => {
     if (isSaving) return;
-    if (!title && !hasContent()) return; // Don't save if there's no content
+    if (!title && !hasContent()) return;
 
     try {
       setIsSaving(true);
+      console.log('Saving blog with ID:', currentBlogId);
       await saveBlog.mutateAsync({
         title,
         content,
@@ -163,10 +178,19 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
         throw new Error("Blog must be saved as draft first");
       }
 
+      const updateData = {
+        status: "pending_approval" as const,
+        title,
+        content,
+        title_tamil: titleTamil || null,
+        content_tamil: contentTamil || null,
+        category_id: selectedCategory || null,
+      };
+
       if (currentBlogId) {
         const { error } = await supabase
           .from("blogs")
-          .update({ status: "pending_approval" })
+          .update(updateData)
           .eq('id', currentBlogId);
 
         if (error) throw error;
@@ -177,13 +201,8 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
         const { error } = await supabase
           .from("blogs")
           .insert({
-            title,
-            content,
-            title_tamil: titleTamil || null,
-            content_tamil: contentTamil || null,
-            category_id: selectedCategory || null,
+            ...updateData,
             author_id: user.id,
-            status: "pending_approval",
           });
 
         if (error) throw error;
