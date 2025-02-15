@@ -54,16 +54,34 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
     setIsSaving
   );
 
-  // Increase debounce time to 2 seconds and add leading edge trigger
+  // Manual save function
+  const handleSaveDraft = async () => {
+    if (isSaving) return;
+    
+    try {
+      setIsSaving(true);
+      console.log('Manually saving blog with ID:', currentBlogId);
+      
+      await saveBlog.mutateAsync({
+        title,
+        content,
+        title_tamil: titleTamil,
+        content_tamil: contentTamil,
+        category_id: selectedCategory
+      });
+    } catch (error) {
+      console.error('Manual save failed:', error);
+    }
+  };
+
+  // Commented out auto-save functionality
+  /*
   const debouncedSave = useDebouncedCallback(async () => {
     if (isSaving) return;
     if (!title && !hasContent(content, title)) return;
 
     try {
       setIsSaving(true);
-      console.log('Auto-saving blog with ID:', currentBlogId);
-      console.log('Content being saved:', content);
-      
       await saveBlog.mutateAsync({
         title,
         content,
@@ -78,7 +96,6 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
     }
   }, 2000, { leading: true, trailing: true });
 
-  // Only trigger auto-save when content actually changes
   useEffect(() => {
     const hasRealContent = content !== emptyContent;
     const shouldSave = hasRealContent || title || titleTamil || contentTamil !== emptyContent;
@@ -88,6 +105,7 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
       debouncedSave();
     }
   }, [title, content, titleTamil, contentTamil, selectedCategory]);
+  */
 
   const handleSubmit = () => {
     if (!title || !hasContent(content, title)) {
@@ -118,16 +136,6 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
   };
 
   const handleBack = async () => {
-    if (isSaving) {
-      try {
-        await debouncedSave.flush();
-        if (saveBlog.isPending) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
-      } catch (error) {
-        console.error('Error while saving before navigation:', error);
-      }
-    }
     navigate("/dashboard");
   };
 
@@ -147,6 +155,7 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
     handleSubmit,
     handleTranslate,
     handleBack,
+    handleSaveDraft,
     hasContent: () => hasContent(content, title),
     isSubmitting: submitBlog.isPending,
     isSaving: saveBlog.isPending,

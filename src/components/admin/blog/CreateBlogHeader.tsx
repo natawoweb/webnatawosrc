@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, SendHorizontal } from "lucide-react";
+import { ArrowLeft, Save, SendHorizontal } from "lucide-react";
 import { CategoryManagement } from "./CategoryManagement";
 import {
   Select,
@@ -19,7 +19,9 @@ interface CreateBlogHeaderProps {
   onLanguageChange: (value: "english" | "tamil") => void;
   onBack: () => void;
   onSubmit: () => void;
+  onSaveDraft: () => void;
   isSubmitting: boolean;
+  isSaving: boolean;
 }
 
 export function CreateBlogHeader({
@@ -29,7 +31,9 @@ export function CreateBlogHeader({
   onCategoryChange,
   onBack,
   onSubmit,
+  onSaveDraft,
   isSubmitting,
+  isSaving,
 }: CreateBlogHeaderProps) {
   return (
     <div className="space-y-4">
@@ -57,6 +61,14 @@ export function CreateBlogHeader({
             </SelectContent>
           </Select>
           <Button
+            onClick={onSaveDraft}
+            disabled={isSaving}
+            variant="outline"
+          >
+            <Save className="mr-2 h-4 w-4" />
+            Save as Draft
+          </Button>
+          <Button
             onClick={onSubmit}
             disabled={isSubmitting}
           >
@@ -66,7 +78,7 @@ export function CreateBlogHeader({
         </div>
       </div>
       <p className="text-sm text-muted-foreground">
-        Your content will be automatically saved as a draft while you write. You can access your drafts from the dashboard at any time.
+        Click "Save as Draft" to save your work or "Submit for Approval" when you're ready to publish.
       </p>
     </div>
   );

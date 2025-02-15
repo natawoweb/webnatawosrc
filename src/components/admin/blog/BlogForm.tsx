@@ -15,6 +15,7 @@ interface BlogFormProps {
   handleSubmit: () => void;
   handleTranslate: () => void;
   handleBack: () => void;
+  handleSaveDraft: () => void;
   currentTitle: string;
   content: string;
   titleTamil: string;
@@ -25,6 +26,7 @@ interface BlogFormProps {
   setContentTamil: (content: string) => void;
   hasContent: () => boolean;
   isSubmitting: boolean;
+  isSaving: boolean;
 }
 
 export function BlogForm({
@@ -37,6 +39,7 @@ export function BlogForm({
   handleSubmit,
   handleTranslate,
   handleBack,
+  handleSaveDraft,
   currentTitle,
   content,
   titleTamil,
@@ -47,6 +50,7 @@ export function BlogForm({
   setContentTamil,
   hasContent,
   isSubmitting,
+  isSaving,
 }: BlogFormProps) {
   return (
     <div className="container max-w-[1400px] py-8">
@@ -60,7 +64,9 @@ export function BlogForm({
           onLanguageChange={setSelectedLanguage}
           onBack={handleBack}
           onSubmit={handleSubmit}
+          onSaveDraft={handleSaveDraft}
           isSubmitting={isSubmitting}
+          isSaving={isSaving}
         />
 
         <Tabs 
