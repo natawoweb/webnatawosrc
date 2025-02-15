@@ -60,8 +60,6 @@ export default function Dashboard() {
         title: "Success",
         description: "Blog published successfully",
       });
-      
-      window.location.reload();
     } catch (error: any) {
       console.error("Publish error:", error);
       toast({

@@ -7,8 +7,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BlogTableRow } from "./BlogTableRow";
-import { Blog } from "@/types/blog";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { Database } from "@/integrations/supabase/types";
+
+type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
+  blog_comments?: Array<{ count: number }>;
+  blog_categories?: { name: string };
+};
 
 interface BlogTableProps {
   blogs: Blog[];
