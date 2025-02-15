@@ -29,12 +29,14 @@ export default function CreateBlog() {
     handleSubmit,
     handleTranslate,
     handleBack,
+    handleSaveDraft,
     setTitle,
     setContent,
     setTitleTamil,
     setContentTamil,
     hasContent,
     isSubmitting,
+    isSaving,
   } = useBlogForm();
 
   return (
@@ -47,6 +49,7 @@ export default function CreateBlog() {
       handleSubmit={handleSubmit}
       handleTranslate={handleTranslate}
       handleBack={handleBack}
+      handleSaveDraft={handleSaveDraft}
       currentTitle={title}
       content={content}
       titleTamil={titleTamil}
@@ -57,6 +60,7 @@ export default function CreateBlog() {
       setContentTamil={setContentTamil}
       hasContent={hasContent}
       isSubmitting={isSubmitting}
+      isSaving={isSaving}
     />
   );
 }

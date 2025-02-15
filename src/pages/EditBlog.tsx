@@ -60,12 +60,14 @@ export default function EditBlog() {
     handleSubmit,
     handleTranslate,
     handleBack,
+    handleSaveDraft,
     setTitle,
     setContent,
     setTitleTamil,
     setContentTamil,
     hasContent,
     isSubmitting,
+    isSaving,
   } = useBlogForm({
     blogId: id,
     initialData: formattedBlogData,
@@ -90,6 +92,7 @@ export default function EditBlog() {
       handleSubmit={handleSubmit}
       handleTranslate={handleTranslate}
       handleBack={handleBack}
+      handleSaveDraft={handleSaveDraft}
       currentTitle={title}
       content={content}
       titleTamil={titleTamil}
@@ -100,6 +103,7 @@ export default function EditBlog() {
       setContentTamil={setContentTamil}
       hasContent={hasContent}
       isSubmitting={isSubmitting}
+      isSaving={isSaving}
     />
   );
 }
