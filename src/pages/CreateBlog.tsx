@@ -1,9 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BlogContentSection } from "@/components/admin/blog/BlogContentSection";
-import { CreateBlogHeader } from "@/components/admin/blog/CreateBlogHeader";
-import { CreateBlogActions } from "@/components/admin/blog/CreateBlogActions";
+import { BlogForm } from "@/components/admin/blog/BlogForm";
 import { useBlogForm } from "@/hooks/useBlogForm";
 
 export default function CreateBlog() {
@@ -40,32 +38,25 @@ export default function CreateBlog() {
   } = useBlogForm();
 
   return (
-    <div className="container max-w-[1400px] py-8">
-      <div className="space-y-6">
-        <CreateBlogHeader
-          categories={categories || []}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          selectedLanguage={selectedLanguage}
-          onLanguageChange={setSelectedLanguage}
-          onBack={handleBack}
-        />
-        
-        <CreateBlogActions
-          onSubmit={handleSubmit}
-          isLoading={isSubmitting}
-        />
-
-        <BlogContentSection
-          language={selectedLanguage}
-          title={selectedLanguage === "english" ? title : titleTamil}
-          content={selectedLanguage === "english" ? content : contentTamil}
-          onTitleChange={selectedLanguage === "english" ? setTitle : setTitleTamil}
-          onContentChange={selectedLanguage === "english" ? setContent : setContentTamil}
-          onTranslate={selectedLanguage === "english" ? handleTranslate : undefined}
-          hasContent={hasContent()}
-        />
-      </div>
-    </div>
+    <BlogForm
+      categories={categories || []}
+      selectedLanguage={selectedLanguage}
+      setSelectedLanguage={setSelectedLanguage}
+      selectedCategory={selectedCategory}
+      setSelectedCategory={setSelectedCategory}
+      handleSubmit={handleSubmit}
+      handleTranslate={handleTranslate}
+      handleBack={handleBack}
+      currentTitle={title}
+      content={content}
+      titleTamil={titleTamil}
+      contentTamil={contentTamil}
+      setTitle={setTitle}
+      setContent={setContent}
+      setTitleTamil={setTitleTamil}
+      setContentTamil={setContentTamil}
+      hasContent={hasContent}
+      isSubmitting={isSubmitting}
+    />
   );
 }
