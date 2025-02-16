@@ -15,19 +15,8 @@ import Auth from "./pages/Auth";
 import SearchWriters from "./pages/SearchWriters";
 import Events from "./pages/Events";
 import AdminDashboard from "./pages/AdminDashboard";
-import CreateBlog from "./pages/CreateBlog";
-import EditBlog from "./pages/EditBlog";
 import EventDetails from "./pages/EventDetails";
-import Blogs from "./pages/Blogs";
-import BlogDetail from "./pages/BlogDetail";
 import Dashboard from "./pages/Dashboard";
-import BlogPreview from "./pages/BlogPreview";
-
-// Create a wrapper component for the redirect
-const BlogRedirect = () => {
-  const { id } = useParams();
-  return <Navigate to={`/blogs/${id}`} replace />;
-};
 
 const App: React.FC = () => {
   return (
@@ -43,17 +32,10 @@ const App: React.FC = () => {
           <Route path="profile" element={<UserProfile />} />
           <Route path="auth" element={<Auth />} />
           <Route path="search" element={<SearchWriters />} />
-          <Route path="blogs" element={<Blogs />} />
-          <Route path="blogs/:id" element={<BlogDetail />} />
-          <Route path="preview/:id" element={<BlogPreview />} />
-          {/* Add redirect for old /blog/:id URLs */}
-          <Route path="blog/:id" element={<BlogRedirect />} />
           <Route path="events" element={<Events />} />
           <Route path="events/:id" element={<EventDetails />} />
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/user-profile" element={<AdminUserProfile />} />
-          <Route path="write" element={<CreateBlog />} />
-          <Route path="edit/:id" element={<EditBlog />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Route>
