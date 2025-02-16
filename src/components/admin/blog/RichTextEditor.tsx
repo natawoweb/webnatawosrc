@@ -18,26 +18,27 @@ const processInitialContent = (content: string) => {
   try {
     console.log('Processing initial content:', content);
     
-    // If it's already a string and seems to be JSON, parse it
-    if (typeof content === 'string') {
-      const parsed = JSON.parse(content);
-      
-      // If it's already in TipTap format, return as is
-      if (parsed.type === 'doc') {
-        console.log('Content already in TipTap format', parsed);
-        return parsed;
-      }
-
-      // If it's in Draft.js format, convert it
-      if (parsed.blocks) {
-        console.log('Converting Draft.js format to TipTap');
-        return convertDraftToTiptap(parsed);
-      }
+    // If content is empty or just whitespace, return default structure
+    if (!content || !content.trim()) {
+      return {
+        type: 'doc',
+        content: [{
+          type: 'paragraph',
+          content: [{ type: 'text', text: '' }]
+        }]
+      };
     }
 
-    // If we got here and content is not empty, treat it as plain text
-    if (content && content.trim()) {
-      console.log('Creating TipTap doc from plain text');
+    // Try to parse the content if it's a string
+    let parsedContent;
+    try {
+      parsedContent = typeof content === 'string' ? JSON.parse(content) : content;
+      // Handle double-stringified content
+      if (typeof parsedContent === 'string') {
+        parsedContent = JSON.parse(parsedContent);
+      }
+    } catch (e) {
+      console.log('Content is not JSON, treating as plain text');
       return {
         type: 'doc',
         content: [{
@@ -47,21 +48,35 @@ const processInitialContent = (content: string) => {
       };
     }
 
-    // Default empty content
+    // If it's already in TipTap format
+    if (parsedContent.type === 'doc') {
+      console.log('Content is already in TipTap format');
+      return parsedContent;
+    }
+
+    // If it's in Draft.js format
+    if (parsedContent.blocks) {
+      console.log('Converting Draft.js format to TipTap');
+      return convertDraftToTiptap(parsedContent);
+    }
+
+    // If we get here, wrap the content in a paragraph
+    console.log('Wrapping content in default structure');
     return {
       type: 'doc',
       content: [{
         type: 'paragraph',
-        content: [{ type: 'text', text: ' ' }]
+        content: [{ type: 'text', text: String(content) }]
       }]
     };
   } catch (error) {
     console.error('Error processing initial content:', error);
+    // Return empty editor state
     return {
       type: 'doc',
       content: [{
         type: 'paragraph',
-        content: [{ type: 'text', text: ' ' }]
+        content: [{ type: 'text', text: '' }]
       }]
     };
   }
@@ -69,9 +84,18 @@ const processInitialContent = (content: string) => {
 
 const convertDraftToTiptap = (draftContent: any) => {
   try {
-    // Convert Draft.js format to TipTap format
     const blocks = draftContent.blocks || [];
     
+    if (blocks.length === 0) {
+      return {
+        type: 'doc',
+        content: [{
+          type: 'paragraph',
+          content: [{ type: 'text', text: '' }]
+        }]
+      };
+    }
+
     return {
       type: 'doc',
       content: blocks.map((block: any) => {
@@ -101,15 +125,12 @@ const convertDraftToTiptap = (draftContent: any) => {
             break;
         }
 
-        // If text is empty, provide a space to prevent empty text node error
-        const text = block.text.trim() || ' ';
-
         return {
           type: nodeType,
           attrs: { textAlign },
           content: [{
             type: 'text',
-            text: text
+            text: block.text || ''
           }]
         };
       }).filter(Boolean)
@@ -120,10 +141,7 @@ const convertDraftToTiptap = (draftContent: any) => {
       type: 'doc',
       content: [{
         type: 'paragraph',
-        content: [{ 
-          type: 'text', 
-          text: ' '
-        }]
+        content: [{ type: 'text', text: '' }]
       }]
     };
   }
