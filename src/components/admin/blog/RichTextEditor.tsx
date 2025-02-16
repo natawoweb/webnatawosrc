@@ -3,6 +3,7 @@ import React from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
+import TextAlign from '@tiptap/extension-text-align';
 import { EditorToolbar } from './editor/EditorToolbar';
 import { ImageUploader } from './editor/ImageUploader';
 
@@ -13,6 +14,67 @@ interface RichTextEditorProps {
   placeholder?: string;
 }
 
+const convertDraftToTiptap = (draftContent: any) => {
+  try {
+    // If it's already in TipTap format, return as is
+    if (draftContent.type === 'doc') {
+      return draftContent;
+    }
+
+    // Convert Draft.js format to TipTap format
+    const blocks = draftContent.blocks || [];
+    
+    return {
+      type: 'doc',
+      content: blocks.map((block: any) => {
+        let nodeType = 'paragraph';
+        let textAlign = block.data?.textAlign || 'left';
+
+        switch (block.type) {
+          case 'header-one':
+            nodeType = 'heading';
+            break;
+          case 'ordered-list-item':
+            nodeType = 'orderedList';
+            break;
+          case 'unordered-list-item':
+            nodeType = 'bulletList';
+            break;
+          case 'atomic':
+            if (draftContent.entityMap[block.entityRanges[0]?.key]?.type === 'IMAGE') {
+              return {
+                type: 'image',
+                attrs: {
+                  src: draftContent.entityMap[block.entityRanges[0].key].data.src,
+                  alt: draftContent.entityMap[block.entityRanges[0].key].data.alt || '',
+                }
+              };
+            }
+            break;
+        }
+
+        return {
+          type: nodeType,
+          attrs: { textAlign },
+          content: [{
+            type: 'text',
+            text: block.text
+          }]
+        };
+      }).filter(Boolean)
+    };
+  } catch (error) {
+    console.error('Error converting content:', error);
+    return {
+      type: 'doc',
+      content: [{
+        type: 'paragraph',
+        content: [{ type: 'text', text: '' }]
+      }]
+    };
+  }
+};
+
 export function RichTextEditor({ content, onChange, language = "english", placeholder }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
@@ -22,8 +84,13 @@ export function RichTextEditor({ content, onChange, language = "english", placeh
           class: 'max-w-full rounded-lg',
         },
       }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+        alignments: ['left', 'center', 'right', 'justify'],
+        defaultAlignment: 'left',
+      }),
     ],
-    content: content ? JSON.parse(content) : '',
+    content: content ? convertDraftToTiptap(JSON.parse(content)) : '',
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
       onChange(JSON.stringify(json));

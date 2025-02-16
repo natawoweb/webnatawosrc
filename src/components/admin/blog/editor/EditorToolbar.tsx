@@ -57,7 +57,7 @@ export function EditorToolbar({ editor, language }: EditorToolbarProps) {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().setTextAlign('left').run()}
+        onClick={() => editor.commands.setTextAlign('left')}
         className={editor.isActive({ textAlign: 'left' }) ? 'bg-muted' : ''}
       >
         <AlignLeft className="h-4 w-4" />
@@ -65,7 +65,7 @@ export function EditorToolbar({ editor, language }: EditorToolbarProps) {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().setTextAlign('center').run()}
+        onClick={() => editor.commands.setTextAlign('center')}
         className={editor.isActive({ textAlign: 'center' }) ? 'bg-muted' : ''}
       >
         <AlignCenter className="h-4 w-4" />
@@ -73,7 +73,7 @@ export function EditorToolbar({ editor, language }: EditorToolbarProps) {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().setTextAlign('right').run()}
+        onClick={() => editor.commands.setTextAlign('right')}
         className={editor.isActive({ textAlign: 'right' }) ? 'bg-muted' : ''}
       >
         <AlignRight className="h-4 w-4" />
@@ -81,7 +81,7 @@ export function EditorToolbar({ editor, language }: EditorToolbarProps) {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+        onClick={() => editor.commands.setTextAlign('justify')}
         className={editor.isActive({ textAlign: 'justify' }) ? 'bg-muted' : ''}
       >
         <AlignJustify className="h-4 w-4" />
