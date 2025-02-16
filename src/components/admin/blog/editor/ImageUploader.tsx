@@ -4,16 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Image } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { EditorState, AtomicBlockUtils } from 'draft-js';
 
 interface ImageUploaderProps {
   language: "english" | "tamil";
-  editorState: EditorState;
-  setEditorState: (state: EditorState) => void;
-  onImageAdd: (blockKey: string) => void;
+  onImageAdd: (url: string) => void;
 }
 
-export const ImageUploader = ({ language, editorState, setEditorState, onImageAdd }: ImageUploaderProps) => {
+export const ImageUploader = ({ language, onImageAdd }: ImageUploaderProps) => {
   const { toast } = useToast();
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,22 +34,7 @@ export const ImageUploader = ({ language, editorState, setEditorState, onImageAd
         .from('blog-images')
         .getPublicUrl(filePath);
 
-      const contentState = editorState.getCurrentContent();
-      const contentStateWithEntity = contentState.createEntity(
-        'IMAGE',
-        'IMMUTABLE',
-        { src: publicUrl, width: 300, height: 'auto' }
-      );
-      const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-      const newEditorState = EditorState.set(
-        editorState,
-        { currentContent: contentStateWithEntity }
-      );
-      const nextEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
-      setEditorState(nextEditorState);
-
-      const block = nextEditorState.getCurrentContent().getLastBlock();
-      onImageAdd(block.getKey());
+      onImageAdd(publicUrl);
 
       toast({
         title: "Success",

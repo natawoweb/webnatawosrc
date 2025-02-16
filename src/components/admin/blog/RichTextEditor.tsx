@@ -1,11 +1,10 @@
 
 import React from 'react';
-import { Editor, RichUtils, DraftHandleValue } from 'draft-js';
-import 'draft-js/dist/Draft.css';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
 import { EditorToolbar } from './editor/EditorToolbar';
-import { ImageComponent } from './editor/ImageComponent';
 import { ImageUploader } from './editor/ImageUploader';
-import { useEditorState } from './editor/useEditorState';
 
 interface RichTextEditorProps {
   content: string;
@@ -15,87 +14,48 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ content, onChange, language = "english", placeholder }: RichTextEditorProps) {
-  const { editorState, setEditorState, imageStates, setImageStates } = useEditorState(content, onChange);
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Image.configure({
+        HTMLAttributes: {
+          class: 'max-w-full rounded-lg',
+        },
+      }),
+    ],
+    content: content ? JSON.parse(content) : '',
+    onUpdate: ({ editor }) => {
+      const json = editor.getJSON();
+      onChange(JSON.stringify(json));
+    },
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl max-w-none focus:outline-none',
+      },
+    },
+  });
 
-  const handleKeyCommand = (command: string): DraftHandleValue => {
-    const newState = RichUtils.handleKeyCommand(editorState, command);
-    if (newState) {
-      setEditorState(newState);
-      return 'handled';
-    }
-    return 'not-handled';
-  };
-
-  const toggleInlineStyle = (style: string) => {
-    setEditorState(RichUtils.toggleInlineStyle(editorState, style));
-  };
-
-  const toggleBlockType = (blockType: string) => {
-    setEditorState(RichUtils.toggleBlockType(editorState, blockType));
-  };
-
-  const blockRendererFn = (contentBlock: any) => {
-    if (contentBlock.getType() === 'atomic') {
-      const entityKey = contentBlock.getEntityAt(0);
-      if (!entityKey) return null;
-      
-      const entity = editorState.getCurrentContent().getEntity(entityKey);
-      if (entity.getType() === 'IMAGE') {
-        return {
-          component: ImageComponent,
-          editable: false,
-          props: {
-            onResizeImage: (width: number) => {
-              setImageStates(prev => ({
-                ...prev,
-                [contentBlock.getKey()]: { width, height: 'auto' }
-              }));
-            }
-          }
-        };
-      }
-    }
+  if (!editor) {
     return null;
-  };
-
-  const handleImageAdd = (blockKey: string) => {
-    setImageStates(prev => ({
-      ...prev,
-      [blockKey]: { width: 300, height: 'auto' }
-    }));
-  };
-
-  const contentState = editorState.getCurrentContent();
-  const isEditorEmpty = !contentState.hasText() && 
-    contentState.getBlockMap().first().getType() === 'unstyled';
+  }
 
   return (
     <div className="border rounded-lg flex flex-col h-full bg-white">
-      <EditorToolbar 
-        editorState={editorState}
-        onInlineStyle={toggleInlineStyle}
-        onBlockType={toggleBlockType}
-        language={language}
-      />
+      <EditorToolbar editor={editor} language={language} />
       <div className="flex-1 overflow-y-auto p-4">
         <ImageUploader
           language={language}
-          editorState={editorState}
-          setEditorState={setEditorState}
-          onImageAdd={handleImageAdd}
+          onImageAdd={(url: string) => {
+            editor.chain().focus().setImage({ src: url }).run();
+          }}
         />
-        <div className="relative">
-          {isEditorEmpty && (
+        <div className="relative min-h-[200px]">
+          {!editor.getText() && placeholder && (
             <div className="absolute text-gray-400 pointer-events-none p-0">
               {placeholder}
             </div>
           )}
-          <Editor
-            editorState={editorState}
-            onChange={setEditorState}
-            handleKeyCommand={handleKeyCommand}
-            blockRendererFn={blockRendererFn}
-          />
+          <EditorContent editor={editor} />
         </div>
       </div>
     </div>

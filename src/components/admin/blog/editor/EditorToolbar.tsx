@@ -1,29 +1,91 @@
 
-import React from "react";
-import { EditorState } from 'draft-js';
-import { TextFormatButtons } from './toolbar/TextFormatButtons';
-import { ListButtons } from './toolbar/ListButtons';
-import { AlignmentButtons } from './toolbar/AlignmentButtons';
+import React from 'react';
+import { Button } from "@/components/ui/button";
+import { Editor } from '@tiptap/react';
+import {
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+} from "lucide-react";
 
 interface EditorToolbarProps {
-  editorState: EditorState;
-  onInlineStyle: (style: string) => void;
-  onBlockType: (blockType: string) => void;
+  editor: Editor;
   language?: "english" | "tamil";
 }
 
-export function EditorToolbar({ 
-  editorState, 
-  onInlineStyle, 
-  onBlockType,
-  language 
-}: EditorToolbarProps) {
+export function EditorToolbar({ editor, language }: EditorToolbarProps) {
   return (
     <div className="border-b p-2 flex gap-2 flex-wrap">
-      <TextFormatButtons editorState={editorState} onInlineStyle={onInlineStyle} />
-      <ListButtons editorState={editorState} onBlockType={onBlockType} />
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={editor.isActive('bold') ? 'bg-muted' : ''}
+      >
+        <Bold className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={editor.isActive('italic') ? 'bg-muted' : ''}
+      >
+        <Italic className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={editor.isActive('bulletList') ? 'bg-muted' : ''}
+      >
+        <List className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={editor.isActive('orderedList') ? 'bg-muted' : ''}
+      >
+        <ListOrdered className="h-4 w-4" />
+      </Button>
       <div className="h-6 w-px bg-border mx-2" />
-      <AlignmentButtons editorState={editorState} onBlockType={onBlockType} />
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().setTextAlign('left').run()}
+        className={editor.isActive({ textAlign: 'left' }) ? 'bg-muted' : ''}
+      >
+        <AlignLeft className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().setTextAlign('center').run()}
+        className={editor.isActive({ textAlign: 'center' }) ? 'bg-muted' : ''}
+      >
+        <AlignCenter className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().setTextAlign('right').run()}
+        className={editor.isActive({ textAlign: 'right' }) ? 'bg-muted' : ''}
+      >
+        <AlignRight className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+        className={editor.isActive({ textAlign: 'justify' }) ? 'bg-muted' : ''}
+      >
+        <AlignJustify className="h-4 w-4" />
+      </Button>
     </div>
   );
 }
