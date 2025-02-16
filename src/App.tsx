@@ -9,6 +9,7 @@ import UserProfile from './pages/UserProfile';
 import Dashboard from './pages/Dashboard';
 import WriterDashboard from './pages/WriterDashboard';
 import Auth from './pages/Auth';
+import SearchWriters from './pages/SearchWriters';
 import { useSession } from "@/hooks/useSession";
 import { Navigate } from "react-router-dom";
 
@@ -32,6 +33,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:eventId" element={<EventDetails />} />
+          <Route path="/search" element={<SearchWriters />} />
           <Route 
             path="/admin/dashboard" 
             element={
