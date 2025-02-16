@@ -9,53 +9,21 @@ export function useDashboardData(userId: string | undefined) {
   useEffect(() => {
     if (!userId) return;
 
-    // Subscribe to all blog changes for this user
+    // Subscribe to events changes for this user
     const channel = supabase
-      .channel(`blogs-changes-${userId}`)
+      .channel(`events-changes-${userId}`)
       .on(
         'postgres_changes',
         {
-          event: 'INSERT', // Listen specifically for new blogs/drafts
+          event: '*',
           schema: 'public',
-          table: 'blogs',
-          filter: `author_id=eq.${userId}`
+          table: 'events',
+          filter: `created_by=eq.${userId}`
         },
         (payload) => {
-          console.log('Received new blog/draft:', payload);
+          console.log('Received event change:', payload);
           queryClient.invalidateQueries({ 
-            queryKey: ["writer-blogs", userId],
-            exact: true
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'blogs',
-          filter: `author_id=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Received blog update:', payload);
-          queryClient.invalidateQueries({ 
-            queryKey: ["writer-blogs", userId],
-            exact: true
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'blogs',
-          filter: `author_id=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Received blog deletion:', payload);
-          queryClient.invalidateQueries({ 
-            queryKey: ["writer-blogs", userId],
+            queryKey: ["user-events", userId],
             exact: true
           });
         }
@@ -72,29 +40,29 @@ export function useDashboardData(userId: string | undefined) {
   }, [queryClient, userId]);
 
   return useQuery({
-    queryKey: ["writer-blogs", userId],
+    queryKey: ["user-events", userId],
     queryFn: async () => {
-      console.log('Fetching blogs for user:', userId);
+      console.log('Fetching events for user:', userId);
       if (!userId) return [];
       
       const { data, error } = await supabase
-        .from("blogs")
+        .from("events")
         .select(`
           *,
-          blog_comments (count),
-          blog_categories (
+          event_comments (count),
+          event_categories (
             name
           )
         `)
-        .eq("author_id", userId)
+        .eq("created_by", userId)
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching blogs:", error);
+        console.error("Error fetching events:", error);
         throw error;
       }
       
-      console.log('Fetched blogs:', data);
+      console.log('Fetched events:', data);
       return data;
     },
     enabled: !!userId,
