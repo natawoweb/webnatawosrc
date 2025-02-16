@@ -1,7 +1,8 @@
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
-import { Outlet } from "react-router-dom";
+import Index from './pages/Index';
+import Events from './pages/Events';
 import AdminDashboard from './pages/AdminDashboard';
 import EventDetails from './pages/EventDetails';
 import UserProfile from './pages/UserProfile';
@@ -13,8 +14,8 @@ function App() {
     <Router>
       <Layout>
         <Routes>
-          <Route path="/" element={<Outlet />} />
-          <Route path="/events" element={<Outlet />} />
+          <Route path="/" element={<Index />} />
+          <Route path="/events" element={<Events />} />
           <Route path="/events/:eventId" element={<EventDetails />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/user-profile" element={<UserProfile />} />
