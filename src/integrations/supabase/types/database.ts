@@ -1,4 +1,3 @@
-
 import { EventsTable } from './events'
 import { WritersTable } from './writers'
 import { ProfilesTable, UserRolesTable } from './auth'
@@ -8,6 +7,130 @@ export interface Database {
     Tables: {
       profiles: ProfilesTable
       user_roles: UserRolesTable
+      blogs: {
+        Row: {
+          id: string
+          title: string
+          content: string
+          author_id: string
+          status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'published'
+          created_at: string
+          updated_at: string | null
+          published_at: string | null
+          cover_image: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          content: string
+          author_id: string
+          status?: 'draft' | 'submitted' | 'approved' | 'rejected' | 'published'
+          created_at?: string
+          updated_at?: string | null
+          published_at?: string | null
+          cover_image?: string | null
+        }
+        Update: {
+          title?: string
+          content?: string
+          author_id?: string
+          status?: 'draft' | 'submitted' | 'approved' | 'rejected' | 'published'
+          updated_at?: string | null
+          published_at?: string | null
+          cover_image?: string | null
+        }
+      }
+      blog_categories: {
+        Row: {
+          id: string
+          name: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          created_at?: string
+        }
+        Update: {
+          name?: string
+        }
+      }
+      blog_category_relations: {
+        Row: {
+          blog_id: string
+          category_id: string
+          created_at: string
+        }
+        Insert: {
+          blog_id: string
+          category_id: string
+          created_at?: string
+        }
+        Update: {
+          blog_id?: string
+          category_id?: string
+        }
+      }
+      blog_comments: {
+        Row: {
+          id: string
+          blog_id: string
+          user_id: string
+          content: string
+          created_at: string
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          blog_id: string
+          user_id: string
+          content: string
+          created_at?: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          updated_at?: string | null
+        }
+      }
+      blog_comment_reactions: {
+        Row: {
+          id: string
+          comment_id: string
+          user_id: string
+          type: 'like' | 'dislike'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          comment_id: string
+          user_id: string
+          type: 'like' | 'dislike'
+          created_at?: string
+        }
+        Update: {
+          type?: 'like' | 'dislike'
+        }
+      }
+      blog_ratings: {
+        Row: {
+          id: string
+          blog_id: string
+          user_id: string
+          rating: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          blog_id: string
+          user_id: string
+          rating: number
+          created_at?: string
+        }
+        Update: {
+          rating?: number
+        }
+      }
       event_comments: {
         Row: {
           id: string
@@ -149,9 +272,18 @@ export interface Database {
       has_role: HasRoleFunction
       register_for_event: RegisterForEventFunction
       unregister_from_event: UnregisterFromEventFunction
+      check_blog_status_transition: {
+        Args: {
+          old_status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'published'
+          new_status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'published'
+          user_role: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
+      blog_status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'published'
     }
     CompositeTypes: {
       [_ in never]: never
