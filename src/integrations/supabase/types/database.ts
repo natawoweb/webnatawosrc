@@ -1,4 +1,4 @@
-import { BlogsTable, CommentsTable, RatingsTable } from './content'
+
 import { EventsTable } from './events'
 import { WritersTable } from './writers'
 import { ProfilesTable, UserRolesTable } from './auth'
@@ -8,33 +8,6 @@ export interface Database {
     Tables: {
       profiles: ProfilesTable
       user_roles: UserRolesTable
-      blogs: BlogsTable
-      blog_comments: {
-        Row: {
-          id: string
-          blog_id: string
-          user_id: string
-          content: string
-          created_at: string
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          blog_id: string
-          user_id: string
-          content: string
-          created_at?: string
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          blog_id?: string
-          user_id?: string
-          content?: string
-          created_at?: string
-          updated_at?: string | null
-        }
-      }
       event_comments: {
         Row: {
           id: string
@@ -61,72 +34,64 @@ export interface Database {
           updated_at?: string | null
         }
       }
-      blog_ratings: {
+      events: {
         Row: {
           id: string
-          blog_id: string
-          user_id: string
-          rating: number
+          title: string
+          description: string
+          start_date: string
+          end_date: string
+          location: string
+          created_by: string
           created_at: string
+          updated_at: string | null
+          category_id: string
+          status: 'draft' | 'published' | 'cancelled'
+          images: string[]
         }
         Insert: {
           id?: string
-          blog_id: string
-          user_id: string
-          rating: number
+          title: string
+          description: string
+          start_date: string
+          end_date: string
+          location: string
+          created_by: string
           created_at?: string
+          updated_at?: string | null
+          category_id: string
+          status?: 'draft' | 'published' | 'cancelled'
+          images?: string[]
         }
         Update: {
           id?: string
-          blog_id?: string
-          user_id?: string
-          rating?: number
+          title?: string
+          description?: string
+          start_date?: string
+          end_date?: string
+          location?: string
+          created_by?: string
           created_at?: string
+          updated_at?: string | null
+          category_id?: string
+          status?: 'draft' | 'published' | 'cancelled'
+          images?: string[]
         }
       }
-      event_ratings: {
+      event_categories: {
         Row: {
           id: string
-          event_id: string
-          user_id: string
-          rating: number
+          name: string
           created_at: string
         }
         Insert: {
           id?: string
-          event_id: string
-          user_id: string
-          rating: number
+          name: string
           created_at?: string
         }
         Update: {
           id?: string
-          event_id?: string
-          user_id?: string
-          rating?: number
-          created_at?: string
-        }
-      }
-      blog_comment_reactions: {
-        Row: {
-          id: string
-          comment_id: string
-          user_id: string
-          reaction_type: 'like' | 'dislike'
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          comment_id: string
-          user_id: string
-          reaction_type: 'like' | 'dislike'
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          comment_id?: string
-          user_id?: string
-          reaction_type?: 'like' | 'dislike'
+          name?: string
           created_at?: string
         }
       }
@@ -153,20 +118,26 @@ export interface Database {
           created_at?: string
         }
       }
-      event_categories: {
+      event_ratings: {
         Row: {
           id: string
-          name: string
+          event_id: string
+          user_id: string
+          rating: number
           created_at: string
         }
         Insert: {
           id?: string
-          name: string
+          event_id: string
+          user_id: string
+          rating: number
           created_at?: string
         }
         Update: {
           id?: string
-          name?: string
+          event_id?: string
+          user_id?: string
+          rating?: number
           created_at?: string
         }
       }
@@ -178,7 +149,6 @@ export interface Database {
       has_role: HasRoleFunction
       register_for_event: RegisterForEventFunction
       unregister_from_event: UnregisterFromEventFunction
-      increment_blog_views: IncrementBlogViewsFunction
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
@@ -211,11 +181,4 @@ interface UnregisterFromEventFunction {
     p_user_id: string
   }
   Returns: boolean
-}
-
-interface IncrementBlogViewsFunction {
-  Args: {
-    blog_id: string
-  }
-  Returns: void
 }
