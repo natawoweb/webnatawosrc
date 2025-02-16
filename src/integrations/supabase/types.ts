@@ -12,75 +12,48 @@ export type Database = {
       blog_categories: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           name: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           name: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           name?: string
+          updated_at?: string
         }
         Relationships: []
       }
-      blog_category_relations: {
-        Row: {
-          blog_id: string
-          category_id: string
-          created_at: string
-        }
-        Insert: {
-          blog_id: string
-          category_id: string
-          created_at?: string
-        }
-        Update: {
-          blog_id?: string
-          category_id?: string
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "blog_category_relations_blog_id_fkey"
-            columns: ["blog_id"]
-            isOneToOne: false
-            referencedRelation: "blogs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "blog_category_relations_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "blog_categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       blog_comment_reactions: {
         Row: {
-          comment_id: string
-          created_at: string
+          comment_id: string | null
+          created_at: string | null
           id: string
-          type: string
-          user_id: string
+          reaction_type: string
+          user_id: string | null
         }
         Insert: {
-          comment_id: string
-          created_at?: string
+          comment_id?: string | null
+          created_at?: string | null
           id?: string
-          type: string
-          user_id: string
+          reaction_type: string
+          user_id?: string | null
         }
         Update: {
-          comment_id?: string
-          created_at?: string
+          comment_id?: string | null
+          created_at?: string | null
           id?: string
-          type?: string
-          user_id?: string
+          reaction_type?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -108,28 +81,28 @@ export type Database = {
       }
       blog_comments: {
         Row: {
-          blog_id: string
+          blog_id: string | null
           content: string
-          created_at: string
+          created_at: string | null
           id: string
           updated_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
-          blog_id: string
+          blog_id?: string | null
           content: string
-          created_at?: string
+          created_at?: string | null
           id?: string
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
-          blog_id?: string
+          blog_id?: string | null
           content?: string
-          created_at?: string
+          created_at?: string | null
           id?: string
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -157,25 +130,25 @@ export type Database = {
       }
       blog_ratings: {
         Row: {
-          blog_id: string
-          created_at: string
+          blog_id: string | null
+          created_at: string | null
           id: string
           rating: number
-          user_id: string
+          user_id: string | null
         }
         Insert: {
-          blog_id: string
-          created_at?: string
+          blog_id?: string | null
+          created_at?: string | null
           id?: string
           rating: number
-          user_id: string
+          user_id?: string | null
         }
         Update: {
-          blog_id?: string
-          created_at?: string
+          blog_id?: string | null
+          created_at?: string | null
           id?: string
           rating?: number
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -203,37 +176,58 @@ export type Database = {
       }
       blogs: {
         Row: {
-          author_id: string
+          author_id: string | null
+          category_id: string | null
           content: string
+          content_tamil: Json | null
+          content_type: string | null
           cover_image: string | null
-          created_at: string
+          created_at: string | null
           id: string
+          is_published: boolean | null
+          metadata: Json | null
           published_at: string | null
-          status: Database["public"]["Enums"]["blog_status"]
+          status: Database["public"]["Enums"]["blog_status"] | null
           title: string
+          title_tamil: string | null
           updated_at: string | null
+          views_count: number | null
         }
         Insert: {
-          author_id: string
+          author_id?: string | null
+          category_id?: string | null
           content: string
+          content_tamil?: Json | null
+          content_type?: string | null
           cover_image?: string | null
-          created_at?: string
+          created_at?: string | null
           id?: string
+          is_published?: boolean | null
+          metadata?: Json | null
           published_at?: string | null
-          status?: Database["public"]["Enums"]["blog_status"]
+          status?: Database["public"]["Enums"]["blog_status"] | null
           title: string
+          title_tamil?: string | null
           updated_at?: string | null
+          views_count?: number | null
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
+          category_id?: string | null
           content?: string
+          content_tamil?: Json | null
+          content_type?: string | null
           cover_image?: string | null
-          created_at?: string
+          created_at?: string | null
           id?: string
+          is_published?: boolean | null
+          metadata?: Json | null
           published_at?: string | null
-          status?: Database["public"]["Enums"]["blog_status"]
+          status?: Database["public"]["Enums"]["blog_status"] | null
           title?: string
+          title_tamil?: string | null
           updated_at?: string | null
+          views_count?: number | null
         }
         Relationships: [
           {
@@ -246,6 +240,62 @@ export type Database = {
           {
             foreignKeyName: "blogs_author_id_fkey"
             columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blogs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          blog_id: string | null
+          content: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          blog_id?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          blog_id?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_blog_id_fkey"
+            columns: ["blog_id"]
+            isOneToOne: false
+            referencedRelation: "blogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -643,6 +693,52 @@ export type Database = {
         }
         Relationships: []
       }
+      ratings: {
+        Row: {
+          blog_id: string | null
+          created_at: string | null
+          id: string
+          rating: number
+          user_id: string | null
+        }
+        Insert: {
+          blog_id?: string | null
+          created_at?: string | null
+          id?: string
+          rating: number
+          user_id?: string | null
+        }
+        Update: {
+          blog_id?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_blog_id_fkey"
+            columns: ["blog_id"]
+            isOneToOne: false
+            referencedRelation: "blogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -734,14 +830,6 @@ export type Database = {
       }
     }
     Functions: {
-      check_blog_status_transition: {
-        Args: {
-          old_status: Database["public"]["Enums"]["blog_status"]
-          new_status: Database["public"]["Enums"]["blog_status"]
-          user_role: string
-        }
-        Returns: boolean
-      }
       create_user_with_role: {
         Args: {
           user_id: string
@@ -768,6 +856,12 @@ export type Database = {
             }
             Returns: boolean
           }
+      increment_blog_views: {
+        Args: {
+          blog_id: string
+        }
+        Returns: undefined
+      }
       is_admin:
         | {
             Args: Record<PropertyKey, never>
@@ -806,7 +900,12 @@ export type Database = {
     }
     Enums: {
       app_role: "reader" | "writer" | "manager" | "admin"
-      blog_status: "draft" | "submitted" | "approved" | "rejected" | "published"
+      blog_status:
+        | "draft"
+        | "pending_approval"
+        | "approved"
+        | "rejected"
+        | "published"
       registration_status: "pending" | "approved" | "rejected"
       user_level:
         | "Literary Tamil Writers"

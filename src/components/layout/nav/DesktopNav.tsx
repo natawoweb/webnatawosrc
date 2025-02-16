@@ -57,10 +57,10 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
     <div className="hidden md:flex md:items-center md:space-x-4">
       {isAdmin && (
         <Link 
-          to="/admin/dashboard" 
+          to="/admin" 
           className={cn(
             "px-3 py-2 rounded-md transition-colors",
-            isActiveRoute("/admin/dashboard")
+            isActiveRoute("/admin")
               ? "text-foreground font-medium bg-accent"
               : "text-foreground/80 hover:text-foreground"
           )}

@@ -1,128 +1,249 @@
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Link } from "react-router-dom";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Filter, Loader2, Search } from "lucide-react";
-
-interface Writer {
-  id: string;
-  full_name: string | null;
-  bio: string | null;
-  avatar_url: string | null;
-  pseudonym: string | null;
-}
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ChevronLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SearchWriters() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showApproved, setShowApproved] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchType, setSearchType] = useState("name");
+  const [selectedWriter, setSelectedWriter] = useState<any>(null);
+  const { toast } = useToast();
 
   const { data: writers, isLoading } = useQuery({
-    queryKey: ["writers", searchQuery, showApproved],
+    queryKey: ["writers", searchTerm, searchType],
     queryFn: async () => {
-      let query = supabase
-        .from('profiles')
-        .select('id, full_name, bio, avatar_url, pseudonym')
-        .eq('user_type', 'writer');
+      console.log("Starting writers search query...");
+      try {
+        if (!searchTerm) {
+          const { data, error } = await supabase
+            .from("writers")
+            .select("*")
+            .limit(10);
+          
+          if (error) {
+            console.error("Error fetching writers:", error);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to fetch writers. Please try again.",
+            });
+            throw error;
+          }
+          console.log("Writers data:", data);
+          return data;
+        }
 
-      if (searchQuery) {
-        query = query.or(`full_name.ilike.%${searchQuery}%,pseudonym.ilike.%${searchQuery}%`);
+        let query = supabase.from("writers").select("*");
+
+        switch (searchType) {
+          case "name":
+            query = query.ilike("name", `%${searchTerm}%`);
+            break;
+          case "genre":
+            query = query.ilike("genre", `%${searchTerm}%`);
+            break;
+          case "title":
+            query = query.contains("published_works", [{ title: searchTerm }]);
+            break;
+        }
+
+        const { data, error } = await query;
+        if (error) {
+          console.error("Error searching writers:", error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to search writers. Please try again.",
+          });
+          throw error;
+        }
+        console.log("Search results:", data);
+        return data;
+      } catch (error) {
+        console.error("Error in writers query:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "An error occurred while fetching writers.",
+        });
+        throw error;
       }
-
-      if (showApproved) {
-        query = query.eq('approval_status', 'approved');
-      }
-
-      const { data, error } = await query;
-      
-      if (error) throw error;
-      return data as Writer[];
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="container py-8">
-        <div className="flex items-center justify-center p-12">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container py-8">
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Tamil Writers</h1>
-          <p className="mt-2 text-muted-foreground">
-            Discover and connect with talented Tamil writers from our community.
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-8">Search Writers</h1>
+      
+      <div className="flex gap-4 mb-8">
+        <Select value={searchType} onValueChange={setSearchType}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Search by..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="name">Name</SelectItem>
+            <SelectItem value="genre">Genre</SelectItem>
+            <SelectItem value="title">Article Title</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Input
+          placeholder="Search writers..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isLoading ? (
+          <p className="col-span-full text-center">Loading writers...</p>
+        ) : writers?.length === 0 ? (
+          <p className="col-span-full text-center text-muted-foreground">
+            No writers found. Try adjusting your search.
           </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search writers..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <Button
-            variant={showApproved ? "default" : "outline"}
-            onClick={() => setShowApproved(!showApproved)}
-            className="w-full sm:w-auto"
-          >
-            <Filter className="mr-2 h-4 w-4" />
-            {showApproved ? "Showing Approved" : "Show All"}
-          </Button>
-        </div>
-
-        {writers && writers.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {writers.map((writer) => (
-              <Card key={writer.id} className="glass-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={writer.avatar_url || undefined} />
-                      <AvatarFallback>
-                        {writer.pseudonym?.[0] || writer.full_name?.[0] || '?'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-1">
-                      <Link 
-                        to={`/writer/${writer.id}`}
-                        className="text-lg font-semibold hover:underline"
-                      >
-                        {writer.pseudonym || writer.full_name || 'Anonymous Writer'}
-                      </Link>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {writer.bio || "No bio available"}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground">
-              {searchQuery 
-                ? "No writers found matching your search criteria." 
-                : "No writers available at the moment."}
-            </p>
-          </div>
+          writers?.map((writer) => (
+            <Card key={writer.id} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  {writer.image_url ? (
+                    <img
+                      src={writer.image_url}
+                      alt={writer.name}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-accent" />
+                  )}
+                  <div>
+                    <h3 className="font-semibold">{writer.name}</h3>
+                    <p className="text-sm text-muted-foreground">{writer.genre}</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                  {writer.bio}
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setSelectedWriter(writer)}
+                >
+                  View Profile
+                </Button>
+              </CardContent>
+            </Card>
+          ))
         )}
       </div>
+
+      <Dialog open={!!selectedWriter} onOpenChange={() => setSelectedWriter(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedWriter(null)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <DialogTitle className="text-2xl font-bold">
+                Writer Profile
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+
+          {selectedWriter && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-6">
+                {selectedWriter.image_url ? (
+                  <img
+                    src={selectedWriter.image_url}
+                    alt={selectedWriter.name}
+                    className="w-24 h-24 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-accent" />
+                )}
+                <div>
+                  <h2 className="text-2xl font-bold">{selectedWriter.name}</h2>
+                  <p className="text-muted-foreground">{selectedWriter.genre}</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Biography</h3>
+                <p className="text-muted-foreground whitespace-pre-wrap">
+                  {selectedWriter.bio}
+                </p>
+              </div>
+
+              {selectedWriter.published_works && selectedWriter.published_works.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Published Works</h3>
+                  <ul className="space-y-2">
+                    {selectedWriter.published_works.map((work: any, index: number) => (
+                      <li key={index} className="flex justify-between items-center">
+                        <span>{work.title}</span>
+                        <span className="text-muted-foreground">{work.year}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedWriter.accomplishments && selectedWriter.accomplishments.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Accomplishments</h3>
+                  <ul className="list-disc list-inside space-y-1">
+                    {selectedWriter.accomplishments.map((accomplishment: string, index: number) => (
+                      <li key={index}>{accomplishment}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedWriter.social_links && Object.keys(selectedWriter.social_links).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Social Links</h3>
+                  <div className="flex gap-4">
+                    {Object.entries(selectedWriter.social_links).map(([platform, url]) => (
+                      <a
+                        key={platform}
+                        href={url as string}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline capitalize"
+                      >
+                        {platform}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
