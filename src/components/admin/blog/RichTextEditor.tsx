@@ -53,12 +53,15 @@ const convertDraftToTiptap = (draftContent: any) => {
             break;
         }
 
+        // If text is empty, provide a space to prevent empty text node error
+        const text = block.text.trim() || ' ';
+
         return {
           type: nodeType,
           attrs: { textAlign },
           content: [{
             type: 'text',
-            text: block.text
+            text
           }]
         };
       }).filter(Boolean)
@@ -69,7 +72,10 @@ const convertDraftToTiptap = (draftContent: any) => {
       type: 'doc',
       content: [{
         type: 'paragraph',
-        content: [{ type: 'text', text: '' }]
+        content: [{ 
+          type: 'text', 
+          text: ' ' // Providing a space instead of empty string
+        }]
       }]
     };
   }
@@ -90,7 +96,16 @@ export function RichTextEditor({ content, onChange, language = "english", placeh
         defaultAlignment: 'left',
       }),
     ],
-    content: content ? convertDraftToTiptap(JSON.parse(content)) : '',
+    content: content ? convertDraftToTiptap(JSON.parse(content)) : {
+      type: 'doc',
+      content: [{
+        type: 'paragraph',
+        content: [{ 
+          type: 'text', 
+          text: ' ' // Default content with a space
+        }]
+      }]
+    },
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
       onChange(JSON.stringify(json));
@@ -117,7 +132,7 @@ export function RichTextEditor({ content, onChange, language = "english", placeh
           }}
         />
         <div className="relative min-h-[200px]">
-          {!editor.getText() && placeholder && (
+          {!editor.getText().trim() && placeholder && (
             <div className="absolute text-gray-400 pointer-events-none p-0">
               {placeholder}
             </div>
