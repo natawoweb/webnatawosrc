@@ -61,7 +61,7 @@ const convertDraftToTiptap = (draftContent: any) => {
           attrs: { textAlign },
           content: [{
             type: 'text',
-            text
+            text: text
           }]
         };
       }).filter(Boolean)
@@ -96,7 +96,9 @@ export function RichTextEditor({ content, onChange, language = "english", placeh
         defaultAlignment: 'left',
       }),
     ],
-    content: content ? convertDraftToTiptap(JSON.parse(content)) : {
+    content: content ? convertDraftToTiptap(
+      typeof content === 'string' ? JSON.parse(content) : content
+    ) : {
       type: 'doc',
       content: [{
         type: 'paragraph',
