@@ -24,7 +24,7 @@ const processInitialContent = (content: string) => {
         type: 'doc',
         content: [{
           type: 'paragraph',
-          content: [{ type: 'text', text: '' }]
+          content: [{ type: 'text', text: ' ' }] // Always include a space
         }]
       };
     }
@@ -51,6 +51,18 @@ const processInitialContent = (content: string) => {
     // If it's already in TipTap format
     if (parsedContent.type === 'doc') {
       console.log('Content is already in TipTap format');
+      // Ensure no empty text nodes
+      if (parsedContent.content) {
+        parsedContent.content = parsedContent.content.map((node: any) => {
+          if (node.type === 'paragraph' && (!node.content || !node.content[0]?.text)) {
+            return {
+              ...node,
+              content: [{ type: 'text', text: ' ' }]
+            };
+          }
+          return node;
+        });
+      }
       return parsedContent;
     }
 
@@ -66,17 +78,16 @@ const processInitialContent = (content: string) => {
       type: 'doc',
       content: [{
         type: 'paragraph',
-        content: [{ type: 'text', text: String(content) }]
+        content: [{ type: 'text', text: String(content) || ' ' }]
       }]
     };
   } catch (error) {
     console.error('Error processing initial content:', error);
-    // Return empty editor state
     return {
       type: 'doc',
       content: [{
         type: 'paragraph',
-        content: [{ type: 'text', text: '' }]
+        content: [{ type: 'text', text: ' ' }]
       }]
     };
   }
@@ -91,7 +102,7 @@ const convertDraftToTiptap = (draftContent: any) => {
         type: 'doc',
         content: [{
           type: 'paragraph',
-          content: [{ type: 'text', text: '' }]
+          content: [{ type: 'text', text: ' ' }]
         }]
       };
     }
@@ -130,7 +141,7 @@ const convertDraftToTiptap = (draftContent: any) => {
           attrs: { textAlign },
           content: [{
             type: 'text',
-            text: block.text || ''
+            text: block.text || ' ' // Always provide at least a space
           }]
         };
       }).filter(Boolean)
@@ -141,7 +152,7 @@ const convertDraftToTiptap = (draftContent: any) => {
       type: 'doc',
       content: [{
         type: 'paragraph',
-        content: [{ type: 'text', text: '' }]
+        content: [{ type: 'text', text: ' ' }]
       }]
     };
   }
