@@ -14,13 +14,61 @@ interface RichTextEditorProps {
   placeholder?: string;
 }
 
-const convertDraftToTiptap = (draftContent: any) => {
+const processInitialContent = (content: string) => {
   try {
-    // If it's already in TipTap format, return as is
-    if (draftContent.type === 'doc') {
-      return draftContent;
+    console.log('Processing initial content:', content);
+    
+    // If it's already a string and seems to be JSON, parse it
+    if (typeof content === 'string') {
+      const parsed = JSON.parse(content);
+      
+      // If it's already in TipTap format, return as is
+      if (parsed.type === 'doc') {
+        console.log('Content already in TipTap format', parsed);
+        return parsed;
+      }
+
+      // If it's in Draft.js format, convert it
+      if (parsed.blocks) {
+        console.log('Converting Draft.js format to TipTap');
+        return convertDraftToTiptap(parsed);
+      }
     }
 
+    // If we got here and content is not empty, treat it as plain text
+    if (content && content.trim()) {
+      console.log('Creating TipTap doc from plain text');
+      return {
+        type: 'doc',
+        content: [{
+          type: 'paragraph',
+          content: [{ type: 'text', text: content }]
+        }]
+      };
+    }
+
+    // Default empty content
+    return {
+      type: 'doc',
+      content: [{
+        type: 'paragraph',
+        content: [{ type: 'text', text: ' ' }]
+      }]
+    };
+  } catch (error) {
+    console.error('Error processing initial content:', error);
+    return {
+      type: 'doc',
+      content: [{
+        type: 'paragraph',
+        content: [{ type: 'text', text: ' ' }]
+      }]
+    };
+  }
+};
+
+const convertDraftToTiptap = (draftContent: any) => {
+  try {
     // Convert Draft.js format to TipTap format
     const blocks = draftContent.blocks || [];
     
@@ -67,14 +115,14 @@ const convertDraftToTiptap = (draftContent: any) => {
       }).filter(Boolean)
     };
   } catch (error) {
-    console.error('Error converting content:', error);
+    console.error('Error converting Draft.js content:', error);
     return {
       type: 'doc',
       content: [{
         type: 'paragraph',
         content: [{ 
           type: 'text', 
-          text: ' ' // Providing a space instead of empty string
+          text: ' '
         }]
       }]
     };
@@ -96,18 +144,7 @@ export function RichTextEditor({ content, onChange, language = "english", placeh
         defaultAlignment: 'left',
       }),
     ],
-    content: content ? convertDraftToTiptap(
-      typeof content === 'string' ? JSON.parse(content) : content
-    ) : {
-      type: 'doc',
-      content: [{
-        type: 'paragraph',
-        content: [{ 
-          type: 'text', 
-          text: ' ' // Default content with a space
-        }]
-      }]
-    },
+    content: processInitialContent(content),
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
       onChange(JSON.stringify(json));
