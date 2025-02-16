@@ -11,10 +11,11 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 type Blog = Database['public']['Tables']['blogs']['Row'];
+type BlogStatus = Database['public']['Enums']['blog_status'];
 
 export function BlogManagement() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<BlogStatus | "all">("all");
   const navigate = useNavigate();
   const { session } = useSession();
   const [currentPage, setCurrentPage] = useState(1);

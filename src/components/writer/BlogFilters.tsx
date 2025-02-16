@@ -8,12 +8,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Database } from "@/integrations/supabase/types";
+
+type BlogStatus = Database['public']['Enums']['blog_status'];
 
 interface BlogFiltersProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  selectedStatus: string | null;
-  onStatusChange: (value: string) => void;
+  selectedStatus: BlogStatus | "all" | null;
+  onStatusChange: (value: BlogStatus | "all") => void;
 }
 
 export function BlogFilters({

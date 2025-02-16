@@ -1,4 +1,3 @@
-
 import { type Database } from "@/integrations/supabase/types";
 import {
   Table,
@@ -43,13 +42,12 @@ export function BlogTable({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'published':
-        return 'success';
+      case 'approved':
+        return 'default';
       case 'draft':
         return 'secondary';
       case 'submitted':
-        return 'warning';
-      case 'approved':
-        return 'info';
+        return 'outline';
       case 'rejected':
         return 'destructive';
       default:
