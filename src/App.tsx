@@ -8,6 +8,7 @@ import EventDetails from './pages/EventDetails';
 import UserProfile from './pages/UserProfile';
 import Dashboard from './pages/Dashboard';
 import WriterDashboard from './pages/WriterDashboard';
+import Auth from './pages/Auth';
 import { useSession } from "@/hooks/useSession";
 import { Navigate } from "react-router-dom";
 
@@ -28,6 +29,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:eventId" element={<EventDetails />} />
           <Route 
