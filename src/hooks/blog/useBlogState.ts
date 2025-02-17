@@ -73,6 +73,7 @@ export function useBlogState({ initialData, initialBlogId }: UseBlogStateProps =
   // Update state when initial data changes
   useEffect(() => {
     if (initialData) {
+      console.log("Updating state with initial data:", initialData);
       setTitle(initialData.title || "");
       setContent(prev => {
         if (initialData.content === prev) return prev;
@@ -93,15 +94,26 @@ export function useBlogState({ initialData, initialBlogId }: UseBlogStateProps =
     }
   }, [initialData, initialBlogId]);
 
+  // Create wrapped setters that include logging
+  const wrappedSetTitle = (newTitle: string) => {
+    console.log("Setting new title:", newTitle);
+    setTitle(newTitle);
+  };
+
+  const wrappedSetTitleTamil = (newTitle: string) => {
+    console.log("Setting new Tamil title:", newTitle);
+    setTitleTamil(newTitle);
+  };
+
   return {
     selectedLanguage,
     setSelectedLanguage,
     title,
-    setTitle,
+    setTitle: wrappedSetTitle,
     content,
     setContent,
     titleTamil,
-    setTitleTamil,
+    setTitleTamil: wrappedSetTitleTamil,
     contentTamil,
     setContentTamil,
     selectedCategory,

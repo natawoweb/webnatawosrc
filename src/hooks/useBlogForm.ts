@@ -56,11 +56,18 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
 
   const debouncedSave = useDebouncedCallback(async () => {
     if (isSaving) return;
-    if (!title && !hasContent(content, title)) return;
-
+    
     try {
       setIsSaving(true);
       console.log('Saving blog with ID:', currentBlogId);
+      console.log('Current blog data:', {
+        title,
+        content,
+        title_tamil: titleTamil,
+        content_tamil: contentTamil,
+        category_id: selectedCategory
+      });
+      
       await saveBlog.mutateAsync({
         title,
         content,
