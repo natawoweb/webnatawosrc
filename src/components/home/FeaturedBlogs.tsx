@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
+import { BlogContent } from "@/components/blog-detail/BlogContent";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
   profiles: {
@@ -65,10 +66,12 @@ export function FeaturedBlogs() {
   }
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-50 to-pink-50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold">Featured Blogs</h2>
+          <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+            Featured Blogs
+          </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             Discover our hand-picked selection of outstanding content
           </p>
@@ -87,7 +90,7 @@ export function FeaturedBlogs() {
             <CarouselContent>
               {blogs.map((blog) => (
                 <CarouselItem key={blog.id} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="glass-card p-6 h-full transition-all duration-300 hover:scale-[1.02]">
+                  <div className="rounded-lg p-6 h-full transition-all duration-300 hover:scale-[1.02] bg-white/80 backdrop-blur-sm shadow-lg border border-purple-100 hover:border-purple-200">
                     {blog.cover_image && (
                       <img
                         src={blog.cover_image}
@@ -95,16 +98,18 @@ export function FeaturedBlogs() {
                         className="w-full h-48 object-cover rounded-lg mb-4"
                       />
                     )}
-                    <h3 className="font-semibold line-clamp-2">{blog.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-2">
+                    <h3 className="font-semibold text-lg text-purple-900 line-clamp-2">
+                      {blog.title}
+                    </h3>
+                    <p className="text-sm text-purple-600 mt-2">
                       By {blog.profiles?.full_name || 'Anonymous'}
                     </p>
-                    <p className="mt-4 text-sm text-muted-foreground line-clamp-3">
-                      {blog.content}
-                    </p>
+                    <div className="mt-4 text-sm text-gray-600 line-clamp-3">
+                      <BlogContent content={blog.content} />
+                    </div>
                     <Button
                       variant="ghost"
-                      className="mt-4 w-full"
+                      className="mt-4 w-full hover:bg-purple-50 text-purple-700 hover:text-purple-800"
                       onClick={() => navigate(`/blogs/${blog.id}`)}
                     >
                       Read More
