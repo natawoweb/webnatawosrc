@@ -69,7 +69,7 @@ export function FeaturedBlogs() {
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background border-y">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-600 via-red-500 to-blue-700">
+          <h2 className="text-3xl font-bold text-foreground">
             Featured Blogs
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
