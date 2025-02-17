@@ -16,11 +16,10 @@ import { useProfile } from "@/hooks/useProfile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MobileNavProps {
   isOpen: boolean;
-  currentLanguage: string;
-  setCurrentLanguage: (lang: string) => void;
   session: any;
   handleSignOut: () => Promise<void>;
   navigate: (path: string) => void;
@@ -28,14 +27,13 @@ interface MobileNavProps {
 
 export const MobileNav: React.FC<MobileNavProps> = ({
   isOpen,
-  currentLanguage,
-  setCurrentLanguage,
   session,
   handleSignOut,
   navigate,
 }) => {
   const location = useLocation();
   const { profile } = useProfile();
+  const { language, setLanguage, t } = useLanguage();
   const isWriter = profile?.user_type === "writer";
 
   const { data: isAdmin } = useQuery({
@@ -68,7 +66,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
             )}
           >
-            Admin Dashboard
+            {t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")}
           </Link>
         )}
         {isWriter && (
@@ -81,7 +79,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
             )}
           >
-            Dashboard
+            {t("Dashboard", "டாஷ்போர்டு")}
           </Link>
         )}
         <Link
@@ -93,7 +91,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
               : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
           )}
         >
-          Writers
+          {t("Writers", "எழுத்தாளர்கள்")}
         </Link>
         <Link
           to="/blogs"
@@ -104,7 +102,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
               : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
           )}
         >
-          Blogs
+          {t("Blogs", "வலைப்பதிவுகள்")}
         </Link>
         <Link
           to="/events"
@@ -115,7 +113,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
               : "text-foreground/80 hover:text-foreground hover:bg-accent/50"
           )}
         >
-          Events
+          {t("Events", "நிகழ்வுகள்")}
         </Link>
         
         <div className="px-3 py-2">
@@ -123,14 +121,14 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
                 <Globe className="h-4 w-4" />
-                <span>{currentLanguage}</span>
+                <span>{language === 'english' ? 'English' : 'தமிழ்'}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setCurrentLanguage("English")}>
+              <DropdownMenuItem onClick={() => setLanguage("english")}>
                 English
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setCurrentLanguage("தமிழ்")}>
+              <DropdownMenuItem onClick={() => setLanguage("tamil")}>
                 தமிழ் (Tamil)
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -156,17 +154,17 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                   {profile?.pseudonym ? profile.pseudonym[0].toUpperCase() : profile?.email?.[0].toUpperCase() || '?'}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm">Profile</span>
+              <span className="text-sm">{t("Profile", "சுயவிவரம்")}</span>
             </Link>
             <Button variant="outline" onClick={handleSignOut} className="w-full mt-4">
               <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
+              {t("Sign Out", "வெளியேறு")}
             </Button>
           </>
         ) : (
           <Link to="/auth">
             <Button variant="outline" className="w-full mt-4">
-              Sign In
+              {t("Sign In", "உள்நுழைக")}
             </Button>
           </Link>
         )}
