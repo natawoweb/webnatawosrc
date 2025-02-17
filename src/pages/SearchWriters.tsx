@@ -2,30 +2,17 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ChevronLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { WriterSearch } from "@/components/writers/WriterSearch";
+import { WriterCard } from "@/components/writers/WriterCard";
+import { WriterProfile } from "@/components/writers/WriterProfile";
+import type { Writer } from "@/types/writer";
 
 export default function SearchWriters() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("name");
-  const [selectedWriter, setSelectedWriter] = useState<any>(null);
+  const [selectedWriter, setSelectedWriter] = useState<Writer | null>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -106,25 +93,12 @@ export default function SearchWriters() {
         {t("Search Writers", "எழுத்தாளர்களைத் தேடுங்கள்")}
       </h1>
       
-      <div className="flex gap-4 mb-8">
-        <Select value={searchType} onValueChange={setSearchType}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder={t("Search by...", "தேடல் வகை...")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="name">{t("Name", "பெயர்")}</SelectItem>
-            <SelectItem value="genre">{t("Genre", "இலக்கிய வகை")}</SelectItem>
-            <SelectItem value="title">{t("Article Title", "கட்டுரை தலைப்பு")}</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <Input
-          placeholder={t("Search writers...", "எழுத்தாளர்களைத் தேடுங்கள்...")}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1"
-        />
-      </div>
+      <WriterSearch
+        searchTerm={searchTerm}
+        searchType={searchType}
+        onSearchTermChange={setSearchTerm}
+        onSearchTypeChange={setSearchType}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
@@ -140,136 +114,19 @@ export default function SearchWriters() {
           </p>
         ) : (
           writers?.map((writer) => (
-            <Card key={writer.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  {writer.image_url ? (
-                    <img
-                      src={writer.image_url}
-                      alt={writer.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-accent" />
-                  )}
-                  <div>
-                    <h3 className="font-semibold">{writer.name}</h3>
-                    <p className="text-sm text-muted-foreground">{writer.genre}</p>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-                  {writer.bio}
-                </p>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setSelectedWriter(writer)}
-                >
-                  {t("View Profile", "சுயவிவரத்தைக் காண")}
-                </Button>
-              </CardContent>
-            </Card>
+            <WriterCard
+              key={writer.id}
+              writer={writer}
+              onSelect={setSelectedWriter}
+            />
           ))
         )}
       </div>
 
-      <Dialog open={!!selectedWriter} onOpenChange={() => setSelectedWriter(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <div className="flex items-center gap-2 mb-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSelectedWriter(null)}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <DialogTitle className="text-2xl font-bold">
-                {t("Writer Profile", "எழுத்தாளர் சுயவிவரம்")}
-              </DialogTitle>
-            </div>
-          </DialogHeader>
-
-          {selectedWriter && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-6">
-                {selectedWriter.image_url ? (
-                  <img
-                    src={selectedWriter.image_url}
-                    alt={selectedWriter.name}
-                    className="w-24 h-24 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-accent" />
-                )}
-                <div>
-                  <h2 className="text-2xl font-bold">{selectedWriter.name}</h2>
-                  <p className="text-muted-foreground">{selectedWriter.genre}</p>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("Biography", "சுயசரிதை")}
-                </h3>
-                <p className="text-muted-foreground whitespace-pre-wrap">
-                  {selectedWriter.bio}
-                </p>
-              </div>
-
-              {selectedWriter.published_works && selectedWriter.published_works.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">
-                    {t("Published Works", "வெளியிடப்பட்ட படைப்புகள்")}
-                  </h3>
-                  <ul className="space-y-2">
-                    {selectedWriter.published_works.map((work: any, index: number) => (
-                      <li key={index} className="flex justify-between items-center">
-                        <span>{work.title}</span>
-                        <span className="text-muted-foreground">{work.year}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {selectedWriter.accomplishments && selectedWriter.accomplishments.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">
-                    {t("Accomplishments", "சாதனைகள்")}
-                  </h3>
-                  <ul className="list-disc list-inside space-y-1">
-                    {selectedWriter.accomplishments.map((accomplishment: string, index: number) => (
-                      <li key={index}>{accomplishment}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {selectedWriter.social_links && Object.keys(selectedWriter.social_links).length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">
-                    {t("Social Links", "சமூக இணைப்புகள்")}
-                  </h3>
-                  <div className="flex gap-4">
-                    {Object.entries(selectedWriter.social_links).map(([platform, url]) => (
-                      <a
-                        key={platform}
-                        href={url as string}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline capitalize"
-                      >
-                        {platform}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <WriterProfile
+        writer={selectedWriter}
+        onClose={() => setSelectedWriter(null)}
+      />
     </div>
   );
 }
