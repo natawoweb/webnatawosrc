@@ -11,13 +11,44 @@ import { useUserManagement } from "@/hooks/useUserManagement";
 import { useState } from "react";
 import { type Database } from "@/integrations/supabase/types";
 import type { UserLevel } from "@/integrations/supabase/types/models";
+import { useSession } from "@/hooks/useSession";
+import { useUserRoles } from "@/hooks/useUserRoles";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
 
-type UserWithRole = Profile & {
-  role: AppRole;
-};
+interface UserFiltersProps {
+  selectedRole: string;
+  onRoleChange: (role: string) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  onAddUser: () => void;
+  isAdmin: boolean;
+}
+
+interface UserTableProps {
+  users: (Profile & { role: AppRole })[];
+  isLoading: boolean;
+  onDelete: (user: Profile & { role: AppRole }) => void;
+  onEdit: (user: Profile & { role: AppRole }) => void;
+  isAdmin: boolean;
+}
+
+interface DeleteUserDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  email: string;
+}
+
+interface AddUserDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (email: string, fullName: string, role: AppRole, password: string, level: UserLevel) => Promise<void>;
+  isSubmitting: boolean;
+}
 
 export function UserManagement() {
   const {
@@ -48,6 +79,7 @@ export function UserManagement() {
   const { session } = useSession();
   const { data: userRoles } = useUserRoles(session?.user?.id);
   const isAdmin = userRoles?.some(role => role.role === 'admin') || false;
+  const { toast } = useToast();
 
   const handleProfileUpdate = async (profile: Partial<Profile> & { featured?: boolean }) => {
     try {
