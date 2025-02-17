@@ -25,47 +25,43 @@ export default function SearchWriters() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("name");
   const [selectedWriter, setSelectedWriter] = useState<any>(null);
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
   const { toast } = useToast();
 
   const { data: writers, isLoading } = useQuery({
-    queryKey: ["writers", searchTerm, searchType],
+    queryKey: ["writers", searchTerm, searchType, selectedCountry],
     queryFn: async () => {
       console.log("Starting writers search query...");
       try {
-        if (!searchTerm) {
-          const { data, error } = await supabase
-            .from("writers")
-            .select("*")
-            .limit(10);
-          
-          if (error) {
-            console.error("Error fetching writers:", error);
-            toast({
-              variant: "destructive",
-              title: "Error",
-              description: "Failed to fetch writers. Please try again.",
-            });
-            throw error;
+        let query = supabase
+          .from("writers")
+          .select(`
+            *,
+            profiles:id (
+              county
+            )
+          `);
+
+        if (searchTerm) {
+          switch (searchType) {
+            case "name":
+              query = query.ilike("name", `%${searchTerm}%`);
+              break;
+            case "genre":
+              query = query.ilike("genre", `%${searchTerm}%`);
+              break;
+            case "title":
+              query = query.contains("published_works", [{ title: searchTerm }]);
+              break;
           }
-          console.log("Writers data:", data);
-          return data;
         }
 
-        let query = supabase.from("writers").select("*");
-
-        switch (searchType) {
-          case "name":
-            query = query.ilike("name", `%${searchTerm}%`);
-            break;
-          case "genre":
-            query = query.ilike("genre", `%${searchTerm}%`);
-            break;
-          case "title":
-            query = query.contains("published_works", [{ title: searchTerm }]);
-            break;
+        if (selectedCountry) {
+          query = query.eq("profiles.county", selectedCountry);
         }
 
         const { data, error } = await query;
+        
         if (error) {
           console.error("Error searching writers:", error);
           toast({
@@ -89,19 +85,56 @@ export default function SearchWriters() {
     },
   });
 
+  // Fetch unique countries for the dropdown
+  const { data: countries } = useQuery({
+    queryKey: ["writer-countries"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("county")
+        .eq("user_type", "writer")
+        .not("county", "is", null);
+
+      if (error) throw error;
+
+      const uniqueCountries = Array.from(
+        new Set(data.map((item) => item.county).filter(Boolean))
+      ).sort();
+
+      return uniqueCountries;
+    },
+  });
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-8">Search Writers</h1>
       
-      <div className="flex gap-4 mb-8">
+      <div className="flex gap-4 mb-8 flex-col md:flex-row">
         <Select value={searchType} onValueChange={setSearchType}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue placeholder="Search by..." />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="name">Name</SelectItem>
             <SelectItem value="genre">Genre</SelectItem>
             <SelectItem value="title">Article Title</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select 
+          value={selectedCountry} 
+          onValueChange={setSelectedCountry}
+        >
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder="Filter by country..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All Countries</SelectItem>
+            {countries?.map((country) => (
+              <SelectItem key={country} value={country}>
+                {country}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         
@@ -137,6 +170,11 @@ export default function SearchWriters() {
                   <div>
                     <h3 className="font-semibold">{writer.name}</h3>
                     <p className="text-sm text-muted-foreground">{writer.genre}</p>
+                    {writer.profiles?.county && (
+                      <p className="text-sm text-muted-foreground">
+                        {writer.profiles.county}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
