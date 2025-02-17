@@ -100,9 +100,17 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
 
   const handleTranslate = async () => {
     try {
-      const { translatedTitle, translatedContent } = await translateContent(title, content);
-      setTitleTamil(translatedTitle);
-      setContentTamil(translatedContent);
+      if (selectedLanguage === "english") {
+        // Translate from English to Tamil
+        const { translatedTitle, translatedContent } = await translateContent(title, content);
+        setTitleTamil(translatedTitle);
+        setContentTamil(translatedContent);
+      } else {
+        // Translate from Tamil to English
+        const { translatedTitle, translatedContent } = await translateContent(titleTamil, contentTamil);
+        setTitle(translatedTitle);
+        setContent(translatedContent);
+      }
     } catch (error) {
       console.error('Translation failed:', error);
     }

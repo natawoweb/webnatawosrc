@@ -1,4 +1,3 @@
-
 import { BlogContentSection } from "./BlogContentSection";
 import { CreateBlogHeader } from "./CreateBlogHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -62,11 +61,21 @@ export function BlogForm({
   const [showTranslateDialog, setShowTranslateDialog] = useState(false);
 
   const handleTranslateClick = () => {
-    if (titleTamil || contentTamil) {
+    if (selectedLanguage === "english" ? (titleTamil || contentTamil) : (currentTitle || content)) {
       setShowTranslateDialog(true);
     } else {
       handleTranslate();
     }
+  };
+
+  const getTranslateButtonText = () => {
+    return selectedLanguage === "english" ? "Translate to Tamil" : "Translate to English";
+  };
+
+  const getConfirmationMessage = () => {
+    return selectedLanguage === "english" 
+      ? "Existing Tamil content will be replaced with the new translation."
+      : "Existing English content will be replaced with the new translation.";
   };
 
   return (
@@ -98,25 +107,14 @@ export function BlogForm({
           </div>
 
           <div className="flex justify-end mb-4">
-            {selectedLanguage === "english" ? (
-              <Button
-                onClick={handleTranslateClick}
-                disabled={!hasContent()}
-                className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white"
-              >
-                <Globe className="mr-2 h-4 w-4" />
-                Translate to Tamil
-              </Button>
-            ) : (
-              <Button
-                onClick={handleTranslateClick}
-                disabled={!hasContent()}
-                className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white"
-              >
-                <Globe className="mr-2 h-4 w-4" />
-                Translate to English
-              </Button>
-            )}
+            <Button
+              onClick={handleTranslateClick}
+              disabled={!hasContent()}
+              className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white"
+            >
+              <Globe className="mr-2 h-4 w-4" />
+              {getTranslateButtonText()}
+            </Button>
           </div>
 
           <TabsContent value="english" className="mt-0">
@@ -147,7 +145,7 @@ export function BlogForm({
             <AlertDialogHeader>
               <AlertDialogTitle>Confirm Translation</AlertDialogTitle>
               <AlertDialogDescription>
-                Existing Tamil content will be replaced with the new translation. Are you sure you want to continue?
+                {getConfirmationMessage()}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
