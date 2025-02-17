@@ -81,7 +81,15 @@ export function FeaturedBlogs() {
   };
 
   const getContent = (blog: Blog) => {
-    return language === 'tamil' && blog.content_tamil ? blog.content_tamil : blog.content;
+    if (language === 'tamil' && blog.content_tamil) {
+      // If content_tamil is a string, return it directly
+      if (typeof blog.content_tamil === 'string') {
+        return blog.content_tamil;
+      }
+      // If it's JSON, stringify it
+      return JSON.stringify(blog.content_tamil);
+    }
+    return blog.content;
   };
 
   return (
