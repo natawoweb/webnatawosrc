@@ -4,6 +4,7 @@ import { CommentForm } from "./CommentForm";
 import { CommentItem } from "./CommentItem";
 import { CommentsHeader } from "./CommentsHeader";
 import { CommentsSkeleton } from "./CommentsSkeleton";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EventCommentsProps {
   eventId: string;
@@ -20,11 +21,16 @@ export function EventComments({ eventId }: EventCommentsProps) {
     deleteComment,
     reactToComment,
   } = useEventComments(eventId);
+  
+  const { t } = useLanguage();
 
   if (error) {
     return (
       <div className="text-red-500">
-        Error loading comments. Please try again.
+        {t(
+          "Failed to load comments. Please try again.",
+          "கருத்துகளை ஏற்ற முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+        )}
       </div>
     );
   }
@@ -33,14 +39,26 @@ export function EventComments({ eventId }: EventCommentsProps) {
     <div className="space-y-6">
       <CommentsHeader />
       
-      <CommentForm onSubmit={addComment} />
+      {currentUser ? (
+        <CommentForm onSubmit={addComment} />
+      ) : (
+        <p className="text-muted-foreground text-center py-4">
+          {t(
+            "Please log in to add comments",
+            "கருத்துகளைச் சேர்க்க உள்நுழையவும்"
+          )}
+        </p>
+      )}
 
       <div className="space-y-4">
         {isLoading ? (
           <CommentsSkeleton />
         ) : comments?.length === 0 ? (
           <p className="text-muted-foreground text-center py-4">
-            No comments yet. Be the first to comment!
+            {t(
+              "No comments yet. Be the first to comment!",
+              "இதுவரை கருத்துகள் இல்லை. முதல் கருத்தை இடுங்கள்!"
+            )}
           </p>
         ) : (
           comments?.map((comment) => (
