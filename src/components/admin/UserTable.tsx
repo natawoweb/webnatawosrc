@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Eye, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
@@ -32,6 +34,33 @@ export function UserTable({
   isAdmin 
 }: UserTableProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleFeatureWriter = async (user: Profile & { role: AppRole }) => {
+    try {
+      const { error } = await supabase
+        .from('writers')
+        .update({
+          featured: true,
+          featured_month: new Date().toISOString().substring(0, 7) // YYYY-MM format
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Writer has been featured for this month",
+      });
+    } catch (error) {
+      console.error('Error featuring writer:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to feature writer"
+      });
+    }
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -78,7 +107,7 @@ export function UserTable({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onEdit(user)}
+                    onClick={() => handleFeatureWriter(user)}
                   >
                     <Star className="h-4 w-4 text-yellow-500" />
                   </Button>
