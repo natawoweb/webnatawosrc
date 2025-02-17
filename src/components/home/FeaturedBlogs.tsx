@@ -66,10 +66,10 @@ export function FeaturedBlogs() {
   }
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-50 to-pink-50">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-slate-50 to-red-50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+          <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-600 via-red-500 to-blue-700">
             Featured Blogs
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
@@ -90,7 +90,7 @@ export function FeaturedBlogs() {
             <CarouselContent>
               {blogs.map((blog) => (
                 <CarouselItem key={blog.id} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="rounded-lg p-6 h-full transition-all duration-300 hover:scale-[1.02] bg-white/80 backdrop-blur-sm shadow-lg border border-purple-100 hover:border-purple-200">
+                  <div className="rounded-lg p-6 h-full transition-all duration-300 hover:scale-[1.02] bg-white/90 backdrop-blur-sm shadow-lg border border-red-100 hover:border-red-200">
                     {blog.cover_image && (
                       <img
                         src={blog.cover_image}
@@ -98,10 +98,10 @@ export function FeaturedBlogs() {
                         className="w-full h-48 object-cover rounded-lg mb-4"
                       />
                     )}
-                    <h3 className="font-semibold text-lg text-purple-900 line-clamp-2">
+                    <h3 className="font-semibold text-lg text-blue-900 line-clamp-2">
                       {blog.title}
                     </h3>
-                    <p className="text-sm text-purple-600 mt-2">
+                    <p className="text-sm text-red-600 mt-2">
                       By {blog.profiles?.full_name || 'Anonymous'}
                     </p>
                     <div className="mt-4 text-sm text-gray-600 line-clamp-3">
@@ -109,7 +109,7 @@ export function FeaturedBlogs() {
                     </div>
                     <Button
                       variant="ghost"
-                      className="mt-4 w-full hover:bg-purple-50 text-purple-700 hover:text-purple-800"
+                      className="mt-4 w-full hover:bg-red-50 text-blue-700 hover:text-blue-800"
                       onClick={() => navigate(`/blogs/${blog.id}`)}
                     >
                       Read More
