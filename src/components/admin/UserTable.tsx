@@ -14,6 +14,7 @@ import { Trash2, Eye, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
@@ -35,29 +36,66 @@ export function UserTable({
 }: UserTableProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [featuredWriters, setFeaturedWriters] = useState<{ [key: string]: boolean }>({});
+
+  useEffect(() => {
+    const fetchFeaturedStatus = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('writers')
+          .select('id, featured')
+          .in('id', users.filter(user => user.user_type === 'writer').map(user => user.id));
+
+        if (error) throw error;
+
+        const featuredStatus = data.reduce((acc, writer) => {
+          acc[writer.id] = writer.featured || false;
+          return acc;
+        }, {} as { [key: string]: boolean });
+
+        setFeaturedWriters(featuredStatus);
+      } catch (error) {
+        console.error('Error fetching featured status:', error);
+      }
+    };
+
+    if (users.some(user => user.user_type === 'writer')) {
+      fetchFeaturedStatus();
+    }
+  }, [users]);
 
   const handleFeatureWriter = async (user: Profile & { role: AppRole }) => {
     try {
+      const newFeaturedStatus = !featuredWriters[user.id];
+      
       const { error } = await supabase
         .from('writers')
         .update({
-          featured: true,
-          featured_month: new Date().toISOString().substring(0, 7) // YYYY-MM format
+          featured: newFeaturedStatus,
+          featured_month: newFeaturedStatus ? new Date().toISOString().substring(0, 7) : null
         })
         .eq('id', user.id);
 
       if (error) throw error;
 
+      // Update local state
+      setFeaturedWriters(prev => ({
+        ...prev,
+        [user.id]: newFeaturedStatus
+      }));
+
       toast({
         title: "Success",
-        description: "Writer has been featured for this month",
+        description: newFeaturedStatus 
+          ? "Writer has been featured for this month"
+          : "Writer has been unfeatured",
       });
     } catch (error) {
-      console.error('Error featuring writer:', error);
+      console.error('Error updating featured status:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to feature writer"
+        description: "Failed to update featured status"
       });
     }
   };
@@ -109,7 +147,11 @@ export function UserTable({
                     size="sm"
                     onClick={() => handleFeatureWriter(user)}
                   >
-                    <Star className="h-4 w-4 text-yellow-500" />
+                    <Star 
+                      className={`h-4 w-4 ${
+                        featuredWriters[user.id] ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'
+                      }`} 
+                    />
                   </Button>
                 )}
                 {isAdmin && (
