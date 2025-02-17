@@ -161,6 +161,8 @@ export type Database = {
           content_tamil: Json | null
           cover_image: string | null
           created_at: string | null
+          featured: boolean | null
+          featured_month: string | null
           id: string
           published_at: string | null
           rejection_reason: string | null
@@ -177,6 +179,8 @@ export type Database = {
           content_tamil?: Json | null
           cover_image?: string | null
           created_at?: string | null
+          featured?: boolean | null
+          featured_month?: string | null
           id?: string
           published_at?: string | null
           rejection_reason?: string | null
@@ -193,6 +197,8 @@ export type Database = {
           content_tamil?: Json | null
           cover_image?: string | null
           created_at?: string | null
+          featured?: boolean | null
+          featured_month?: string | null
           id?: string
           published_at?: string | null
           rejection_reason?: string | null

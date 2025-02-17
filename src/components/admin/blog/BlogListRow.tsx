@@ -1,11 +1,14 @@
 
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Trash2, Eye, Pencil, CheckCircle, XCircle } from "lucide-react";
+import { Trash2, Eye, Pencil, CheckCircle, XCircle, Star } from "lucide-react";
 import { BlogStatusBadge } from "./BlogStatusBadge";
 import { Database } from "@/integrations/supabase/types";
 import type { BlogStatus } from "@/integrations/supabase/types/content";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 type Blog = Database["public"]["Tables"]["blogs"]["Row"];
 
@@ -29,13 +32,42 @@ export function BlogListRow({
   onReject,
 }: BlogListRowProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const status = blog.status as BlogStatus;
+  const [isFeatured, setIsFeatured] = useState(blog.featured || false);
 
-  console.log('BlogListRow - Props:', { isAdmin, canDelete, blog });
+  const handleFeatureBlog = async () => {
+    try {
+      const newFeaturedStatus = !isFeatured;
+      const { error } = await supabase
+        .from('blogs')
+        .update({
+          featured: newFeaturedStatus,
+          featured_month: newFeaturedStatus ? new Date().toISOString().substring(0, 7) : null
+        })
+        .eq('id', blog.id);
+
+      if (error) throw error;
+
+      setIsFeatured(newFeaturedStatus);
+      toast({
+        title: "Success",
+        description: newFeaturedStatus 
+          ? "Blog has been featured for this month"
+          : "Blog has been unfeatured"
+      });
+    } catch (error) {
+      console.error('Error updating featured status:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update featured status"
+      });
+    }
+  };
 
   const renderActionButtons = () => {
     const showDeleteButton = isAdmin;
-    console.log('Show delete button:', { isAdmin, showDeleteButton });
 
     return (
       <div className="flex gap-2">
@@ -55,6 +87,18 @@ export function BlogListRow({
         >
           <Pencil className="h-4 w-4" />
         </Button>
+        {status === 'published' && isAdmin && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleFeatureBlog}
+            title={isFeatured ? "Unfeature Blog" : "Feature Blog"}
+          >
+            <Star className={`h-4 w-4 ${
+              isFeatured ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'
+            }`} />
+          </Button>
+        )}
         {showDeleteButton && (
           <Button
             variant="ghost"

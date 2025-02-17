@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedWriters } from "@/components/home/FeaturedWriters";
+import { FeaturedBlogs } from "@/components/home/FeaturedBlogs";
 import { UpcomingEvents } from "@/components/home/UpcomingEvents";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -66,6 +67,7 @@ const Index = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <HeroSection />
+      <FeaturedBlogs />
       <FeaturedWriters />
       <UpcomingEvents />
     </div>
