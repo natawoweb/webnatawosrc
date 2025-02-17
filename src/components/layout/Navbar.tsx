@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import { MobileNav } from "./nav/MobileNav";
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [currentLanguage, setCurrentLanguage] = React.useState("English");
   const [session, setSession] = React.useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -70,8 +70,6 @@ export const Navbar: React.FC = () => {
 
           <div className="hidden md:flex items-center">
             <DesktopNav
-              currentLanguage={currentLanguage}
-              setCurrentLanguage={setCurrentLanguage}
               session={session}
               handleSignOut={handleSignOut}
               navigate={navigate}
@@ -89,8 +87,6 @@ export const Navbar: React.FC = () => {
 
       <MobileNav
         isOpen={isOpen}
-        currentLanguage={currentLanguage}
-        setCurrentLanguage={setCurrentLanguage}
         session={session}
         handleSignOut={handleSignOut}
         navigate={navigate}

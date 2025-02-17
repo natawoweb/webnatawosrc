@@ -16,24 +16,22 @@ import { useProfile } from "@/hooks/useProfile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DesktopNavProps {
-  currentLanguage: string;
-  setCurrentLanguage: (lang: string) => void;
   session: any;
   handleSignOut: () => Promise<void>;
   navigate: (path: string) => void;
 }
 
 export const DesktopNav: React.FC<DesktopNavProps> = ({
-  currentLanguage,
-  setCurrentLanguage,
   session,
   handleSignOut,
   navigate,
 }) => {
   const location = useLocation();
   const { profile } = useProfile();
+  const { language, setLanguage, t } = useLanguage();
   const isWriter = profile?.user_type === "writer";
 
   const { data: isAdmin } = useQuery({
@@ -65,7 +63,7 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
               : "text-foreground/80 hover:text-foreground"
           )}
         >
-          Admin Dashboard
+          {t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")}
         </Link>
       )}
       {isWriter && (
@@ -78,7 +76,7 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
               : "text-foreground/80 hover:text-foreground"
           )}
         >
-          Dashboard
+          {t("Dashboard", "டாஷ்போர்டு")}
         </Link>
       )}
       <Link 
@@ -90,7 +88,7 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
             : "text-foreground/80 hover:text-foreground"
         )}
       >
-        Writers
+        {t("Writers", "எழுத்தாளர்கள்")}
       </Link>
       <Link 
         to="/blogs" 
@@ -101,7 +99,7 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
             : "text-foreground/80 hover:text-foreground"
         )}
       >
-        Blogs
+        {t("Blogs", "வலைப்பதிவுகள்")}
       </Link>
       <Link 
         to="/events" 
@@ -112,21 +110,21 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
             : "text-foreground/80 hover:text-foreground"
         )}
       >
-        Events
+        {t("Events", "நிகழ்வுகள்")}
       </Link>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="w-auto px-3 gap-2">
             <Globe className="h-4 w-4" />
-            <span>{currentLanguage}</span>
+            <span>{language === 'english' ? 'English' : 'தமிழ்'}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setCurrentLanguage("English")}>
+          <DropdownMenuItem onClick={() => setLanguage("english")}>
             English
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setCurrentLanguage("தமிழ்")}>
+          <DropdownMenuItem onClick={() => setLanguage("tamil")}>
             தமிழ் (Tamil)
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -148,13 +146,13 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
           </Link>
           <Button variant="outline" onClick={handleSignOut}>
             <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
+            {t("Sign Out", "வெளியேறு")}
           </Button>
         </div>
       ) : (
         <Link to="/auth">
           <Button variant="outline" className="ml-4">
-            Sign In
+            {t("Sign In", "உள்நுழைக")}
           </Button>
         </Link>
       )}
