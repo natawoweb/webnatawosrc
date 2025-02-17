@@ -26,10 +26,15 @@ interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (email: string, fullName: string, role: AppRole, password: string, level: UserLevel) => Promise<void>;
-  isLoading?: boolean;
+  isSubmitting: boolean;
 }
 
-export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUserDialogProps) {
+export function AddUserDialog({ 
+  open, 
+  onOpenChange, 
+  onSubmit, 
+  isSubmitting 
+}: AddUserDialogProps) {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<AppRole>("reader");
@@ -39,16 +44,6 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
   const handleSubmit = async () => {
     if (!email || !fullName || !role || !password || !level) {
       console.error("All fields are required");
-      return;
-    }
-
-    if (fullName.length < 2) {
-      console.error("Full name must be at least 2 characters long");
-      return;
-    }
-
-    if (password.length < 6) {
-      console.error("Password must be at least 6 characters long");
       return;
     }
 
@@ -62,7 +57,6 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
       setLevel("Subscriber");
       onOpenChange(false);
     } catch (error) {
-      // If there's an error, the form won't be cleared and dialog won't close
       console.error("Error adding user:", error);
     }
   };
@@ -145,8 +139,8 @@ export function AddUserDialog({ open, onOpenChange, onSubmit, isLoading }: AddUs
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? "Adding..." : "Add User"}
+          <Button onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Adding..." : "Add User"}
           </Button>
         </DialogFooter>
       </DialogContent>

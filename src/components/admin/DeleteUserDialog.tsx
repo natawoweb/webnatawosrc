@@ -1,3 +1,4 @@
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,12 +14,14 @@ interface DeleteUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  email: string;
 }
 
 export function DeleteUserDialog({
   open,
   onOpenChange,
   onConfirm,
+  email,
 }: DeleteUserDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -27,7 +30,7 @@ export function DeleteUserDialog({
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete the user account
-            and remove their data from our servers.
+            ({email}) and remove their data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

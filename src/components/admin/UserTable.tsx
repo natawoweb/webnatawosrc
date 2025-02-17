@@ -12,82 +12,69 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
 
-type UserWithRole = Profile & {
-  role: AppRole;
-};
-
 interface UserTableProps {
-  users: UserWithRole[];
-  onEdit: (user: UserWithRole) => void;
-  onDelete: (user: UserWithRole) => void;
-  onView: (user: UserWithRole) => void;
-  currentPage: number;
-  pageSize: number;
-  totalItems: number;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (pageSize: number) => void;
+  users: (Profile & { role: AppRole })[];
+  isLoading: boolean;
+  onDelete: (user: Profile & { role: AppRole }) => void;
+  onEdit: (user: Profile & { role: AppRole }) => void;
+  isAdmin: boolean;
 }
 
 export function UserTable({ 
   users, 
-  onEdit, 
+  isLoading, 
   onDelete, 
-  onView,
-  currentPage,
-  pageSize,
-  totalItems,
-  onPageChange,
-  onPageSizeChange
+  onEdit,
+  isAdmin 
 }: UserTableProps) {
   const navigate = useNavigate();
 
-  const handleView = (user: UserWithRole) => {
-    navigate('/admin/user-profile', { state: { user } });
-  };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="space-y-4">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Full Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Level</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users?.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.full_name || 'N/A'}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>
-                {new Date(user.created_at || "").toLocaleDateString()}
-              </TableCell>
-              <TableCell className="capitalize">{user.role}</TableCell>
-              <TableCell>
-                {user.level ? (
-                  <Badge variant="secondary">{user.level}</Badge>
-                ) : (
-                  <span className="text-muted-foreground text-sm">Not set</span>
-                )}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleView(user)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Full Name</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Created At</TableHead>
+          <TableHead>Role</TableHead>
+          <TableHead>Level</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {users?.map((user) => (
+          <TableRow key={user.id}>
+            <TableCell>{user.full_name || 'N/A'}</TableCell>
+            <TableCell>{user.email}</TableCell>
+            <TableCell>
+              {new Date(user.created_at || "").toLocaleDateString()}
+            </TableCell>
+            <TableCell className="capitalize">{user.role}</TableCell>
+            <TableCell>
+              {user.level ? (
+                <Badge variant="secondary">{user.level}</Badge>
+              ) : (
+                <span className="text-muted-foreground text-sm">Not set</span>
+              )}
+            </TableCell>
+            <TableCell>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(user)}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                {isAdmin && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -95,20 +82,12 @@ export function UserTable({
                   >
                     <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <DataTablePagination
-        currentPage={currentPage}
-        pageSize={pageSize}
-        totalItems={totalItems}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-      />
-    </div>
+                )}
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

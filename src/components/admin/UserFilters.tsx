@@ -1,3 +1,4 @@
+
 import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -7,12 +8,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 interface UserFiltersProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  selectedRole: string | null;
+  selectedRole: string;
   onRoleChange: (value: string) => void;
+  onAddUser: () => void;
+  isAdmin: boolean;
 }
 
 export function UserFilters({
@@ -20,6 +24,8 @@ export function UserFilters({
   onSearchChange,
   selectedRole,
   onRoleChange,
+  onAddUser,
+  isAdmin,
 }: UserFiltersProps) {
   return (
     <div className="flex gap-4 items-center">
@@ -49,6 +55,9 @@ export function UserFilters({
           </SelectContent>
         </Select>
       </div>
+      {isAdmin && (
+        <Button onClick={onAddUser}>Add User</Button>
+      )}
     </div>
   );
 }
