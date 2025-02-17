@@ -32,7 +32,11 @@ export function useTranslation() {
       // First translate the title
       console.log('Translating title:', title);
       const titleResponse = await supabase.functions.invoke('translate', {
-        body: { text: title }
+        body: { 
+          text: title,
+          sourceLang: 'auto',  // This tells the API to auto-detect the source language
+          targetLang: 'en'     // Always translate to English when coming from Tamil
+        }
       });
 
       console.log('Title translation response:', titleResponse);
@@ -41,7 +45,11 @@ export function useTranslation() {
       // Then translate the content
       console.log('Translating content:', textContent);
       const contentResponse = await supabase.functions.invoke('translate', {
-        body: { text: textContent }
+        body: { 
+          text: textContent,
+          sourceLang: 'auto',  // Auto-detect source language
+          targetLang: 'en'     // Always translate to English when coming from Tamil
+        }
       });
 
       console.log('Content translation response:', contentResponse);
