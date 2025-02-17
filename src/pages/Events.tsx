@@ -17,13 +17,17 @@ const Events = () => {
   const { data: events, isLoading } = useQuery({
     queryKey: ["events", showUpcoming],
     queryFn: async () => {
+      const now = new Date();
+      const todayDate = now.toISOString().split('T')[0];
+      const currentTime = now.toTimeString().split(' ')[0];
+
       const query = supabase
         .from("events")
         .select("*")
         .order("date", { ascending: true });
 
       if (showUpcoming) {
-        query.eq("is_upcoming", true);
+        query.or(`date.gt.${todayDate},and(date.eq.${todayDate},time.gt.${currentTime})`);
       }
 
       const { data, error } = await query;
