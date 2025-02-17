@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Eye } from "lucide-react";
+import { Trash2, Eye, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -74,6 +74,15 @@ export function UserTable({
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
+                {isAdmin && user.user_type === 'writer' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(user)}
+                  >
+                    <Star className="h-4 w-4 text-yellow-500" />
+                  </Button>
+                )}
                 {isAdmin && (
                   <Button
                     variant="ghost"
