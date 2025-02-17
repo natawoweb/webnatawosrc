@@ -37,7 +37,7 @@ export default function SearchWriters() {
           .from("writers")
           .select(`
             *,
-            profiles:id (
+            profile:profiles!inner(
               county
             )
           `);
@@ -57,7 +57,7 @@ export default function SearchWriters() {
         }
 
         if (selectedCountry) {
-          query = query.eq("profiles.county", selectedCountry);
+          query = query.eq("profile.county", selectedCountry);
         }
 
         const { data, error } = await query;
@@ -170,9 +170,9 @@ export default function SearchWriters() {
                   <div>
                     <h3 className="font-semibold">{writer.name}</h3>
                     <p className="text-sm text-muted-foreground">{writer.genre}</p>
-                    {writer.profiles?.county && (
+                    {writer.profile?.county && (
                       <p className="text-sm text-muted-foreground">
-                        {writer.profiles.county}
+                        {writer.profile.county}
                       </p>
                     )}
                   </div>
@@ -225,6 +225,11 @@ export default function SearchWriters() {
                 <div>
                   <h2 className="text-2xl font-bold">{selectedWriter.name}</h2>
                   <p className="text-muted-foreground">{selectedWriter.genre}</p>
+                  {selectedWriter.profile?.county && (
+                    <p className="text-muted-foreground">
+                      {selectedWriter.profile.county}
+                    </p>
+                  )}
                 </div>
               </div>
 
