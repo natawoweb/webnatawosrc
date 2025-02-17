@@ -16,10 +16,12 @@ import { useUserRoles } from "@/hooks/useUserRoles";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { CheckSquare, XSquare } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const BlogDetail = () => {
   const { id } = useParams();
   const { toast } = useToast();
+  const { language } = useLanguage();
 
   // Increment view count when the page loads
   React.useEffect(() => {
@@ -110,11 +112,27 @@ const BlogDetail = () => {
     return <BlogErrorState notFound />;
   }
 
+  const getTitle = () => {
+    if (language === 'tamil' && blog.title_tamil) {
+      return blog.title_tamil;
+    }
+    return blog.title;
+  };
+
+  const getContent = () => {
+    if (language === 'tamil' && blog.content_tamil) {
+      return typeof blog.content_tamil === 'string' 
+        ? blog.content_tamil 
+        : JSON.stringify(blog.content_tamil);
+    }
+    return blog.content;
+  };
+
   return (
     <div className="container mx-auto py-8">
       <article className="prose prose-lg mx-auto">
         <BlogHeader
-          title={blog.title}
+          title={getTitle()}
           authorName={blog.profiles?.full_name}
           publishedDate={blog.published_at || blog.created_at}
           categoryName={blog.blog_categories?.name}
@@ -141,7 +159,7 @@ const BlogDetail = () => {
           </div>
         )}
         
-        <BlogContent content={blog.content} />
+        <BlogContent content={getContent()} />
 
         <div className="mt-12 border-t pt-8">
           <BlogRating

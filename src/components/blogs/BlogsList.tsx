@@ -7,6 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface Blog {
   id: string;
   title: string;
+  title_tamil?: string;
   cover_image?: string;
   published_at?: string;
   created_at: string;
@@ -29,7 +30,14 @@ interface BlogsListProps {
 }
 
 export const BlogsList = ({ blogs }: BlogsListProps) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
+
+  const getTitle = (blog: Blog) => {
+    if (language === 'tamil' && blog.title_tamil) {
+      return blog.title_tamil;
+    }
+    return blog.title;
+  };
 
   return (
     <>
@@ -54,12 +62,12 @@ export const BlogsList = ({ blogs }: BlogsListProps) => {
                           {blog.cover_image && (
                             <img
                               src={blog.cover_image}
-                              alt={blog.title}
+                              alt={getTitle(blog)}
                               className="w-full h-48 object-cover rounded-t-lg"
                             />
                           )}
                           <CardHeader>
-                            <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
+                            <CardTitle className="line-clamp-2">{getTitle(blog)}</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <p className="text-sm text-muted-foreground">
