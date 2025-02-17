@@ -137,6 +137,14 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
     navigate("/dashboard");
   };
 
+  const hasTranslatableContent = () => {
+    if (selectedLanguage === "english") {
+      return title.trim() !== "" || content !== emptyContent;
+    } else {
+      return titleTamil.trim() !== "" || contentTamil !== emptyContent;
+    }
+  };
+
   return {
     selectedLanguage,
     setSelectedLanguage,
@@ -153,7 +161,7 @@ export function useBlogForm({ blogId: initialBlogId, initialData }: UseBlogFormP
     handleSubmit,
     handleTranslate,
     handleBack,
-    hasContent: () => hasContent(content, title),
+    hasContent: hasTranslatableContent,
     isSubmitting: submitBlog.isPending,
     isSaving: saveBlog.isPending,
     lastSaved,
