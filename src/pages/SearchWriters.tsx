@@ -20,12 +20,14 @@ import {
 } from "@/components/ui/select";
 import { ChevronLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function SearchWriters() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("name");
   const [selectedWriter, setSelectedWriter] = useState<any>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const { data: writers, isLoading } = useQuery({
     queryKey: ["writers", searchTerm, searchType],
@@ -42,8 +44,11 @@ export default function SearchWriters() {
             console.error("Error fetching writers:", error);
             toast({
               variant: "destructive",
-              title: "Error",
-              description: "Failed to fetch writers. Please try again.",
+              title: t("Error", "பிழை"),
+              description: t(
+                "Failed to fetch writers. Please try again.",
+                "எழுத்தாளர்களை பெற முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+              ),
             });
             throw error;
           }
@@ -70,8 +75,11 @@ export default function SearchWriters() {
           console.error("Error searching writers:", error);
           toast({
             variant: "destructive",
-            title: "Error",
-            description: "Failed to search writers. Please try again.",
+            title: t("Error", "பிழை"),
+            description: t(
+              "Failed to search writers. Please try again.",
+              "எழுத்தாளர்களை தேட முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+            ),
           });
           throw error;
         }
@@ -81,8 +89,11 @@ export default function SearchWriters() {
         console.error("Error in writers query:", error);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "An error occurred while fetching writers.",
+          title: t("Error", "பிழை"),
+          description: t(
+            "An error occurred while fetching writers.",
+            "எழுத்தாளர்களை பெறும்போது பிழை ஏற்பட்டது."
+          ),
         });
         throw error;
       }
@@ -91,22 +102,24 @@ export default function SearchWriters() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Search Writers</h1>
+      <h1 className="text-3xl font-bold mb-8">
+        {t("Search Writers", "எழுத்தாளர்களைத் தேடுங்கள்")}
+      </h1>
       
       <div className="flex gap-4 mb-8">
         <Select value={searchType} onValueChange={setSearchType}>
           <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Search by..." />
+            <SelectValue placeholder={t("Search by...", "தேடல் வகை...")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="name">Name</SelectItem>
-            <SelectItem value="genre">Genre</SelectItem>
-            <SelectItem value="title">Article Title</SelectItem>
+            <SelectItem value="name">{t("Name", "பெயர்")}</SelectItem>
+            <SelectItem value="genre">{t("Genre", "இலக்கிய வகை")}</SelectItem>
+            <SelectItem value="title">{t("Article Title", "கட்டுரை தலைப்பு")}</SelectItem>
           </SelectContent>
         </Select>
         
         <Input
-          placeholder="Search writers..."
+          placeholder={t("Search writers...", "எழுத்தாளர்களைத் தேடுங்கள்...")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="flex-1"
@@ -115,10 +128,15 @@ export default function SearchWriters() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
-          <p className="col-span-full text-center">Loading writers...</p>
+          <p className="col-span-full text-center">
+            {t("Loading writers...", "எழுத்தாளர்களை ஏற்றுகிறது...")}
+          </p>
         ) : writers?.length === 0 ? (
           <p className="col-span-full text-center text-muted-foreground">
-            No writers found. Try adjusting your search.
+            {t(
+              "No writers found. Try adjusting your search.",
+              "எழுத்தாளர்கள் எவரும் கிடைக்கவில்லை. உங்கள் தேடலை மாற்றி முயற்சிக்கவும்."
+            )}
           </p>
         ) : (
           writers?.map((writer) => (
@@ -147,7 +165,7 @@ export default function SearchWriters() {
                   className="w-full"
                   onClick={() => setSelectedWriter(writer)}
                 >
-                  View Profile
+                  {t("View Profile", "சுயவிவரத்தைக் காண")}
                 </Button>
               </CardContent>
             </Card>
@@ -167,7 +185,7 @@ export default function SearchWriters() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <DialogTitle className="text-2xl font-bold">
-                Writer Profile
+                {t("Writer Profile", "எழுத்தாளர் சுயவிவரம்")}
               </DialogTitle>
             </div>
           </DialogHeader>
@@ -191,7 +209,9 @@ export default function SearchWriters() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-2">Biography</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  {t("Biography", "சுயசரிதை")}
+                </h3>
                 <p className="text-muted-foreground whitespace-pre-wrap">
                   {selectedWriter.bio}
                 </p>
@@ -199,7 +219,9 @@ export default function SearchWriters() {
 
               {selectedWriter.published_works && selectedWriter.published_works.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Published Works</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {t("Published Works", "வெளியிடப்பட்ட படைப்புகள்")}
+                  </h3>
                   <ul className="space-y-2">
                     {selectedWriter.published_works.map((work: any, index: number) => (
                       <li key={index} className="flex justify-between items-center">
@@ -213,7 +235,9 @@ export default function SearchWriters() {
 
               {selectedWriter.accomplishments && selectedWriter.accomplishments.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Accomplishments</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {t("Accomplishments", "சாதனைகள்")}
+                  </h3>
                   <ul className="list-disc list-inside space-y-1">
                     {selectedWriter.accomplishments.map((accomplishment: string, index: number) => (
                       <li key={index}>{accomplishment}</li>
@@ -224,7 +248,9 @@ export default function SearchWriters() {
 
               {selectedWriter.social_links && Object.keys(selectedWriter.social_links).length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Social Links</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {t("Social Links", "சமூக இணைப்புகள்")}
+                  </h3>
                   <div className="flex gap-4">
                     {Object.entries(selectedWriter.social_links).map(([platform, url]) => (
                       <a
