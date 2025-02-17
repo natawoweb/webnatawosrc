@@ -1,5 +1,5 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
@@ -29,6 +29,7 @@ export function EventList({ onEdit, searchQuery = "" }: EventListProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: events, isLoading } = useQuery({
     queryKey: ["admin-events", searchQuery],
@@ -80,6 +81,9 @@ export function EventList({ onEdit, searchQuery = "" }: EventListProps) {
         title: "Event deleted",
         description: "The event has been successfully deleted.",
       });
+      
+      // Invalidate the events query to trigger a refresh
+      await queryClient.invalidateQueries({ queryKey: ["admin-events"] });
       
       setDeleteDialogOpen(false);
       setSelectedEvent(null);
