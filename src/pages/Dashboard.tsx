@@ -74,11 +74,12 @@ export default function Dashboard() {
 
   const handlePublish = async (blogId: string) => {
     try {
-      // First show the "will be published" toast
+      // First show the "will be published" toast with longer duration
       toast({
-        title: "Publishing Blog",
+        title: "Blog Publishing Started",
         description: "Your blog will be published in a few minutes.",
-        duration: 5000,
+        variant: "default",
+        duration: 1000000, // Keep it visible longer
       });
 
       console.log("Publishing blog:", blogId);
@@ -100,9 +101,10 @@ export default function Dashboard() {
 
           // Show success toast after publishing is complete
           toast({
-            title: "Success",
-            description: "Your blog has been published successfully!",
-            duration: 3000,
+            title: "Blog Published Successfully!",
+            description: "Your blog is now live and can be viewed by readers.",
+            variant: "default",
+            duration: 5000,
           });
 
           // Manually invalidate the query to update the UI
