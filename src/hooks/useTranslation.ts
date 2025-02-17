@@ -62,6 +62,14 @@ export function useTranslation() {
       console.log('Content translation response:', contentResponse);
       if (contentResponse.error) throw new Error(contentResponse.error.message);
 
+      // Check if the response data exists and has the expected structure
+      if (!titleResponse.data?.data?.translations?.[0]?.translatedText) {
+        throw new Error('Invalid title translation response structure');
+      }
+      if (!contentResponse.data?.data?.translations?.[0]?.translatedText) {
+        throw new Error('Invalid content translation response structure');
+      }
+
       const translatedTitle = titleResponse.data.data.translations[0].translatedText;
       const translatedText = contentResponse.data.data.translations[0].translatedText;
       
