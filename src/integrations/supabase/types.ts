@@ -746,6 +746,7 @@ export type Database = {
           id: string
           image_url: string | null
           name: string
+          profile_id: string | null
           published_works: Json | null
           social_links: Json | null
         }
@@ -759,6 +760,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           name: string
+          profile_id?: string | null
           published_works?: Json | null
           social_links?: Json | null
         }
@@ -772,6 +774,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           name?: string
+          profile_id?: string | null
           published_works?: Json | null
           social_links?: Json | null
         }
@@ -780,6 +783,13 @@ export type Database = {
             foreignKeyName: "writers_id_fkey"
             columns: ["id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "writers_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },

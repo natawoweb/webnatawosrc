@@ -37,7 +37,7 @@ export default function SearchWriters() {
           .from("writers")
           .select(`
             *,
-            profiles (
+            profiles!writers_profile_id_fkey (
               county
             )
           `);
@@ -170,9 +170,9 @@ export default function SearchWriters() {
                   <div>
                     <h3 className="font-semibold">{writer.name}</h3>
                     <p className="text-sm text-muted-foreground">{writer.genre}</p>
-                    {writer.profiles?.[0]?.county && (
+                    {writer.profiles?.county && (
                       <p className="text-sm text-muted-foreground">
-                        {writer.profiles[0].county}
+                        {writer.profiles.county}
                       </p>
                     )}
                   </div>
@@ -225,9 +225,9 @@ export default function SearchWriters() {
                 <div>
                   <h2 className="text-2xl font-bold">{selectedWriter.name}</h2>
                   <p className="text-muted-foreground">{selectedWriter.genre}</p>
-                  {selectedWriter.profiles?.[0]?.county && (
+                  {selectedWriter.profiles?.county && (
                     <p className="text-muted-foreground">
-                      {selectedWriter.profiles[0].county}
+                      {selectedWriter.profiles.county}
                     </p>
                   )}
                 </div>
@@ -290,3 +290,4 @@ export default function SearchWriters() {
     </div>
   );
 }
+
