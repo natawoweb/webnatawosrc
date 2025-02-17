@@ -41,14 +41,21 @@ export function UserTable({
   useEffect(() => {
     const fetchFeaturedStatus = async () => {
       try {
+        // Get IDs of writer-type users
+        const writerIds = users
+          .filter(user => user.user_type === 'writer')
+          .map(user => user.id);
+
+        if (writerIds.length === 0) return;
+
         const { data, error } = await supabase
           .from('writers')
           .select('id, featured')
-          .in('id', users.filter(user => user.user_type === 'writer').map(user => user.id));
+          .in('id', writerIds);
 
         if (error) throw error;
 
-        const featuredStatus = data.reduce((acc, writer) => {
+        const featuredStatus = (data || []).reduce((acc, writer) => {
           acc[writer.id] = writer.featured || false;
           return acc;
         }, {} as { [key: string]: boolean });
@@ -56,27 +63,55 @@ export function UserTable({
         setFeaturedWriters(featuredStatus);
       } catch (error) {
         console.error('Error fetching featured status:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch featured writers status"
+        });
       }
     };
 
-    if (users.some(user => user.user_type === 'writer')) {
-      fetchFeaturedStatus();
-    }
-  }, [users]);
+    fetchFeaturedStatus();
+  }, [users, toast]);
 
   const handleFeatureWriter = async (user: Profile & { role: AppRole }) => {
     try {
-      const newFeaturedStatus = !featuredWriters[user.id];
-      
-      const { error } = await supabase
+      // First check if writer exists in writers table
+      const { data: existingWriter } = await supabase
         .from('writers')
-        .update({
-          featured: newFeaturedStatus,
-          featured_month: newFeaturedStatus ? new Date().toISOString().substring(0, 7) : null
-        })
-        .eq('id', user.id);
+        .select('id, featured')
+        .eq('id', user.id)
+        .single();
 
-      if (error) throw error;
+      const newFeaturedStatus = !(existingWriter?.featured || false);
+      
+      const updateData = {
+        featured: newFeaturedStatus,
+        featured_month: newFeaturedStatus ? new Date().toISOString().substring(0, 7) : null
+      };
+
+      // If writer doesn't exist, we need to create the record first
+      if (!existingWriter) {
+        const { error: insertError } = await supabase
+          .from('writers')
+          .insert([{
+            id: user.id,
+            name: user.full_name || user.pseudonym || user.email,
+            bio: user.bio || '',
+            genre: 'General',
+            ...updateData
+          }]);
+
+        if (insertError) throw insertError;
+      } else {
+        // Update existing writer
+        const { error: updateError } = await supabase
+          .from('writers')
+          .update(updateData)
+          .eq('id', user.id);
+
+        if (updateError) throw updateError;
+      }
 
       // Update local state
       setFeaturedWriters(prev => ({
