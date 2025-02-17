@@ -47,12 +47,19 @@ export function EventList({ onEdit, searchQuery = "" }: EventListProps) {
 
       if (error) throw error;
       
-      return data.sort((a, b) => {
+      return data.map(event => {
+        const eventDateTime = new Date(`${event.date}T${event.time}`);
+        const now = new Date();
+        return {
+          ...event,
+          is_upcoming: eventDateTime > now
+        };
+      }).sort((a, b) => {
         if (a.is_upcoming && !b.is_upcoming) return -1;
         if (!a.is_upcoming && b.is_upcoming) return 1;
         
-        const dateA = new Date(a.date + ' ' + a.time);
-        const dateB = new Date(b.date + ' ' + b.time);
+        const dateA = new Date(a.date + 'T' + a.time);
+        const dateB = new Date(b.date + 'T' + b.time);
         return dateB.getTime() - dateA.getTime();
       });
     },
