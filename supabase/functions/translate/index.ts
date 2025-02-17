@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text } = await req.json()
+    const { text, sourceLang = 'auto', targetLang } = await req.json()
     const apiKey = Deno.env.get('GOOGLE_TRANSLATE_API_KEY')
 
     if (!apiKey) {
@@ -21,7 +21,12 @@ serve(async (req) => {
     }
 
     console.log('Translating text:', text)
+    console.log('Source language:', sourceLang)
+    console.log('Target language:', targetLang)
     console.log('Text length:', text.length)
+
+    // Set target language based on source
+    const effectiveTargetLang = sourceLang === 'ta' || sourceLang === 'auto' ? 'en' : 'ta'
 
     const response = await fetch(
       `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
@@ -32,8 +37,8 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           q: text,
-          target: 'ta', // Tamil language code
-          source: 'en', // English language code
+          target: effectiveTargetLang,
+          source: sourceLang === 'auto' ? undefined : sourceLang,
         }),
       }
     )
@@ -42,7 +47,7 @@ serve(async (req) => {
     console.log('Translation response:', data)
 
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify({ data }),
       { 
         headers: { 
           ...corsHeaders,

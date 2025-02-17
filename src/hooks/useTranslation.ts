@@ -29,13 +29,20 @@ export function useTranslation() {
 
       console.log('Extracted text content for translation:', textContent);
 
+      // Detect if the text is Tamil using a simple check
+      const isTamil = /[\u0B80-\u0BFF]/.test(title + textContent);
+      const sourceLang = isTamil ? 'ta' : 'en';
+      const targetLang = isTamil ? 'en' : 'ta';
+
+      console.log('Translation direction:', { sourceLang, targetLang });
+
       // First translate the title
       console.log('Translating title:', title);
       const titleResponse = await supabase.functions.invoke('translate', {
         body: { 
           text: title,
-          sourceLang: 'auto',  // This tells the API to auto-detect the source language
-          targetLang: 'en'     // Always translate to English when coming from Tamil
+          sourceLang,
+          targetLang
         }
       });
 
@@ -47,8 +54,8 @@ export function useTranslation() {
       const contentResponse = await supabase.functions.invoke('translate', {
         body: { 
           text: textContent,
-          sourceLang: 'auto',  // Auto-detect source language
-          targetLang: 'en'     // Always translate to English when coming from Tamil
+          sourceLang,
+          targetLang
         }
       });
 
