@@ -32,8 +32,9 @@ export function AttendanceManagement() {
         .from("event_registrations")
         .select(`
           id,
-          created_at as registration_date,
-          profiles:user_id (
+          created_at,
+          user_id,
+          profiles (
             full_name,
             email,
             level
@@ -46,7 +47,7 @@ export function AttendanceManagement() {
       // Transform the data to match the expected format
       return data.map(registration => ({
         registration_id: registration.id,
-        registration_date: registration.registration_date,
+        registration_date: registration.created_at,
         full_name: registration.profiles?.full_name || 'N/A',
         email: registration.profiles?.email || 'N/A',
         level: registration.profiles?.level || 'N/A'
