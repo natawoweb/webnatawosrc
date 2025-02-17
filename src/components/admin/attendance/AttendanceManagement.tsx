@@ -8,6 +8,33 @@ import { format } from "date-fns";
 import { Search } from "lucide-react";
 import { AttendanceList } from "./AttendanceList";
 
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+}
+
+interface Profile {
+  full_name: string | null;
+  email: string | null;
+  level: string | null;
+}
+
+interface Registration {
+  id: string;
+  created_at: string;
+  user_id: string;
+  profiles: Profile;
+}
+
+interface Participant {
+  registration_id: string;
+  registration_date: string;
+  full_name: string;
+  email: string;
+  level: string;
+}
+
 export function AttendanceManagement() {
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +48,7 @@ export function AttendanceManagement() {
         .order("date", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Event[];
     },
   });
 
@@ -45,13 +72,13 @@ export function AttendanceManagement() {
       if (error) throw error;
       
       // Transform the data to match the expected format
-      return data.map(registration => ({
+      return (data as Registration[]).map(registration => ({
         registration_id: registration.id,
         registration_date: registration.created_at,
         full_name: registration.profiles?.full_name || 'N/A',
         email: registration.profiles?.email || 'N/A',
         level: registration.profiles?.level || 'N/A'
-      }));
+      })) as Participant[];
     },
     enabled: !!selectedEvent,
   });
