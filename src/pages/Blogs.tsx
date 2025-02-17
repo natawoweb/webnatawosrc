@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +9,7 @@ import { BlogSearch } from "@/components/blogs/BlogSearch";
 import { LoadingState } from "@/components/blogs/LoadingState";
 import { NoResults } from "@/components/blogs/NoResults";
 import { startOfDay, endOfDay } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BlogsByDate {
   [year: string]: {
@@ -20,6 +22,7 @@ const Blogs = () => {
   const [searchType, setSearchType] = React.useState("title");
   const [dateFilter, setDateFilter] = React.useState<Date>();
   const [ratingFilter, setRatingFilter] = React.useState("all");
+  const { t } = useLanguage();
   
   const { data: blogs, isLoading, error } = useQuery({
     queryKey: ["blogs", searchTerm, searchType, dateFilter, ratingFilter],
@@ -109,7 +112,7 @@ const Blogs = () => {
       
       acc[year][month].push({
         ...blog,
-        author_name: blog.profiles?.pseudonym || blog.profiles?.full_name || "Anonymous"
+        author_name: blog.profiles?.pseudonym || blog.profiles?.full_name || t("Anonymous", "அநாமதேயர்")
       });
       
       return acc;
@@ -124,7 +127,9 @@ const Blogs = () => {
       <div className="container mx-auto py-8">
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col space-y-4">
-            <h1 className="text-3xl font-bold">Latest Blogs</h1>
+            <h1 className="text-3xl font-bold">
+              {t("Latest Blogs", "சமீபத்திய பதிவுகள்")}
+            </h1>
             <BlogSearch
               searchTerm={searchTerm}
               searchType={searchType}
@@ -147,7 +152,9 @@ const Blogs = () => {
       <div className="container mx-auto py-8">
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col space-y-4">
-            <h1 className="text-3xl font-bold">Latest Blogs</h1>
+            <h1 className="text-3xl font-bold">
+              {t("Latest Blogs", "சமீபத்திய பதிவுகள்")}
+            </h1>
             <BlogSearch
               searchTerm={searchTerm}
               searchType={searchType}
@@ -161,9 +168,12 @@ const Blogs = () => {
           </div>
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
+            <AlertTitle>{t("Error", "பிழை")}</AlertTitle>
             <AlertDescription>
-              Failed to load blogs. Please try again later.
+              {t(
+                "Failed to load blogs. Please try again later.",
+                "பதிவுகளை ஏற்ற முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்."
+              )}
             </AlertDescription>
           </Alert>
         </div>
@@ -175,7 +185,9 @@ const Blogs = () => {
     <div className="container mx-auto py-8">
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col space-y-4">
-          <h1 className="text-3xl font-bold">Latest Blogs</h1>
+          <h1 className="text-3xl font-bold">
+            {t("Latest Blogs", "சமீபத்திய பதிவுகள்")}
+          </h1>
           <BlogSearch
             searchTerm={searchTerm}
             searchType={searchType}

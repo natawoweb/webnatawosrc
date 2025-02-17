@@ -1,16 +1,16 @@
 
-import * as React from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-export const LoadingState = () => {
+export function LoadingState() {
+  const { t } = useLanguage();
+
   return (
-    <div className="container mx-auto py-8 space-y-4">
-      <Skeleton className="h-12 w-48" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-64" />
-        ))}
-      </div>
+    <div className="flex flex-col items-center justify-center py-12">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <p className="mt-4 text-muted-foreground">
+        {t("Loading blogs...", "பதிவுகளை ஏற்றுகிறது...")}
+      </p>
     </div>
   );
-};
+}

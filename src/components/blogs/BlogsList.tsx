@@ -2,6 +2,7 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Blog {
   id: string;
@@ -28,6 +29,8 @@ interface BlogsListProps {
 }
 
 export const BlogsList = ({ blogs }: BlogsListProps) => {
+  const { t } = useLanguage();
+
   return (
     <>
       {Object.entries(blogs)
@@ -60,10 +63,10 @@ export const BlogsList = ({ blogs }: BlogsListProps) => {
                           </CardHeader>
                           <CardContent>
                             <p className="text-sm text-muted-foreground">
-                              Category: {blog.blog_categories?.name || "Uncategorized"}
+                              {t("Category:", "வகை:")} {blog.blog_categories?.name || t("Uncategorized", "வகைப்படுத்தப்படாதது")}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Author: {blog.author_name}
+                              {t("Author:", "ஆசிரியர்:")} {blog.author_name}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
                               {new Date(blog.published_at || blog.created_at).toLocaleDateString()}
