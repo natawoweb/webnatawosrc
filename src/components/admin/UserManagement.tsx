@@ -39,99 +39,101 @@ export function UserManagement() {
     setEditRole,
     editLevel,
     setEditLevel,
-    updateUserRole,
+    updateUserProfile,
     handleDeleteUser,
     handleAddUser,
     isAddingUser,
-    updateUserProfile,
   } = useUserManagement();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const { session } = useSession();
+  const { data: userRoles } = useUserRoles(session?.user?.id);
+  const isAdmin = userRoles?.some(role => role.role === 'admin') || false;
 
-  const handleLevelChange = (level: UserLevel) => {
-    setEditLevel(level);
+  const handleProfileUpdate = async (profile: Partial<Profile> & { featured?: boolean }) => {
+    try {
+      // Update profile in the profiles table
+      await updateUserProfile(profile);
+
+      // If this is a writer and featured status is included, update the writers table
+      if (profile.id && selectedUser?.user_type === 'writer' && 'featured' in profile) {
+        const { error } = await supabase
+          .from('writers')
+          .update({
+            featured: profile.featured,
+            featured_month: profile.featured ? new Date().toISOString().substring(0, 7) : null
+          })
+          .eq('id', profile.id);
+
+        if (error) throw error;
+      }
+
+      setEditDialogOpen(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update profile"
+      });
+    }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">User Management</h2>
-        <Button onClick={() => setAddUserDialogOpen(true)}>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Add User
-        </Button>
-      </div>
-
+    <div className="space-y-4">
       <UserFilters
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
         selectedRole={selectedRole}
         onRoleChange={setSelectedRole}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onAddUser={() => setAddUserDialogOpen(true)}
+        isAdmin={isAdmin}
       />
 
       <UserTable
-        users={users || []}
+        users={users}
+        isLoading={isLoading}
+        onDelete={(user) => {
+          setSelectedUser(user);
+          setDeleteDialogOpen(true);
+        }}
         onEdit={(user) => {
           setSelectedUser(user);
           setEditRole(user.role);
           setEditLevel(user.level as UserLevel);
           setEditDialogOpen(true);
         }}
-        onDelete={(user) => {
-          setSelectedUser(user);
-          setDeleteDialogOpen(true);
-        }}
-        onView={(user) => {
-          setSelectedUser(user);
-          setProfileDialogOpen(true);
-        }}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        totalItems={users?.length || 0}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
+        isAdmin={isAdmin}
       />
 
-      <DeleteUserDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        onConfirm={() => selectedUser && handleDeleteUser(selectedUser.id)}
-      />
+      {selectedUser && (
+        <>
+          <DeleteUserDialog
+            open={deleteDialogOpen}
+            onOpenChange={setDeleteDialogOpen}
+            onConfirm={() => {
+              if (selectedUser) {
+                handleDeleteUser(selectedUser.id);
+                setDeleteDialogOpen(false);
+              }
+            }}
+            email={selectedUser.email}
+          />
 
-      <EditUserDialog
-        user={selectedUser}
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        onSubmit={updateUserRole}
-        selectedRole={editRole}
-        selectedLevel={editLevel}
-        onRoleChange={setEditRole}
-        onLevelChange={handleLevelChange}
-      />
+          <ProfileDialog
+            profile={selectedUser}
+            open={editDialogOpen}
+            onOpenChange={setEditDialogOpen}
+            onSubmit={handleProfileUpdate}
+            isAdmin={isAdmin}
+          />
+        </>
+      )}
 
       <AddUserDialog
         open={addUserDialogOpen}
         onOpenChange={setAddUserDialogOpen}
         onSubmit={handleAddUser}
-        isLoading={isAddingUser}
-      />
-
-      <ProfileDialog
-        profile={selectedUser}
-        open={profileDialogOpen}
-        onOpenChange={setProfileDialogOpen}
-        onSubmit={updateUserProfile}
-        isAdmin={true}
+        isSubmitting={isAddingUser}
       />
     </div>
   );

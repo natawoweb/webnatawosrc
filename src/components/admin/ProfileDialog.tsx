@@ -15,6 +15,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type UserLevel } from "@/integrations/supabase/types/models";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
@@ -23,7 +25,7 @@ interface ProfileDialogProps {
   profile: (Profile & { role: AppRole }) | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (profile: Partial<Profile>) => void;
+  onSubmit: (profile: Partial<Profile> & { featured?: boolean }) => void;
   isAdmin: boolean;
 }
 
@@ -48,14 +50,23 @@ export function ProfileDialog({
   const [level, setLevel] = useState<UserLevel | undefined>(
     profile?.level as UserLevel | undefined
   );
+  const [isFeatured, setIsFeatured] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!profile) return;
+
+    // Only include featured status if the user is a writer
+    const featuredStatus = profile.user_type === 'writer' ? {
+      featured: isFeatured,
+      featured_month: isFeatured ? new Date().toISOString().substring(0, 7) : null // YYYY-MM format
+    } : {};
+
     onSubmit({
       id: profile.id,
       full_name: fullName,
       bio,
       level,
+      ...featuredStatus
     });
   };
 
@@ -126,6 +137,23 @@ export function ProfileDialog({
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            )}
+
+            {/* Only show featured toggle for writers */}
+            {isAdmin && profile?.user_type === 'writer' && (
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="featured"
+                  checked={isFeatured}
+                  onCheckedChange={setIsFeatured}
+                />
+                <Label htmlFor="featured">Featured Writer</Label>
+                {isFeatured && (
+                  <Badge variant="secondary" className="ml-2">
+                    Featured for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </Badge>
+                )}
               </div>
             )}
 
