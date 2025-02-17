@@ -1,7 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { convertToRaw } from 'draft-js';
 
 export function useTranslation() {
   const { toast } = useToast();
@@ -73,7 +72,7 @@ export function useTranslation() {
 
       toast({
         title: "Translation Complete",
-        description: "Content has been translated to Tamil",
+        description: "Content has been translated",
       });
 
       return {

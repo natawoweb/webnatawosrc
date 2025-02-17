@@ -4,6 +4,17 @@ import { CreateBlogHeader } from "./CreateBlogHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 interface BlogFormProps {
   title?: string;
@@ -48,6 +59,16 @@ export function BlogForm({
   hasContent,
   isSubmitting,
 }: BlogFormProps) {
+  const [showTranslateDialog, setShowTranslateDialog] = useState(false);
+
+  const handleTranslateClick = () => {
+    if (titleTamil || contentTamil) {
+      setShowTranslateDialog(true);
+    } else {
+      handleTranslate();
+    }
+  };
+
   return (
     <div className="container max-w-[1400px] py-8">
       <div className="space-y-6">
@@ -79,7 +100,7 @@ export function BlogForm({
           <div className="flex justify-end mb-4">
             {selectedLanguage === "english" ? (
               <Button
-                onClick={handleTranslate}
+                onClick={handleTranslateClick}
                 disabled={!hasContent()}
                 className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white"
               >
@@ -88,7 +109,7 @@ export function BlogForm({
               </Button>
             ) : (
               <Button
-                onClick={handleTranslate}
+                onClick={handleTranslateClick}
                 disabled={!hasContent()}
                 className="bg-[#FF4747] hover:bg-[#FF4747]/90 text-white"
               >
@@ -120,6 +141,26 @@ export function BlogForm({
             />
           </TabsContent>
         </Tabs>
+
+        <AlertDialog open={showTranslateDialog} onOpenChange={setShowTranslateDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Translation</AlertDialogTitle>
+              <AlertDialogDescription>
+                Existing Tamil content will be replaced with the new translation. Are you sure you want to continue?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                handleTranslate();
+                setShowTranslateDialog(false);
+              }}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
