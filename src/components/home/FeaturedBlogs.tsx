@@ -18,6 +18,7 @@ import { BlogContent } from "@/components/blog-detail/BlogContent";
 type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
   profiles: {
     full_name: string | null;
+    pseudonym: string | null;
   } | null;
 };
 
@@ -33,7 +34,8 @@ export function FeaturedBlogs() {
         .select(`
           *,
           profiles (
-            full_name
+            full_name,
+            pseudonym
           )
         `)
         .eq('featured', true)
@@ -64,6 +66,11 @@ export function FeaturedBlogs() {
       </div>
     );
   }
+
+  const getAuthorName = (blog: Blog) => {
+    if (!blog.profiles) return "Anonymous";
+    return blog.profiles.pseudonym || blog.profiles.full_name || "Anonymous";
+  };
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background border-y">
@@ -102,7 +109,7 @@ export function FeaturedBlogs() {
                       {blog.title}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-2">
-                      By {blog.profiles?.full_name || 'Anonymous'}
+                      By {getAuthorName(blog)}
                     </p>
                     <div className="mt-4 text-sm text-muted-foreground line-clamp-3">
                       <BlogContent content={blog.content} />
