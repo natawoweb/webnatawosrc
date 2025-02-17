@@ -11,11 +11,10 @@ export const BlogContent = ({ content }: BlogContentProps) => {
     try {
       console.log('Formatting blog content:', content);
       
-      // First try to parse the content
       let contentObj;
       try {
         contentObj = JSON.parse(content);
-        // Handle case where content might be double-stringified
+        // Handle double-stringified content
         if (typeof contentObj === 'string') {
           contentObj = JSON.parse(contentObj);
         }

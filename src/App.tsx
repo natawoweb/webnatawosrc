@@ -1,7 +1,7 @@
-
 import * as React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -23,7 +23,6 @@ import BlogDetail from "./pages/BlogDetail";
 import Dashboard from "./pages/Dashboard";
 import BlogPreview from "./pages/BlogPreview";
 
-// Create a wrapper component for the redirect
 const BlogRedirect = () => {
   const { id } = useParams();
   return <Navigate to={`/blogs/${id}`} replace />;
@@ -31,34 +30,35 @@ const BlogRedirect = () => {
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Index />} />
-          <Route path="about" element={<About />} />
-          <Route path="contact" element={<Contact />} />
-          <Route path="privacy" element={<Privacy />} />
-          <Route path="terms" element={<Terms />} />
-          <Route path="writer/:id" element={<WriterProfile />} />
-          <Route path="profile" element={<UserProfile />} />
-          <Route path="auth" element={<Auth />} />
-          <Route path="search" element={<SearchWriters />} />
-          <Route path="blogs" element={<Blogs />} />
-          <Route path="blogs/:id" element={<BlogDetail />} />
-          <Route path="preview/:id" element={<BlogPreview />} />
-          {/* Add redirect for old /blog/:id URLs */}
-          <Route path="blog/:id" element={<BlogRedirect />} />
-          <Route path="events" element={<Events />} />
-          <Route path="events/:id" element={<EventDetails />} />
-          <Route path="admin" element={<AdminDashboard />} />
-          <Route path="admin/user-profile" element={<AdminUserProfile />} />
-          <Route path="write" element={<CreateBlog />} />
-          <Route path="edit/:id" element={<EditBlog />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </Router>
+    <LanguageProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Index />} />
+            <Route path="about" element={<About />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="privacy" element={<Privacy />} />
+            <Route path="terms" element={<Terms />} />
+            <Route path="writer/:id" element={<WriterProfile />} />
+            <Route path="profile" element={<UserProfile />} />
+            <Route path="auth" element={<Auth />} />
+            <Route path="search" element={<SearchWriters />} />
+            <Route path="blogs" element={<Blogs />} />
+            <Route path="blogs/:id" element={<BlogDetail />} />
+            <Route path="preview/:id" element={<BlogPreview />} />
+            <Route path="blog/:id" element={<BlogRedirect />} />
+            <Route path="events" element={<Events />} />
+            <Route path="events/:id" element={<EventDetails />} />
+            <Route path="admin" element={<AdminDashboard />} />
+            <Route path="admin/user-profile" element={<AdminUserProfile />} />
+            <Route path="write" element={<CreateBlog />} />
+            <Route path="edit/:id" element={<EditBlog />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </Router>
+    </LanguageProvider>
   );
 };
 
