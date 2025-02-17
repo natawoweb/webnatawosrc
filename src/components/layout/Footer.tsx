@@ -1,7 +1,9 @@
+
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   FaFacebook,
   FaTwitter,
@@ -10,13 +12,15 @@ import {
 } from "react-icons/fa";
 
 export function Footer() {
+  const { t } = useLanguage();
+
   const handleSubscribe = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     
     // Here you would typically handle the newsletter subscription
-    toast.success("Thank you for subscribing to our newsletter!");
+    toast.success(t("Thank you for subscribing to our newsletter!", "எங்கள் செய்திமடலுக்கு பதிவு செய்தமைக்கு நன்றி!"));
     (e.target as HTMLFormElement).reset();
   };
 
@@ -33,95 +37,95 @@ export function Footer() {
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("Quick Links", "விரைவு இணைப்புகள்")}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
-                  About Us
+                  {t("About Us", "எங்களைப் பற்றி")}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground">
-                  Contact Us
+                  {t("Contact Us", "எங்களை தொடர்பு கொள்ள")}
                 </Link>
               </li>
               <li>
                 <Link to="/writers" className="text-sm text-muted-foreground hover:text-foreground">
-                  Writers Directory
+                  {t("Writers Directory", "எழுத்தாளர்கள் அடைவு")}
                 </Link>
               </li>
               <li>
                 <Link to="/events" className="text-sm text-muted-foreground hover:text-foreground">
-                  Events
+                  {t("Events", "நிகழ்வுகள்")}
                 </Link>
               </li>
               <li>
                 <Link to="/blogs" className="text-sm text-muted-foreground hover:text-foreground">
-                  Blogs
+                  {t("Blogs", "வலைப்பதிவுகள்")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-4">Community</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("Community", "சமூகம்")}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/forums" className="text-sm text-muted-foreground hover:text-foreground">
-                  Forums
+                  {t("Forums", "கலந்துரையாடல்கள்")}
                 </Link>
               </li>
               <li>
                 <Link to="/workshops" className="text-sm text-muted-foreground hover:text-foreground">
-                  Writing Workshops
+                  {t("Writing Workshops", "எழுத்துப் பயிலரங்குகள்")}
                 </Link>
               </li>
               <li>
                 <Link to="/mentorship" className="text-sm text-muted-foreground hover:text-foreground">
-                  Mentorship Program
+                  {t("Mentorship Program", "வழிகாட்டல் திட்டம்")}
                 </Link>
               </li>
               <li>
                 <Link to="/book-clubs" className="text-sm text-muted-foreground hover:text-foreground">
-                  Book Clubs
+                  {t("Book Clubs", "நூல் வட்டங்கள்")}
                 </Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("Legal", "சட்டம்")}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
-                  Privacy Policy
+                  {t("Privacy Policy", "தனியுரிமைக் கொள்கை")}
                 </Link>
               </li>
               <li>
                 <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground">
-                  Terms of Use
+                  {t("Terms of Use", "பயன்பாட்டு விதிமுறைகள்")}
                 </Link>
               </li>
               <li>
                 <Link to="/guidelines" className="text-sm text-muted-foreground hover:text-foreground">
-                  Guidelines
+                  {t("Guidelines", "வழிகாட்டுதல்கள்")}
                 </Link>
               </li>
             </ul>
           </div>
           
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Stay Connected</h3>
+            <h3 className="text-lg font-semibold">{t("Stay Connected", "தொடர்பில் இருங்கள்")}</h3>
             <form onSubmit={handleSubscribe} className="space-y-2">
               <Input
                 type="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder={t("Enter your email", "உங்கள் மின்னஞ்சலை உள்ளிடவும்")}
                 required
                 className="w-full"
               />
               <Button type="submit" className="w-full">
-                Subscribe
+                {t("Subscribe", "குழு சேர")}
               </Button>
             </form>
             <div className="flex space-x-4 mt-4">
@@ -143,7 +147,7 @@ export function Footer() {
         
         <div className="mt-8 pt-8 border-t">
           <p className="text-sm text-muted-foreground text-center">
-            © {new Date().getFullYear()} NATAWO. All rights reserved.
+            © {new Date().getFullYear()} NATAWO. {t("All rights reserved.", "அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.")}
           </p>
         </div>
       </div>

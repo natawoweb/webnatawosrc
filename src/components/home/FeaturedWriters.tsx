@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { format } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Carousel,
   CarouselContent,
@@ -20,6 +21,7 @@ export function FeaturedWriters() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   const { data: writers, isLoading, error } = useQuery({
     queryKey: ["writers", searchQuery],
@@ -43,14 +45,14 @@ export function FeaturedWriters() {
         console.error("Error fetching writers:", error);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Failed to fetch writers. Please try again later.",
+          title: t("Error", "பிழை"),
+          description: t("Failed to fetch writers. Please try again later.", "எழுத்தாளர்களைப் பெற முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்."),
         });
         throw error;
       }
 
       console.log("Writers query result:", data);
-      return data || []; // Ensure we return an empty array if data is null
+      return data || [];
     },
     retry: 2,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -71,7 +73,9 @@ export function FeaturedWriters() {
     console.error("Error in featured writers component:", error);
     return (
       <div className="text-center py-20">
-        <p className="text-muted-foreground">Failed to load featured writers.</p>
+        <p className="text-muted-foreground">
+          {t("Failed to load featured writers.", "சிறப்பு எழுத்தாளர்களை ஏற்ற முடியவில்லை.")}
+        </p>
       </div>
     );
   }
@@ -80,15 +84,15 @@ export function FeaturedWriters() {
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold">Featured Writers</h2>
+          <h2 className="text-3xl font-bold">{t("Featured Writers", "சிறப்பு எழுத்தாளர்கள்")}</h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Discover talented voices from our community
+            {t("Discover talented voices from our community", "எங்கள் சமூகத்தின் திறமையான குரல்களைக் கண்டறியுங்கள்")}
           </p>
           <div className="max-w-md mx-auto mt-6">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search writers by name or genre..."
+                placeholder={t("Search writers by name or genre...", "பெயர் அல்லது வகையால் எழுத்தாளர்களைத் தேடுங்கள்...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -98,7 +102,7 @@ export function FeaturedWriters() {
         </div>
 
         {isLoading ? (
-          <div className="text-center">Loading writers...</div>
+          <div className="text-center">{t("Loading writers...", "எழுத்தாளர்கள் ஏற்றப்படுகிறது...")}</div>
         ) : writers && writers.length > 0 ? (
           <Carousel
             opts={{
@@ -130,7 +134,7 @@ export function FeaturedWriters() {
                         <p className="text-sm text-muted-foreground">{writer.genre}</p>
                         {writer.featured_month && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Featured: {formatFeaturedMonth(writer.featured_month)}
+                            {t("Featured:", "சிறப்பிக்கப்பட்டது:")} {formatFeaturedMonth(writer.featured_month)}
                           </p>
                         )}
                       </div>
@@ -143,7 +147,7 @@ export function FeaturedWriters() {
                       className="mt-4 w-full"
                       onClick={() => navigate(`/writer/${writer.id}`)}
                     >
-                      View Profile
+                      {t("View Profile", "சுயவிவரத்தைக் காண")}
                     </Button>
                   </div>
                 </CarouselItem>
@@ -154,7 +158,7 @@ export function FeaturedWriters() {
           </Carousel>
         ) : (
           <div className="text-center text-muted-foreground">
-            No writers found
+            {t("No writers found", "எழுத்தாளர்கள் எதுவும் கிடைக்கவில்லை")}
           </div>
         )}
       </div>
