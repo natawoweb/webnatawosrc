@@ -19,6 +19,7 @@ export default function EditBlog() {
         .single();
       
       if (error) throw error;
+      console.log("Fetched blog data:", data);
       return data;
     },
   });
@@ -48,6 +49,8 @@ export default function EditBlog() {
     category_id: blog.category_id || ""
   } : undefined;
 
+  console.log("Formatted blog data:", formattedBlogData);
+
   const {
     selectedLanguage,
     setSelectedLanguage,
@@ -70,6 +73,9 @@ export default function EditBlog() {
     blogId: id,
     initialData: formattedBlogData,
   });
+
+  console.log("Current title state:", title);
+  console.log("Current titleTamil state:", titleTamil);
 
   if (isBlogLoading) {
     return <div>Loading...</div>;

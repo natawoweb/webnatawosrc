@@ -20,6 +20,8 @@ const BlogContentSection = memo(({
   onContentChange,
   hasContent,
 }: BlogContentSectionProps) => {
+  console.log(`BlogContentSection rendering for ${language}:`, { title, content });
+  
   const isEnglish = language === "english";
 
   return (
