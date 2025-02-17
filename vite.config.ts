@@ -3,7 +3,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   server: {
     port: 8080,
@@ -16,9 +15,11 @@ export default defineConfig({
     },
   },
   build: {
+    // Generate source maps for better debugging
+    sourcemap: true,
     // Generate manifest.json in the dist directory
     manifest: true,
-    // Use a more reliable hashing method
+    // Optimize chunk size
     rollupOptions: {
       output: {
         manualChunks: undefined,
@@ -26,6 +27,8 @@ export default defineConfig({
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]'
       }
-    }
+    },
+    // Optimize chunk size
+    chunkSizeWarningLimit: 1000
   }
 });
