@@ -11,10 +11,12 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Users, MapPin, Pencil, Loader2 } from "lucide-react";
+import { Calendar, Users, MapPin, Pencil, Trash2, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { useState } from "react";
+import { DeleteEventDialog } from "./DeleteEventDialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface EventListProps {
   onEdit: (event: any) => void;
@@ -24,6 +26,9 @@ interface EventListProps {
 export function EventList({ onEdit, searchQuery = "" }: EventListProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const { toast } = useToast();
 
   const { data: events, isLoading } = useQuery({
     queryKey: ["admin-events", searchQuery],
@@ -34,7 +39,6 @@ export function EventList({ onEdit, searchQuery = "" }: EventListProps) {
         .order('date', { ascending: false })
         .order('time', { ascending: false });
 
-      // Apply search filter if search query exists
       if (searchQuery) {
         query.ilike('title', `%${searchQuery}%`);
       }
@@ -43,19 +47,43 @@ export function EventList({ onEdit, searchQuery = "" }: EventListProps) {
 
       if (error) throw error;
       
-      // Sort with upcoming events first, then by date desc
       return data.sort((a, b) => {
-        // First sort by upcoming status
         if (a.is_upcoming && !b.is_upcoming) return -1;
         if (!a.is_upcoming && b.is_upcoming) return 1;
         
-        // Then sort by date
         const dateA = new Date(a.date + ' ' + a.time);
         const dateB = new Date(b.date + ' ' + b.time);
         return dateB.getTime() - dateA.getTime();
       });
     },
   });
+
+  const handleDelete = async () => {
+    if (!selectedEvent) return;
+
+    try {
+      const { error } = await supabase
+        .from("events")
+        .delete()
+        .eq("id", selectedEvent.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Event deleted",
+        description: "The event has been successfully deleted.",
+      });
+      
+      setDeleteDialogOpen(false);
+      setSelectedEvent(null);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to delete the event. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -110,13 +138,26 @@ export function EventList({ onEdit, searchQuery = "" }: EventListProps) {
                 </Badge>
               </TableCell>
               <TableCell>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(event)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(event)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setSelectedEvent(event);
+                      setDeleteDialogOpen(true);
+                    }}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -129,6 +170,13 @@ export function EventList({ onEdit, searchQuery = "" }: EventListProps) {
         totalItems={events?.length || 0}
         onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}
+      />
+
+      <DeleteEventDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        event={selectedEvent}
       />
     </div>
   );
