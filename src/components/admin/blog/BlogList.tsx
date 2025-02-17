@@ -54,8 +54,9 @@ export function BlogList({ blogs }: BlogListProps) {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Blog has been approved",
+        title: "Blog Approved",
+        description: `The blog "${blog.title}" has been approved successfully.`,
+        duration: 3000,
       });
     } catch (error: any) {
       toast({
@@ -76,8 +77,9 @@ export function BlogList({ blogs }: BlogListProps) {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Blog has been rejected",
+        title: "Blog Rejected",
+        description: `The blog "${blog.title}" has been rejected.`,
+        duration: 3000,
       });
     } catch (error: any) {
       toast({
