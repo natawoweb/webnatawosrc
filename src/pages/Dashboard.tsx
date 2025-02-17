@@ -31,8 +31,8 @@ export default function Dashboard() {
           table: 'blogs',
           filter: `author_id=eq.${session.user.id}`
         },
-        () => {
-          console.log('Blog change detected, invalidating query');
+        (payload) => {
+          console.log('Blog change detected:', payload);
           queryClient.invalidateQueries({
             queryKey: ["writer-blogs", session.user.id]
           });
@@ -54,7 +54,6 @@ export default function Dashboard() {
 
       if (error) throw error;
 
-      // Manually remove the deleted blog from the cache
       queryClient.setQueryData(
         ["writer-blogs", session?.user?.id],
         (oldData: any) => oldData?.filter((blog: any) => blog.id !== blogId)
@@ -75,28 +74,63 @@ export default function Dashboard() {
 
   const handlePublish = async (blogId: string) => {
     try {
+      // First show the "will be published" toast
+      toast({
+        title: "Publishing Blog",
+        description: "Your blog will be published in a few minutes.",
+        duration: 5000,
+      });
+
       console.log("Publishing blog:", blogId);
       const now = new Date().toISOString();
-      const { error } = await supabase
+      
+      // Update the blog status to 'publishing' first
+      const { error: updateError } = await supabase
         .from("blogs")
         .update({ 
-          status: 'published',
-          published_at: now
+          status: 'publishing'
         })
-        .eq("id", blogId)
-        .select();
+        .eq("id", blogId);
 
-      if (error) {
-        console.error("Error publishing blog:", error);
-        throw error;
-      }
+      if (updateError) throw updateError;
 
-      toast({
-        title: "Success",
-        description: "Blog published successfully",
-      });
+      // Simulate a delay for the publishing process
+      setTimeout(async () => {
+        try {
+          // Update the blog to published status
+          const { error: publishError } = await supabase
+            .from("blogs")
+            .update({ 
+              status: 'published',
+              published_at: now
+            })
+            .eq("id", blogId);
+
+          if (publishError) throw publishError;
+
+          // Show success toast after publishing is complete
+          toast({
+            title: "Success",
+            description: "Your blog has been published successfully!",
+            duration: 3000,
+          });
+
+          // Manually invalidate the query to update the UI
+          queryClient.invalidateQueries({
+            queryKey: ["writer-blogs", session?.user?.id]
+          });
+        } catch (error: any) {
+          console.error("Final publish error:", error);
+          toast({
+            variant: "destructive",
+            title: "Publishing Failed",
+            description: error.message,
+          });
+        }
+      }, 3000); // Simulate a 3-second publishing process
+
     } catch (error: any) {
-      console.error("Publish error:", error);
+      console.error("Initial publish error:", error);
       toast({
         variant: "destructive",
         title: "Error",
