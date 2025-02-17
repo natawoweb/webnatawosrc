@@ -4,18 +4,18 @@ import { ArrowRight, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function HeroSection() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
-    // Check current auth state
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsLoggedIn(!!session);
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -43,25 +43,31 @@ export function HeroSection() {
 
           <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-8">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight animate-in fade-in slide-in duration-1000">
-              Celebrate Tamil Literature Across North America
+              {t(
+                "Celebrate Tamil Literature Across North America",
+                "வட அமெரிக்காவில் தமிழ் இலக்கியத்தைக் கொண்டாடுங்கள்"
+              )}
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl animate-in fade-in slide-in duration-1000 delay-200">
-              Join our vibrant community of writers and readers celebrating Tamil literary excellence.
+              {t(
+                "Join our vibrant community of writers and readers celebrating Tamil literary excellence.",
+                "தமிழ் இலக்கிய சிறப்பை கொண்டாடும் எழுத்தாளர்கள் மற்றும் வாசகர்களின் துடிப்பான சமூகத்தில் இணையுங்கள்."
+              )}
             </p>
             <div className="flex flex-wrap gap-4 animate-in fade-in slide-in duration-1000 delay-300">
               {!isLoggedIn && (
                 <Button size="lg" className="group" onClick={() => navigate('/auth')}>
                   <Users className="mr-2 h-4 w-4" />
-                  Join Us
+                  {t("Join Us", "எங்களுடன் இணையுங்கள்")}
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               )}
               <Button size="lg" variant="outline" onClick={() => navigate('/search')}>
-                Discover Writers
+                {t("Discover Writers", "எழுத்தாளர்களைக் கண்டறியுங்கள்")}
               </Button>
               <Button size="lg" variant="outline" onClick={() => navigate('/events')}>
                 <Calendar className="mr-2 h-4 w-4" />
-                Upcoming Events
+                {t("Upcoming Events", "வரவிருக்கும் நிகழ்வுகள்")}
               </Button>
             </div>
           </div>

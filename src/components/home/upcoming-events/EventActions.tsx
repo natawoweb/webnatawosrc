@@ -9,6 +9,7 @@ import { Database } from "@/integrations/supabase/types";
 import { useEventRegistration } from "@/hooks/useEventRegistration";
 import { useEventShare } from "@/hooks/useEventShare";
 import { parseISO, isBefore } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
@@ -20,6 +21,7 @@ export function EventActions({ event }: EventActionsProps) {
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const handleShare = useEventShare();
+  const { t } = useLanguage();
   
   const eventDateTime = parseISO(`${event.date}T${event.time}`);
   const isPastEvent = isBefore(eventDateTime, new Date());
@@ -75,11 +77,11 @@ export function EventActions({ event }: EventActionsProps) {
     isPastEvent || 
     (!registration && event.current_participants >= (event.max_participants || 0));
 
-  const buttonText = isPastEvent ? "Event Ended" : 
-    isProcessing ? "Processing..." : 
-    registration ? "Unregister" : 
-    event.current_participants >= (event.max_participants || 0) ? "Full" :
-    "Register";
+  const buttonText = isPastEvent ? t("Event Ended", "நிகழ்வு முடிந்தது") : 
+    isProcessing ? t("Processing...", "செயலாக்கப்படுகிறது...") : 
+    registration ? t("Unregister", "பதிவு நீக்கம்") : 
+    event.current_participants >= (event.max_participants || 0) ? t("Full", "நிரம்பியது") :
+    t("Register", "பதிவு செய்க");
 
   return (
     <div className="flex gap-2">
@@ -87,7 +89,7 @@ export function EventActions({ event }: EventActionsProps) {
         className="flex-1"
         onClick={() => navigate(`/events/${event.id}`)}
       >
-        View Details
+        {t("View Details", "விவரங்களைக் காண")}
         <ArrowRight className="ml-2 h-4 w-4" />
       </Button>
       <Button

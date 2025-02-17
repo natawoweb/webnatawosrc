@@ -1,8 +1,8 @@
 
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
-import { format } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { Database } from "@/integrations/supabase/types";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
@@ -11,6 +11,7 @@ interface EventInfoProps {
 }
 
 export function EventInfo({ event }: EventInfoProps) {
+  const { t } = useLanguage();
   // Get user's timezone
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   
@@ -42,7 +43,10 @@ export function EventInfo({ event }: EventInfoProps) {
       </p>
       <p className="flex items-center gap-2">
         <Users className="h-4 w-4" />
-        {event.current_participants} / {event.max_participants} participants
+        {t(
+          `${event.current_participants} / ${event.max_participants} participants`,
+          `${event.current_participants} / ${event.max_participants} பங்கேற்பாளர்கள்`
+        )}
       </p>
     </div>
   );

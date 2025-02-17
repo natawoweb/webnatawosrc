@@ -1,23 +1,27 @@
-import { Database } from "@/integrations/supabase/types";
 
-type Event = Database["public"]["Tables"]["events"]["Row"];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EventImageProps {
-  event: Event;
+  image: string | null;
+  title: string;
 }
 
-export function EventImage({ event }: EventImageProps) {
-  if (!event.gallery || !Array.isArray(event.gallery) || event.gallery.length === 0) {
-    return null;
+export function EventImage({ image, title }: EventImageProps) {
+  const { t } = useLanguage();
+  
+  if (!image) {
+    return (
+      <div className="w-full aspect-[16/9] bg-muted flex items-center justify-center text-muted-foreground">
+        {t("No image available", "படம் கிடைக்கவில்லை")}
+      </div>
+    );
   }
 
   return (
-    <div className="relative h-48 w-full overflow-hidden rounded-lg">
-      <img
-        src={event.gallery[0] as string}
-        alt={event.title}
-        className="w-full h-full object-cover"
-      />
-    </div>
+    <img
+      src={image}
+      alt={title}
+      className="w-full aspect-[16/9] object-cover rounded-t-lg"
+    />
   );
 }
