@@ -775,7 +775,15 @@ export type Database = {
           published_works?: Json | null
           social_links?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "writers_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
