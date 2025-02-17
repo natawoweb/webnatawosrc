@@ -67,13 +67,6 @@ export type Database = {
             foreignKeyName: "blog_comment_reactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "blog_comment_reactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -111,13 +104,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "blogs"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "blog_comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "blog_comments_user_id_fkey"
@@ -162,13 +148,6 @@ export type Database = {
             foreignKeyName: "blog_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "blog_ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -180,12 +159,9 @@ export type Database = {
           category_id: string | null
           content: string
           content_tamil: Json | null
-          content_type: string | null
           cover_image: string | null
           created_at: string | null
           id: string
-          is_published: boolean | null
-          metadata: Json | null
           published_at: string | null
           status: Database["public"]["Enums"]["blog_status"] | null
           title: string
@@ -198,12 +174,9 @@ export type Database = {
           category_id?: string | null
           content: string
           content_tamil?: Json | null
-          content_type?: string | null
           cover_image?: string | null
           created_at?: string | null
           id?: string
-          is_published?: boolean | null
-          metadata?: Json | null
           published_at?: string | null
           status?: Database["public"]["Enums"]["blog_status"] | null
           title: string
@@ -216,12 +189,9 @@ export type Database = {
           category_id?: string | null
           content?: string
           content_tamil?: Json | null
-          content_type?: string | null
           cover_image?: string | null
           created_at?: string | null
           id?: string
-          is_published?: boolean | null
-          metadata?: Json | null
           published_at?: string | null
           status?: Database["public"]["Enums"]["blog_status"] | null
           title?: string
@@ -230,13 +200,6 @@ export type Database = {
           views_count?: number | null
         }
         Relationships: [
-          {
-            foreignKeyName: "blogs_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
-          },
           {
             foreignKeyName: "blogs_author_id_fkey"
             columns: ["author_id"]
@@ -285,13 +248,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "blogs"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "comments_user_id_fkey"
@@ -354,13 +310,6 @@ export type Database = {
             foreignKeyName: "event_comment_reactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "event_comment_reactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -398,13 +347,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "events"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "event_comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "event_comments_user_id_fkey"
@@ -479,13 +421,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "events"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "event_ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "event_ratings_user_id_fkey"
@@ -618,13 +553,6 @@ export type Database = {
             foreignKeyName: "events_registrations_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "events_registrations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -727,13 +655,6 @@ export type Database = {
             foreignKeyName: "ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "event_participants"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -804,30 +725,7 @@ export type Database = {
       }
     }
     Views: {
-      event_participants: {
-        Row: {
-          email: string | null
-          event_date: string | null
-          event_id: string | null
-          event_time: string | null
-          event_title: string | null
-          full_name: string | null
-          has_access: boolean | null
-          level: string | null
-          participant_id: string | null
-          registration_date: string | null
-          registration_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_registrations_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       create_user_with_role: {
