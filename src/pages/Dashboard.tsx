@@ -7,14 +7,43 @@ import { useSession } from "@/hooks/useSession";
 import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Dashboard() {
   const { session } = useSession();
   const { toast } = useToast();
-  const { data: blogs, isLoading, isFetching } = useDashboardData(session?.user?.id);
+  const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const { data: blogs, isLoading, isFetching } = useDashboardData(session?.user?.id);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    const channel = supabase
+      .channel('dashboard-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'blogs',
+          filter: `author_id=eq.${session.user.id}`
+        },
+        () => {
+          console.log('Blog change detected, invalidating query');
+          queryClient.invalidateQueries({
+            queryKey: ["writer-blogs", session.user.id]
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user?.id, queryClient]);
 
   const handleDelete = async (blogId: string) => {
     try {
@@ -24,6 +53,12 @@ export default function Dashboard() {
         .eq("id", blogId);
 
       if (error) throw error;
+
+      // Manually remove the deleted blog from the cache
+      queryClient.setQueryData(
+        ["writer-blogs", session?.user?.id],
+        (oldData: any) => oldData?.filter((blog: any) => blog.id !== blogId)
+      );
 
       toast({
         title: "Success",
