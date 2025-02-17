@@ -44,8 +44,8 @@ export const BlogsList = ({ blogs }: BlogsListProps) => {
       {Object.entries(blogs)
         .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
         .map(([year, months]) => (
-          <div key={year} className="space-y-6">
-            <h2 className="text-2xl font-semibold">{year}</h2>
+          <div key={year} className="space-y-8">
+            <h2 className="text-3xl font-semibold px-4">{year}</h2>
             {Object.entries(months)
               .sort(([monthA], [monthB]) => {
                 const dateA = new Date(`${monthA} 1, ${year}`);
@@ -53,12 +53,12 @@ export const BlogsList = ({ blogs }: BlogsListProps) => {
                 return dateB.getTime() - dateA.getTime();
               })
               .map(([month, monthBlogs]) => (
-                <div key={`${year}-${month}`} className="space-y-4">
-                  <h3 className="text-xl font-medium text-muted-foreground">{month}</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div key={`${year}-${month}`} className="space-y-6">
+                  <h3 className="text-2xl font-medium text-muted-foreground px-4">{month}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                     {monthBlogs.map((blog) => (
                       <Link key={blog.id} to={`/blogs/${blog.id}`}>
-                        <Card className="flex flex-col hover:shadow-lg transition-shadow">
+                        <Card className="flex flex-col hover:shadow-lg transition-shadow h-full">
                           {blog.cover_image && (
                             <img
                               src={blog.cover_image}
@@ -66,17 +66,19 @@ export const BlogsList = ({ blogs }: BlogsListProps) => {
                               className="w-full h-48 object-cover rounded-t-lg"
                             />
                           )}
-                          <CardHeader>
-                            <CardTitle className="line-clamp-2">{getTitle(blog)}</CardTitle>
+                          <CardHeader className="flex-1">
+                            <CardTitle className="text-xl mb-4 leading-relaxed">
+                              {getTitle(blog)}
+                            </CardTitle>
                           </CardHeader>
-                          <CardContent>
-                            <p className="text-sm text-muted-foreground">
+                          <CardContent className="pt-0 pb-6">
+                            <p className="text-sm text-muted-foreground mb-2">
                               {t("Category:", "வகை:")} {blog.blog_categories?.name || t("Uncategorized", "வகைப்படுத்தப்படாதது")}
                             </p>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-sm text-muted-foreground mb-2">
                               {t("Author:", "ஆசிரியர்:")} {blog.author_name}
                             </p>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-sm text-muted-foreground">
                               {new Date(blog.published_at || blog.created_at).toLocaleDateString()}
                             </p>
                           </CardContent>

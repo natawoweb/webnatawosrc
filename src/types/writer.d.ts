@@ -8,9 +8,12 @@ export interface Writer {
   published_works?: Array<{
     title: string;
     year: string;
-  }>;
-  accomplishments?: string[];
+  }> | null;
+  accomplishments?: string[] | null;
   social_links?: {
     [key: string]: string;
-  };
+  } | null;
+  created_at: string;
+  featured: boolean;
+  featured_month: string;
 }
