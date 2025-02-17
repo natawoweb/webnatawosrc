@@ -392,6 +392,44 @@ export type Database = {
           },
         ]
       }
+      event_participants: {
+        Row: {
+          email: string
+          event_id: string | null
+          full_name: string
+          id: string
+          level: string | null
+          registration_date: string | null
+          user_id: string
+        }
+        Insert: {
+          email: string
+          event_id?: string | null
+          full_name: string
+          id?: string
+          level?: string | null
+          registration_date?: string | null
+          user_id: string
+        }
+        Update: {
+          email?: string
+          event_id?: string | null
+          full_name?: string
+          id?: string
+          level?: string | null
+          registration_date?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_ratings: {
         Row: {
           created_at: string | null
@@ -794,6 +832,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      update_all_event_statuses: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {

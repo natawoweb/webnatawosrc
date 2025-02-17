@@ -3,6 +3,36 @@ import { EventsTable } from './events'
 import { WritersTable } from './writers'
 import { ProfilesTable, UserRolesTable } from './auth'
 
+export interface EventParticipantsTable {
+  Row: {
+    id: string
+    event_id: string
+    user_id: string
+    full_name: string
+    email: string
+    level: string | null
+    registration_date: string
+  }
+  Insert: {
+    id?: string
+    event_id: string
+    user_id: string
+    full_name: string
+    email: string
+    level?: string | null
+    registration_date?: string
+  }
+  Update: {
+    id?: string
+    event_id?: string
+    user_id?: string
+    full_name?: string
+    email?: string
+    level?: string | null
+    registration_date?: string
+  }
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -170,6 +200,7 @@ export interface Database {
           created_at?: string
         }
       }
+      event_participants: EventParticipantsTable
     }
     Views: {
       [_ in never]: never
