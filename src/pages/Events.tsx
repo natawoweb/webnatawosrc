@@ -8,11 +8,13 @@ import { EventGrid } from "@/components/events/EventGrid";
 import { EventCalendar } from "@/components/events/EventCalendar";
 import { Loader2, LayoutGrid, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Events = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showUpcoming, setShowUpcoming] = useState(true);
   const [view, setView] = useState<"grid" | "calendar">("grid");
+  const { t } = useLanguage();
 
   const { data: events, isLoading } = useQuery({
     queryKey: ["events", showUpcoming],
@@ -83,7 +85,10 @@ const Events = () => {
         ) : (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground">
-              No events found. Please try adjusting your search criteria.
+              {t(
+                "No events found. Please try adjusting your search criteria.",
+                "நிகழ்வுகள் எதுவும் கிடைக்கவில்லை. உங்கள் தேடல் அளவுகோல்களை மாற்றி முயற்சிக்கவும்."
+              )}
             </p>
           </div>
         )

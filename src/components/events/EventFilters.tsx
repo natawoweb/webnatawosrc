@@ -1,6 +1,8 @@
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Calendar } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EventFiltersProps {
   searchQuery: string;
@@ -15,24 +17,28 @@ export function EventFilters({
   onFilterUpcoming,
   showingUpcoming,
 }: EventFiltersProps) {
+  const { t } = useLanguage();
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-6">
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search events..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-9"
-        />
-      </div>
+    <div className="flex flex-col sm:flex-row gap-4">
+      <Input
+        placeholder={t(
+          "Search events by title, description or location...",
+          "தலைப்பு, விளக்கம் அல்லது இடத்தால் நிகழ்வுகளைத் தேடுங்கள்..."
+        )}
+        value={searchQuery}
+        onChange={(e) => onSearchChange(e.target.value)}
+        className="sm:max-w-sm"
+      />
       <Button
         variant={showingUpcoming ? "default" : "outline"}
         onClick={onFilterUpcoming}
         className="w-full sm:w-auto"
       >
-        <Filter className="mr-2 h-4 w-4" />
-        {showingUpcoming ? "Showing Upcoming" : "Show All"}
+        <Calendar className="mr-2 h-4 w-4" />
+        {showingUpcoming ? 
+          t("Showing Upcoming", "வரவிருக்கும் நிகழ்வுகள்") : 
+          t("Show All", "அனைத்தையும் காட்டு")}
       </Button>
     </div>
   );

@@ -1,8 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Users, Clock, ArrowRight, Image as ImageIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { Database } from "@/integrations/supabase/types";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +21,7 @@ interface EventGridProps {
 export function EventGrid({ events }: EventGridProps) {
   const navigate = useNavigate();
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -39,7 +42,7 @@ export function EventGrid({ events }: EventGridProps) {
                     />
                     {event.gallery.length > 1 && (
                       <div className="absolute bottom-2 right-2 bg-background/80 px-2 py-1 rounded-md text-xs font-medium">
-                        +{event.gallery.length - 1} more
+                        +{event.gallery.length - 1} {t("more", "மேலும்")}
                       </div>
                     )}
                   </div>
@@ -80,7 +83,10 @@ export function EventGrid({ events }: EventGridProps) {
             </p>
             <p className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {event.current_participants} / {event.max_participants} participants
+              {t(
+                `${event.current_participants} / ${event.max_participants} participants`,
+                `${event.current_participants} / ${event.max_participants} பங்கேற்பாளர்கள்`
+              )}
             </p>
           </div>
           <p className="line-clamp-2 text-muted-foreground">
@@ -90,7 +96,7 @@ export function EventGrid({ events }: EventGridProps) {
             className="w-full"
             onClick={() => navigate(`/events/${event.id}`)}
           >
-            View Details
+            {t("View Details", "விவரங்களைக் காண")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
@@ -101,7 +107,7 @@ export function EventGrid({ events }: EventGridProps) {
           <DialogContent className="max-w-4xl p-0">
             <img
               src={selectedImageUrl}
-              alt="Full size"
+              alt={t("Full size image", "முழு அளவு படம்")}
               className="w-full h-auto rounded-lg"
             />
           </DialogContent>
