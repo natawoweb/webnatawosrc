@@ -39,8 +39,24 @@ export default function SearchWriters() {
             });
             throw error;
           }
-          console.log("Writers data:", data);
-          return data;
+
+          // Transform the data to match the Writer type
+          const transformedData = data.map((writer) => ({
+            id: writer.id,
+            name: writer.name,
+            bio: writer.bio,
+            genre: writer.genre,
+            image_url: writer.image_url,
+            published_works: writer.published_works ? JSON.parse(writer.published_works as string) : null,
+            accomplishments: writer.accomplishments ? JSON.parse(writer.accomplishments as string) : null,
+            social_links: writer.social_links ? JSON.parse(writer.social_links as string) : null,
+            created_at: writer.created_at,
+            featured: writer.featured || false,
+            featured_month: writer.featured_month || ""
+          }));
+
+          console.log("Writers data:", transformedData);
+          return transformedData;
         }
 
         let query = supabase.from("writers").select("*");
@@ -70,8 +86,24 @@ export default function SearchWriters() {
           });
           throw error;
         }
-        console.log("Search results:", data);
-        return data;
+
+        // Transform the search results data
+        const transformedData = data.map((writer) => ({
+          id: writer.id,
+          name: writer.name,
+          bio: writer.bio,
+          genre: writer.genre,
+          image_url: writer.image_url,
+          published_works: writer.published_works ? JSON.parse(writer.published_works as string) : null,
+          accomplishments: writer.accomplishments ? JSON.parse(writer.accomplishments as string) : null,
+          social_links: writer.social_links ? JSON.parse(writer.social_links as string) : null,
+          created_at: writer.created_at,
+          featured: writer.featured || false,
+          featured_month: writer.featured_month || ""
+        }));
+
+        console.log("Search results:", transformedData);
+        return transformedData;
       } catch (error) {
         console.error("Error in writers query:", error);
         toast({
