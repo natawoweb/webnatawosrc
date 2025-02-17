@@ -25,9 +25,6 @@ serve(async (req) => {
     console.log('Target language:', targetLang)
     console.log('Text length:', text.length)
 
-    // Set target language based on source
-    const effectiveTargetLang = sourceLang === 'ta' || sourceLang === 'auto' ? 'en' : 'ta'
-
     const response = await fetch(
       `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
       {
@@ -37,17 +34,24 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           q: text,
-          target: effectiveTargetLang,
+          target: targetLang,
           source: sourceLang === 'auto' ? undefined : sourceLang,
         }),
       }
     )
 
     const data = await response.json()
-    console.log('Translation response:', data)
+    console.log('Raw translation response:', JSON.stringify(data, null, 2))
+
+    // Check if the response has the expected structure
+    if (!data.data?.translations?.[0]?.translatedText) {
+      throw new Error('Invalid response from Google Translate API')
+    }
+
+    const translatedText = data.data.translations[0].translatedText
 
     return new Response(
-      JSON.stringify({ data }),
+      JSON.stringify({ translatedText }),
       { 
         headers: { 
           ...corsHeaders,
