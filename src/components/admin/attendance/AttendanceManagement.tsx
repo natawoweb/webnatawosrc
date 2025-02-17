@@ -29,12 +29,28 @@ export function AttendanceManagement() {
     queryKey: ["event-participants", selectedEvent],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("event_participants")
-        .select("*")
+        .from("event_registrations")
+        .select(`
+          id,
+          created_at as registration_date,
+          profiles:user_id (
+            full_name,
+            email,
+            level
+          )
+        `)
         .eq("event_id", selectedEvent);
 
       if (error) throw error;
-      return data;
+      
+      // Transform the data to match the expected format
+      return data.map(registration => ({
+        registration_id: registration.id,
+        registration_date: registration.registration_date,
+        full_name: registration.profiles?.full_name || 'N/A',
+        email: registration.profiles?.email || 'N/A',
+        level: registration.profiles?.level || 'N/A'
+      }));
     },
     enabled: !!selectedEvent,
   });
