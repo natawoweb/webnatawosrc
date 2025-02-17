@@ -83,16 +83,6 @@ export default function Dashboard() {
 
       console.log("Publishing blog:", blogId);
       const now = new Date().toISOString();
-      
-      // Update the blog status to 'publishing' first
-      const { error: updateError } = await supabase
-        .from("blogs")
-        .update({ 
-          status: 'publishing'
-        })
-        .eq("id", blogId);
-
-      if (updateError) throw updateError;
 
       // Simulate a delay for the publishing process
       setTimeout(async () => {
