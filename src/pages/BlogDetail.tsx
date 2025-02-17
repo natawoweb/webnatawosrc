@@ -113,19 +113,39 @@ const BlogDetail = () => {
   }
 
   const getTitle = () => {
+    // Only return Tamil title if it exists and Tamil language is selected
     if (language === 'tamil' && blog.title_tamil) {
       return blog.title_tamil;
     }
+    // Fallback to English title
     return blog.title;
   };
 
   const getContent = () => {
+    let content;
+    
+    // Only use Tamil content if it exists and Tamil language is selected
     if (language === 'tamil' && blog.content_tamil) {
-      return typeof blog.content_tamil === 'string' 
-        ? blog.content_tamil 
-        : JSON.stringify(blog.content_tamil);
+      content = blog.content_tamil;
+    } else {
+      // Fallback to English content
+      content = blog.content;
     }
-    return blog.content;
+
+    // Handle content parsing
+    if (typeof content === 'string') {
+      try {
+        // Check if the content is JSON
+        const parsedContent = JSON.parse(content);
+        return JSON.stringify(parsedContent);
+      } catch {
+        // If parsing fails, return as-is (it's probably plain text)
+        return content;
+      }
+    }
+    
+    // If content is already an object, stringify it
+    return JSON.stringify(content);
   };
 
   return (
