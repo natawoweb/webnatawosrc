@@ -9,6 +9,7 @@ import { CommentItem } from "@/components/events/comments/CommentItem";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
 import { useSession } from "@/hooks/useSession";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
@@ -21,6 +22,7 @@ export function EventRatingAndComments({ event }: EventRatingAndCommentsProps) {
   const queryClient = useQueryClient();
   const [hoveredRating, setHoveredRating] = useState(0);
   const { session } = useSession();
+  const { t } = useLanguage();
 
   const { data: userRating } = useQuery({
     queryKey: ["eventRating", event.id, session?.user.id],
@@ -52,7 +54,10 @@ export function EventRatingAndComments({ event }: EventRatingAndCommentsProps) {
 
   const rateMutation = useMutation({
     mutationFn: async (rating: number) => {
-      if (!session?.user.id) throw new Error("Must be logged in to rate");
+      if (!session?.user.id) throw new Error(t(
+        "Must be logged in to rate",
+        "மதிப்பிட உள்நுழைய வேண்டும்"
+      ));
       
       // First try to update any existing rating
       const { data: existingRating, error: fetchError } = await supabase
@@ -87,14 +92,17 @@ export function EventRatingAndComments({ event }: EventRatingAndCommentsProps) {
       queryClient.invalidateQueries({ queryKey: ["eventRating"] });
       queryClient.invalidateQueries({ queryKey: ["eventAverageRating"] });
       toast({
-        title: "Success",
-        description: "Your rating has been submitted",
+        title: t("Success", "வெற்றி"),
+        description: t(
+          "Your rating has been submitted",
+          "உங்கள் மதிப்பீடு சமர்ப்பிக்கப்பட்டது"
+        ),
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         variant: "destructive",
-        title: "Error",
+        title: t("Error", "பிழை"),
         description: error.message,
       });
     },
@@ -103,7 +111,9 @@ export function EventRatingAndComments({ event }: EventRatingAndCommentsProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Event Rating</h3>
+        <h3 className="text-lg font-semibold">
+          {t("Event Rating", "நிகழ்வு மதிப்பீடு")}
+        </h3>
         <div className="flex items-center gap-2">
           <div className="flex">
             {[1, 2, 3, 4, 5].map((rating) => (
@@ -124,17 +134,18 @@ export function EventRatingAndComments({ event }: EventRatingAndCommentsProps) {
             ))}
           </div>
           <span className="text-sm text-muted-foreground">
-            Average: {averageRating?.toFixed(1) || "No ratings yet"}
+            {t("Average:", "சராசரி:")} {averageRating?.toFixed(1) || t("No ratings yet", "இதுவரை மதிப்பீடுகள் இல்லை")}
           </span>
         </div>
         {!session && (
           <p className="text-sm text-muted-foreground">
-            Please log in to rate this event
+            {t(
+              "Please log in to rate this event",
+              "இந்த நிகழ்வை மதிப்பிட உள்நுழையவும்"
+            )}
           </p>
         )}
       </div>
-      
-      {/* Comments section will be rendered by EventComments component */}
     </div>
   );
 }

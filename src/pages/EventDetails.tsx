@@ -9,12 +9,14 @@ import { EventRatingAndComments } from "@/components/events/EventRatingAndCommen
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Event = Database["public"]["Tables"]["events"]["Row"];
 
 const EventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", id],
@@ -39,7 +41,7 @@ const EventDetails = () => {
           className="mb-6"
         >
           <ChevronLeft className="h-4 w-4 mr-2" />
-          Back
+          {t("Back", "பின் செல்க")}
         </Button>
         <Skeleton className="h-[400px] w-full rounded-xl" />
         <div className="mt-6">
@@ -58,12 +60,17 @@ const EventDetails = () => {
           className="mb-6"
         >
           <ChevronLeft className="h-4 w-4 mr-2" />
-          Back
+          {t("Back", "பின் செல்க")}
         </Button>
         <div className="text-center py-12">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Event not found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            {t("Event not found", "நிகழ்வு கிடைக்கவில்லை")}
+          </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">
-            The event you're looking for doesn't exist or has been removed.
+            {t(
+              "The event you're looking for doesn't exist or has been removed.",
+              "நீங்கள் தேடும் நிகழ்வு இல்லை அல்லது நீக்கப்பட்டுள்ளது."
+            )}
           </p>
         </div>
       </div>
@@ -78,7 +85,7 @@ const EventDetails = () => {
         className="mb-6"
       >
         <ChevronLeft className="h-4 w-4 mr-2" />
-        Back
+        {t("Back", "பின் செல்க")}
       </Button>
       
       {event.gallery && Array.isArray(event.gallery) && event.gallery.length > 0 && (
