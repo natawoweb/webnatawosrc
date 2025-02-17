@@ -163,6 +163,7 @@ export type Database = {
           created_at: string | null
           id: string
           published_at: string | null
+          rejection_reason: string | null
           status: Database["public"]["Enums"]["blog_status"] | null
           title: string
           title_tamil: string | null
@@ -178,6 +179,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           published_at?: string | null
+          rejection_reason?: string | null
           status?: Database["public"]["Enums"]["blog_status"] | null
           title: string
           title_tamil?: string | null
@@ -193,6 +195,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           published_at?: string | null
+          rejection_reason?: string | null
           status?: Database["public"]["Enums"]["blog_status"] | null
           title?: string
           title_tamil?: string | null

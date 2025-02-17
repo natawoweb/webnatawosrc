@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import { DeleteBlogDialog } from "./DeleteBlogDialog";
+import { RejectBlogDialog } from "./RejectBlogDialog";
 import { BlogListRow } from "./BlogListRow";
 import { useBlogListManagement } from "@/hooks/useBlogListManagement";
 import { Database } from "@/integrations/supabase/types";
@@ -24,6 +25,7 @@ interface BlogListProps {
 
 export function BlogList({ blogs }: BlogListProps) {
   const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
+  const [blogToReject, setBlogToReject] = useState<Blog | null>(null);
   const { toast } = useToast();
   const { session } = useSession();
   const { data: userRoles } = useUserRoles(session?.user?.id);
@@ -68,19 +70,29 @@ export function BlogList({ blogs }: BlogListProps) {
   };
 
   const handleReject = async (blog: Blog) => {
+    setBlogToReject(blog);
+  };
+
+  const handleRejectConfirm = async (reason: string) => {
+    if (!blogToReject) return;
+
     try {
       const { error } = await supabase
         .from('blogs')
-        .update({ status: 'rejected' })
-        .eq('id', blog.id);
+        .update({ 
+          status: 'rejected',
+          rejection_reason: reason 
+        })
+        .eq('id', blogToReject.id);
 
       if (error) throw error;
 
       toast({
         title: "Blog Rejected",
-        description: `The blog "${blog.title}" has been rejected.`,
+        description: `The blog "${blogToReject.title}" has been rejected.`,
         duration: 3000,
       });
+      setBlogToReject(null);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -131,6 +143,15 @@ export function BlogList({ blogs }: BlogListProps) {
           }
         }}
         blog={blogToDelete}
+      />
+
+      <RejectBlogDialog
+        open={!!blogToReject}
+        onOpenChange={(open) => {
+          if (!open) setBlogToReject(null);
+        }}
+        onConfirm={handleRejectConfirm}
+        blogTitle={blogToReject?.title || ""}
       />
     </>
   );

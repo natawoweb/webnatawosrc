@@ -3,6 +3,13 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { BlogStatusBadge } from "@/components/admin/blog/BlogStatusBadge";
 import { BlogTableActions } from "./BlogTableActions";
 import { Database } from "@/integrations/supabase/types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { AlertCircle } from "lucide-react";
 
 // Extend the base Blog type to include the joined data
 type Blog = Database["public"]["Tables"]["blogs"]["Row"] & {
@@ -21,7 +28,21 @@ export function BlogTableRow({ blog, onDelete, onPublish }: BlogTableRowProps) {
     <TableRow>
       <TableCell className="font-medium">{blog.title}</TableCell>
       <TableCell>
-        <BlogStatusBadge status={blog.status || 'draft'} />
+        <div className="flex items-center gap-2">
+          <BlogStatusBadge status={blog.status || 'draft'} />
+          {blog.status === 'rejected' && blog.rejection_reason && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">{blog.rejection_reason}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
       </TableCell>
       <TableCell>
         {blog.published_at 
