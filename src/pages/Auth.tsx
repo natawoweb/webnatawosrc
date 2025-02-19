@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { useProfile } from "@/hooks/useProfile";
-import { Toaster } from "@/components/ui/toaster";
+import { toast } from "sonner";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -112,7 +112,6 @@ export default function Auth() {
             <ResetPasswordForm />
           </CardContent>
         </Card>
-        <Toaster />
       </div>
     );
   }
@@ -143,8 +142,6 @@ export default function Auth() {
           </Tabs>
         </CardContent>
       </Card>
-      <Toaster />
     </div>
   );
 }
-
