@@ -78,11 +78,14 @@ export function UserManagement() {
     }
   };
 
-  const handleEditUser = (user: UserWithRole) => {
-    setSelectedUser(user);
-    setEditRole(user.role);
-    setEditLevel(user.level as UserLevel);
-    setEditDialogOpen(true);
+  const handleEditUser = (userId: string, role: AppRole, level?: UserLevel) => {
+    const user = users?.find(u => u.id === userId);
+    if (user) {
+      setSelectedUser(user);
+      setEditRole(role);
+      setEditLevel(level);
+      setEditDialogOpen(true);
+    }
   };
 
   return (
