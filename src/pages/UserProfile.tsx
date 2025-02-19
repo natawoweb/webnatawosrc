@@ -24,12 +24,13 @@ export default function UserProfile() {
 
   const { uploading, uploadAvatar } = useAvatarUpload(profile, (url) => {
     if (profile) {
-      setProfile({
+      const updatedProfile = {
         ...profile,
         avatar_url: url,
         social_links: profile.social_links || {},
         approval_status: profile.approval_status || 'pending'
-      });
+      };
+      setProfile(updatedProfile);
     }
   });
 
@@ -40,6 +41,13 @@ export default function UserProfile() {
       </div>
     );
   }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (editedProfile) {
+      await updateProfile(editedProfile);
+    }
+  };
 
   return (
     <div className="container max-w-2xl mx-auto py-8 px-4">
@@ -64,7 +72,7 @@ export default function UserProfile() {
                 editedProfile={editedProfile}
                 onProfileChange={handleProfileChange}
                 onSocialLinkChange={handleSocialLinkChange}
-                onSubmit={updateProfile}
+                onSubmit={handleSubmit}
                 onCancel={handleCancel}
               />
             ) : (

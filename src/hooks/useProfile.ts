@@ -5,9 +5,25 @@ import { supabase } from "@/integrations/supabase/client";
 import type { ProfilesTable } from "@/integrations/supabase/types/auth";
 import { toast } from "sonner";
 
-export type Profile = ProfilesTable["Row"] & {
-  social_links?: Record<string, string>;
-  approval_status?: 'pending' | 'approved' | 'rejected';
+export type Profile = {
+  id: string;
+  full_name: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  email: string | null;
+  level: string | null;
+  location: string | null;
+  status: string | null;
+  user_type: string;
+  date_of_birth: string | null;
+  gender: string | null;
+  pseudonym: string | null;
+  county: string | null;
+  state: string | null;
+  social_links: Record<string, string>;
+  approval_status: 'pending' | 'approved' | 'rejected';
 };
 
 export function useProfile() {
@@ -28,7 +44,13 @@ export function useProfile() {
         .single();
 
       if (error) throw error;
-      return data as Profile;
+      
+      // Ensure the profile has required fields with defaults
+      return {
+        ...data,
+        social_links: data.social_links || {},
+        approval_status: data.approval_status || 'pending'
+      } as Profile;
     },
   });
 
