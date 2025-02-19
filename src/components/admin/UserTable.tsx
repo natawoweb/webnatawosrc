@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Eye, Star } from "lucide-react";
+import { Trash2, Eye, Star, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -173,6 +173,13 @@ export function UserTable({
                   variant="ghost"
                   size="sm"
                   onClick={() => onEdit(user)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(`/admin/users/${user.id}`)}
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
