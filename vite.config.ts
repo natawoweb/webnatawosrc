@@ -7,12 +7,15 @@ export default defineConfig({
   server: {
     port: 8080,
     host: true,
-    open: true // This will open the browser automatically
+    open: true
   },
   plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  define: {
+    global: 'window',
   }
 });
