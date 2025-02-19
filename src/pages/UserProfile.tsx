@@ -16,7 +16,7 @@ export default function UserProfile() {
     editedProfile,
     setIsEditing,
     updateProfile,
-    setProfile, // Make sure we have access to setProfile
+    setProfile,
     handleProfileChange,
     handleSocialLinkChange,
     handleCancel,
@@ -24,10 +24,11 @@ export default function UserProfile() {
 
   const { uploading, uploadAvatar } = useAvatarUpload(profile, (url) => {
     if (profile) {
-      // Update the local profile state immediately
       setProfile({
         ...profile,
-        avatar_url: url
+        avatar_url: url,
+        social_links: profile.social_links || {},
+        approval_status: profile.approval_status || 'pending'
       });
     }
   });
