@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
-  FaFacebook,
-  FaTwitter,
-  FaInstagram,
-  FaYoutube,
-} from "react-icons/fa";
+  Facebook,
+  Instagram,
+  Youtube,
+  X
+} from "lucide-react";
 
 export function Footer() {
   const { t } = useLanguage();
@@ -129,17 +129,37 @@ export function Footer() {
               </Button>
             </form>
             <div className="flex space-x-4 mt-4">
-              <a href="https://facebook.com/natawo" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
-                <FaFacebook size={20} />
+              <a 
+                href="https://www.facebook.com/profile.php?id=61573118737447" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Facebook size={20} />
               </a>
-              <a href="https://twitter.com/natawo" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
-                <FaTwitter size={20} />
+              <a 
+                href="https://x.com/NATAWOrg" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X size={20} />
               </a>
-              <a href="https://instagram.com/natawo" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
-                <FaInstagram size={20} />
+              <a 
+                href="https://www.instagram.com/natawo_tamil/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Instagram size={20} />
               </a>
-              <a href="https://youtube.com/natawo" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
-                <FaYoutube size={20} />
+              <a 
+                href="https://youtube.com/natawo" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Youtube size={20} />
               </a>
             </div>
           </div>
