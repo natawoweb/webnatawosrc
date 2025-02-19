@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,10 @@ interface BlogsByDate {
     [month: string]: Array<any>;
   };
 }
+
+type YearData = {
+  [month: string]: Array<any>;
+};
 
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -120,11 +125,13 @@ const Blogs = () => {
     }, {});
   };
 
-  const totalBlogs = Object.values(blogs || {}).reduce((total: number, yearData) => {
-    return total + Object.values(yearData).reduce((yearTotal: number, monthData) => {
-      return yearTotal + monthData.length;
+  const totalBlogs = React.useMemo(() => {
+    return Object.values(blogs || {}).reduce((total: number, yearData: YearData) => {
+      return total + Object.values(yearData).reduce((yearTotal: number, monthData: any[]) => {
+        return yearTotal + monthData.length;
+      }, 0);
     }, 0);
-  }, 0);
+  }, [blogs]);
 
   const hasBlogs = !!(blogs && Object.keys(blogs).length > 0);
   const hasActiveSearch = searchTerm.trim() !== '' || !!dateFilter || ratingFilter !== 'all';
@@ -227,6 +234,6 @@ const Blogs = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Blogs;
