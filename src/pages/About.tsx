@@ -16,6 +16,12 @@ export default function About() {
       role: "Networking Coordinator",
       bio: "A renowned professional and community organizer, Mani focuses on building connections between writers and readers across North America.",
       image: "/lovable-uploads/168cf684-5521-4c4e-b13c-c5ab1e534803.png"
+    },
+    {
+      name: "Ravi Kumar Potu",
+      role: "Technology Coordinator",
+      bio: "An accomplished information technology professional, Ravi manages our organization's day-to-day Technology operations and System improvement initiatives.",
+      image: "/lovable-uploads/7c55429f-231e-40b9-9a37-7ebfd6758cc1.png"
     }
   ];
 
@@ -95,7 +101,7 @@ export default function About() {
                 <li>
                   {t(
                     "Engage Communities: Host workshops, literary events, and collaborations to connect writers, readers, and scholars in a vibrant literary community.",
-                    "சமூகங்களை ஈடுபடுத்துதல்: துடிப்பான இலக்கிய சமூகத்தில் எழுத்தாளர்கள், வாசகர்கள் மற்றும் அறிஞர்களை இணைக்க பட்டறைகள், இலக்கிய நிகழ்வுகள் மற்றும் க���ட்டுமுயற்சிகளை நடத்துதல்."
+                    "சமூகங்களை ஈடுபடுத்துதல்: துடிப்பான இலக்கிய சமூகத்தில் எழுத்தாளர்கள், வாசகர்கள் மற்றும் அறிஞர்களை இணைக்க பட்டறைகள், இலக்கிய நிகழ்வுகள் மற்றும் கூட்டுமுயற்சிகளை நடத்துதல்."
                   )}
                 </li>
                 <li>
@@ -240,7 +246,7 @@ export default function About() {
                 <p className="text-lg leading-relaxed">
                   {t(
                     "Tamil literature has thrived for over 2,000 years, evolving through poetry, epics, short stories, and modern storytelling. As Tamil communities flourished in North America, writers sought a dedicated space to share their work, collaborate, and find publishing opportunities.",
-                    "தமிழ் இலக்கியம் 2,000 ஆண்டுகளுக்கும் மேலாக கவிதை, காவியங்கள், சிறுகதைகள் மற்றும் நவீன கதை சொல்லல் வழியாக வளர்ந்து வந்துள்ளது. வட அமெரிக்காவில் தமிழ் சமூகங்கள் செழித்தோங்கியதால், எழுத்தாளர்கள் தங்கள் படைப்புகளைப் பகிர்ந்து கொள்ள, ஒத்துழைக்க மற்றும் பதிப்பிக்கு��் வாய்ப்புகளைக் கண்டறிய ஒரு அர்ப்பணிக்கப்பட்ட இடத்தைத் தேடினர்."
+                    "தமிழ் இலக்கியம் 2,000 ஆண்டுகளுக்கும் மேலாக கவிதை, காவியங்கள், சிறுகதைகள் மற்றும் நவீன கதை சொல்லல் வழியாக வளர்ந்து வந்துள்ளது. வட அமெரிக்காவில் தமிழ் சமூகங்கள் செழித்தோங்கியதால், எழுத்தாளர்கள் தங்கள் படைப்புகளைப் பகிர்ந்து கொள்ள, ஒத்துழைக்க மற்றும் பதிப்பிக்கும் வாய்ப்புகளைக் கண்டறிய ஒரு அர்ப்பணிக்கப்பட்ட இடத்தைத் தேடினர்."
                   )}
                 </p>
                 <p className="text-lg leading-relaxed mt-4">
@@ -278,7 +284,7 @@ export default function About() {
                 <p className="text-lg leading-relaxed">
                   {t(
                     "A group of dedicated Tamil writers, scholars, and educators came together to find the answer. They shared a common vision—to create a community-driven platform that nurtures Tamil literary talent while promoting the rich heritage of Tamil literature in a globalized world.",
-                    "அர்ப்பணிப்புள்ள தமிழ் எழுத்தாளர்கள், அறிஞர்க���் மற்றும் கல்வியாளர்கள் குழு பதிலைக் கண்டறிய ஒன்றிணைந்தனர். உலகமயமாக்கப்பட்ட உலகில் தமிழ் இலக்கியத்தின் செழுமையான பாரம்பரியத்தை மேம்படுத்தும் அதே வேளையில் தமிழ் இலக்கியத் திறமையை வளர்க்கும் சமூகம் சார்ந்த தளத்தை உருவாக்குவது என்ற பொதுவான பார்வையை அவர்கள் பகிர்ந்து கொண்டனர்."
+                    "அர்ப்பணிப்புள்ள தமிழ் எழுத்தாளர்கள், அறிஞர்கள் மற்றும் கல்வியாளர்கள் குழு பதிலைக் கண்டறிய ஒன்றிணைந்தனர். உலகமயமாக்கப்பட்ட உலகில் தமிழ் இலக்கியத்தின் செழுமையான பாரம்பரியத்தை மேம்படுத்தும் அதே வேளையில் தமிழ் இலக்கியத் திறமையை வளர்க்கும் சமூகம் சார்ந்த தளத்தை உருவாக்குவது என்ற பொதுவான பார்வையை அவர்கள் பகிர்ந்து கொண்டனர்."
                   )}
                 </p>
                 <p className="text-lg leading-relaxed mt-4">
@@ -313,7 +319,9 @@ export default function About() {
                     src={leader.image}
                     alt={t(
                       leader.name, 
-                      leader.name === "Manikanda Prabu" ? "மணிகண்ட பிரபு" : "டாக்டர் பாலமுருகன் குப்புசாமி"
+                      leader.name === "Manikanda Prabu" ? "மணிகண்ட பிரபு" : 
+                      leader.name === "Ravi Kumar Potu" ? "ரவி குமார் போடு" :
+                      "டாக்டர் பாலமுருகன் குப்புசாமி"
                     )}
                     className="w-full h-64 object-cover object-center"
                   />
@@ -321,13 +329,17 @@ export default function About() {
                     <h3 className="font-semibold text-xl">
                       {t(
                         leader.name,
-                        leader.name === "Manikanda Prabu" ? "மணிகண்ட பிரபு" : "டாக்டர் பாலமுருகன் குப்புசாமி"
+                        leader.name === "Manikanda Prabu" ? "மணிகண்ட பிரபு" :
+                        leader.name === "Ravi Kumar Potu" ? "ரவி குமார் போடு" :
+                        "டாக்டர் பாலமுருகன் குப்புசாமி"
                       )}
                     </h3>
                     <p className="text-muted-foreground">
                       {t(
                         leader.role,
-                        leader.role === "Networking Coordinator" ? "இணைப்பு ஒருங்கிணைப்பாளர்" : "முதன்மை ஒருங்கிணைப்பாளர்"
+                        leader.role === "Networking Coordinator" ? "இணைப்பு ஒருங்கிணைப்பாளர்" :
+                        leader.role === "Technology Coordinator" ? "தொழில்நுட்ப ஒருங்கிணைப்பாளர்" :
+                        "முதன்மை ஒருங்கிணைப்பாளர்"
                       )}
                     </p>
                     <p className="mt-2 text-sm">
@@ -335,6 +347,8 @@ export default function About() {
                         leader.bio,
                         leader.name === "Manikanda Prabu" 
                           ? "புகழ்பெற்ற தொழில்முறை மற்றும் சமூக அமைப்பாளரான மணி, வட அமெரிக்கா முழுவதும் எழுத்தாளர்களுக்கும் வாசகர்களுக்கும் இடையே இணைப்புகளை உருவாக்குவதில் கவனம் செலுத்துகிறார்."
+                          : leader.name === "Ravi Kumar Potu"
+                          ? "சிறந்த தகவல் தொழில்நுட்ப நிபுணரான ரவி, எங்கள் அமைப்பின் அன்றாட தொழில்நுட்ப செயல்பாடுகள் மற்றும் அமைப்பு மேம்பாட்டு முயற்சிகளை நிர்வகிக்கிறார்."
                           : "தமிழ் இலக்கியம் மற்றும் கல்வியில் 20 ஆண்டுகளுக்கும் மேலான அனுபவம் கொண்ட டாக்டர் குப்புசாமி, தமிழ் இலக்கிய எழுத்துக்களை மேம்படுத்துவதற்கான எங்கள் அமைப்பின் நோக்கத்தை வழிநடத்துகிறார்."
                       )}
                     </p>
