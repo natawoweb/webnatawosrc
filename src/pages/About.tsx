@@ -10,6 +10,12 @@ export default function About() {
       role: "Chief Coordinator",
       bio: "With over 20 years of experience in Tamil literature and education, Dr. Kuppusamy leads our organization's mission to promote Tamil literary writing.",
       image: "/lovable-uploads/dc133d31-ff53-48f8-9c21-f2aa21c91bc7.png"
+    },
+    {
+      name: "Manikanda Prabu",
+      role: "Networking Coordinator",
+      bio: "A renowned professional and community organizer, Mani focuses on building connections between writers and readers across North America.",
+      image: "/lovable-uploads/168cf684-5521-4c4e-b13c-c5ab1e534803.png"
     }
   ];
 
@@ -89,13 +95,13 @@ export default function About() {
                 <li>
                   {t(
                     "Engage Communities: Host workshops, literary events, and collaborations to connect writers, readers, and scholars in a vibrant literary community.",
-                    "சமூகங்களை ஈடுபடுத்துதல்: துடிப்பான இலக்கிய சமூகத்தில் எழுத்தாளர்கள், வாசகர்கள் மற்றும் அறிஞர்களை இணைக்க பட்டறைகள், இலக்கிய நிகழ்வுகள் மற்றும் கூட்டுமுயற்சிகளை நடத்துதல்."
+                    "சமூகங்களை ஈடுபடுத்துதல்: துடிப்பான இலக்கிய சமூகத்தில் எழுத்தாளர்கள், வாசகர்கள் மற்றும் அறிஞர்களை இணைக்க பட்டறைகள், இலக்கிய நிகழ்வுகள் மற்றும் க���ட்டுமுயற்சிகளை நடத்துதல்."
                   )}
                 </li>
                 <li>
                   {t(
                     "Bridge Generations: Inspire younger generations to embrace Tamil as a medium of creativity, writing and cultural expression through innovative programs and mentorship opportunities. Be a bridge between Tamil Writers and North American literary publishers and libraries to bring the Tamil language into the mainstream in North America.",
-                    "தலைமுறைகளை இணைத்தல்: புத்தாக்க திட்டங்கள் மற்றும் வழிகாட்டல் வாய்ப்புகள் மூலம் இளைய தலைமுறையினர் தமிழை படைப்பாற்றல், எழுத்து மற்றும் கலாச்சார வெளிப்பாட்டின் ஊடகமாக ஏற்றுக்கொள்ள ஊக்குவித்தல். வட அமெரிக்காவில் தமிழ் மொழியை முக்கிய நீரோட்டத்திற்கு கொண்டு வர தமிழ் எழுத்தாளர்களுக்கும் வட அமெரிக்க இலக்கிய பதிப்பகங்கள் மற்றும் நூலகங்களுக்கும் இடையே பாலமாக இருத்தல்."
+                    "தலைமுறைகளை இணைத்தல்: புத்தாக்க திட்டங்கள் மற்றும் வழிகாட்டல் வாய்ப்புகள் மூலம் இளைய தலைமுறையினர் தமிழை படைப்பாற்றல், எழுது மற்றும் கலாச்சார வெளிப்பாட்டின் ஊடகமாக ஏற்றுக்கொள்ள ஊக்குவித்தல். வட அமெரிக்காவில் தமிழ் மொழியை முக்கிய நீரோட்டத்திற்கு கொண்டு வர தமிழ் எழுத்தாளர்களுக்கும் வட அமெரிக்க இலக்கிய பதிப்பகங்கள் மற்றும் நூலகங்களுக்கும் இடையே பாலமாக இருத்தல்."
                   )}
                 </li>
               </ul>
@@ -234,7 +240,7 @@ export default function About() {
                 <p className="text-lg leading-relaxed">
                   {t(
                     "Tamil literature has thrived for over 2,000 years, evolving through poetry, epics, short stories, and modern storytelling. As Tamil communities flourished in North America, writers sought a dedicated space to share their work, collaborate, and find publishing opportunities.",
-                    "தமிழ் இலக்கியம் 2,000 ஆண்டுகளுக்கும் மேலாக கவிதை, காவியங்கள், சிறுகதைகள் மற்றும் நவீன கதை சொல்லல் வழியாக வளர்ந்து வந்துள்ளது. வட அமெரிக்காவில் தமிழ் சமூகங்கள் செழித்தோங்கியதால், எழுத்தாளர்கள் தங்கள் படைப்புகளைப் பகிர்ந்து கொள்ள, ஒத்துழைக்க மற்றும் பதிப்பிக்கும் வாய்ப்புகளைக் கண்டறிய ஒரு அர்ப்பணிக்கப்பட்ட இடத்தைத் தேடினர்."
+                    "தமிழ் இலக்கியம் 2,000 ஆண்டுகளுக்கும் மேலாக கவிதை, காவியங்கள், சிறுகதைகள் மற்றும் நவீன கதை சொல்லல் வழியாக வளர்ந்து வந்துள்ளது. வட அமெரிக்காவில் தமிழ் சமூகங்கள் செழித்தோங்கியதால், எழுத்தாளர்கள் தங்கள் படைப்புகளைப் பகிர்ந்து கொள்ள, ஒத்துழைக்க மற்றும் பதிப்பிக்கு��் வாய்ப்புகளைக் கண்டறிய ஒரு அர்ப்பணிக்கப்பட்ட இடத்தைத் தேடினர்."
                   )}
                 </p>
                 <p className="text-lg leading-relaxed mt-4">
@@ -272,7 +278,7 @@ export default function About() {
                 <p className="text-lg leading-relaxed">
                   {t(
                     "A group of dedicated Tamil writers, scholars, and educators came together to find the answer. They shared a common vision—to create a community-driven platform that nurtures Tamil literary talent while promoting the rich heritage of Tamil literature in a globalized world.",
-                    "அர்ப்பணிப்புள்ள தமிழ் எழுத்தாளர்கள், அறிஞர்கள் மற்றும் கல்வியாளர்கள் குழு பதிலைக் கண்டறிய ஒன்றிணைந்தனர். உலகமயமாக்கப்பட்ட உலகில் தமிழ் இலக்கியத்தின் செழுமையான பாரம்பரியத்தை மேம்படுத்தும் அதே வேளையில் தமிழ் இலக்கியத் திறமையை வளர்க்கும் சமூகம் சார்ந்த தளத்தை உருவாக்குவது என்ற பொதுவான பார்வையை அவர்கள் பகிர்ந்து கொண்டனர்."
+                    "அர்ப்பணிப்புள்ள தமிழ் எழுத்தாளர்கள், அறிஞர்க���் மற்றும் கல்வியாளர்கள் குழு பதிலைக் கண்டறிய ஒன்றிணைந்தனர். உலகமயமாக்கப்பட்ட உலகில் தமிழ் இலக்கியத்தின் செழுமையான பாரம்பரியத்தை மேம்படுத்தும் அதே வேளையில் தமிழ் இலக்கியத் திறமையை வளர்க்கும் சமூகம் சார்ந்த தளத்தை உருவாக்குவது என்ற பொதுவான பார்வையை அவர்கள் பகிர்ந்து கொண்டனர்."
                   )}
                 </p>
                 <p className="text-lg leading-relaxed mt-4">
@@ -300,25 +306,36 @@ export default function About() {
             <CardTitle>{t("Leadership", "தலைமைத்துவம்")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {leadershipTeam.map((leader) => (
                 <Card key={leader.name} className="overflow-hidden">
                   <img
                     src={leader.image}
-                    alt={t(leader.name, "டாக்டர் பாலமுருகன் குப்புசாமி")}
+                    alt={t(
+                      leader.name, 
+                      leader.name === "Manikanda Prabu" ? "மணிகண்ட பிரபு" : "டாக்டர் பாலமுருகன் குப்புசாமி"
+                    )}
                     className="w-full h-64 object-cover object-center"
                   />
                   <div className="p-4">
                     <h3 className="font-semibold text-xl">
-                      {t(leader.name, "டாக்டர் பாலமுருகன் குப்புசாமி")}
+                      {t(
+                        leader.name,
+                        leader.name === "Manikanda Prabu" ? "மணிகண்ட பிரபு" : "டாக்டர் பாலமுருகன் குப்புசாமி"
+                      )}
                     </h3>
                     <p className="text-muted-foreground">
-                      {t(leader.role, "முதன்மை ஒருங்கிணைப்பாளர்")}
+                      {t(
+                        leader.role,
+                        leader.role === "Networking Coordinator" ? "இணைப்பு ஒருங்கிணைப்பாளர்" : "முதன்மை ஒருங்கிணைப்பாளர்"
+                      )}
                     </p>
                     <p className="mt-2 text-sm">
                       {t(
                         leader.bio,
-                        "தமிழ் இலக்கியம் மற்றும் கல்வியில் 20 ஆண்டுகளுக்கும் மேலான அனுபவம் கொண்ட டாக்டர் குப்புசாமி, தமிழ் இலக்கிய எழுத்துக்களை மேம்படுத்துவதற்கான எங்கள் அமைப்பின் நோக்கத்தை வழிநடத்துகிறார்."
+                        leader.name === "Manikanda Prabu" 
+                          ? "புகழ்பெற்ற தொழில்முறை மற்றும் சமூக அமைப்பாளரான மணி, வட அமெரிக்கா முழுவதும் எழுத்தாளர்களுக்கும் வாசகர்களுக்கும் இடையே இணைப்புகளை உருவாக்குவதில் கவனம் செலுத்துகிறார்."
+                          : "தமிழ் இலக்கியம் மற்றும் கல்வியில் 20 ஆண்டுகளுக்கும் மேலான அனுபவம் கொண்ட டாக்டர் குப்புசாமி, தமிழ் இலக்கிய எழுத்துக்களை மேம்படுத்துவதற்கான எங்கள் அமைப்பின் நோக்கத்தை வழிநடத்துகிறார்."
                       )}
                     </p>
                   </div>
