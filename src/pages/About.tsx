@@ -51,14 +51,8 @@ export default function About() {
   ];
 
   const handleDownloadBylaws = () => {
-    // Replace this URL with your actual PDF file URL
-    const pdfUrl = "/path-to-your-bylaws.pdf";
-    const link = document.createElement('a');
-    link.href = pdfUrl;
-    link.download = "NATAWO-Bylaws.pdf"; // Name of the downloaded file
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const pdfUrl = "https://yqqfxpvptgcczumqowpc.supabase.co/storage/v1/object/public/Common/NATAWO_ByLaws.pdf";
+    window.open(pdfUrl, '_blank');
   };
 
   return (
