@@ -8,6 +8,7 @@ import { BlogsList } from "@/components/blogs/BlogsList";
 import { BlogSearch } from "@/components/blogs/BlogSearch";
 import { LoadingState } from "@/components/blogs/LoadingState";
 import { NoResults } from "@/components/blogs/NoResults";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { startOfDay, endOfDay } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -22,6 +23,8 @@ const Blogs = () => {
   const [searchType, setSearchType] = React.useState("title");
   const [dateFilter, setDateFilter] = React.useState<Date>();
   const [ratingFilter, setRatingFilter] = React.useState("all");
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(12); // Show 12 blogs per page
   const { t } = useLanguage();
   
   const { data: blogs, isLoading, error } = useQuery({
@@ -78,7 +81,6 @@ const Blogs = () => {
         throw error;
       }
 
-      // If rating filter is applied, filter blogs by average rating
       if (ratingFilter !== 'all' && blogsData) {
         const filteredBlogs = blogsData.filter(blog => {
           const ratings = blog.blog_ratings || [];
@@ -118,6 +120,13 @@ const Blogs = () => {
       return acc;
     }, {});
   };
+
+  // Calculate total number of blogs
+  const totalBlogs = Object.values(blogs || {}).reduce((total, yearData) => {
+    return total + Object.values(yearData).reduce((yearTotal, monthData) => {
+      return yearTotal + monthData.length;
+    }, 0);
+  }, 0);
 
   const hasBlogs = !!(blogs && Object.keys(blogs).length > 0);
   const hasActiveSearch = searchTerm.trim() !== '' || !!dateFilter || ratingFilter !== 'all';
@@ -201,10 +210,25 @@ const Blogs = () => {
         </div>
 
         {!hasBlogs && <NoResults hasActiveSearch={hasActiveSearch} />}
-        {hasBlogs && <BlogsList blogs={blogs} />}
+        {hasBlogs && (
+          <>
+            <BlogsList 
+              blogs={blogs} 
+              currentPage={currentPage}
+              pageSize={pageSize}
+            />
+            <DataTablePagination
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalItems={totalBlogs}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+            />
+          </>
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default Blogs;

@@ -7,12 +7,15 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { WriterSearch } from "@/components/writers/WriterSearch";
 import { WriterCard } from "@/components/writers/WriterCard";
 import { WriterProfile } from "@/components/writers/WriterProfile";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import type { Writer } from "@/types/writer";
 
 export default function SearchWriters() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("name");
   const [selectedWriter, setSelectedWriter] = useState<Writer | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(9); // Show 9 writers per page
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -24,8 +27,7 @@ export default function SearchWriters() {
         if (!searchTerm) {
           const { data, error } = await supabase
             .from("writers")
-            .select("*")
-            .limit(10);
+            .select("*");
           
           if (error) {
             console.error("Error fetching writers:", error);
@@ -40,7 +42,6 @@ export default function SearchWriters() {
             throw error;
           }
 
-          // Transform the data to match the Writer type
           const transformedData = data.map((writer) => ({
             id: writer.id,
             name: writer.name,
@@ -87,7 +88,6 @@ export default function SearchWriters() {
           throw error;
         }
 
-        // Transform the search results data
         const transformedData = data.map((writer) => ({
           id: writer.id,
           name: writer.name,
@@ -119,6 +119,12 @@ export default function SearchWriters() {
     },
   });
 
+  // Calculate pagination values
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedWriters = writers?.slice(startIndex, endIndex);
+  const totalWriters = writers?.length || 0;
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-8">
@@ -145,7 +151,7 @@ export default function SearchWriters() {
             )}
           </p>
         ) : (
-          writers?.map((writer) => (
+          paginatedWriters?.map((writer) => (
             <WriterCard
               key={writer.id}
               writer={writer}
@@ -154,6 +160,18 @@ export default function SearchWriters() {
           ))
         )}
       </div>
+
+      {writers && writers.length > 0 && (
+        <div className="mt-6">
+          <DataTablePagination
+            currentPage={currentPage}
+            pageSize={pageSize}
+            totalItems={totalWriters}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+          />
+        </div>
+      )}
 
       <WriterProfile
         writer={selectedWriter}

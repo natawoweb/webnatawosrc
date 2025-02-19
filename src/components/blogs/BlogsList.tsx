@@ -27,9 +27,11 @@ interface BlogsListProps {
       [month: string]: Array<Blog>;
     };
   };
+  currentPage: number;
+  pageSize: number;
 }
 
-export const BlogsList = ({ blogs }: BlogsListProps) => {
+export const BlogsList = ({ blogs, currentPage, pageSize }: BlogsListProps) => {
   const { language, t } = useLanguage();
 
   const getTitle = (blog: Blog) => {
@@ -39,9 +41,42 @@ export const BlogsList = ({ blogs }: BlogsListProps) => {
     return blog.title;
   };
 
+  // Flatten the blogs structure for pagination
+  const flattenedBlogs = React.useMemo(() => {
+    const flattened: Blog[] = [];
+    Object.values(blogs).forEach(yearData => {
+      Object.values(yearData).forEach(monthData => {
+        flattened.push(...monthData);
+      });
+    });
+    return flattened;
+  }, [blogs]);
+
+  // Calculate pagination slice
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedBlogs = flattenedBlogs.slice(startIndex, endIndex);
+
+  // Group paginated blogs by date
+  const groupedBlogs = paginatedBlogs.reduce((acc: BlogsListProps['blogs'], blog) => {
+    const date = new Date(blog.published_at || blog.created_at);
+    const year = date.getFullYear().toString();
+    const month = date.toLocaleString('default', { month: 'long' });
+    
+    if (!acc[year]) {
+      acc[year] = {};
+    }
+    if (!acc[year][month]) {
+      acc[year][month] = [];
+    }
+    
+    acc[year][month].push(blog);
+    return acc;
+  }, {});
+
   return (
     <>
-      {Object.entries(blogs)
+      {Object.entries(groupedBlogs)
         .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
         .map(([year, months]) => (
           <div key={year} className="space-y-8">
