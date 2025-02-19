@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,10 +16,6 @@ interface BlogsByDate {
     [month: string]: Array<any>;
   };
 }
-
-type YearData = {
-  [month: string]: Array<any>;
-};
 
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -126,14 +121,17 @@ const Blogs = () => {
   };
 
   const totalBlogs = React.useMemo(() => {
-    const blogsData = blogs || {};
-    return Object.values(blogsData).reduce((total: number, yearData: YearData) => {
-      const monthArrays = Object.values(yearData);
-      const yearTotal = monthArrays.reduce((sum: number, monthData: any[]) => {
-        return sum + (Array.isArray(monthData) ? monthData.length : 0);
-      }, 0);
-      return total + yearTotal;
-    }, 0);
+    if (!blogs) return 0;
+    
+    let total = 0;
+    Object.values(blogs).forEach((yearData) => {
+      Object.values(yearData).forEach((monthData) => {
+        if (Array.isArray(monthData)) {
+          total += monthData.length;
+        }
+      });
+    });
+    return total;
   }, [blogs]);
 
   const hasBlogs = !!(blogs && Object.keys(blogs).length > 0);

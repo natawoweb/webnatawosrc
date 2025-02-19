@@ -92,30 +92,38 @@ export const BlogsList = ({ blogs, currentPage, pageSize }: BlogsListProps) => {
                   <h3 className="text-2xl font-medium text-muted-foreground px-4">{month}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                     {monthBlogs.map((blog) => (
-                      <Link key={blog.id} to={`/blogs/${blog.id}`}>
+                      <Link key={blog.id} to={`/blogs/${blog.id}`} className="block h-full">
                         <Card className="flex flex-col hover:shadow-lg transition-shadow h-full">
-                          {blog.cover_image && (
-                            <img
-                              src={blog.cover_image}
-                              alt={getTitle(blog)}
-                              className="w-full h-48 object-cover rounded-t-lg"
-                            />
-                          )}
+                          <div className="aspect-video w-full overflow-hidden rounded-t-lg">
+                            {blog.cover_image ? (
+                              <img
+                                src={blog.cover_image}
+                                alt={getTitle(blog)}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-muted flex items-center justify-center">
+                                <span className="text-muted-foreground">No Image</span>
+                              </div>
+                            )}
+                          </div>
                           <CardHeader className="flex-1">
-                            <CardTitle className="text-xl mb-4 leading-relaxed">
+                            <CardTitle className="text-xl line-clamp-2 leading-relaxed mb-2">
                               {getTitle(blog)}
                             </CardTitle>
                           </CardHeader>
-                          <CardContent className="pt-0 pb-6">
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {t("Category:", "வகை:")} {blog.blog_categories?.name || t("Uncategorized", "வகைப்படுத்தப்படாதது")}
-                            </p>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {t("Author:", "ஆசிரியர்:")} {blog.author_name}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {new Date(blog.published_at || blog.created_at).toLocaleDateString()}
-                            </p>
+                          <CardContent className="pt-0">
+                            <div className="space-y-2">
+                              <p className="text-sm text-muted-foreground">
+                                {t("Category:", "வகை:")} {blog.blog_categories?.name || t("Uncategorized", "வகைப்படுத்தப்படாதது")}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {t("Author:", "ஆசிரியர்:")} {blog.author_name}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Date(blog.published_at || blog.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
                           </CardContent>
                         </Card>
                       </Link>
