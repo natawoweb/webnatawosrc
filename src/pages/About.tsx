@@ -83,7 +83,7 @@ export default function About() {
                 <li>
                   {t(
                     "Empower Tamil Writers: Provide a supportive platform for aspiring and established Tamil writers in North America to express their ideas, refine their craft, and achieve global recognition.",
-                    "தமிழ் எழுத்தாளர்களை மேம்படுத்துதல்: வட அமெரிக்காவில் உள்ள ஆர்வமுள்ள மற்றும் நிலைபெற்ற தமிழ் எழுத்தாளர்கள் தங்கள் கருத்துக்களை வெளிப்படுத்த, தங்கள் திறமையை மெருகேற்ற மற்றும் உலகளாவிய அங்கீகாரத்தைப் பெற ஆதரவான தளத்தை வழங்குதல்."
+                    "தமிழ் எழுத்தாளர்களை மேம்படுத்துதல்: வட அமெரிக்காவில் உள்ள ஆர்வமுள்ள மற்றும் நிலைபெற்ற தமிழ் எழுத்தாளர்கள் தங்கள் கருத்துக்களை வெளிப்படு, தங்கள் திறமையை மெருகேற்ற மற்றும் உலகளாவிய அங்கீகாரத்தைப் பெற ஆதரவான தளத்தை வழங்குதல்."
                   )}
                 </li>
                 <li>
@@ -128,7 +128,7 @@ export default function About() {
               <p className="text-lg leading-relaxed">
                 {t(
                   "NATAWO is a non-profit, non-partisan, and secular organization dedicated to promoting Tamil literary expression, education, and cultural identity in North America. We aim to provide Tamil writers with the resources, opportunities, and networks they need to thrive in a global literary environment.",
-                  "நடவு என்பது வட அமெரிக்காவில் தமிழ் இலக்கிய வெளிப்பாடு, கல்வி மற்றும் கலாச்சார அடையாளத்தை மேம்படுத்துவதற்காக அர்ப்பணிக்கப்பட்ட இலாப நோக்கற்ற, கட்சி சார்பற்ற மற்றும் மதச்சார்பற்ற அமைப்பாகும். உலகளாவிய இலக்கியச் சூழலில் செழிக்க தமிழ் எழுத்தாளர்களுக்குத் தேவையான வளங்கள், வாய்ப்புகள் மற்றும் வலைப்பின்னல்களை வழங்குவதே எங்கள் நோக்கம்."
+                  "நடவு என்பது வட அமெரிக்காவில் தமிழ் இலக்கிய வெளிப்பாடு, கல்வி மற்றும் கலாச்சார அடையாளத்தை மேம்படுத்துவதற்காக அர்ப்பணிக்கப்பட்ட இலாப நோக்கற்ற, கட்சி சார்பற்ற மற்றும் மதச்சார்பற்ற அமைப்பாகும். உலகளாவிய இலக்கியச் சூழலில் செழிக்க தமிழ் எழுத்தாளர்கள் சமூகத்தை ஊக்குவித்து, படைப்பாற்றலை வளர்த்து, தமிழ் மொழியை மெருகேற்ற மற்றும் உலகளாவிய அங்கீகாரத்தைப் பெற ஆதரவான தளத்தை வழங்குதல்."
                 )}
               </p>
             </div>
@@ -232,22 +232,73 @@ export default function About() {
       <section className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>History</CardTitle>
+            <CardTitle>{t("History", "வரலாறு")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              <p className="text-lg">
-                Founded in 2018 by a group of passionate Tamil writers and literature enthusiasts, 
-                Writers Hub has grown from a small community gathering to a prominent organization 
-                serving the Tamil literary community across North America.
-              </p>
-              <div className="space-y-4">
-                {milestones.map((milestone) => (
-                  <div key={milestone.year} className="flex items-start gap-4">
-                    <span className="font-bold text-xl">{milestone.year}</span>
-                    <p>{milestone.event}</p>
-                  </div>
-                ))}
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-xl font-semibold mb-4">
+                  {t(
+                    "A Legacy Rooted in Tamil Literary Passion",
+                    "தமிழ் இலக்கிய ஆர்வத்தில் வேரூன்றிய மரபு"
+                  )}
+                </h3>
+                <p className="text-lg leading-relaxed">
+                  {t(
+                    "Tamil literature has thrived for over 2,000 years, evolving through poetry, epics, short stories, and modern storytelling. As Tamil communities flourished in North America, writers sought a dedicated space to share their work, collaborate, and find publishing opportunities.",
+                    "தமிழ் இலக்கியம் 2,000 ஆண்டுகளுக்கும் மேலாக கவிதை, காவியங்கள், சிறுகதைகள் மற்றும் நவீன கதை சொல்லல் வழியாக வளர்ந்து வந்துள்ளது. வட அமெரிக்காவில் தமிழ் சமூகங்கள் செழித்தோங்கியதால், எழுத்தாளர்கள் தங்கள் படைப்புகளைப் பகிர்ந்து கொள்ள, ஒத்துழைக்க மற்றும் பதிப்பிக்கும் வாய்ப்புகளைக் கண்டறிய ஒரு அர்ப்பணிக்கப்பட்ட இடத்தைத் தேடினர்."
+                  )}
+                </p>
+                <p className="text-lg leading-relaxed mt-4">
+                  {t(
+                    "Recognizing this need, a group of passionate Tamil literary enthusiasts founded North America Tamil Writers Incorporated to provide a structured platform for Tamil writers. Since its inception, NATAWO has grown into a respected institution, hosting literary events, mentorship programs, and collaborations that celebrate Tamil storytelling.",
+                    "இந்த தேவையை உணர்ந்து, ஆர்வமுள்ள தமிழ் இலக்கிய ஆர்வலர்கள் குழு தமிழ் எழுத்தாளர்களுக்கு ஒரு கட்டமைக்கப்பட்ட தளத்தை வழங்க வட அமெரிக்க தமிழ் எழுத்தாளர்கள் நிறுவனத்தை நிறுவினர். தொடக்கம் முதல், நடவு தமிழ் கதை சொல்லலைக் கொண்டாடும் இலக்கிய நிகழ்வுகள், வழிகாட்டல் திட்டங்கள் மற்றும் கூட்டு முயற்சிகளை நடத்தும் மதிப்புமிக்க நிறுவனமாக வளர்ந்துள்ளது."
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-semibold mb-6">
+                  {t("Founding Story", "தொடக்கக் கதை")}
+                </h3>
+                <h4 className="text-xl font-medium mb-4">
+                  {t(
+                    "The Birth of NATAWO: Uniting Tamil Writers Across North America",
+                    "நடவு-வின் பிறப்பு: வட அமெரிக்கா முழுவதும் தமிழ் எழுத்தாளர்களை ஒன்றிணைத்தல்"
+                  )}
+                </h4>
+                <p className="text-lg leading-relaxed italic mb-6">
+                  {t(
+                    "The journey of NATAWO began with a simple yet powerful question:",
+                    "நடவு-வின் பயணம் ஒரு எளிமையான ஆனால் சக்திவாய்ந்த கேள்வியுடன் தொடங்கியது:"
+                  )}
+                </p>
+                <blockquote className="border-l-4 border-primary pl-4 mb-6">
+                  <p className="text-lg font-medium">
+                    {t(
+                      "\"How can we create a lasting impact on Tamil literature in North America?\"",
+                      "\"வட அமெரிக்காவில் தமிழ் இலக்கியத்தில் நிலையான தாக்கத்தை எவ்வாறு உருவாக்க முடியும்?\""
+                    )}
+                  </p>
+                </blockquote>
+                <p className="text-lg leading-relaxed">
+                  {t(
+                    "A group of dedicated Tamil writers, scholars, and educators came together to find the answer. They shared a common vision—to create a community-driven platform that nurtures Tamil literary talent while promoting the rich heritage of Tamil literature in a globalized world.",
+                    "அர்ப்பணிப்புள்ள தமிழ் எழுத்தாளர்கள், அறிஞர்கள் மற்றும் கல்வியாளர்கள் குழு பதிலைக் கண்டறிய ஒன்றிணைந்தனர். உலகமயமாக்கப்பட்ட உலகில் தமிழ் இலக்கியத்தின் செழுமையான பாரம்பரியத்தை மேம்படுத்தும் அதே வேளையில் தமிழ் இலக்கியத் திறமையை வளர்க்கும் சமூகம் சார்ந்த தளத்தை உருவாக்குவது என்ற பொதுவான பார்வையை அவர்கள் பகிர்ந்து கொண்டனர்."
+                  )}
+                </p>
+                <p className="text-lg leading-relaxed mt-4">
+                  {t(
+                    "Through countless discussions, planning sessions, and collaborations, North America Tamil Writers Incorporated was officially formed as a non-profit literary organization with a commitment to fostering Tamil creativity.",
+                    "எண்ணற்ற விவாதங்கள், திட்டமிடல் அமர்வுகள் மற்றும் கூட்டு முயற்சிகள் மூலம், தமிழ் படைப்பாற்றலை வளர்ப்பதற்கான அர்ப்பணிப்புடன் வட அமெரிக்க தமிழ் எழுத்தாளர்கள் நிறுவனம் அதிகாரப்பூர்வமாக இலாப நோக்கற்ற இலக்கிய அமைப்பாக உருவாக்கப்பட்டது."
+                  )}
+                </p>
+                <p className="text-lg leading-relaxed mt-4">
+                  {t(
+                    "Today, NATAWO stands as a pioneering force in Tamil literary development, bridging generations, cultures, and geographies through literature.",
+                    "இன்று, நடவு தமிழ் இலக்கிய வளர்ச்சியில் முன்னோடி சக்தியாக நின்று, இலக்கியம் வழியாக தலைமுறைகள், கலாச்சாரங்கள் மற்றும் புவியியல்களை இணைக்கிறது."
+                  )}
+                </p>
               </div>
             </div>
           </CardContent>
