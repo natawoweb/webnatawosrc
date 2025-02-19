@@ -6,22 +6,10 @@ export default function About() {
   
   const leadershipTeam = [
     {
-      name: "Dr. Lakshmi Chandran",
-      role: "President",
-      bio: "With over 20 years of experience in Tamil literature and education, Dr. Chandran leads our organization's mission to promote Tamil literary arts.",
-      image: "/placeholder.svg"
-    },
-    {
-      name: "Rajesh Kumar",
-      role: "Vice President",
-      bio: "A published author and community organizer, Rajesh focuses on building connections between writers and readers across North America.",
-      image: "/placeholder.svg"
-    },
-    {
-      name: "Priya Subramaniam",
-      role: "Secretary",
-      bio: "An accomplished translator and editor, Priya manages our organization's day-to-day operations and communication initiatives.",
-      image: "/placeholder.svg"
+      name: "Dr. Balamurugan Kuppusamy",
+      role: "Chief Coordinator",
+      bio: "With over 20 years of experience in Tamil literature and education, Dr. Kuppusamy leads our organization's mission to promote Tamil literary writing.",
+      image: "/lovable-uploads/dc133d31-ff53-48f8-9c21-f2aa21c91bc7.png"
     }
   ];
 
@@ -140,7 +128,7 @@ export default function About() {
               <p className="text-lg leading-relaxed">
                 {t(
                   "NATAWO is led by a dedicated Board of Coordinators, Bylaws Committee and Global Ambassadors composed of Tamil writers, scholars, educators, and community leaders. The leadership team is responsible for shaping the organization's strategic direction, ensuring financial transparency, and fostering a culture of inclusivity and innovation.",
-                  "நடவு அமைப்பானது தமிழ் எழுத்தாளர்கள், அறிஞர்கள், கல்வியாளர்கள் மற்றும் சமூகத் தலைவர்களைக் கொண்ட அர்ப்பணிப்புள்ள ஒருங்கிணைப்பாளர்கள் குழு, விதிமுறைகள் குழு மற்றும் உலகளாவிய தூதுவர்களால் வழிநடத்தப்படுகிறது. அமைப்பின் மூலோபாய திசையை வடிவமைப்பது, நிதி வ���ளிப்படைத்தன்மையை உறுதி செய்வது மற்றும் உள்ளடக்கம் மற்றும் புத்தாக்கக் கலாச்சாரத்தை வளர்ப்பது தலைமைக் குழுவின் பொறுப்பாகும்."
+                  "நடவு அமைப்பானது தமிழ் எழுத்தாளர்கள், அறிஞர்கள், கல்வியாளர்கள் மற்றும் சமூகத் தலைவர்களைக் கொண்ட அர்ப்பணிப்புள்ள ஒருங்கிணைப்பாளர்கள் குழு, விதிமுறைகள் குழு மற்றும் உலகளாவிய தூதுவர்களால் வழிநடத்தப்படுகிறது. அமைப்பின் மூலோபாய திசையை வடிவமைப்பது, நிதி வெளிப்படைத்தன்மையை உறுதி செய்வது மற்றும் உள்ளடக்கம் மற்றும் புத்தாக்கக் கலாச்சாரத்தை வளர்ப்பது தலைமைக் குழுவின் பொறுப்பாகும்."
                 )}
               </p>
             </div>
@@ -309,7 +297,7 @@ export default function About() {
       <section className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Leadership</CardTitle>
+            <CardTitle>{t("Leadership", "தலைமைத்துவம்")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -317,13 +305,22 @@ export default function About() {
                 <Card key={leader.name} className="overflow-hidden">
                   <img
                     src={leader.image}
-                    alt={leader.name}
-                    className="w-full h-48 object-cover"
+                    alt={t(leader.name, "டாக்டர் பாலமுருகன் குப்புசாமி")}
+                    className="w-full h-64 object-cover object-center"
                   />
                   <div className="p-4">
-                    <h3 className="font-semibold text-xl">{leader.name}</h3>
-                    <p className="text-muted-foreground">{leader.role}</p>
-                    <p className="mt-2 text-sm">{leader.bio}</p>
+                    <h3 className="font-semibold text-xl">
+                      {t(leader.name, "டாக்டர் பாலமுருகன் குப்புசாமி")}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {t(leader.role, "முதன்மை ஒருங்கிணைப்பாளர்")}
+                    </p>
+                    <p className="mt-2 text-sm">
+                      {t(
+                        leader.bio,
+                        "தமிழ் இலக்கியம் மற்றும் கல்வியில் 20 ஆண்டுகளுக்கும் மேலான அனுபவம் கொண்ட டாக்டர் குப்புசாமி, தமிழ் இலக்கிய எழுத்துக்களை மேம்படுத்துவதற்கான எங்கள் அமைப்பின் நோக்கத்தை வழிநடத்துகிறார்."
+                      )}
+                    </p>
                   </div>
                 </Card>
               ))}
