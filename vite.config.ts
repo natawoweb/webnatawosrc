@@ -43,8 +43,6 @@ export default defineConfig({
         drop_console: true,
         drop_debugger: true
       }
-    },
-    // Enable build cache
-    cache: true
+    }
   }
 });
