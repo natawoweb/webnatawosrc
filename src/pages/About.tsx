@@ -1,5 +1,7 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Check } from "lucide-react";
 
 export default function About() {
   const { t } = useLanguage();
@@ -364,28 +366,125 @@ export default function About() {
       <section className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Membership</CardTitle>
+            <CardTitle>{t("Membership", "உறுப்பினர்")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-xl font-semibold mb-4">For Writers</h3>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li>Access to writing workshops and seminars</li>
-                  <li>Opportunities to publish in our quarterly journal</li>
-                  <li>Networking events with fellow writers</li>
-                  <li>Mentorship programs</li>
-                  <li>Priority registration for literary festivals</li>
-                </ul>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* For Writers */}
+              <div className="space-y-6">
+                <h3 className="text-2xl font-semibold">{t("For Writers", "எழுத்தாளர்களுக்கு")}</h3>
+                
+                <div className="space-y-4">
+                  <p className="text-lg">
+                    {t(
+                      "NATAWO consists of four Levels of memberships:",
+                      "நடவு நான்கு வகையான உறுப்பினர் நிலைகளைக் கொண்டுள்ளது:"
+                    )}
+                  </p>
+                  <ol className="list-decimal pl-6 space-y-2">
+                    <li>{t("Literary Experts", "இலக்கிய வல்லுநர்கள்")}</li>
+                    <li>{t("Aspiring Writers", "ஆர்வமுள்ள எழுத்தாளர்கள்")}</li>
+                    <li>{t("NATAWO Volunteers", "நடவு தன்னார்வலர்கள்")}</li>
+                    <li>{t("NATAWO Students Writers", "நடவு மாணவர் எழுத்தாளர்கள்")}</li>
+                  </ol>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-xl font-semibold">
+                    {t("Join the NATAWO Literary Community!", "நடவு இலக்கிய சமூகத்தில் இணையுங்கள்!")}
+                  </h4>
+                  <p className="text-lg">
+                    {t(
+                      "By becoming a NATAWO Member, you gain access to:",
+                      "நடவு உறுப்பினராவதன் மூலம், நீங்கள் பின்வரும் வசதிகளைப் பெறலாம்:"
+                    )}
+                  </p>
+                  <ul className="space-y-3">
+                    <li className="flex gap-2">
+                      <Check className="text-green-600 mt-1" />
+                      {t(
+                        "Exclusive literary workshops and mentorship programs.",
+                        "தனித்துவமான இலக்கிய பட்டறைகள் மற்றும் வழிகாட்டல் திட்டங்கள்."
+                      )}
+                    </li>
+                    <li className="flex gap-2">
+                      <Check className="text-green-600 mt-1" />
+                      {t(
+                        "Opportunities to publish your work.",
+                        "உங்கள் படைப்புகளை வெளியிடும் வாய்ப்புகள்."
+                      )}
+                    </li>
+                    <li className="flex gap-2">
+                      <Check className="text-green-600 mt-1" />
+                      {t(
+                        "Write your blogs to publish in the our website.",
+                        "எங்கள் வலைத்தளத்தில் வெளியிட உங்கள் வலைப்பதிவுகளை எழுதுங்கள்."
+                      )}
+                    </li>
+                    <li className="flex gap-2">
+                      <Check className="text-green-600 mt-1" />
+                      {t(
+                        "Invitations to Tamil literary events, festivals, and competitions.",
+                        "தமிழ் இலக்கிய நிகழ்வுகள், விழாக்கள் மற்றும் போட்டிகளுக்கான அழைப்புகள்."
+                      )}
+                    </li>
+                    <li className="flex gap-2">
+                      <Check className="text-green-600 mt-1" />
+                      {t(
+                        "Networking with Tamil writers, publishers, and scholars.",
+                        "தமிழ் எழுத்தாளர்கள், பதிப்பகங்கள் மற்றும் அறிஞர்களுடன் நெட்வொர்க்கிங்."
+                      )}
+                    </li>
+                    <li className="flex gap-2">
+                      <Check className="text-green-600 mt-1" />
+                      {t(
+                        "Resources and tools to enhance your writing skills.",
+                        "உங்கள் எழுத்துத் திறனை மேம்படுத்த வளங்கள் மற்றும் கருவிகள்."
+                      )}
+                    </li>
+                  </ul>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-4">For Readers</h3>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li>Access to our digital library</li>
-                  <li>Invitations to book launches and readings</li>
-                  <li>Quarterly newsletter with literary updates</li>
-                  <li>Discounted tickets to events</li>
-                  <li>Book club membership</li>
+
+              {/* For Readers */}
+              <div className="space-y-6">
+                <h3 className="text-2xl font-semibold">{t("For Readers", "வாசகர்களுக்கு")}</h3>
+                <ul className="space-y-3">
+                  <li className="flex gap-2">
+                    <Check className="text-green-600 mt-1" />
+                    {t(
+                      "Access to our digital library",
+                      "எங்கள் டிஜிட்டல் நூலகத்திற்கான அணுகல்"
+                    )}
+                  </li>
+                  <li className="flex gap-2">
+                    <Check className="text-green-600 mt-1" />
+                    {t(
+                      "Invitations to book launches and readings",
+                      "புத்தக வெளியீடுகள் மற்றும் வாசிப்பு நிகழ்வுகளுக்கான அழைப்புகள்"
+                    )}
+                  </li>
+                  <li className="flex gap-2">
+                    <Check className="text-green-600 mt-1" />
+                    {t(
+                      "Quarterly newsletter with literary updates",
+                      "இலக்கிய புதுப்பிப்புகளுடன் காலாண்டு செய்திமடல்"
+                    )}
+                  </li>
+                  <li className="flex gap-2">
+                    <Check className="text-green-600 mt-1" />
+                    {t(
+                      "Discounted tickets to events",
+                      "நிகழ்வுகளுக்கான தள்ளுபடி டிக்கெட்டுகள்"
+                    )}
+                  </li>
+                  <li className="flex gap-2">
+                    <Check className="text-green-600 mt-1" />
+                    {t(
+                      "Book club membership",
+                      "புத்தக குழு உறுப்பினர்"
+                    )}
+                  </li>
                 </ul>
               </div>
             </div>
