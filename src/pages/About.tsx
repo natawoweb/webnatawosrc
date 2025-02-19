@@ -1,7 +1,7 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Check } from "lucide-react";
+import { Check, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function About() {
   const { t } = useLanguage();
@@ -49,6 +49,17 @@ export default function About() {
       event: "Opening of Regional Chapters across Major Cities"
     }
   ];
+
+  const handleDownloadBylaws = () => {
+    // Replace this URL with your actual PDF file URL
+    const pdfUrl = "/path-to-your-bylaws.pdf";
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = "NATAWO-Bylaws.pdf"; // Name of the downloaded file
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="container mx-auto py-12 space-y-12">
@@ -487,6 +498,33 @@ export default function About() {
                   </li>
                 </ul>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Bylaws Section */}
+      <section className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("Bylaws", "விதிமுறைகள்")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-lg leading-relaxed">
+              {t(
+                "Our bylaws outline the rules and regulations that govern NATAWO's operations, including membership criteria, election procedures, and organizational structure.",
+                "எங்கள் விதிமுறைகள் நடவு-வின் செயல்பாடுகளை நிர்வகிக்கும் விதிகள் மற்றும் ஒழுங்குமுறைகளை வரையறுக்கின்றன, இதில் உறுப்பினர் தகுதி, தேர்தல் நடைமுறைகள் மற்றும் அமைப்பு கட்டமைப்பு ஆகியவை அடங்கும்."
+              )}
+            </p>
+            
+            <div className="flex justify-center mt-6">
+              <Button 
+                onClick={handleDownloadBylaws}
+                className="flex items-center gap-2"
+              >
+                <Download size={20} />
+                {t("Download NATAWO Bylaws", "நடவு விதிமுறைகளைப் பதிவிறக்குக")}
+              </Button>
             </div>
           </CardContent>
         </Card>
