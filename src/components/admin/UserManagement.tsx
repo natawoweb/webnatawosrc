@@ -18,7 +18,37 @@ import { useToast } from "@/hooks/use-toast";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
-type UserWithRole = Profile & { role: AppRole };
+
+interface UserFiltersProps {
+  selectedRole: string;
+  onRoleChange: (role: string) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  onAddUser: () => void;
+  isAdmin: boolean;
+}
+
+interface UserTableProps {
+  users: (Profile & { role: AppRole })[];
+  isLoading: boolean;
+  onDelete: (user: Profile & { role: AppRole }) => void;
+  onEdit: (user: Profile & { role: AppRole }) => void;
+  isAdmin: boolean;
+}
+
+interface DeleteUserDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  email: string;
+}
+
+interface AddUserDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (email: string, fullName: string, role: AppRole, password: string, level: UserLevel) => Promise<void>;
+  isSubmitting: boolean;
+}
 
 export function UserManagement() {
   const {
@@ -53,8 +83,10 @@ export function UserManagement() {
 
   const handleProfileUpdate = async (profile: Partial<Profile> & { featured?: boolean }) => {
     try {
+      // Update profile in the profiles table
       await updateUserProfile(profile);
 
+      // If this is a writer and featured status is included, update the writers table
       if (profile.id && selectedUser?.user_type === 'writer' && 'featured' in profile) {
         const { error } = await supabase
           .from('writers')
@@ -78,16 +110,6 @@ export function UserManagement() {
     }
   };
 
-  const handleEditUser = (userId: string, role: AppRole, level?: UserLevel) => {
-    const user = users?.find(u => u.id === userId);
-    if (user) {
-      setSelectedUser(user);
-      setEditRole(role);
-      setEditLevel(level);
-      setEditDialogOpen(true);
-    }
-  };
-
   return (
     <div className="space-y-4">
       <UserFilters
@@ -106,7 +128,12 @@ export function UserManagement() {
           setSelectedUser(user);
           setDeleteDialogOpen(true);
         }}
-        onEdit={handleEditUser}
+        onEdit={(user) => {
+          setSelectedUser(user);
+          setEditRole(user.role);
+          setEditLevel(user.level as UserLevel);
+          setEditDialogOpen(true);
+        }}
         isAdmin={isAdmin}
       />
 
@@ -121,7 +148,7 @@ export function UserManagement() {
                 setDeleteDialogOpen(false);
               }
             }}
-            email={selectedUser.email || ''}
+            email={selectedUser.email}
           />
 
           <ProfileDialog

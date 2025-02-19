@@ -1,12 +1,20 @@
+
 import { type Database } from "@/integrations/supabase/types";
-import { Table, TableBody } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Trash2, Eye, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { UserTableHeader } from "./table/UserTableHeader";
-import { UserTableRow } from "./table/UserTableRow";
-import { EditUserDialog } from "./EditUserDialog";
-import type { UserLevel } from "@/integrations/supabase/types/models";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
@@ -15,7 +23,7 @@ interface UserTableProps {
   users: (Profile & { role: AppRole })[];
   isLoading: boolean;
   onDelete: (user: Profile & { role: AppRole }) => void;
-  onEdit: (userId: string, role: AppRole, level?: UserLevel) => void;
+  onEdit: (user: Profile & { role: AppRole }) => void;
   isAdmin: boolean;
 }
 
@@ -26,16 +34,14 @@ export function UserTable({
   onEdit,
   isAdmin 
 }: UserTableProps) {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [featuredWriters, setFeaturedWriters] = useState<{ [key: string]: boolean }>({});
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<(Profile & { role: AppRole }) | null>(null);
-  const [selectedRole, setSelectedRole] = useState<AppRole>('reader');
-  const [selectedLevel, setSelectedLevel] = useState<UserLevel>();
 
   useEffect(() => {
     const fetchFeaturedStatus = async () => {
       try {
+        // Get IDs of writer-type users
         const writerIds = users
           .filter(user => user.user_type === 'writer')
           .map(user => user.id);
@@ -68,15 +74,9 @@ export function UserTable({
     fetchFeaturedStatus();
   }, [users, toast]);
 
-  const handleEditUser = (user: Profile & { role: AppRole }) => {
-    setSelectedUser(user);
-    setSelectedRole(user.role);
-    setSelectedLevel(user.level as UserLevel);
-    setEditDialogOpen(true);
-  };
-
   const handleFeatureWriter = async (user: Profile & { role: AppRole }) => {
     try {
+      // First check if writer exists in writers table
       const { data: existingWriter } = await supabase
         .from('writers')
         .select('id, featured')
@@ -90,6 +90,7 @@ export function UserTable({
         featured_month: newFeaturedStatus ? new Date().toISOString().substring(0, 7) : null
       };
 
+      // If writer doesn't exist, we need to create the record first
       if (!existingWriter) {
         const { error: insertError } = await supabase
           .from('writers')
@@ -103,6 +104,7 @@ export function UserTable({
 
         if (insertError) throw insertError;
       } else {
+        // Update existing writer
         const { error: updateError } = await supabase
           .from('writers')
           .update(updateData)
@@ -111,6 +113,7 @@ export function UserTable({
         if (updateError) throw updateError;
       }
 
+      // Update local state
       setFeaturedWriters(prev => ({
         ...prev,
         [user.id]: newFeaturedStatus
@@ -137,34 +140,69 @@ export function UserTable({
   }
 
   return (
-    <>
-      <Table>
-        <UserTableHeader />
-        <TableBody>
-          {users?.map((user) => (
-            <UserTableRow
-              key={user.id}
-              user={user}
-              isAdmin={isAdmin}
-              onEdit={handleEditUser}
-              onDelete={onDelete}
-              onFeature={handleFeatureWriter}
-              isFeatured={featuredWriters[user.id]}
-            />
-          ))}
-        </TableBody>
-      </Table>
-
-      <EditUserDialog
-        user={selectedUser}
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        onSubmit={onEdit}
-        selectedRole={selectedRole}
-        selectedLevel={selectedLevel}
-        onRoleChange={setSelectedRole}
-        onLevelChange={setSelectedLevel}
-      />
-    </>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Full Name</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Created At</TableHead>
+          <TableHead>Role</TableHead>
+          <TableHead>Level</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {users?.map((user) => (
+          <TableRow key={user.id}>
+            <TableCell>{user.full_name || 'N/A'}</TableCell>
+            <TableCell>{user.email}</TableCell>
+            <TableCell>
+              {new Date(user.created_at || "").toLocaleDateString()}
+            </TableCell>
+            <TableCell className="capitalize">{user.role}</TableCell>
+            <TableCell>
+              {user.level ? (
+                <Badge variant="secondary">{user.level}</Badge>
+              ) : (
+                <span className="text-muted-foreground text-sm">Not set</span>
+              )}
+            </TableCell>
+            <TableCell>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(user)}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                {isAdmin && user.user_type === 'writer' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleFeatureWriter(user)}
+                  >
+                    <Star 
+                      className={`h-4 w-4 ${
+                        featuredWriters[user.id] ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'
+                      }`} 
+                    />
+                  </Button>
+                )}
+                {isAdmin && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDelete(user)}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                )}
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

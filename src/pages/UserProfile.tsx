@@ -16,7 +16,7 @@ export default function UserProfile() {
     editedProfile,
     setIsEditing,
     updateProfile,
-    setProfile,
+    setProfile, // Make sure we have access to setProfile
     handleProfileChange,
     handleSocialLinkChange,
     handleCancel,
@@ -24,13 +24,11 @@ export default function UserProfile() {
 
   const { uploading, uploadAvatar } = useAvatarUpload(profile, (url) => {
     if (profile) {
-      const updatedProfile = {
+      // Update the local profile state immediately
+      setProfile({
         ...profile,
-        avatar_url: url,
-        social_links: profile.social_links || {},
-        approval_status: profile.approval_status || 'pending'
-      };
-      setProfile(updatedProfile);
+        avatar_url: url
+      });
     }
   });
 
@@ -41,13 +39,6 @@ export default function UserProfile() {
       </div>
     );
   }
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (editedProfile) {
-      await updateProfile(editedProfile);
-    }
-  };
 
   return (
     <div className="container max-w-2xl mx-auto py-8 px-4">
@@ -72,7 +63,7 @@ export default function UserProfile() {
                 editedProfile={editedProfile}
                 onProfileChange={handleProfileChange}
                 onSocialLinkChange={handleSocialLinkChange}
-                onSubmit={handleSubmit}
+                onSubmit={updateProfile}
                 onCancel={handleCancel}
               />
             ) : (
