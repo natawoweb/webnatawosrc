@@ -51,7 +51,7 @@ export function HeroSection() {
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl animate-in fade-in slide-in duration-1000 delay-200">
               {t(
                 "Join our vibrant community of writers and readers celebrating Tamil literary excellence. By Writers, For Writers, Of Writers, A Tamil Platform! NATAWO",
-                "தமிழ் இலக்கிய சிறப்பை கொண்டாடும் எழுத்தாளர்கள் மற்றும் வாசகர்களின் துடிப்பான சமூகத்தில் இணையுங்கள். எழுத்தாளர்களால், எழுத்தாளர்களுக்காக, எழுத்தாளர்களின், ஒரு தமிழ் தளம்! நடவோ"
+                "தமிழ் இலக்கிய சிறப்பை கொண்டாடும் எழுத்தாளர்கள் மற்றும் வாசகர்களின் துடிப்பான சமூகத்தில் இணையுங்கள். எழுத்தாளர்களால், எழுத்தாளர்களுக்காக, எழுத்தாளர்களின், ஒரு தமிழ் தளம்! நடவு"
               )}
             </p>
             <div className="flex flex-wrap gap-4 animate-in fade-in slide-in duration-1000 delay-300">
