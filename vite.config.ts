@@ -9,6 +9,7 @@ export default defineConfig({
     host: true,
     open: true
   },
+  base: "/", // Explicitly set the base URL for assets
   plugins: [react()],
   resolve: {
     alias: {
@@ -19,5 +20,13 @@ export default defineConfig({
     global: {},
     'process.env': {},
     'window.global': {},
+  },
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined // Disable code splitting for simpler asset loading
+      }
+    }
   }
 });
