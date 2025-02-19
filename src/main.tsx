@@ -6,12 +6,13 @@ import { ThemeProvider } from "next-themes";
 import App from './App.tsx';
 import './index.css';
 
-// Create a client
+// Create a client with more lenient settings for development
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 0, // More frequent refreshes in development
       retry: 1,
+      refetchOnWindowFocus: false // Disable refetch on focus for easier development
     },
   },
 });
