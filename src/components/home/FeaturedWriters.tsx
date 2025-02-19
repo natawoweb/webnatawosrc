@@ -26,40 +26,57 @@ export function FeaturedWriters() {
   const { data: writers, isLoading, error } = useQuery({
     queryKey: ["writers", searchQuery],
     queryFn: async () => {
-      let query = supabase
-        .from("writers")
-        .select("*");
+      console.log("Starting writers query with search:", searchQuery);
+      try {
+        let query = supabase
+          .from("writers")
+          .select("*");
 
-      if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,genre.ilike.%${searchQuery}%`);
-      } else {
-        query = query.eq("featured", true)
-          .order("featured_month", { ascending: false });
-      }
+        if (searchQuery) {
+          console.log("Applying search filter:", searchQuery);
+          query = query.or(`name.ilike.%${searchQuery}%,genre.ilike.%${searchQuery}%`);
+        } else {
+          console.log("Fetching featured writers");
+          query = query.eq("featured", true)
+            .order("featured_month", { ascending: false });
+        }
 
-      const { data, error } = await query;
-      
-      if (error) {
-        console.error("Error fetching writers:", error);
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error("Supabase query error:", error);
+          throw error;
+        }
+
+        if (!data) {
+          console.log("No writers found");
+          return [];
+        }
+
+        console.log("Writers fetched successfully:", data.length);
+        return data || [];
+      } catch (error) {
+        console.error("Error in writers query:", error);
         toast({
           variant: "destructive",
           title: t("Error", "பிழை"),
-          description: t("Failed to fetch writers. Please try again later.", "எழுத்தாளர்களைப் பெற முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்."),
+          description: t(
+            "Failed to fetch writers. Please try again later.", 
+            "எழுத்தாளர்களைப் பெற முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்."
+          ),
         });
         throw error;
       }
-
-      return data || [];
     },
-    retry: 2,
+    retry: 3,
+    retryDelay: 1000,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const formatFeaturedMonth = (dateString: string | null) => {
     if (!dateString) return "";
     try {
-      const date = new Date(dateString);
-      return format(date, "MMMM yyyy");
+      return format(new Date(dateString + "-01"), "MMMM yyyy");
     } catch (error) {
       console.error("Error formatting date:", error);
       return "";
@@ -67,10 +84,14 @@ export function FeaturedWriters() {
   };
 
   if (error) {
+    console.error("Writers query error state:", error);
     return (
       <div className="text-center py-20">
         <p className="text-muted-foreground">
-          {t("Failed to load featured writers.", "சிறப்பு எழுத்தாளர்களை ஏற்ற முடியவில்லை.")}
+          {t(
+            "Failed to load featured writers.", 
+            "சிறப்பு எழுத்தாளர்களை ஏற்ற முடியவில்லை."
+          )}
         </p>
       </div>
     );
@@ -80,15 +101,23 @@ export function FeaturedWriters() {
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold">{t("Featured Writers", "சிறப்பு எழுத்தாளர்கள்")}</h2>
+          <h2 className="text-3xl font-bold">
+            {t("Featured Writers", "சிறப்பு எழுத்தாளர்கள்")}
+          </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            {t("Discover talented voices from our community", "எங்கள் சமூகத்தின் திறமையான குரல்களைக் கண்டறியுங்கள்")}
+            {t(
+              "Discover talented voices from our community",
+              "எங்கள் சமூகத்தின் திறமையான குரல்களைக் கண்டறியுங்கள்"
+            )}
           </p>
           <div className="max-w-md mx-auto mt-6">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={t("Search writers by name or genre...", "பெயர் அல்லது வகையால் எழுத்தாளர்களைத் தேடுங்கள்...")}
+                placeholder={t(
+                  "Search writers by name or genre...",
+                  "பெயர் அல்லது வகையால் எழுத்தாளர்களைத் தேடுங்கள்..."
+                )}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -98,7 +127,9 @@ export function FeaturedWriters() {
         </div>
 
         {isLoading ? (
-          <div className="text-center">{t("Loading writers...", "எழுத்தாளர்கள் ஏற்றப்படுகிறது...")}</div>
+          <div className="text-center">
+            {t("Loading writers...", "எழுத்தாளர்கள் ஏற்றப்படுகிறது...")}
+          </div>
         ) : writers && writers.length > 0 ? (
           <Carousel
             opts={{
