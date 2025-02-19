@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
@@ -22,6 +23,10 @@ import Blogs from "./pages/Blogs";
 import BlogDetail from "./pages/BlogDetail";
 import Dashboard from "./pages/Dashboard";
 import BlogPreview from "./pages/BlogPreview";
+import Forums from "./pages/Forums";
+import Workshops from "./pages/Workshops";
+import Mentorship from "./pages/Mentorship";
+import BookClubs from "./pages/BookClubs";
 
 const BlogRedirect = () => {
   const { id } = useParams();
@@ -54,6 +59,10 @@ const App: React.FC = () => {
             <Route path="write" element={<CreateBlog />} />
             <Route path="edit/:id" element={<EditBlog />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="forums" element={<Forums />} />
+            <Route path="workshops" element={<Workshops />} />
+            <Route path="mentorship" element={<Mentorship />} />
+            <Route path="book-clubs" element={<BookClubs />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
