@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Facebook,
   Instagram,
-  Youtube,
   X
 } from "lucide-react";
 
@@ -152,14 +150,6 @@ export function Footer() {
                 className="text-muted-foreground hover:text-foreground"
               >
                 <Instagram size={20} />
-              </a>
-              <a 
-                href="https://youtube.com/natawo" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <Youtube size={20} />
               </a>
             </div>
           </div>
