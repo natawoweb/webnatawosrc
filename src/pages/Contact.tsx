@@ -1,3 +1,4 @@
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -124,7 +125,7 @@ const Contact = () => {
             <h2 className="text-2xl font-bold mb-6">Connect With Us</h2>
             <div className="flex space-x-6">
               <a 
-                href="https://facebook.com/natawo" 
+                href="https://www.facebook.com/profile.php?id=61573118737447" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -132,7 +133,7 @@ const Contact = () => {
                 <FaFacebook size={24} />
               </a>
               <a 
-                href="https://twitter.com/natawo" 
+                href="https://x.com/NATAWOrg" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -140,7 +141,7 @@ const Contact = () => {
                 <FaTwitter size={24} />
               </a>
               <a 
-                href="https://instagram.com/natawo" 
+                href="https://www.instagram.com/natawo_tamil/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
