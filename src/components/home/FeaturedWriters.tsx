@@ -26,7 +26,6 @@ export function FeaturedWriters() {
   const { data: writers, isLoading, error } = useQuery({
     queryKey: ["writers", searchQuery],
     queryFn: async () => {
-      console.log("Starting writers query...");
       let query = supabase
         .from("writers")
         .select("*");
@@ -38,7 +37,6 @@ export function FeaturedWriters() {
           .order("featured_month", { ascending: false });
       }
 
-      console.log("Executing query:", query);
       const { data, error } = await query;
       
       if (error) {
@@ -51,7 +49,6 @@ export function FeaturedWriters() {
         throw error;
       }
 
-      console.log("Writers query result:", data);
       return data || [];
     },
     retry: 2,
@@ -70,7 +67,6 @@ export function FeaturedWriters() {
   };
 
   if (error) {
-    console.error("Error in featured writers component:", error);
     return (
       <div className="text-center py-20">
         <p className="text-muted-foreground">
@@ -108,12 +104,13 @@ export function FeaturedWriters() {
             opts={{
               align: "start",
               loop: true,
+              dragFree: true,
             }}
-            className="w-full max-w-5xl mx-auto"
+            className="w-full max-w-5xl mx-auto relative"
           >
             <CarouselContent>
               {writers.map((writer) => (
-                <CarouselItem key={writer.id} className="md:basis-1/3">
+                <CarouselItem key={writer.id} className="md:basis-1/3 sm:basis-full pl-4">
                   <div className="glass-card p-6 h-full transition-all duration-300 hover:scale-[1.02]">
                     <div className="flex items-center space-x-4">
                       {writer.image_url ? (
@@ -153,8 +150,26 @@ export function FeaturedWriters() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            <CarouselPrevious className="absolute -left-4 md:-left-12 hidden sm:flex" />
+            <CarouselNext className="absolute -right-4 md:-right-12 hidden sm:flex" />
+            <div className="mt-4 flex justify-center gap-2 sm:hidden">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-prev]')?.click()}
+              >
+                ←
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-next]')?.click()}
+              >
+                →
+              </Button>
+            </div>
           </Carousel>
         ) : (
           <div className="text-center text-muted-foreground">

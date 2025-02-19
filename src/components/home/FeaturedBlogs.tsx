@@ -61,7 +61,6 @@ export function FeaturedBlogs() {
   });
 
   if (error) {
-    console.error("Error in featured blogs component:", error);
     return (
       <div className="text-center py-20">
         <p className="text-muted-foreground">
@@ -82,11 +81,9 @@ export function FeaturedBlogs() {
 
   const getContent = (blog: Blog) => {
     if (language === 'tamil' && blog.content_tamil) {
-      // If content_tamil is a string, return it directly
       if (typeof blog.content_tamil === 'string') {
         return blog.content_tamil;
       }
-      // If it's JSON, stringify it
       return JSON.stringify(blog.content_tamil);
     }
     return blog.content;
@@ -116,12 +113,13 @@ export function FeaturedBlogs() {
             opts={{
               align: "start",
               loop: true,
+              dragFree: true,
             }}
-            className="w-full max-w-5xl mx-auto"
+            className="w-full max-w-5xl mx-auto relative"
           >
             <CarouselContent>
               {blogs.map((blog) => (
-                <CarouselItem key={blog.id} className="md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={blog.id} className="md:basis-1/2 lg:basis-1/3 sm:basis-full pl-4">
                   <div className="rounded-lg p-6 h-full transition-all duration-300 hover:scale-[1.02] bg-card text-card-foreground shadow-lg border hover:border-primary/20">
                     {blog.cover_image && (
                       <img
@@ -150,8 +148,26 @@ export function FeaturedBlogs() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            <CarouselPrevious className="absolute -left-4 md:-left-12 hidden sm:flex" />
+            <CarouselNext className="absolute -right-4 md:-right-12 hidden sm:flex" />
+            <div className="mt-4 flex justify-center gap-2 sm:hidden">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-prev]')?.click()}
+              >
+                ←
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-next]')?.click()}
+              >
+                →
+              </Button>
+            </div>
           </Carousel>
         ) : (
           <div className="text-center text-muted-foreground">
