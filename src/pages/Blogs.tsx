@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +23,7 @@ const Blogs = () => {
   const [dateFilter, setDateFilter] = React.useState<Date>();
   const [ratingFilter, setRatingFilter] = React.useState("all");
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(12); // Show 12 blogs per page
+  const [pageSize, setPageSize] = React.useState(12);
   const { t } = useLanguage();
   
   const { data: blogs, isLoading, error } = useQuery({
@@ -121,9 +120,8 @@ const Blogs = () => {
     }, {});
   };
 
-  // Calculate total number of blogs
-  const totalBlogs = Object.values(blogs || {}).reduce((total, yearData) => {
-    return total + Object.values(yearData).reduce((yearTotal, monthData) => {
+  const totalBlogs = Object.values(blogs || {}).reduce((total: number, yearData) => {
+    return total + Object.values(yearData).reduce((yearTotal: number, monthData) => {
       return yearTotal + monthData.length;
     }, 0);
   }, 0);
