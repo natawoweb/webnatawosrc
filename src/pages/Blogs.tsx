@@ -126,8 +126,10 @@ const Blogs = () => {
   };
 
   const totalBlogs = React.useMemo(() => {
-    return Object.values(blogs || {}).reduce((total: number, yearData: YearData) => {
-      return total + Object.values(yearData).reduce((yearTotal: number, monthData: any[]) => {
+    const blogsData = blogs || {};
+    return Object.values(blogsData).reduce((total: number, yearData: YearData) => {
+      const monthArrays = Object.values(yearData) as Array<any[]>;
+      return total + monthArrays.reduce((yearTotal: number, monthData: any[]) => {
         return yearTotal + monthData.length;
       }, 0);
     }, 0);
