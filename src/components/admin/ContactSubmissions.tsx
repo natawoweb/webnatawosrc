@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import type { ContactSubmissionsTable } from "@/integrations/supabase/types/database";
 
 export function ContactSubmissions() {
   const { data: submissions, isLoading } = useQuery({
@@ -28,11 +30,11 @@ export function ContactSubmissions() {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data as ContactSubmissionsTable["Row"][];
     },
   });
 
-  const updateStatus = async (id: string, status: string) => {
+  const updateStatus = async (id: string, status: ContactSubmissionsTable["Row"]["status"]) => {
     try {
       const { error } = await supabase
         .from('contact_submissions')
@@ -81,7 +83,7 @@ export function ContactSubmissions() {
               <TableCell>
                 <Select
                   defaultValue={submission.status}
-                  onValueChange={(value) => updateStatus(submission.id, value)}
+                  onValueChange={(value) => updateStatus(submission.id, value as ContactSubmissionsTable["Row"]["status"])}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />

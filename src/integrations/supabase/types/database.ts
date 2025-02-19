@@ -33,12 +33,43 @@ export interface EventParticipantsTable {
   }
 }
 
+export interface ContactSubmissionsTable {
+  Row: {
+    id: string
+    name: string
+    email: string
+    subject: string
+    message: string
+    status: 'pending' | 'replied' | 'archived'
+    created_at: string
+  }
+  Insert: {
+    id?: string
+    name: string
+    email: string
+    subject: string
+    message: string
+    status?: 'pending' | 'replied' | 'archived'
+    created_at?: string
+  }
+  Update: {
+    id?: string
+    name?: string
+    email?: string
+    subject?: string
+    message?: string
+    status?: 'pending' | 'replied' | 'archived'
+    created_at?: string
+  }
+}
+
 export interface Database {
   public: {
     Tables: {
       profiles: ProfilesTable
       user_roles: UserRolesTable
       blogs: BlogsTable
+      contact_submissions: ContactSubmissionsTable
       blog_comments: {
         Row: {
           id: string

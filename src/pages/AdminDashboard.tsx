@@ -1,8 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { UserManagement } from "@/components/admin/UserManagement"
-import { ContentManagement } from "@/components/admin/ContentManagement"
-import { EventManagement } from "@/components/admin/EventManagement"
-import { SettingsManagement } from "@/components/admin/SettingsManagement"
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserManagement } from "@/components/admin/UserManagement";
+import { ContentManagement } from "@/components/admin/ContentManagement";
+import { EventManagement } from "@/components/admin/EventManagement";
+import { SettingsManagement } from "@/components/admin/SettingsManagement";
 import { ContactSubmissions } from "@/components/admin/ContactSubmissions";
 
 export default function AdminDashboard() {
