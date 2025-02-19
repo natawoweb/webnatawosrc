@@ -12,6 +12,7 @@ import Events from "./pages/Events";
 import Blogs from "./pages/Blogs";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
+import SearchWriters from "./pages/SearchWriters";
 import { ComingSoon } from "./components/shared/ComingSoon";
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/search" element={<SearchWriters />} />
           <Route path="/forums" element={<ComingSoon />} />
           <Route path="/workshops" element={<ComingSoon />} />
           <Route path="/mentorship" element={<ComingSoon />} />
