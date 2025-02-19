@@ -120,34 +120,108 @@ export default function About() {
       <section className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Organization</CardTitle>
+            <CardTitle>{t("About the Organization", "அமைப்பைப் பற்றி")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold mb-2">About the Organization</h3>
-              <p>
-                Writers Hub is a non-profit organization established in 2018 to serve as a bridge between Tamil writers 
-                and readers in North America. We organize literary events, workshops, and provide platforms for writers 
-                to showcase their work while helping readers discover rich Tamil literature.
+              <h3 className="text-xl font-semibold mb-4">{t("Who We Are", "நாங்கள் யார்")}</h3>
+              <p className="text-lg leading-relaxed">
+                {t(
+                  "NATAWO is a non-profit, non-partisan, and secular organization dedicated to promoting Tamil literary expression, education, and cultural identity in North America. We aim to provide Tamil writers with the resources, opportunities, and networks they need to thrive in a global literary environment.",
+                  "நடவு என்பது வட அமெரிக்காவில் தமிழ் இலக்கிய வெளிப்பாடு, கல்வி மற்றும் கலாச்சார அடையாளத்தை மேம்படுத்துவதற்காக அர்ப்பணிக்கப்பட்ட இலாப நோக்கற்ற, கட்சி சார்பற்ற மற்றும் மதச்சார்பற்ற அமைப்பாகும். உலகளாவிய இலக்கியச் சூழலில் செழிக்க தமிழ் எழுத்தாளர்களுக்குத் தேவையான வளங்கள், வாய்ப்புகள் மற்றும் வலைப்பின்னல்களை வழங்குவதே எங்கள் நோக்கம்."
+                )}
               </p>
             </div>
+
             <div>
-              <h3 className="text-xl font-semibold mb-2">Bylaws</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                {t("Governance & Leadership", "ஆட்சி & தலைமை")}
+              </h3>
+              <p className="text-lg leading-relaxed">
+                {t(
+                  "NATAWO is led by a dedicated Board of Coordinators, Bylaws Committee and Global Ambassadors composed of Tamil writers, scholars, educators, and community leaders. The leadership team is responsible for shaping the organization's strategic direction, ensuring financial transparency, and fostering a culture of inclusivity and innovation.",
+                  "நடவு அமைப்பானது தமிழ் எழுத்தாளர்கள், அறிஞர்கள், கல்வியாளர்கள் மற்றும் சமூகத் தலைவர்களைக் கொண்ட அர்ப்பணிப்புள்ள ஒருங்கிணைப்பாளர்கள் குழு, விதிமுறைகள் குழு மற்றும் உலகளாவிய தூதுவர்களால் வழிநடத்தப்படுகிறது. அமைப்பின் மூலோபாய திசையை வடிவமைப்பது, நிதி வ���ளிப்படைத்தன்மையை உறுதி செய்வது மற்றும் உள்ளடக்கம் மற்றும் புத்தாக்கக் கலாச்சாரத்தை வளர்ப்பது தலைமைக் குழுவின் பொறுப்பாகும்."
+                )}
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold mb-4">{t("Core Values", "அடிப்படை மதிப்புகள்")}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="p-4">
-                  <img 
-                    src="/placeholder.svg" 
-                    alt="Bylaws Page 1" 
-                    className="w-full h-64 object-cover rounded-lg"
-                  />
-                </Card>
-                <Card className="p-4">
-                  <img 
-                    src="/placeholder.svg" 
-                    alt="Bylaws Page 2" 
-                    className="w-full h-64 object-cover rounded-lg"
-                  />
-                </Card>
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">📝</span>
+                  <div>
+                    <h4 className="font-semibold">
+                      {t("Creativity", "படைப்பாற்றல்")}
+                    </h4>
+                    <p>
+                      {t(
+                        "Encouraging diverse forms of Tamil literary expression.",
+                        "தமிழ் இலக்கிய வெளிப்பாட்டின் பல்வேறு வடிவங்களை ஊக்குவித்தல்."
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">📚</span>
+                  <div>
+                    <h4 className="font-semibold">
+                      {t("Preservation", "பாதுகாப்பு")}
+                    </h4>
+                    <p>
+                      {t(
+                        "Safeguarding and promoting Tamil literary heritage.",
+                        "தமிழ் இலக்கிய பாரம்பரியத்தைப் பாதுகாத்து மேம்படுத்துதல்."
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">🤝</span>
+                  <div>
+                    <h4 className="font-semibold">
+                      {t("Collaboration", "கூட்டுறவு")}
+                    </h4>
+                    <p>
+                      {t(
+                        "Partnering with local and international literary organizations.",
+                        "உள்ளூர் மற்றும் சர்வதேச இலக்கிய அமைப்புகளுடன் கூட்டு சேர்தல்."
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">🌍</span>
+                  <div>
+                    <h4 className="font-semibold">
+                      {t("Inclusivity", "உள்ளடக்கம்")}
+                    </h4>
+                    <p>
+                      {t(
+                        "Welcoming Tamil writers from all backgrounds and experiences.",
+                        "அனைத்து பின்னணி மற்றும் அனுபவங்களைக் கொண்ட தமிழ் எழுத்தாளர்களை வரவேற்றல்."
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">💡</span>
+                  <div>
+                    <h4 className="font-semibold">
+                      {t("Innovation", "புத்தாக்கம்")}
+                    </h4>
+                    <p>
+                      {t(
+                        "Using modern platforms to enhance Tamil literary engagement.",
+                        "தமிழ் இலக்கிய ஈடுபாட்டை மேம்படுத்த நவீன தளங்களைப் பயன்படுத்துதல்."
+                      )}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
