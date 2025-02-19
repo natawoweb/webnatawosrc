@@ -1,74 +1,42 @@
-
-import * as React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
-import { LanguageProvider } from "./contexts/LanguageContext";
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import WriterProfile from "./pages/WriterProfile";
-import UserProfile from "./pages/UserProfile";
-import AdminUserProfile from "./pages/AdminUserProfile";
-import Auth from "./pages/Auth";
-import SearchWriters from "./pages/SearchWriters";
-import Events from "./pages/Events";
-import AdminDashboard from "./pages/AdminDashboard";
-import CreateBlog from "./pages/CreateBlog";
-import EditBlog from "./pages/EditBlog";
-import EventDetails from "./pages/EventDetails";
-import Blogs from "./pages/Blogs";
-import BlogDetail from "./pages/BlogDetail";
-import Dashboard from "./pages/Dashboard";
-import BlogPreview from "./pages/BlogPreview";
-import Forums from "./pages/Forums";
-import Workshops from "./pages/Workshops";
-import Mentorship from "./pages/Mentorship";
-import BookClubs from "./pages/BookClubs";
+import { Toaster } from "./components/ui/toaster";
+import { Index } from "./pages/Index";
+import { About } from "./pages/About";
+import { Contact } from "./pages/Contact";
+import { Privacy } from "./pages/Privacy";
+import { Terms } from "./pages/Terms";
+import { Guidelines } from "./pages/Guidelines";
+import { Writers } from "./pages/Writers";
+import { Events } from "./pages/Events";
+import { Blogs } from "./pages/Blogs";
+import { Forums } from "./pages/Forums";
+import { Workshops } from "./pages/Workshops";
+import { Mentorship } from "./pages/Mentorship";
+import { BookClubs } from "./pages/BookClubs";
+import { ComingSoon } from "./components/shared/ComingSoon";
 
-const BlogRedirect = () => {
-  const { id } = useParams();
-  return <Navigate to={`/blogs/${id}`} replace />;
-};
-
-const App: React.FC = () => {
+export default function App() {
   return (
-    <LanguageProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Index />} />
-            <Route path="about" element={<About />} />
-            <Route path="contact" element={<Contact />} />
-            <Route path="privacy" element={<Privacy />} />
-            <Route path="terms" element={<Terms />} />
-            <Route path="writer/:id" element={<WriterProfile />} />
-            <Route path="profile" element={<UserProfile />} />
-            <Route path="auth" element={<Auth />} />
-            <Route path="search" element={<SearchWriters />} />
-            <Route path="blogs" element={<Blogs />} />
-            <Route path="blogs/:id" element={<BlogDetail />} />
-            <Route path="preview/:id" element={<BlogPreview />} />
-            <Route path="blog/:id" element={<BlogRedirect />} />
-            <Route path="events" element={<Events />} />
-            <Route path="events/:id" element={<EventDetails />} />
-            <Route path="admin" element={<AdminDashboard />} />
-            <Route path="admin/user-profile" element={<AdminUserProfile />} />
-            <Route path="write" element={<CreateBlog />} />
-            <Route path="edit/:id" element={<EditBlog />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="forums" element={<Forums />} />
-            <Route path="workshops" element={<Workshops />} />
-            <Route path="mentorship" element={<Mentorship />} />
-            <Route path="book-clubs" element={<BookClubs />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </Router>
-    </LanguageProvider>
+    <>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Index />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/guidelines" element={<Guidelines />} />
+          <Route path="/writers" element={<Writers />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/forums" element={<ComingSoon />} />
+          <Route path="/workshops" element={<ComingSoon />} />
+          <Route path="/mentorship" element={<ComingSoon />} />
+          <Route path="/book-clubs" element={<ComingSoon />} />
+        </Route>
+      </Routes>
+      <Toaster />
+    </>
   );
-};
-
-export default App;
+}
