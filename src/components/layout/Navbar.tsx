@@ -3,7 +3,6 @@ import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DesktopNav } from "./nav/DesktopNav";
@@ -11,47 +10,13 @@ import { MobileNav } from "./nav/MobileNav";
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [session, setSession] = React.useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  React.useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Signed out successfully",
-        description: "You have been signed out of your account.",
-      });
-      navigate("/");
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error signing out",
-        description: "Please try again later.",
-      });
-    }
-  };
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate("/", { replace: true });
   };
-
-  const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-lg border-b">
@@ -68,29 +33,10 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center">
-            <DesktopNav
-              session={session}
-              handleSignOut={handleSignOut}
-              navigate={navigate}
-            />
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <Button variant="ghost" size="icon" onClick={toggleMenu}>
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
-          </div>
+          <DesktopNav />
+          <MobileNav />
         </div>
       </div>
-
-      <MobileNav
-        isOpen={isOpen}
-        session={session}
-        handleSignOut={handleSignOut}
-        navigate={navigate}
-      />
     </nav>
   );
 };
