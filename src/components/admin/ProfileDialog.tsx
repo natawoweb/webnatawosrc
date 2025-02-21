@@ -19,8 +19,8 @@ type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
 
 const USER_LEVELS: UserLevel[] = [
-  'Literary Tamil Writers',
-  'Talented Experts',
+  'Literary Experts',
+  'Aspiring Writers',
   'NATAWO Volunteers',
   'NATAWO Students Writers',
   'Subscriber',
