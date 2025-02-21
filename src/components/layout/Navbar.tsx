@@ -124,13 +124,6 @@ export const Navbar: React.FC = () => {
                         {t("Profile", "சுயவிவரம்")}
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to={isAdmin ? "/admin" : "/dashboard"}>
-                        {isAdmin 
-                          ? t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")
-                          : t("Dashboard", "டாஷ்போர்டு")}
-                      </Link>
-                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => signOut()}>
                       {t("Sign Out", "வெளியேறு")}
