@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -46,7 +45,11 @@ export function ProfileDialog({
 }: ProfileDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRole, setSelectedRole] = useState<AppRole | undefined>(profile?.role);
-  const [selectedLevel, setSelectedLevel] = useState<UserLevel | undefined>(profile?.level as UserLevel);
+  const [selectedLevel, setSelectedLevel] = useState<UserLevel | undefined>(
+    profile?.level === 'Literary Tamil Writers' ? 'Literary Experts' :
+    profile?.level === 'Talented Experts' ? 'Aspiring Writers' :
+    profile?.level as UserLevel
+  );
 
   const ProfileField = ({ label, value }: { label: string; value: string | null | undefined }) => (
     <div className="space-y-1.5">
@@ -150,7 +153,14 @@ export function ProfileDialog({
                 <ProfileField label="Pseudonym" value={profile?.pseudonym} />
                 <ProfileField label="Date of Birth" value={profile?.date_of_birth} />
                 <ProfileField label="Gender" value={profile?.gender} />
-                <ProfileField label="Level" value={profile?.level} />
+                <ProfileField 
+                  label="Level" 
+                  value={
+                    profile?.level === 'Literary Tamil Writers' ? 'Literary Experts' :
+                    profile?.level === 'Talented Experts' ? 'Aspiring Writers' :
+                    profile?.level
+                  } 
+                />
                 <div className="space-y-1.5">
                   <h3 className="text-sm font-medium text-muted-foreground">Bio</h3>
                   <p className="text-sm whitespace-pre-wrap">{profile?.bio || 'No bio available'}</p>
