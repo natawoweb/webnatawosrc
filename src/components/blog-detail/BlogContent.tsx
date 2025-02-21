@@ -13,6 +13,11 @@ export const BlogContent = ({ content }: BlogContentProps) => {
       
       let contentObj;
       try {
+        // Handle case where content is already a string
+        if (typeof content === 'string' && !content.startsWith('{')) {
+          return content;
+        }
+        
         contentObj = JSON.parse(content);
         // Handle double-stringified content
         if (typeof contentObj === 'string') {
@@ -25,10 +30,11 @@ export const BlogContent = ({ content }: BlogContentProps) => {
       }
 
       // Check if it's in Draft.js format
-      if (contentObj.blocks && Array.isArray(contentObj.blocks)) {
+      if (contentObj && contentObj.blocks && Array.isArray(contentObj.blocks)) {
         console.log('Converting Draft.js content to HTML');
         const contentState = convertFromRaw(contentObj);
-        return stateToHTML(contentState);
+        const html = stateToHTML(contentState);
+        return html;
       }
 
       // If not in Draft.js format but is a string, return as is
@@ -46,10 +52,12 @@ export const BlogContent = ({ content }: BlogContentProps) => {
     }
   };
 
+  const formattedContent = getFormattedContent();
+
   return (
     <div 
-      className="mt-8 prose prose-lg max-w-none"
-      dangerouslySetInnerHTML={{ __html: getFormattedContent() }} 
+      className="prose prose-lg max-w-none"
+      dangerouslySetInnerHTML={{ __html: formattedContent }} 
     />
   );
 };
