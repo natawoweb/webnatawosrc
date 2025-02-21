@@ -22,6 +22,15 @@ import { ChevronLeft } from "lucide-react";
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
 
+const USER_LEVELS: UserLevel[] = [
+  'Literary Tamil Writers',
+  'Talented Experts',
+  'NATAWO Volunteers',
+  'NATAWO Students Writers',
+  'Subscriber',
+  'Technical'
+];
+
 interface ProfileDialogProps {
   profile: (Profile & { role: AppRole }) | null;
   open: boolean;
