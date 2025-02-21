@@ -17,12 +17,30 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Navbar: React.FC = () => {
   const { session, signOut } = useSession();
   const { profile } = useProfile();
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  // Check if user is admin
+  const { data: isAdmin } = useQuery({
+    queryKey: ["isAdmin", session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user?.id) return false;
+      const { data } = await supabase.rpc('has_role', {
+        user_id: session.user.id,
+        required_role: 'admin'
+      });
+      return data;
+    },
+    enabled: !!session?.user?.id,
+  });
+
+  const isWriter = profile?.user_type === "writer";
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -45,12 +63,22 @@ export const Navbar: React.FC = () => {
 
             {session && (
               <div className="hidden md:flex items-center gap-6">
-                <Link 
-                  to="/admin"
-                  className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
-                >
-                  {t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")}
-                </Link>
+                {isAdmin && (
+                  <Link 
+                    to="/admin"
+                    className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
+                  >
+                    {t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")}
+                  </Link>
+                )}
+                {isWriter && !isAdmin && (
+                  <Link 
+                    to="/dashboard"
+                    className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
+                  >
+                    {t("Writer Dashboard", "எழுத்தாளர் டாஷ்போர்டு")}
+                  </Link>
+                )}
                 <Link 
                   to="/search-writers"
                   className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
@@ -97,8 +125,10 @@ export const Navbar: React.FC = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/dashboard">
-                        {t("Dashboard", "டாஷ்போர்டு")}
+                      <Link to={isAdmin ? "/admin" : "/dashboard"}>
+                        {isAdmin 
+                          ? t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")
+                          : t("Dashboard", "டாஷ்போர்டு")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
