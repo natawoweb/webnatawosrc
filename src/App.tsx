@@ -10,6 +10,10 @@ import Terms from "./pages/Terms";
 import Guidelines from "./pages/Guidelines";
 import Events from "./pages/Events";
 import Blogs from "./pages/Blogs";
+import SearchWriters from "./pages/SearchWriters";
+import AdminDashboard from "./pages/AdminDashboard";
+import Dashboard from "./pages/Dashboard";
+import UserProfile from "./pages/UserProfile";
 import { ComingSoon } from "./components/shared/ComingSoon";
 
 export default function App() {
@@ -25,6 +29,10 @@ export default function App() {
           <Route path="/guidelines" element={<Guidelines />} />
           <Route path="/events" element={<Events />} />
           <Route path="/blogs" element={<Blogs />} />
+          <Route path="/search-writers" element={<SearchWriters />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="/forums" element={<ComingSoon />} />
           <Route path="/workshops" element={<ComingSoon />} />
           <Route path="/mentorship" element={<ComingSoon />} />
