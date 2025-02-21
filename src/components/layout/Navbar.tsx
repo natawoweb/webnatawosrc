@@ -24,7 +24,7 @@ export const Navbar: React.FC = () => {
   const { session, signOut } = useSession();
   const { profile } = useProfile();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   // Check if user is admin
   const { data: isAdmin } = useQuery({
@@ -47,6 +47,10 @@ export const Navbar: React.FC = () => {
     navigate("/", { replace: true });
   };
 
+  const handleLanguageChange = (newLanguage: 'english' | 'tamil') => {
+    setLanguage(newLanguage);
+  };
+
   return (
     <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-lg border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -61,50 +65,64 @@ export const Navbar: React.FC = () => {
               <span className="text-xl font-semibold">NATAWO</span>
             </Link>
 
-            {session && (
-              <div className="hidden md:flex items-center gap-6">
-                {isAdmin && (
-                  <Link 
-                    to="/admin"
-                    className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
-                  >
-                    {t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")}
-                  </Link>
-                )}
-                {isWriter && !isAdmin && (
-                  <Link 
-                    to="/dashboard"
-                    className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
-                  >
-                    {t("Writer Dashboard", "எழுத்தாளர் டாஷ்போர்டு")}
-                  </Link>
-                )}
-                <Link 
-                  to="/search-writers"
-                  className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
-                >
-                  {t("Writers", "எழுத்தாளர்கள்")}
-                </Link>
-                <Link 
-                  to="/blogs"
-                  className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
-                >
-                  {t("Blogs", "வலைப்பதிவுகள்")}
-                </Link>
-                <Link 
-                  to="/events"
-                  className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
-                >
-                  {t("Events", "நிகழ்வுகள்")}
-                </Link>
-              </div>
-            )}
+            <div className="hidden md:flex items-center gap-6">
+              {session && (
+                <>
+                  {isAdmin && (
+                    <Link 
+                      to="/admin"
+                      className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
+                    >
+                      {t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")}
+                    </Link>
+                  )}
+                  {isWriter && !isAdmin && (
+                    <Link 
+                      to="/dashboard"
+                      className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
+                    >
+                      {t("Writer Dashboard", "எழுத்தாளர் டாஷ்போர்டு")}
+                    </Link>
+                  )}
+                </>
+              )}
+              <Link 
+                to="/search-writers"
+                className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
+              >
+                {t("Writers", "எழுத்தாளர்கள்")}
+              </Link>
+              <Link 
+                to="/blogs"
+                className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
+              >
+                {t("Blogs", "வலைப்பதிவுகள்")}
+              </Link>
+              <Link 
+                to="/events"
+                className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent"
+              >
+                {t("Events", "நிகழ்வுகள்")}
+              </Link>
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="w-9 h-9">
-              <Globe className="h-4 w-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-9 h-9">
+                  <Globe className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleLanguageChange("english")}>
+                  {t("English", "ஆங்கிலம்")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleLanguageChange("tamil")}>
+                  {t("Tamil", "தமிழ்")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <ThemeToggle />
             {session ? (
               <>
