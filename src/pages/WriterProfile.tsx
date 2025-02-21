@@ -1,16 +1,18 @@
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft } from "lucide-react";
 import type { Writer } from "@/types/writer";
+import { Button } from "@/components/ui/button";
 
 export default function WriterProfile() {
   const { id } = useParams();
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const { data: writer, isLoading } = useQuery({
     queryKey: ["writer", id],
@@ -25,6 +27,10 @@ export default function WriterProfile() {
       return data as Writer;
     },
   });
+
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   if (isLoading) {
     return (
@@ -46,6 +52,15 @@ export default function WriterProfile() {
 
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4">
+      <Button 
+        variant="ghost" 
+        className="mb-4" 
+        onClick={handleBack}
+      >
+        <ChevronLeft className="h-4 w-4 mr-2" />
+        {t("Back", "பின்")}
+      </Button>
+
       <Card className="shadow-lg">
         <CardContent className="p-6">
           <div className="flex items-start gap-6">
