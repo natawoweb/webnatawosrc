@@ -28,7 +28,7 @@ interface UserTableProps {
 }
 
 export function UserTable({ 
-  users, 
+  users = [], // Provide default empty array
   isLoading, 
   onDelete, 
   onEdit,
@@ -41,9 +41,12 @@ export function UserTable({
   useEffect(() => {
     const fetchFeaturedStatus = async () => {
       try {
+        // Ensure users array exists and has items
+        if (!users || users.length === 0) return;
+
         // Get IDs of writer-type users
         const writerIds = users
-          .filter(user => user.user_type === 'writer')
+          .filter(user => user && user.user_type === 'writer')
           .map(user => user.id);
 
         if (writerIds.length === 0) return;
