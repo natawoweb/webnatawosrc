@@ -67,10 +67,7 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
             duration: 5000,
           });
           
-          setTimeout(() => {
-            onExistingAccount();
-          }, 100);
-          
+          onExistingAccount();
           return;
         }
 
@@ -99,7 +96,18 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
         duration: 5000,
       });
       
-      onSuccess();
+      // Clear the form
+      setEmail("");
+      setPassword("");
+      setFullName("");
+      setRole('reader');
+      setPseudonym("");
+      setBio("");
+      setCounty("");
+      
+      // Switch to sign in tab
+      onExistingAccount();
+      
     } catch (error: any) {
       console.error('Signup error:', error);
       toast({

@@ -12,6 +12,7 @@ export async function handleSignupNotifications(
         type: 'reader_welcome',
         email,
         fullName,
+        from: "NATAWO <onboarding@natawo.org>"
       }
     });
   } else if (role === 'writer') {
@@ -36,6 +37,7 @@ export async function handleSignupNotifications(
           email,
           fullName,
           adminEmails,
+          from: "NATAWO <onboarding@natawo.org>"
         }
       });
 
@@ -45,6 +47,7 @@ export async function handleSignupNotifications(
           type: 'request_submitted',
           email,
           fullName,
+          from: "NATAWO <onboarding@natawo.org>"
         }
       });
     }
