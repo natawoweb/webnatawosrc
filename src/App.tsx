@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Dashboard from "./pages/Dashboard";
 import UserProfile from "./pages/UserProfile";
 import { ComingSoon } from "./components/shared/ComingSoon";
+import Auth from "./pages/Auth";
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/workshops" element={<ComingSoon />} />
           <Route path="/mentorship" element={<ComingSoon />} />
           <Route path="/book-clubs" element={<ComingSoon />} />
+          <Route path="/auth" element={<Auth />} />
         </Route>
       </Routes>
       <Toaster />

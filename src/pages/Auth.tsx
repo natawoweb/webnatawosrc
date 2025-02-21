@@ -94,10 +94,6 @@ export default function Auth() {
     }
   }, [navigate, profile, isResetPassword, loading]);
 
-  const handleExistingAccount = () => {
-    setActiveTab('signin');
-  };
-
   if (isResetPassword) {
     return (
       <div className="container mx-auto py-10">
@@ -138,7 +134,7 @@ export default function Auth() {
             </TabsContent>
             
             <TabsContent value="signup">
-              <AuthForm type="signup" onSuccess={() => {}} onExistingAccount={handleExistingAccount} />
+              <AuthForm type="signup" onSuccess={() => {}} onExistingAccount={() => setActiveTab('signin')} />
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -147,4 +143,3 @@ export default function Auth() {
     </div>
   );
 }
-
