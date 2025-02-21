@@ -11,5 +11,9 @@ export const useSession = () => {
     },
   });
 
-  return { session };
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  return { session, signOut };
 };
