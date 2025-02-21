@@ -113,61 +113,61 @@ export function FeaturedBlogs() {
             opts={{
               align: "start",
               loop: true,
-              dragFree: true,
             }}
             className="w-full max-w-5xl mx-auto relative"
           >
             <CarouselContent>
               {blogs.map((blog) => (
-                <CarouselItem key={blog.id} className="md:basis-1/2 lg:basis-1/3 sm:basis-full pl-4">
-                  <div className="rounded-lg p-6 h-full transition-all duration-300 hover:scale-[1.02] bg-card text-card-foreground shadow-lg border hover:border-primary/20">
-                    {blog.cover_image && (
-                      <img
-                        src={blog.cover_image}
-                        alt={getTitle(blog)}
-                        className="w-full h-48 object-cover rounded-lg mb-4"
-                      />
-                    )}
-                    <h3 className="font-semibold text-lg text-foreground line-clamp-2">
-                      {getTitle(blog)}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {t("By", "எழுதியவர்")} {getAuthorName(blog)}
-                    </p>
-                    <div className="mt-4 text-sm text-muted-foreground line-clamp-3">
-                      <BlogContent content={getContent(blog)} />
+                <CarouselItem key={blog.id} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="h-full p-4">
+                    <div className="flex flex-col h-[500px] rounded-lg border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300">
+                      <div className="h-48 overflow-hidden rounded-t-lg">
+                        {blog.cover_image ? (
+                          <img
+                            src={blog.cover_image}
+                            alt={getTitle(blog)}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-muted flex items-center justify-center">
+                            <span className="text-muted-foreground">{t("No Image", "படம் இல்லை")}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex flex-col flex-grow p-6">
+                        <h3 className="text-xl font-semibold line-clamp-2 mb-4 min-h-[3.5rem]">
+                          {getTitle(blog)}
+                        </h3>
+                        
+                        <div className="mb-4">
+                          <p className="text-sm text-muted-foreground">
+                            {t("By", "எழுதியவர்")}{" "}
+                            <span className="font-medium">{getAuthorName(blog)}</span>
+                          </p>
+                        </div>
+                        
+                        <div className="flex-grow overflow-hidden">
+                          <div className="text-sm text-muted-foreground line-clamp-4">
+                            <BlogContent content={getContent(blog)} />
+                          </div>
+                        </div>
+                        
+                        <Button
+                          variant="secondary"
+                          className="w-full mt-6"
+                          onClick={() => navigate(`/blogs/${blog.id}`)}
+                        >
+                          {t("Read More", "மேலும் படிக்க")}
+                        </Button>
+                      </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      className="mt-4 w-full hover:bg-accent"
-                      onClick={() => navigate(`/blogs/${blog.id}`)}
-                    >
-                      {t("Read More", "மேலும் படிக்க")}
-                    </Button>
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute -left-4 md:-left-12 hidden sm:flex" />
-            <CarouselNext className="absolute -right-4 md:-right-12 hidden sm:flex" />
-            <div className="mt-4 flex justify-center gap-2 sm:hidden">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8 rounded-full"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-prev]')?.click()}
-              >
-                ←
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8 rounded-full"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-next]')?.click()}
-              >
-                →
-              </Button>
-            </div>
+            <CarouselPrevious className="absolute -left-12 hidden md:flex" />
+            <CarouselNext className="absolute -right-12 hidden md:flex" />
           </Carousel>
         ) : (
           <div className="text-center text-muted-foreground">
