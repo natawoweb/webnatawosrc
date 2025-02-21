@@ -27,15 +27,14 @@ const USER_LEVELS: UserLevel[] = [
   'Technical'
 ];
 
-const APP_ROLES: AppRole[] = ['admin', 'writer', 'reader', 'moderator'];
+const APP_ROLES: AppRole[] = ['admin', 'writer', 'reader'];
 
 interface ProfileDialogProps {
   profile: (Profile & { role: AppRole }) | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (profile: Partial<Profile> & { featured?: boolean }) => void;
+  onSubmit: (userId: string, role: AppRole, level?: UserLevel) => void;
   isAdmin: boolean;
-  isViewMode?: boolean;
 }
 
 export function ProfileDialog({
@@ -57,12 +56,8 @@ export function ProfileDialog({
   );
 
   const handleSave = () => {
-    if (profile?.id && selectedRole && selectedLevel) {
-      onSubmit({
-        id: profile.id,
-        level: selectedLevel,
-        role: selectedRole
-      });
+    if (profile?.id && selectedRole) {
+      onSubmit(profile.id, selectedRole, selectedLevel);
       setIsEditing(false);
     }
   };
