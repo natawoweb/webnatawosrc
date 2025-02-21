@@ -9,6 +9,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Guidelines from "./pages/Guidelines";
 import Events from "./pages/Events";
+import EventDetails from "./pages/EventDetails";
 import Blogs from "./pages/Blogs";
 import BlogDetail from "./pages/BlogDetail";
 import SearchWriters from "./pages/SearchWriters";
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/guidelines" element={<Guidelines />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/blogs/:id" element={<BlogDetail />} />
           <Route path="/search-writers" element={<SearchWriters />} />
