@@ -119,9 +119,25 @@ export function FeaturedBlogs() {
             <CarouselContent>
               {blogs.map((blog) => (
                 <CarouselItem key={blog.id} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="h-full p-4">
-                    <div className="flex flex-col h-[500px] rounded-lg border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300">
-                      <div className="h-48 overflow-hidden rounded-t-lg">
+                  <div className="p-4 h-[600px]">
+                    <div className="flex flex-col h-full rounded-lg border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300">
+                      {/* Title Section - Fixed height */}
+                      <div className="p-6 h-[80px]">
+                        <h3 className="text-xl font-semibold truncate">
+                          {getTitle(blog)}
+                        </h3>
+                      </div>
+
+                      {/* Author Section - Fixed height */}
+                      <div className="px-6 h-[40px]">
+                        <p className="text-sm text-muted-foreground">
+                          {t("By", "எழுதியவர்")}{" "}
+                          <span className="font-medium">{getAuthorName(blog)}</span>
+                        </p>
+                      </div>
+
+                      {/* Image Section - Fixed height */}
+                      <div className="h-[200px] w-full">
                         {blog.cover_image ? (
                           <img
                             src={blog.cover_image}
@@ -134,28 +150,19 @@ export function FeaturedBlogs() {
                           </div>
                         )}
                       </div>
-                      
-                      <div className="flex flex-col flex-grow p-6">
-                        <h3 className="text-xl font-semibold line-clamp-2 mb-4 min-h-[3.5rem]">
-                          {getTitle(blog)}
-                        </h3>
-                        
-                        <div className="mb-4">
-                          <p className="text-sm text-muted-foreground">
-                            {t("By", "எழுதியவர்")}{" "}
-                            <span className="font-medium">{getAuthorName(blog)}</span>
-                          </p>
+
+                      {/* Content Section - Fixed height */}
+                      <div className="p-6 flex-1 min-h-[180px] max-h-[180px] overflow-hidden">
+                        <div className="text-sm text-muted-foreground line-clamp-6">
+                          <BlogContent content={getContent(blog)} />
                         </div>
-                        
-                        <div className="flex-grow overflow-hidden">
-                          <div className="text-sm text-muted-foreground line-clamp-4">
-                            <BlogContent content={getContent(blog)} />
-                          </div>
-                        </div>
-                        
+                      </div>
+
+                      {/* Read More Button Section - Fixed height */}
+                      <div className="p-6 h-[80px] mt-auto">
                         <Button
                           variant="secondary"
-                          className="w-full mt-6"
+                          className="w-full"
                           onClick={() => navigate(`/blogs/${blog.id}`)}
                         >
                           {t("Read More", "மேலும் படிக்க")}
