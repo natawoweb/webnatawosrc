@@ -11,7 +11,7 @@ interface UserTableRowProps {
   user: Profile & { role: AppRole };
   isAdmin: boolean;
   isFeatured: boolean;
-  onEdit: (user: Profile & { role: AppRole }) => void;
+  onEdit: (user: Profile & { role: AppRole }, isViewMode: boolean) => void;
   onDelete: (user: Profile & { role: AppRole }) => void;
   onFeature: (user: Profile & { role: AppRole }) => void;
 }

@@ -53,7 +53,7 @@ export function UserTable({
             user={user}
             isAdmin={isAdmin}
             isFeatured={featuredWriters[user.id] || false}
-            onEdit={onEdit}
+            onEdit={(user, isViewMode) => onEdit(user, isViewMode)}
             onDelete={onDelete}
             onFeature={handleFeatureWriter}
           />
