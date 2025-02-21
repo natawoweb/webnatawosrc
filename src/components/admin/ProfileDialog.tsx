@@ -31,15 +31,6 @@ interface ProfileDialogProps {
   isViewMode?: boolean;
 }
 
-const USER_LEVELS: UserLevel[] = [
-  'Literary Tamil Writers',
-  'Talented Experts',
-  'NATAWO Volunteers',
-  'NATAWO Students Writers',
-  'Subscriber',
-  'Technical'
-];
-
 export function ProfileDialog({
   profile,
   open,
@@ -111,45 +102,57 @@ export function ProfileDialog({
           <div className="grid gap-4">
             <div>
               <label className="text-sm font-medium">Full Name</label>
-              <Input
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                disabled={!isAdmin || isViewMode}
-                placeholder="Enter full name"
-              />
+              {isViewMode ? (
+                <p className="mt-1 text-sm">{fullName || 'N/A'}</p>
+              ) : (
+                <Input
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  disabled={!isAdmin || isViewMode}
+                  placeholder="Enter full name"
+                />
+              )}
             </div>
 
             <div>
               <label className="text-sm font-medium">Bio</label>
-              <Textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                disabled={!isAdmin || isViewMode}
-                className="h-32"
-                placeholder="Enter user bio"
-              />
+              {isViewMode ? (
+                <p className="mt-1 text-sm whitespace-pre-wrap">{bio || 'N/A'}</p>
+              ) : (
+                <Textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  disabled={!isAdmin || isViewMode}
+                  className="h-32"
+                  placeholder="Enter user bio"
+                />
+              )}
             </div>
 
-            {isAdmin && !isViewMode && (
-              <div>
-                <label className="text-sm font-medium">Level</label>
-                <Select
-                  value={level}
-                  onValueChange={(value: UserLevel) => setLevel(value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select user level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {USER_LEVELS.map((userLevel) => (
-                      <SelectItem key={userLevel} value={userLevel}>
-                        {userLevel}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+            <div>
+              <label className="text-sm font-medium">Level</label>
+              {isViewMode ? (
+                <p className="mt-1 text-sm">{level || 'Not set'}</p>
+              ) : (
+                isAdmin && !isViewMode && (
+                  <Select
+                    value={level}
+                    onValueChange={(value: UserLevel) => setLevel(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select user level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {USER_LEVELS.map((userLevel) => (
+                        <SelectItem key={userLevel} value={userLevel}>
+                          {userLevel}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )
+              )}
+            </div>
 
             {isAdmin && !isViewMode && profile?.user_type === 'writer' && (
               <div className="flex items-center space-x-2">
