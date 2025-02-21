@@ -166,9 +166,20 @@ export function Footer() {
         </div>
         
         <div className="mt-8 pt-8 border-t">
-          <p className="text-sm text-muted-foreground text-center">
-            © {new Date().getFullYear()} NATAWO. {t("All rights reserved.", "அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.")}
-          </p>
+          <div className="flex flex-col items-center space-y-2 text-sm text-muted-foreground text-center">
+            <p>© {new Date().getFullYear()} NATAWO. {t("All rights reserved.", "அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.")}</p>
+            <p className="text-xs">
+              {t("Built with ♥ by ", "♥ உடன் உருவாக்கப்பட்டது ")}
+              <a 
+                href="https://mahayugam.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-foreground transition-colors"
+              >
+                Mahayugam Inc
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
