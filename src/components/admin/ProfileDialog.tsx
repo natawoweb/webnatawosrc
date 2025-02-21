@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { type UserLevel } from "@/integrations/supabase/types/models";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { ChevronLeft } from "lucide-react";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
@@ -27,6 +28,7 @@ interface ProfileDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (profile: Partial<Profile> & { featured?: boolean }) => void;
   isAdmin: boolean;
+  isViewMode?: boolean;
 }
 
 const USER_LEVELS: UserLevel[] = [
@@ -44,6 +46,7 @@ export function ProfileDialog({
   onOpenChange,
   onSubmit,
   isAdmin,
+  isViewMode = false
 }: ProfileDialogProps) {
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [bio, setBio] = useState(profile?.bio || '');
@@ -55,10 +58,9 @@ export function ProfileDialog({
   const handleSubmit = async () => {
     if (!profile) return;
 
-    // Only include featured status if the user is a writer
     const featuredStatus = profile.user_type === 'writer' ? {
       featured: isFeatured,
-      featured_month: isFeatured ? new Date().toISOString().substring(0, 7) : null // YYYY-MM format
+      featured_month: isFeatured ? new Date().toISOString().substring(0, 7) : null
     } : {};
 
     onSubmit({
@@ -74,7 +76,16 @@ export function ProfileDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>User Profile</DialogTitle>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onOpenChange(false)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <DialogTitle>User Profile</DialogTitle>
+          </div>
         </DialogHeader>
         <div className="space-y-6">
           <div className="flex items-center gap-4">
@@ -103,7 +114,7 @@ export function ProfileDialog({
               <Input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                disabled={!isAdmin}
+                disabled={!isAdmin || isViewMode}
                 placeholder="Enter full name"
               />
             </div>
@@ -113,13 +124,13 @@ export function ProfileDialog({
               <Textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                disabled={!isAdmin}
+                disabled={!isAdmin || isViewMode}
                 className="h-32"
                 placeholder="Enter user bio"
               />
             </div>
 
-            {isAdmin && (
+            {isAdmin && !isViewMode && (
               <div>
                 <label className="text-sm font-medium">Level</label>
                 <Select
@@ -140,8 +151,7 @@ export function ProfileDialog({
               </div>
             )}
 
-            {/* Only show featured toggle for writers */}
-            {isAdmin && profile?.user_type === 'writer' && (
+            {isAdmin && !isViewMode && profile?.user_type === 'writer' && (
               <div className="flex items-center space-x-2">
                 <Switch
                   id="featured"
@@ -176,7 +186,7 @@ export function ProfileDialog({
             )}
           </div>
         </div>
-        {isAdmin && (
+        {isAdmin && !isViewMode && (
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel

@@ -10,7 +10,7 @@ interface UserActionsProps {
   user: Profile & { role: AppRole };
   isAdmin: boolean;
   isFeatured: boolean;
-  onEdit: (user: Profile & { role: AppRole }) => void;
+  onEdit: (user: Profile & { role: AppRole }, isViewMode: boolean) => void;
   onDelete: (user: Profile & { role: AppRole }) => void;
   onFeature: (user: Profile & { role: AppRole }) => void;
 }
@@ -28,7 +28,7 @@ export function UserActions({
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => onEdit(user)}
+        onClick={() => onEdit(user, true)}
       >
         <Eye className="h-4 w-4" />
       </Button>
