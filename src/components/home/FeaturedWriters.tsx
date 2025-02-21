@@ -31,7 +31,6 @@ export function FeaturedWriters() {
         .select("*");
 
       if (searchQuery) {
-        // Only search by name, removing genre from search
         query = query.ilike("name", `%${searchQuery}%`);
       } else {
         query = query.eq("featured", true)
@@ -65,6 +64,11 @@ export function FeaturedWriters() {
       console.error("Error formatting date:", error);
       return "";
     }
+  };
+
+  const handleViewProfile = (writerId: string) => {
+    console.log("Navigating to writer profile:", writerId);
+    navigate(`/writer/${writerId}`);
   };
 
   if (error) {
@@ -113,7 +117,6 @@ export function FeaturedWriters() {
                 <CarouselItem key={writer.id} className="md:basis-1/3 lg:basis-1/3">
                   <div className="p-4 h-[400px]">
                     <div className="flex flex-col h-full rounded-lg border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300">
-                      {/* Header Section - Fixed height */}
                       <div className="p-6 h-[100px] flex items-start gap-4">
                         {writer.image_url ? (
                           <img
@@ -135,7 +138,6 @@ export function FeaturedWriters() {
                         </div>
                       </div>
 
-                      {/* Featured Status - Fixed height */}
                       <div className="px-6 h-[40px]">
                         {writer.featured_month && (
                           <p className="text-xs text-muted-foreground">
@@ -144,19 +146,17 @@ export function FeaturedWriters() {
                         )}
                       </div>
 
-                      {/* Bio Section - Fixed height with overflow */}
                       <div className="p-6 flex-1 min-h-[180px] overflow-hidden">
                         <p className="text-sm text-muted-foreground line-clamp-6">
                           {writer.bio}
                         </p>
                       </div>
 
-                      {/* Button Section - Fixed height */}
                       <div className="p-6 h-[80px]">
                         <Button
                           variant="secondary"
                           className="w-full"
-                          onClick={() => navigate(`/writer/${writer.id}`)}
+                          onClick={() => handleViewProfile(writer.id)}
                         >
                           {t("View Profile", "சுயவிவரத்தைக் காண")}
                         </Button>

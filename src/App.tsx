@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import UserProfile from "./pages/UserProfile";
 import { ComingSoon } from "./components/shared/ComingSoon";
 import Auth from "./pages/Auth";
+import WriterProfile from "./pages/WriterProfile";
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<UserProfile />} />
+          <Route path="/writer/:id" element={<WriterProfile />} />
           <Route path="/forums" element={<ComingSoon />} />
           <Route path="/workshops" element={<ComingSoon />} />
           <Route path="/mentorship" element={<ComingSoon />} />
