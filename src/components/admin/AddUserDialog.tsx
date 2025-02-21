@@ -124,8 +124,8 @@ export function AddUserDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Literary Tamil Writers">Literary Tamil Writers</SelectItem>
-                  <SelectItem value="Talented Experts">Talented Experts</SelectItem>
+                  <SelectItem value="Literary Experts">Literary Experts</SelectItem>
+                  <SelectItem value="Aspiring Writers">Aspiring Writers</SelectItem>
                   <SelectItem value="NATAWO Volunteers">NATAWO Volunteers</SelectItem>
                   <SelectItem value="NATAWO Students Writers">NATAWO Students Writers</SelectItem>
                   <SelectItem value="Subscriber">Subscriber</SelectItem>
