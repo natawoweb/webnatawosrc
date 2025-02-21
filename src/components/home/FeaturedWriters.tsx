@@ -104,72 +104,68 @@ export function FeaturedWriters() {
             opts={{
               align: "start",
               loop: true,
-              dragFree: true,
             }}
             className="w-full max-w-5xl mx-auto relative"
           >
             <CarouselContent>
               {writers.map((writer) => (
-                <CarouselItem key={writer.id} className="md:basis-1/3 sm:basis-full pl-4">
-                  <div className="glass-card p-6 h-full transition-all duration-300 hover:scale-[1.02]">
-                    <div className="flex items-center space-x-4">
-                      {writer.image_url ? (
-                        <img
-                          src={writer.image_url}
-                          alt={writer.name}
-                          className="w-16 h-16 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
-                          <span className="text-2xl font-semibold text-muted-foreground">
-                            {writer.name.charAt(0)}
-                          </span>
+                <CarouselItem key={writer.id} className="md:basis-1/3 lg:basis-1/3">
+                  <div className="p-4 h-[400px]">
+                    <div className="flex flex-col h-full rounded-lg border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300">
+                      {/* Header Section - Fixed height */}
+                      <div className="p-6 h-[100px] flex items-center gap-4">
+                        {writer.image_url ? (
+                          <img
+                            src={writer.image_url}
+                            alt={writer.name}
+                            className="w-16 h-16 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
+                            <span className="text-2xl font-semibold text-muted-foreground">
+                              {writer.name.charAt(0)}
+                            </span>
+                          </div>
+                        )}
+                        <div>
+                          <h3 className="font-semibold truncate">{writer.name}</h3>
+                          <p className="text-sm text-muted-foreground">{writer.genre}</p>
                         </div>
-                      )}
-                      <div>
-                        <h3 className="font-semibold">{writer.name}</h3>
-                        <p className="text-sm text-muted-foreground">{writer.genre}</p>
+                      </div>
+
+                      {/* Featured Status - Fixed height */}
+                      <div className="px-6 h-[40px]">
                         {writer.featured_month && (
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-xs text-muted-foreground">
                             {t("Featured:", "சிறப்பிக்கப்பட்டது:")} {formatFeaturedMonth(writer.featured_month)}
                           </p>
                         )}
                       </div>
+
+                      {/* Bio Section - Fixed height with overflow */}
+                      <div className="p-6 flex-1 min-h-[180px] overflow-hidden">
+                        <p className="text-sm text-muted-foreground line-clamp-6">
+                          {writer.bio}
+                        </p>
+                      </div>
+
+                      {/* Button Section - Fixed height */}
+                      <div className="p-6 h-[80px]">
+                        <Button
+                          variant="secondary"
+                          className="w-full"
+                          onClick={() => navigate(`/writer/${writer.id}`)}
+                        >
+                          {t("View Profile", "சுயவிவரத்தைக் காண")}
+                        </Button>
+                      </div>
                     </div>
-                    <p className="mt-4 text-sm text-muted-foreground line-clamp-3">
-                      {writer.bio}
-                    </p>
-                    <Button
-                      variant="ghost"
-                      className="mt-4 w-full"
-                      onClick={() => navigate(`/writer/${writer.id}`)}
-                    >
-                      {t("View Profile", "சுயவிவரத்தைக் காண")}
-                    </Button>
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute -left-4 md:-left-12 hidden sm:flex" />
-            <CarouselNext className="absolute -right-4 md:-right-12 hidden sm:flex" />
-            <div className="mt-4 flex justify-center gap-2 sm:hidden">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8 rounded-full"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-prev]')?.click()}
-              >
-                ←
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8 rounded-full"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-next]')?.click()}
-              >
-                →
-              </Button>
-            </div>
+            <CarouselPrevious className="absolute -left-12 hidden md:flex" />
+            <CarouselNext className="absolute -right-12 hidden md:flex" />
           </Carousel>
         ) : (
           <div className="text-center text-muted-foreground">
