@@ -13,7 +13,6 @@ import { type Database } from "@/integrations/supabase/types";
 import type { UserLevel } from "@/integrations/supabase/types/models";
 import { useSession } from "@/hooks/useSession";
 import { useUserRoles } from "@/hooks/useUserRoles";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -70,7 +69,7 @@ export function UserManagement() {
     setEditRole,
     editLevel,
     setEditLevel,
-    updateUserProfile,
+    updateUserRole,
     handleDeleteUser,
     handleAddUser,
     isAddingUser,
@@ -81,31 +80,20 @@ export function UserManagement() {
   const isAdmin = userRoles?.some(role => role.role === 'admin') || false;
   const { toast } = useToast();
 
-  const handleProfileUpdate = async (profile: Partial<Profile> & { featured?: boolean }) => {
+  const handleUpdateUser = async (userId: string, role: AppRole, level?: UserLevel) => {
     try {
-      // Update profile in the profiles table
-      await updateUserProfile(profile);
-
-      // If this is a writer and featured status is included, update the writers table
-      if (profile.id && selectedUser?.user_type === 'writer' && 'featured' in profile) {
-        const { error } = await supabase
-          .from('writers')
-          .update({
-            featured: profile.featured,
-            featured_month: profile.featured ? new Date().toISOString().substring(0, 7) : null
-          })
-          .eq('id', profile.id);
-
-        if (error) throw error;
-      }
-
+      await updateUserRole(userId, role, level);
       setEditDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "User updated successfully"
+      });
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('Error updating user:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update profile"
+        description: "Failed to update user"
       });
     }
   };
@@ -155,7 +143,7 @@ export function UserManagement() {
             profile={selectedUser}
             open={editDialogOpen}
             onOpenChange={setEditDialogOpen}
-            onSubmit={handleProfileUpdate}
+            onSubmit={handleUpdateUser}
             isAdmin={isAdmin}
           />
         </>
