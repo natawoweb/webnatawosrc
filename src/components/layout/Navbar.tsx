@@ -150,8 +150,15 @@ export const Navbar: React.FC = () => {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={profile?.avatar_url || ""} alt={profile?.full_name || ""} />
-                          <AvatarFallback>{getInitials(profile?.full_name)}</AvatarFallback>
+                          <AvatarImage 
+                            src={profile?.avatar_url || ""} 
+                            alt={profile?.full_name || ""}
+                            className="object-cover"
+                            key={profile?.avatar_url} // Add key to force re-render when avatar changes
+                          />
+                          <AvatarFallback>
+                            {profile?.full_name ? getInitials(profile.full_name) : '?'}
+                          </AvatarFallback>
                         </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
