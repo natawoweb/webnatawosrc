@@ -10,6 +10,7 @@ import Terms from "./pages/Terms";
 import Guidelines from "./pages/Guidelines";
 import Events from "./pages/Events";
 import Blogs from "./pages/Blogs";
+import BlogDetail from "./pages/BlogDetail";
 import SearchWriters from "./pages/SearchWriters";
 import AdminDashboard from "./pages/AdminDashboard";
 import Dashboard from "./pages/Dashboard";
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/guidelines" element={<Guidelines />} />
           <Route path="/events" element={<Events />} />
           <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blogs/:id" element={<BlogDetail />} />
           <Route path="/search-writers" element={<SearchWriters />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
