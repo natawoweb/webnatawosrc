@@ -31,7 +31,8 @@ export function FeaturedWriters() {
         .select("*");
 
       if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,genre.ilike.%${searchQuery}%`);
+        // Only search by name, removing genre from search
+        query = query.ilike("name", `%${searchQuery}%`);
       } else {
         query = query.eq("featured", true)
           .order("featured_month", { ascending: false });
@@ -88,7 +89,7 @@ export function FeaturedWriters() {
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={t("Search writers by name or genre...", "பெயர் அல்லது வகையால் எழுத்தாளர்களைத் தேடுங்கள்...")}
+                placeholder={t("Search writers by name...", "பெயரால் எழுத்தாளர்களைத் தேடுங்கள்...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -129,7 +130,6 @@ export function FeaturedWriters() {
                         )}
                         <div>
                           <h3 className="font-semibold truncate">{writer.name}</h3>
-                          <p className="text-sm text-muted-foreground">{writer.genre}</p>
                         </div>
                       </div>
 
