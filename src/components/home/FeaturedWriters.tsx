@@ -114,22 +114,24 @@ export function FeaturedWriters() {
                   <div className="p-4 h-[400px]">
                     <div className="flex flex-col h-full rounded-lg border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300">
                       {/* Header Section - Fixed height */}
-                      <div className="p-6 h-[100px] flex items-center gap-4">
+                      <div className="p-6 h-[100px] flex items-start gap-4">
                         {writer.image_url ? (
                           <img
                             src={writer.image_url}
                             alt={writer.name}
-                            className="w-16 h-16 rounded-full object-cover"
+                            className="w-16 h-16 rounded-full object-cover flex-shrink-0"
                           />
                         ) : (
-                          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
+                          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
                             <span className="text-2xl font-semibold text-muted-foreground">
                               {writer.name.charAt(0)}
                             </span>
                           </div>
                         )}
-                        <div>
-                          <h3 className="font-semibold truncate">{writer.name}</h3>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-wrap break-words">
+                            {writer.name}
+                          </h3>
                         </div>
                       </div>
 
