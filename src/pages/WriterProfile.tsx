@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Loader2 } from "lucide-react";
+import type { Writer } from "@/types/writer";
 
 export default function WriterProfile() {
   const { id } = useParams();
@@ -21,7 +22,7 @@ export default function WriterProfile() {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Writer;
     },
   });
 
