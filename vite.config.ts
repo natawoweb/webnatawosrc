@@ -9,7 +9,7 @@ export default defineConfig({
     host: true,
     open: true
   },
-  base: "/", // Explicitly set the base URL for assets
+  base: "./", // Change base URL to relative path
   plugins: [react()],
   resolve: {
     alias: {
@@ -23,10 +23,22 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
+    outDir: "dist",
+    assetsDir: "assets",
     rollupOptions: {
       output: {
-        manualChunks: undefined // Disable code splitting for simpler asset loading
+        manualChunks: undefined, // Disable code splitting for simpler asset loading
+        assetFileNames: "assets/[name]-[hash][extname]",
+        chunkFileNames: "assets/[name]-[hash].js",
+        entryFileNames: "assets/[name]-[hash].js"
       }
+    }
+  },
+  css: {
+    // Add specific CSS handling configuration
+    devSourcemap: true,
+    modules: {
+      generateScopedName: "[name]__[local]__[hash:base64:5]"
     }
   }
 });
