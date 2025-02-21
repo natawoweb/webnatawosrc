@@ -7,8 +7,20 @@ import { ProfileView } from "@/components/profile/ProfileView";
 import { Loader2 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { useAvatarUpload } from "@/hooks/useAvatarUpload";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSession } from "@/hooks/useSession";
 
 export default function UserProfile() {
+  const { session } = useSession();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!session) {
+      navigate('/auth');
+    }
+  }, [session, navigate]);
+
   const {
     loading,
     profile,
@@ -16,7 +28,7 @@ export default function UserProfile() {
     editedProfile,
     setIsEditing,
     updateProfile,
-    setProfile, // Make sure we have access to setProfile
+    setProfile,
     handleProfileChange,
     handleSocialLinkChange,
     handleCancel,
@@ -24,13 +36,16 @@ export default function UserProfile() {
 
   const { uploading, uploadAvatar } = useAvatarUpload(profile, (url) => {
     if (profile) {
-      // Update the local profile state immediately
       setProfile({
         ...profile,
         avatar_url: url
       });
     }
   });
+
+  if (!session) {
+    return null;
+  }
 
   if (loading) {
     return (

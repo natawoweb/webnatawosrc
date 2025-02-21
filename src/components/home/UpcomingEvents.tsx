@@ -13,15 +13,30 @@ export function UpcomingEvents() {
   const { data: upcomingEvents, isLoading: eventsLoading } = useQuery({
     queryKey: ["upcomingEvents"],
     queryFn: async () => {
+      // Get current date and time in ISO format
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const currentTime = now.toTimeString().split(' ')[0];
+
       const { data, error } = await supabase
         .from("events")
         .select("*")
-        .eq("is_upcoming", true)
+        .gte('date', today) // Filter for today or future dates
         .order("date", { ascending: true })
+        .order("time", { ascending: true })
         .limit(3);
 
       if (error) throw error;
-      return data as Event[];
+
+      // Further filter events that are today but haven't started yet
+      const filteredEvents = data?.filter(event => {
+        if (event.date === today) {
+          return event.time > currentTime;
+        }
+        return true;
+      });
+
+      return filteredEvents as Event[];
     },
   });
 
