@@ -119,7 +119,7 @@ export function FeaturedBlogs() {
             <CarouselContent>
               {blogs.map((blog) => (
                 <CarouselItem key={blog.id} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="p-4 h-[600px]">
+                  <div className="p-4 h-[400px]">
                     <div className="flex flex-col h-full rounded-lg border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300">
                       {/* Title Section - Fixed height */}
                       <div className="p-6 h-[80px]">
@@ -136,30 +136,15 @@ export function FeaturedBlogs() {
                         </p>
                       </div>
 
-                      {/* Image Section - Fixed height */}
-                      <div className="h-[200px] w-full">
-                        {blog.cover_image ? (
-                          <img
-                            src={blog.cover_image}
-                            alt={getTitle(blog)}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-muted flex items-center justify-center">
-                            <span className="text-muted-foreground">{t("No Image", "படம் இல்லை")}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Content Section - Fixed height */}
-                      <div className="p-6 flex-1 min-h-[180px] max-h-[180px] overflow-hidden">
+                      {/* Content Section - Expanded height since we removed image */}
+                      <div className="p-6 flex-1 min-h-[180px] overflow-hidden">
                         <div className="text-sm text-muted-foreground line-clamp-6">
                           <BlogContent content={getContent(blog)} />
                         </div>
                       </div>
 
                       {/* Read More Button Section - Fixed height */}
-                      <div className="p-6 h-[80px] mt-auto">
+                      <div className="p-6 h-[80px]">
                         <Button
                           variant="secondary"
                           className="w-full"
