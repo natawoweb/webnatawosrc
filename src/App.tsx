@@ -18,6 +18,8 @@ import UserProfile from "./pages/UserProfile";
 import { ComingSoon } from "./components/shared/ComingSoon";
 import Auth from "./pages/Auth";
 import WriterProfile from "./pages/WriterProfile";
+import CreateBlog from "./pages/CreateBlog";
+import EditBlog from "./pages/EditBlog";
 
 export default function App() {
   return (
@@ -38,6 +40,8 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/writer/:id" element={<WriterProfile />} />
+          <Route path="/write" element={<CreateBlog />} />
+          <Route path="/edit/:id" element={<EditBlog />} />
           <Route path="/forums" element={<ComingSoon />} />
           <Route path="/workshops" element={<ComingSoon />} />
           <Route path="/mentorship" element={<ComingSoon />} />
