@@ -8,13 +8,15 @@ import { LanguageProvider } from "./contexts/LanguageContext"
 import App from './App'
 import './index.css'
 
-// Create a client with more lenient settings for development
+// Create a client with optimized caching settings
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 0, // More frequent refreshes in development
+      staleTime: 1000 * 60 * 5, // Data stays fresh for 5 minutes
+      cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
       retry: 1,
-      refetchOnWindowFocus: false // Disable refetch on focus for easier development
+      refetchOnWindowFocus: false,
+      refetchOnMount: false
     },
   },
 })

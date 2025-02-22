@@ -13,6 +13,8 @@ export const useSession = () => {
       const { data } = await supabase.auth.getSession();
       return data.session;
     },
+    staleTime: 1000 * 60 * 5, // Session data stays fresh for 5 minutes
+    cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
   });
 
   const signOut = async () => {

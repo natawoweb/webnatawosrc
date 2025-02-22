@@ -3,13 +3,14 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/integrations/supabase/types/models";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 export const useProfileData = (mounted: boolean) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const { toast } = useToast();
 
   const fetchProfile = async (session: any) => {
-    if (!mounted) return null;
+    if (!mounted || !session?.user?.id) return null;
     
     try {
       let { data: existingProfile, error: fetchError } = await supabase
@@ -18,12 +19,9 @@ export const useProfileData = (mounted: boolean) => {
         .eq('id', session.user.id)
         .maybeSingle();
 
-      if (fetchError) {
-        console.error('Error loading profile:', fetchError);
-        throw fetchError;
-      }
+      if (fetchError) throw fetchError;
 
-      // If profile doesn't exist, wait a moment and try again
+      // If profile doesn't exist, wait a moment and retry once
       if (!existingProfile) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         const { data: retryProfile, error: retryError } = await supabase
@@ -34,13 +32,12 @@ export const useProfileData = (mounted: boolean) => {
 
         if (retryError) throw retryError;
         if (!retryProfile) {
-          console.error('Profile not found after retry');
           throw new Error('Profile not found. Please try logging out and back in.');
         }
         existingProfile = retryProfile;
       }
 
-      // Ensure social_links is properly parsed
+      // Parse social_links if needed
       if (existingProfile.social_links && typeof existingProfile.social_links === 'string') {
         try {
           existingProfile.social_links = JSON.parse(existingProfile.social_links);
