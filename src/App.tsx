@@ -1,5 +1,5 @@
 
-import { Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "@/pages/Index";
@@ -24,7 +24,7 @@ import EditBlog from "@/pages/EditBlog";
 
 export default function App() {
   return (
-    <>
+    <Router>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Index />} />
@@ -52,6 +52,6 @@ export default function App() {
         </Route>
       </Routes>
       <Toaster />
-    </>
+    </Router>
   );
 }
