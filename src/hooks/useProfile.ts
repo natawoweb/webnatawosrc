@@ -16,6 +16,7 @@ export const useProfile = () => {
   const { toast } = useToast();
   
   const { profile, setProfile, fetchProfile } = useProfileData(mounted);
+  const profileUpdates = useProfileUpdates(profile, setProfile);
 
   useEffect(() => {
     let isMounted = true;
@@ -81,6 +82,7 @@ export const useProfile = () => {
   return {
     loading,
     profile,
-    setProfile
+    setProfile,
+    ...profileUpdates  // Spread all the profile update related properties
   };
 };
