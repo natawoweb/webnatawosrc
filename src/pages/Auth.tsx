@@ -27,8 +27,8 @@ export default function Auth() {
       return; // Exit early to prevent any other auth checks
     }
 
-    // Only proceed with session check if not in recovery mode
-    if (!isResetPassword) {
+    // Only proceed with session check if not in recovery mode and not loading
+    if (!isResetPassword && !loading) {
       // Check if user is already logged in
       const checkSessionAndRedirect = async () => {
         const { data: { session } } = await supabase.auth.getSession();
@@ -40,6 +40,8 @@ export default function Auth() {
               user_id: session.user.id,
               required_role: 'admin'
             });
+            
+            console.log("Admin check result:", isAdmin);
             
             if (isAdmin) {
               console.log("Admin user detected, redirecting to admin dashboard");
@@ -69,7 +71,7 @@ export default function Auth() {
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        if (session) {
+        if (session && !loading) { // Only proceed if not loading
           console.log("Auth state changed, checking roles...");
           try {
             // Check if user is admin
@@ -77,6 +79,8 @@ export default function Auth() {
               user_id: session.user.id,
               required_role: 'admin'
             });
+            
+            console.log("Auth state change - Admin check result:", isAdmin);
             
             if (isAdmin) {
               console.log("Admin user detected, redirecting to admin dashboard");
@@ -102,7 +106,15 @@ export default function Auth() {
 
       return () => subscription.unsubscribe();
     }
-  }, [navigate, profile, isResetPassword]);
+  }, [navigate, profile, isResetPassword, loading]); // Added loading back to dependency array
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-10 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (isResetPassword) {
     return (
