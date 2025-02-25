@@ -16,22 +16,15 @@ export const useProfile = () => {
   const { toast } = useToast();
   
   const { profile, setProfile, fetchProfile } = useProfileData(mounted);
-  const {
-    isEditing,
-    editedProfile,
-    setIsEditing,
-    updateProfile,
-    handleProfileChange,
-    handleSocialLinkChange,
-    handleCancel,
-  } = useProfileUpdates(profile, setProfile);
 
   useEffect(() => {
+    let isMounted = true;
+    
     const getProfile = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (!mounted) return;
+        if (!isMounted) return;
 
         // If there's no session and we're on a public route, just set loading to false
         if (!session && isPublicRoute(location.pathname)) {
@@ -42,7 +35,7 @@ export const useProfile = () => {
         // Only redirect to auth if not on a public route and user needs to be authenticated
         if (!session && !isPublicRoute(location.pathname)) {
           setLoading(false);
-          navigate('/auth');
+          navigate('/auth', { replace: true });
           return;
         }
 
@@ -50,10 +43,12 @@ export const useProfile = () => {
           await fetchProfile(session);
         }
 
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       } catch (error: any) {
         console.error('Error in getProfile:', error);
-        if (mounted) {
+        if (isMounted) {
           toast({
             variant: "destructive",
             title: "Error loading profile",
@@ -66,9 +61,8 @@ export const useProfile = () => {
 
     getProfile();
 
-    // Set up auth state listener for profile changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted) return;
+      if (!isMounted) return;
       
       if (session) {
         getProfile();
@@ -79,21 +73,14 @@ export const useProfile = () => {
     });
 
     return () => {
-      setMounted(false);
+      isMounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, toast, location.pathname, fetchProfile, mounted]);
+  }, [navigate, toast, location.pathname, fetchProfile]);
 
   return {
     loading,
     profile,
-    isEditing,
-    editedProfile,
-    setIsEditing,
-    updateProfile,
-    setProfile, // Add setProfile to the returned object
-    handleProfileChange,
-    handleSocialLinkChange,
-    handleCancel,
+    setProfile
   };
 };

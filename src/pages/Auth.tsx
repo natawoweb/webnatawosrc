@@ -8,12 +8,15 @@ import { AuthForm } from "@/components/auth/AuthForm";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { useProfile } from "@/hooks/useProfile";
 import { Toaster } from "@/components/ui/toaster";
+import { useSession } from "@/hooks/useSession";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { profile, loading } = useProfile();
+  const { profile, loading: profileLoading } = useProfile();
+  const { session } = useSession();
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const [isResetPassword, setIsResetPassword] = useState(false);
+  const [isCheckingRole, setIsCheckingRole] = useState(false);
 
   useEffect(() => {
     // Always check for recovery mode first
@@ -24,91 +27,54 @@ export default function Auth() {
     if (type === 'recovery' && accessToken) {
       console.log('Recovery mode detected');
       setIsResetPassword(true);
-      return; // Exit early to prevent any other auth checks
+      return;
     }
 
-    // Only proceed with session check if not in recovery mode and not loading
-    if (!isResetPassword && !loading) {
-      // Check if user is already logged in
-      const checkSessionAndRedirect = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          console.log("Session found, checking roles...");
-          try {
-            // Check if user is admin
-            const { data: isAdmin } = await supabase.rpc('has_role', {
-              user_id: session.user.id,
-              required_role: 'admin'
-            });
-            
-            console.log("Admin check result:", isAdmin);
-            
-            if (isAdmin) {
-              console.log("Admin user detected, redirecting to admin dashboard");
-              navigate("/admin");
-              return;
-            }
+    // Check session and roles
+    const checkRolesAndRedirect = async () => {
+      if (!session || isResetPassword || isCheckingRole || profileLoading) {
+        return;
+      }
 
-            // Check if user is a writer
-            if (profile?.user_type === 'writer') {
-              console.log("Writer detected, redirecting to dashboard");
-              navigate("/dashboard");
-              return;
-            }
-
-            // Default navigation for other users
-            console.log("Regular user detected, redirecting to home");
-            navigate("/");
-          } catch (error) {
-            console.error("Error checking user role:", error);
-          }
+      setIsCheckingRole(true);
+      
+      try {
+        // Check if user is admin
+        const { data: isAdmin } = await supabase.rpc('has_role', {
+          user_id: session.user.id,
+          required_role: 'admin'
+        });
+        
+        console.log("Admin check result:", isAdmin);
+        
+        if (isAdmin) {
+          console.log("Admin user detected, redirecting to admin dashboard");
+          navigate("/admin", { replace: true });
+          return;
         }
-      };
 
-      checkSessionAndRedirect();
-
-      // Set up auth state listener
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        if (session && !loading) { // Only proceed if not loading
-          console.log("Auth state changed, checking roles...");
-          try {
-            // Check if user is admin
-            const { data: isAdmin } = await supabase.rpc('has_role', {
-              user_id: session.user.id,
-              required_role: 'admin'
-            });
-            
-            console.log("Auth state change - Admin check result:", isAdmin);
-            
-            if (isAdmin) {
-              console.log("Admin user detected, redirecting to admin dashboard");
-              navigate("/admin");
-              return;
-            }
-
-            // Check if user is a writer
-            if (profile?.user_type === 'writer') {
-              console.log("Writer detected, redirecting to dashboard");
-              navigate("/dashboard");
-              return;
-            }
-
-            // Default navigation for other users
-            console.log("Regular user detected, redirecting to home");
-            navigate("/");
-          } catch (error) {
-            console.error("Error checking user role:", error);
-          }
+        // Check if user is a writer
+        if (profile?.user_type === 'writer') {
+          console.log("Writer detected, redirecting to dashboard");
+          navigate("/dashboard", { replace: true });
+          return;
         }
-      });
 
-      return () => subscription.unsubscribe();
-    }
-  }, [navigate, profile, isResetPassword, loading]); // Added loading back to dependency array
+        // Default navigation for other users
+        console.log("Regular user detected, redirecting to home");
+        navigate("/", { replace: true });
+      } catch (error) {
+        console.error("Error checking user role:", error);
+      } finally {
+        setIsCheckingRole(false);
+      }
+    };
 
-  if (loading) {
+    checkRolesAndRedirect();
+  }, [session, profile, navigate, isResetPassword, isCheckingRole, profileLoading]);
+
+  // Show loading state
+  if (profileLoading || isCheckingRole) {
     return (
       <div className="container mx-auto py-10 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
