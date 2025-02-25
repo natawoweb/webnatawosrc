@@ -7,6 +7,7 @@ import { useProfileData } from "./useProfileData";
 import { useProfileUpdates } from "./useProfileUpdates";
 import { isPublicRoute } from "@/utils/routeUtils";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useProfile = () => {
   const [loading, setLoading] = useState(true);
@@ -14,14 +15,23 @@ export const useProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const { profile, setProfile, fetchProfile } = useProfileData(mounted);
   const profileUpdates = useProfileUpdates(profile, setProfile);
 
   useEffect(() => {
     let isMounted = true;
+    let lastFetchTime = 0;
+    const FETCH_COOLDOWN = 2000; // 2 seconds cooldown between fetches
     
     const getProfile = async () => {
+      const now = Date.now();
+      if (now - lastFetchTime < FETCH_COOLDOWN) {
+        return;
+      }
+      lastFetchTime = now;
+
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
@@ -62,11 +72,13 @@ export const useProfile = () => {
 
     getProfile();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return;
       
       if (session) {
-        getProfile();
+        // Clear any existing profile data in the cache
+        queryClient.removeQueries({ queryKey: ["profile"] });
+        await getProfile();
       } else {
         setProfile(null);
         setLoading(false);
@@ -77,12 +89,12 @@ export const useProfile = () => {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, toast, location.pathname, fetchProfile]);
+  }, [navigate, toast, location.pathname, fetchProfile, queryClient]);
 
   return {
     loading,
     profile,
     setProfile,
-    ...profileUpdates  // Spread all the profile update related properties
+    ...profileUpdates
   };
 };
