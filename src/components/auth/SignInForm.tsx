@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
 interface SignInFormProps {
   onSuccess: () => void;
@@ -17,7 +16,6 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handlePasswordReset = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -91,12 +89,6 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         description: "You have successfully signed in.",
         duration: 3000,
       });
-
-      // Set a flag in localStorage to indicate where to redirect after refresh
-      localStorage.setItem('auth_redirect', 'true');
-      
-      // Force a page refresh to reset all states
-      window.location.href = '/';
       
       onSuccess();
     } catch (error: any) {
