@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface SignInFormProps {
   onSuccess: () => void;
@@ -16,6 +17,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handlePasswordReset = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -90,6 +92,8 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         duration: 3000,
       });
       
+      // Navigate to home with state indicating we came from auth
+      navigate("/", { state: { from: '/auth' } });
       onSuccess();
     } catch (error: any) {
       console.error('Signin error:', error);
