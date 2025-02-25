@@ -91,9 +91,13 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         description: "You have successfully signed in.",
         duration: 3000,
       });
+
+      // Set a flag in localStorage to indicate where to redirect after refresh
+      localStorage.setItem('auth_redirect', 'true');
       
-      // Navigate to home with state indicating we came from auth
-      navigate("/", { state: { from: '/auth' } });
+      // Force a page refresh to reset all states
+      window.location.href = '/';
+      
       onSuccess();
     } catch (error: any) {
       console.error('Signin error:', error);
