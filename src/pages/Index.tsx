@@ -30,17 +30,13 @@ const Index = () => {
             required_role: 'admin'
           });
           
-          console.log("Admin check result:", isAdmin);
-          
           if (isAdmin) {
-            console.log("Admin user detected, redirecting to admin dashboard");
             navigate("/admin", { replace: true });
             return;
           }
 
           // Check if user is a writer
           if (profile?.user_type === 'writer') {
-            console.log("Writer detected, redirecting to dashboard");
             navigate("/dashboard", { replace: true });
             return;
           }
@@ -54,7 +50,7 @@ const Index = () => {
   }, [navigate, profile, loading]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="container mx-auto px-4 py-8">
       <HeroSection />
       <FeaturedBlogs />
       <FeaturedWriters />
