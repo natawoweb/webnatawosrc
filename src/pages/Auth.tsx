@@ -32,34 +32,29 @@ export default function Auth() {
       // Check if user is already logged in
       const checkSessionAndRedirect = async () => {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
+        if (session && !loading) {  // Only proceed if profile loading is complete
           console.log("Session found, checking roles...");
-          try {
-            // Check if user is admin
-            const { data: isAdmin } = await supabase.rpc('has_role', {
-              user_id: session.user.id,
-              required_role: 'admin'
-            });
-            
-            if (isAdmin) {
-              console.log("Admin user detected, redirecting to admin dashboard");
-              navigate("/admin");
-              return;
-            }
-
-            // Check if user is a writer
-            if (profile?.user_type === 'writer') {
-              console.log("Writer detected, redirecting to dashboard");
-              navigate("/dashboard");
-              return;
-            }
-
-            // Default navigation for other users
-            console.log("Regular user detected, redirecting to home");
-            navigate("/");
-          } catch (error) {
-            console.error("Error checking user role:", error);
+          const { data: isAdmin } = await supabase.rpc('has_role', {
+            user_id: session.user.id,
+            required_role: 'admin'
+          });
+          
+          if (isAdmin) {
+            console.log("Admin user detected, redirecting to admin dashboard");
+            navigate("/admin", { state: { from: '/auth' } });
+            return;
           }
+
+          // Check if user is a writer
+          if (profile?.user_type === 'writer') {
+            console.log("Writer detected, redirecting to dashboard");
+            navigate("/dashboard", { state: { from: '/auth' } });
+            return;
+          }
+
+          // Default navigation for other users
+          console.log("Regular user detected, redirecting to home");
+          navigate("/", { state: { from: '/auth' } });
         }
       };
 
@@ -69,40 +64,35 @@ export default function Auth() {
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        if (session) {
+        if (session && !loading) { // Only proceed if profile loading is complete
           console.log("Auth state changed, checking roles...");
-          try {
-            // Check if user is admin
-            const { data: isAdmin } = await supabase.rpc('has_role', {
-              user_id: session.user.id,
-              required_role: 'admin'
-            });
-            
-            if (isAdmin) {
-              console.log("Admin user detected, redirecting to admin dashboard");
-              navigate("/admin");
-              return;
-            }
-
-            // Check if user is a writer
-            if (profile?.user_type === 'writer') {
-              console.log("Writer detected, redirecting to dashboard");
-              navigate("/dashboard");
-              return;
-            }
-
-            // Default navigation for other users
-            console.log("Regular user detected, redirecting to home");
-            navigate("/");
-          } catch (error) {
-            console.error("Error checking user role:", error);
+          const { data: isAdmin } = await supabase.rpc('has_role', {
+            user_id: session.user.id,
+            required_role: 'admin'
+          });
+          
+          if (isAdmin) {
+            console.log("Admin user detected, redirecting to admin dashboard");
+            navigate("/admin", { state: { from: '/auth' } });
+            return;
           }
+
+          // Check if user is a writer
+          if (profile?.user_type === 'writer') {
+            console.log("Writer detected, redirecting to dashboard");
+            navigate("/dashboard", { state: { from: '/auth' } });
+            return;
+          }
+
+          // Default navigation for other users
+          console.log("Regular user detected, redirecting to home");
+          navigate("/", { state: { from: '/auth' } });
         }
       });
 
       return () => subscription.unsubscribe();
     }
-  }, [navigate, profile, isResetPassword]);
+  }, [navigate, profile, isResetPassword, loading]);
 
   if (isResetPassword) {
     return (
