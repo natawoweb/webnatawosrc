@@ -50,7 +50,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/writers" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/search-writers" className="text-sm text-muted-foreground hover:text-foreground">
                   {t("Writers Directory", "எழுத்தாளர்கள் அடைவு")}
                 </Link>
               </li>
