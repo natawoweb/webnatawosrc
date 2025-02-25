@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/integrations/supabase/types/models";
@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 export const useProfile = () => {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(true);
+  const fetchedRef = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -22,15 +23,13 @@ export const useProfile = () => {
 
   useEffect(() => {
     let isMounted = true;
-    let lastFetchTime = 0;
-    const FETCH_COOLDOWN = 2000; // 2 seconds cooldown between fetches
     
     const getProfile = async () => {
-      const now = Date.now();
-      if (now - lastFetchTime < FETCH_COOLDOWN) {
+      // If we've already fetched the profile, don't fetch again
+      if (fetchedRef.current) {
+        setLoading(false);
         return;
       }
-      lastFetchTime = now;
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -52,6 +51,7 @@ export const useProfile = () => {
 
         if (session) {
           await fetchProfile(session);
+          fetchedRef.current = true;
         }
 
         if (isMounted) {
@@ -75,12 +75,14 @@ export const useProfile = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return;
       
-      if (session) {
+      if (event === 'SIGNED_IN') {
         // Clear any existing profile data in the cache
         queryClient.removeQueries({ queryKey: ["profile"] });
+        fetchedRef.current = false;
         await getProfile();
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         setProfile(null);
+        fetchedRef.current = false;
         setLoading(false);
       }
     });
