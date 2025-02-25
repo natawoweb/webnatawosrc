@@ -16,14 +16,13 @@ export const useProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
-  // Move toast initialization inside the effect where it's used
   const { profile, setProfile, fetchProfile } = useProfileData(mounted);
   const profileUpdates = useProfileUpdates(profile, setProfile);
 
   useEffect(() => {
     let isMounted = true;
-    const { toast } = useToast();
     
     const getProfile = async () => {
       if (fetchedRef.current) {
@@ -88,7 +87,7 @@ export const useProfile = () => {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname, fetchProfile, queryClient]);
+  }, [navigate, location.pathname, fetchProfile, queryClient, toast]);
 
   return {
     loading,
