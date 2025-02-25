@@ -15,17 +15,17 @@ export const useProfile = () => {
   const fetchedRef = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Move toast initialization inside the effect where it's used
   const { profile, setProfile, fetchProfile } = useProfileData(mounted);
   const profileUpdates = useProfileUpdates(profile, setProfile);
 
   useEffect(() => {
     let isMounted = true;
+    const { toast } = useToast();
     
     const getProfile = async () => {
-      // If we've already fetched the profile, don't fetch again
       if (fetchedRef.current) {
         setLoading(false);
         return;
@@ -36,13 +36,11 @@ export const useProfile = () => {
         
         if (!isMounted) return;
 
-        // If there's no session and we're on a public route, just set loading to false
         if (!session && isPublicRoute(location.pathname)) {
           setLoading(false);
           return;
         }
 
-        // Only redirect to auth if not on a public route and user needs to be authenticated
         if (!session && !isPublicRoute(location.pathname)) {
           setLoading(false);
           navigate('/auth', { replace: true });
@@ -76,7 +74,6 @@ export const useProfile = () => {
       if (!isMounted) return;
       
       if (event === 'SIGNED_IN') {
-        // Clear any existing profile data in the cache
         queryClient.removeQueries({ queryKey: ["profile"] });
         fetchedRef.current = false;
         await getProfile();
@@ -91,7 +88,7 @@ export const useProfile = () => {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, toast, location.pathname, fetchProfile, queryClient]);
+  }, [navigate, location.pathname, fetchProfile, queryClient]);
 
   return {
     loading,
