@@ -83,6 +83,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
             duration: 5000,
           });
         }
+        setLoading(false);
         return;
       }
 
