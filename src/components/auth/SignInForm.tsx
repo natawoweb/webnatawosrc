@@ -62,7 +62,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -85,20 +85,36 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         }
         return;
       }
-      
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
-        duration: 3000,
-      });
 
-      // Set a flag in localStorage to indicate where to redirect after refresh
-      localStorage.setItem('auth_redirect', 'true');
-      
-      // Force a page refresh to reset all states
-      window.location.href = '/';
-      
-      onSuccess();
+      if (data.session) {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+          duration: 3000,
+        });
+
+        // Check user role and redirect accordingly
+        const { data: isAdmin } = await supabase.rpc('has_role', {
+          user_id: data.session.user.id,
+          required_role: 'admin'
+        });
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', data.session.user.id)
+          .single();
+
+        if (isAdmin) {
+          navigate('/admin');
+        } else if (profile?.user_type === 'writer') {
+          navigate('/dashboard');
+        } else {
+          navigate('/');
+        }
+        
+        onSuccess();
+      }
     } catch (error: any) {
       console.error('Signin error:', error);
       toast({
