@@ -6,11 +6,13 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedWriters } from "@/components/home/FeaturedWriters";
 import { FeaturedBlogs } from "@/components/home/FeaturedBlogs";
 import { UpcomingEvents } from "@/components/home/UpcomingEvents";
+import { UnderConstruction } from "@/components/shared/UnderConstruction";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const navigate = useNavigate();
   const { profile, loading } = useProfile();
+  const isProduction = import.meta.env.PROD;
 
   useEffect(() => {
     const checkUserRole = async () => {
@@ -48,6 +50,10 @@ const Index = () => {
       checkUserRole();
     }
   }, [navigate, profile, loading]);
+
+  if (isProduction) {
+    return <UnderConstruction />;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
