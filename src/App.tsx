@@ -1,30 +1,30 @@
 
-import { Route, Routes } from "react-router-dom";
-import { Layout } from "./components/layout/Layout";
-import { Toaster } from "./components/ui/toaster";
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Guidelines from "./pages/Guidelines";
-import Events from "./pages/Events";
-import EventDetails from "./pages/EventDetails";
-import Blogs from "./pages/Blogs";
-import BlogDetail from "./pages/BlogDetail";
-import SearchWriters from "./pages/SearchWriters";
-import AdminDashboard from "./pages/AdminDashboard";
-import Dashboard from "./pages/Dashboard";
-import UserProfile from "./pages/UserProfile";
-import { ComingSoon } from "./components/shared/ComingSoon";
-import Auth from "./pages/Auth";
-import WriterProfile from "./pages/WriterProfile";
-import CreateBlog from "./pages/CreateBlog";
-import EditBlog from "./pages/EditBlog";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Layout } from "@/components/layout/Layout";
+import { Toaster } from "@/components/ui/toaster";
+import Index from "@/pages/Index";
+import About from "@/pages/About";
+import Contact from "@/pages/Contact";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
+import Guidelines from "@/pages/Guidelines";
+import Events from "@/pages/Events";
+import EventDetails from "@/pages/EventDetails";
+import Blogs from "@/pages/Blogs";
+import BlogDetail from "@/pages/BlogDetail";
+import SearchWriters from "@/pages/SearchWriters";
+import AdminDashboard from "@/pages/AdminDashboard";
+import Dashboard from "@/pages/Dashboard";
+import UserProfile from "@/pages/UserProfile";
+import { ComingSoon } from "@/components/shared/ComingSoon";
+import Auth from "@/pages/Auth";
+import WriterProfile from "@/pages/WriterProfile";
+import CreateBlog from "@/pages/CreateBlog";
+import EditBlog from "@/pages/EditBlog";
 
 export default function App() {
   return (
-    <>
+    <Router>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Index />} />
@@ -52,6 +52,6 @@ export default function App() {
         </Route>
       </Routes>
       <Toaster />
-    </>
+    </Router>
   );
 }
