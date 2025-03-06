@@ -1,4 +1,3 @@
-
 import { Database } from './database'
 import { Json } from './shared'
 
@@ -25,5 +24,4 @@ export type Profile = {
 
 export type AppRole = Database['public']['Enums']['app_role']
 export type UserRole = Database['public']['Tables']['user_roles']['Row']
-export type UserLevel = 'Literary Experts' | 'Aspiring Writers' | 'NATAWO Volunteers' | 'NATAWO Students Writers' | 'Subscriber' | 'Technical'
-
+export type UserLevel = 'Literary Experts' | 'Aspiring Writers' | 'NATAWO Volunteers' | 'NATAWO Student Writers' | 'Subscriber' | 'Technical' | 'General' | 'Global Ambassador'
