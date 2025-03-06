@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,14 +37,13 @@ export default function Auth() {
     const redirectUser = async () => {
       try {
         if (profile) {
-          // Set state to indicate coming from auth page
-          const state = { from: '/auth' };
-          
-          // Navigate based on user type
+          // Always use replace: true to prevent back navigation
           if (profile.user_type === 'writer') {
-            navigate('/dashboard', { state, replace: true });
+            navigate('/dashboard', { replace: true });
+          } else if (profile.user_type === 'admin') {
+            navigate('/admin', { replace: true });
           } else {
-            navigate('/', { state, replace: true });
+            navigate('/', { replace: true });
           }
         }
       } catch (error) {
@@ -58,6 +58,10 @@ export default function Auth() {
 
     redirectUser();
   }, [session, profile, loading, navigate, toast]);
+
+  const handleAuthSuccess = () => {
+    console.log("Auth success callback triggered");
+  };
 
   if (loading) {
     return (
@@ -89,10 +93,6 @@ export default function Auth() {
       </div>
     );
   }
-
-  const handleAuthSuccess = () => {
-    console.log("Auth success callback triggered");
-  };
 
   return (
     <div className="container mx-auto py-10">
