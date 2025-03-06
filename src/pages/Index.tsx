@@ -18,8 +18,9 @@ const Index = () => {
       console.log("Checking user role...");
       const { data: { session } } = await supabase.auth.getSession();
 
-      if (session && !loading) {
-        console.log("User authenticated, checking roles...");
+      // Only handle redirects if we're coming from the auth page
+      if (session && !loading && location.state?.from === '/auth') {
+        console.log("User authenticated from auth page, checking roles...");
         
         // Check if user is admin
         const { data: isAdmin } = await supabase.rpc('has_role', {
@@ -46,7 +47,7 @@ const Index = () => {
     };
 
     checkUserRole();
-  }, [navigate, profile, loading]);
+  }, [navigate, profile, loading, location.state]);
 
   return (
     <div className="flex flex-col min-h-screen">

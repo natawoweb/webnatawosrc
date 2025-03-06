@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useSession } from "@/hooks/useSession";
@@ -13,10 +13,11 @@ import { LanguageSelector } from "./nav/LanguageSelector";
 export const Navbar: React.FC = () => {
   const { session, signOut } = useSession();
   const { profile } = useProfile();
+  const navigate = useNavigate();
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.location.href = '/';
+    navigate("/");
   };
 
   return (
