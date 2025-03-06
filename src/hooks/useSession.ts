@@ -10,7 +10,8 @@ export const useSession = () => {
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
       return data.session;
     },
     staleTime: 1000 * 60 * 5, // Session data stays fresh for 5 minutes
@@ -22,16 +23,14 @@ export const useSession = () => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      // Clear all relevant queries from the cache
-      queryClient.removeQueries({ queryKey: ["session"] });
-      queryClient.removeQueries({ queryKey: ["profile"] });
-      queryClient.removeQueries({ queryKey: ["isAdmin"] });
+      // Clear all queries from the cache
+      queryClient.clear();
       
       // Navigate to home page after sign out
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Error signing out:", error);
-      throw error; // Re-throw to let components handle the error
+      throw error;
     }
   };
 

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SignInFormProps {
   onSuccess: () => void;
@@ -17,6 +18,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handlePasswordReset = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -61,18 +63,22 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
-      
-      const { data: profile } = await supabase
+      if (authError) throw authError;
+
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('user_type')
-        .eq('id', data.user.id)
+        .eq('id', authData.user.id)
         .single();
+
+      if (profileError) throw profileError;
+
+      await queryClient.invalidateQueries();
 
       let redirectPath = '/';
       if (profile?.user_type === 'writer') {
@@ -88,7 +94,6 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       });
 
       navigate(redirectPath, { replace: true });
-      
       onSuccess();
     } catch (error: any) {
       console.error('Signin error:', error);
