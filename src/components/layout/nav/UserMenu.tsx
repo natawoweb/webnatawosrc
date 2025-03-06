@@ -20,17 +20,20 @@ interface UserMenuProps {
 
 export const UserMenu = ({ profile, onSignOut }: UserMenuProps) => {
   const { t } = useLanguage();
-  const initials = profile?.full_name ? getInitials(profile.full_name) : '?';
+  const initials = profile?.full_name ? getInitials(profile.full_name) : '';
+  const avatarUrl = profile?.avatar_url || '';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage 
-              src={profile?.avatar_url || ""} 
-              alt={profile?.full_name || ""}
-            />
+            {avatarUrl ? (
+              <AvatarImage 
+                src={avatarUrl} 
+                alt={profile?.full_name || ""}
+              />
+            ) : null}
             <AvatarFallback className="bg-primary/10 text-primary">
               {initials}
             </AvatarFallback>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
@@ -77,43 +76,41 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         required_role: 'admin'
       });
 
-      if (isAdmin) {
-        navigate("/admin", { replace: true });
-        toast({
-          title: "Welcome back, Admin!",
-          description: "You have successfully signed in.",
-          duration: 3000,
-        });
-        onSuccess();
-        return;
-      }
-
-      // Then check profile type
+      // Then check profile type if not admin
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('user_type')
+        .select('user_type, full_name, avatar_url')
         .eq('id', authData.user.id)
         .single();
 
       if (profileError) throw profileError;
 
+      // Invalidate queries to refresh data
       await queryClient.invalidateQueries();
 
-      let redirectPath = '/';
-      let welcomeMessage = 'Welcome back!';
-
-      if (profile?.user_type === 'writer') {
-        redirectPath = '/dashboard';
-        welcomeMessage = 'Welcome back, Writer!';
+      if (isAdmin) {
+        navigate("/admin", { replace: true, state: { from: '/auth' } });
+        toast({
+          title: "Welcome back, Admin!",
+          description: "You have successfully signed in.",
+          duration: 3000,
+        });
+      } else if (profile?.user_type === 'writer') {
+        navigate("/dashboard", { replace: true, state: { from: '/auth' } });
+        toast({
+          title: "Welcome back, Writer!",
+          description: "You have successfully signed in.",
+          duration: 3000,
+        });
+      } else {
+        navigate("/", { replace: true, state: { from: '/auth' } });
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+          duration: 3000,
+        });
       }
-
-      toast({
-        title: welcomeMessage,
-        description: "You have successfully signed in.",
-        duration: 3000,
-      });
-
-      navigate(redirectPath, { replace: true });
+      
       onSuccess();
     } catch (error: any) {
       console.error('Signin error:', error);
