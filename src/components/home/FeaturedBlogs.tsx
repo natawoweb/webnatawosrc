@@ -94,7 +94,7 @@ export function FeaturedBlogs() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-foreground">
-            {t("Featured Blogs", "சிறப்பு வலைப்பதிவுகள்")}
+            {t("Hand-Picked Content", "தேர்ந்தெடுக்கப்பட்ட உள்ளடக்கம்")}
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             {t(
