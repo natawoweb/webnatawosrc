@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,6 +20,7 @@ interface UserMenuProps {
 
 export const UserMenu = ({ profile, onSignOut }: UserMenuProps) => {
   const { t } = useLanguage();
+  const initials = profile?.full_name ? getInitials(profile.full_name) : '?';
 
   return (
     <DropdownMenu>
@@ -28,11 +30,9 @@ export const UserMenu = ({ profile, onSignOut }: UserMenuProps) => {
             <AvatarImage 
               src={profile?.avatar_url || ""} 
               alt={profile?.full_name || ""}
-              className="object-cover"
-              key={profile?.avatar_url}
             />
-            <AvatarFallback>
-              {profile?.full_name ? getInitials(profile.full_name) : '?'}
+            <AvatarFallback className="bg-primary/10 text-primary">
+              {initials}
             </AvatarFallback>
           </Avatar>
         </Button>

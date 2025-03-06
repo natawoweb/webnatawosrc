@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
@@ -70,6 +71,24 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
 
       if (authError) throw authError;
 
+      // First check if user is admin
+      const { data: isAdmin } = await supabase.rpc('has_role', {
+        user_id: authData.user.id,
+        required_role: 'admin'
+      });
+
+      if (isAdmin) {
+        navigate("/admin", { replace: true });
+        toast({
+          title: "Welcome back, Admin!",
+          description: "You have successfully signed in.",
+          duration: 3000,
+        });
+        onSuccess();
+        return;
+      }
+
+      // Then check profile type
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('user_type')
@@ -81,14 +100,15 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       await queryClient.invalidateQueries();
 
       let redirectPath = '/';
+      let welcomeMessage = 'Welcome back!';
+
       if (profile?.user_type === 'writer') {
         redirectPath = '/dashboard';
-      } else if (profile?.user_type === 'admin') {
-        redirectPath = '/admin';
+        welcomeMessage = 'Welcome back, Writer!';
       }
 
       toast({
-        title: "Welcome back!",
+        title: welcomeMessage,
         description: "You have successfully signed in.",
         duration: 3000,
       });

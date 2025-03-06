@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
@@ -39,13 +40,15 @@ const Index = () => {
           navigate("/dashboard", { replace: true });
           return;
         }
+
+        // Regular users stay on the home page
+        console.log("Regular user detected, staying on home page");
       }
     };
 
     checkUserRole();
   }, [navigate, profile, loading, location.state]);
 
-  console.log("Rendering Index page components");
   return (
     <div className="flex flex-col min-h-screen">
       <HeroSection />
