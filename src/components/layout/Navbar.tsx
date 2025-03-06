@@ -55,6 +55,14 @@ export const Navbar: React.FC = () => {
     return location.pathname === path;
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Failed to sign out:", error);
+    }
+  };
+
   if (isSessionLoading || isAdminLoading) {
     return (
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-lg border-b">
@@ -185,7 +193,7 @@ export const Navbar: React.FC = () => {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => signOut()}>
+                      <DropdownMenuItem onClick={handleSignOut}>
                         {t("Sign Out", "வெளியேறு")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>

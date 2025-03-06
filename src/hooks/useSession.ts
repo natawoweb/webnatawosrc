@@ -19,16 +19,19 @@ export const useSession = () => {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
-      // Invalidate and remove session data from the query cache
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Clear all relevant queries from the cache
       queryClient.removeQueries({ queryKey: ["session"] });
-      // Clear any user-related queries from the cache
       queryClient.removeQueries({ queryKey: ["profile"] });
       queryClient.removeQueries({ queryKey: ["isAdmin"] });
+      
       // Navigate to home page after sign out
       navigate("/");
     } catch (error) {
       console.error("Error signing out:", error);
+      throw error; // Re-throw to let components handle the error
     }
   };
 
