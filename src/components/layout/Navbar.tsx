@@ -9,28 +9,11 @@ import { Button } from "@/components/ui/button";
 import { NavLinks } from "./nav/NavLinks";
 import { UserMenu } from "./nav/UserMenu";
 import { LanguageSelector } from "./nav/LanguageSelector";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Navbar: React.FC = () => {
   const { session, isSessionLoading, signOut } = useSession();
   const { profile } = useProfile();
   const navigate = useNavigate();
-
-  const { data: isAdmin } = useQuery({
-    queryKey: ["isAdmin", session?.user?.id],
-    queryFn: async () => {
-      if (!session?.user?.id) return false;
-      const { data } = await supabase.rpc('has_role', {
-        user_id: session.user.id,
-        required_role: 'admin'
-      });
-      return data;
-    },
-    enabled: !!session?.user?.id,
-  });
-
-  const isWriter = profile?.user_type === "writer";
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -60,8 +43,8 @@ export const Navbar: React.FC = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8 ml-auto">
-            {/* Always show NavLinks, but pass isAuthenticated flag */}
-            <NavLinks isAdmin={!!isAdmin} isWriter={isWriter} />
+            {/* NavLinks now handles its own state */}
+            <NavLinks />
 
             <div className="flex items-center gap-4">
               <LanguageSelector />
