@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
@@ -13,20 +12,12 @@ const Index = () => {
   const location = useLocation();
   const { profile, loading } = useProfile();
 
-  console.log("Index page rendered with:", {
-    profile,
-    loading,
-    locationState: location.state,
-    pathname: location.pathname
-  });
-
   useEffect(() => {
     const checkUserRole = async () => {
       console.log("Checking user role...");
       const { data: { session } } = await supabase.auth.getSession();
-      console.log("Session status:", session ? "Active" : "No session");
 
-      // Only redirect if coming from the auth page
+      // Only handle redirects if we're coming from the auth page
       if (session && !loading && location.state?.from === '/auth') {
         console.log("User authenticated from auth page, checking roles...");
         
@@ -36,32 +27,23 @@ const Index = () => {
           required_role: 'admin'
         });
 
-        console.log("Admin check result:", isAdmin);
-
         if (isAdmin) {
           console.log("Admin user detected, redirecting to admin dashboard");
-          navigate("/admin");
+          navigate("/admin", { replace: true });
           return;
         }
 
         // Check if user is a writer
-        console.log("Writer check - user type:", profile?.user_type);
         if (profile?.user_type === 'writer') {
           console.log("Writer detected, redirecting to dashboard");
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
           return;
         }
-      } else {
-        console.log("Regular page load or navigation, not redirecting", {
-          hasSession: !!session,
-          isLoading: loading,
-          from: location.state?.from
-        });
       }
     };
 
     checkUserRole();
-  }, [navigate, profile, loading, location]);
+  }, [navigate, profile, loading, location.state]);
 
   console.log("Rendering Index page components");
   return (

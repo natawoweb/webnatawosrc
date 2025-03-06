@@ -1,9 +1,7 @@
-
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { useSession } from "@/hooks/useSession";
@@ -13,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Auth() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { session } = useSession();
   const { profile, loading } = useProfile();
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
@@ -20,51 +19,35 @@ export default function Auth() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Always check for recovery mode first
+    // Check for recovery mode first
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const type = hashParams.get('type');
     const accessToken = hashParams.get('access_token');
 
     if (type === 'recovery' && accessToken) {
-      console.log('Recovery mode detected');
       setIsResetPassword(true);
-      return; // Exit early to prevent any other auth checks
+      return;
     }
+  }, []);
 
-    // Handle redirect based on session and profile
-    const handleRedirect = async () => {
+  useEffect(() => {
+    if (!session || loading) return;
+
+    const redirectUser = async () => {
       try {
-        if (session && !loading && profile) {
-          console.log("Session and profile loaded, checking roles...");
+        if (profile) {
+          // Set state to indicate coming from auth page
+          const state = { from: '/auth' };
           
-          const { data: isAdmin, error: roleError } = await supabase.rpc('has_role', {
-            user_id: session.user.id,
-            required_role: 'admin'
-          });
-
-          if (roleError) {
-            console.error("Error checking admin role:", roleError);
-            return;
-          }
-
-          if (isAdmin) {
-            console.log("Admin user detected, redirecting to admin dashboard");
-            navigate("/admin");
-            return;
-          }
-
+          // Navigate based on user type
           if (profile.user_type === 'writer') {
-            console.log("Writer detected, redirecting to dashboard");
-            navigate("/dashboard");
-            return;
+            navigate('/dashboard', { state, replace: true });
+          } else {
+            navigate('/', { state, replace: true });
           }
-
-          // Default navigation for other users
-          console.log("Regular user detected, redirecting to home");
-          navigate("/");
         }
       } catch (error) {
-        console.error("Error in redirect handling:", error);
+        console.error("Redirect error:", error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -73,10 +56,9 @@ export default function Auth() {
       }
     };
 
-    handleRedirect();
+    redirectUser();
   }, [session, profile, loading, navigate, toast]);
 
-  // Show loading state while profile is being fetched
   if (loading) {
     return (
       <div className="container mx-auto py-10">
@@ -110,7 +92,6 @@ export default function Auth() {
 
   const handleAuthSuccess = () => {
     console.log("Auth success callback triggered");
-    // Success handling is now managed in the useEffect hook
   };
 
   return (
