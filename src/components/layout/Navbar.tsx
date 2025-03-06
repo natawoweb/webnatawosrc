@@ -21,13 +21,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Navbar: React.FC = () => {
-  const { session, isSessionLoading } = useSession();
+  const { session, isSessionLoading, signOut } = useSession();
   const { profile } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
 
-  // Check if user is admin
   const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
     queryKey: ["isAdmin", session?.user?.id],
     queryFn: async () => {
@@ -52,12 +51,10 @@ export const Navbar: React.FC = () => {
     setLanguage(newLanguage);
   };
 
-  // Function to determine if a link is active
   const isActiveLink = (path: string) => {
     return location.pathname === path;
   };
 
-  // Don't render navigation items while loading
   if (isSessionLoading || isAdminLoading) {
     return (
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-lg border-b">
