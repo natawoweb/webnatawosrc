@@ -28,14 +28,15 @@ export const UserMenu = ({ profile, onSignOut }: UserMenuProps) => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {initials}
-            </AvatarFallback>
-            {avatarUrl && (
+            {avatarUrl ? (
               <AvatarImage 
                 src={avatarUrl} 
                 alt={profile?.full_name || ""}
               />
+            ) : (
+              <AvatarFallback className="bg-primary/10 text-primary">
+                {initials}
+              </AvatarFallback>
             )}
           </Avatar>
         </Button>

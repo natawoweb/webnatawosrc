@@ -70,45 +70,48 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
 
       if (authError) throw authError;
 
+      // Invalidate queries to refresh data
+      await queryClient.invalidateQueries();
+
       // First check if user is admin
       const { data: isAdmin } = await supabase.rpc('has_role', {
         user_id: authData.user.id,
         required_role: 'admin'
       });
 
-      // Then check profile type if not admin
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_type, full_name, avatar_url')
-        .eq('id', authData.user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      // Invalidate queries to refresh data
-      await queryClient.invalidateQueries();
-
       if (isAdmin) {
-        navigate("/admin", { replace: true, state: { from: '/auth' } });
         toast({
           title: "Welcome back, Admin!",
           description: "You have successfully signed in.",
           duration: 3000,
         });
-      } else if (profile?.user_type === 'writer') {
-        navigate("/dashboard", { replace: true, state: { from: '/auth' } });
+        navigate("/admin", { replace: true, state: { from: '/auth' } });
+        return;
+      }
+
+      // Then check profile type if not admin
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_type')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (profile?.user_type === 'writer') {
         toast({
           title: "Welcome back, Writer!",
           description: "You have successfully signed in.",
           duration: 3000,
         });
+        navigate("/dashboard", { replace: true, state: { from: '/auth' } });
       } else {
-        navigate("/", { replace: true, state: { from: '/auth' } });
         toast({
           title: "Welcome back!",
           description: "You have successfully signed in.",
           duration: 3000,
         });
+        navigate("/", { replace: true, state: { from: '/auth' } });
       }
       
       onSuccess();
