@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
@@ -22,14 +21,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Navbar: React.FC = () => {
-  const { session, signOut } = useSession();
+  const { session, isSessionLoading } = useSession();
   const { profile } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
 
   // Check if user is admin
-  const { data: isAdmin } = useQuery({
+  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
     queryKey: ["isAdmin", session?.user?.id],
     queryFn: async () => {
       if (!session?.user?.id) return false;
@@ -57,6 +56,26 @@ export const Navbar: React.FC = () => {
   const isActiveLink = (path: string) => {
     return location.pathname === path;
   };
+
+  // Don't render navigation items while loading
+  if (isSessionLoading || isAdminLoading) {
+    return (
+      <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-lg border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2">
+              <img 
+                src="/lovable-uploads/2e998827-54b8-4981-b796-0eaa5c1cd8e2.png" 
+                alt="NATAWO Logo" 
+                className="h-10 w-10"
+              />
+              <span className="text-xl font-semibold">NATAWO</span>
+            </Link>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-lg border-b">

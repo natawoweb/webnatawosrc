@@ -1,3 +1,4 @@
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +7,7 @@ export const useSession = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data: session } = useQuery({
+  const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
       const { data } = await supabase.auth.getSession();
@@ -31,5 +32,5 @@ export const useSession = () => {
     }
   };
 
-  return { session, signOut };
+  return { session, isSessionLoading, signOut };
 };

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,8 +31,11 @@ export default function Auth() {
       // Check if user is already logged in
       const checkSessionAndRedirect = async () => {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session && !loading) {  // Only proceed if profile loading is complete
-          console.log("Session found, checking roles...");
+        
+        // Only proceed with redirects if we have both session and profile loaded
+        if (session && !loading && profile) {
+          console.log("Session and profile loaded, checking roles...");
+          
           const { data: isAdmin } = await supabase.rpc('has_role', {
             user_id: session.user.id,
             required_role: 'admin'
@@ -46,7 +48,7 @@ export default function Auth() {
           }
 
           // Check if user is a writer
-          if (profile?.user_type === 'writer') {
+          if (profile.user_type === 'writer') {
             console.log("Writer detected, redirecting to dashboard");
             navigate("/dashboard", { state: { from: '/auth' } });
             return;
@@ -64,7 +66,8 @@ export default function Auth() {
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        if (session && !loading) { // Only proceed if profile loading is complete
+        // Wait for profile to be loaded before redirecting
+        if (session && !loading && profile) {
           console.log("Auth state changed, checking roles...");
           const { data: isAdmin } = await supabase.rpc('has_role', {
             user_id: session.user.id,
@@ -78,7 +81,7 @@ export default function Auth() {
           }
 
           // Check if user is a writer
-          if (profile?.user_type === 'writer') {
+          if (profile.user_type === 'writer') {
             console.log("Writer detected, redirecting to dashboard");
             navigate("/dashboard", { state: { from: '/auth' } });
             return;
