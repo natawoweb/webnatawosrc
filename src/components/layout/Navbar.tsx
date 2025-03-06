@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
@@ -22,11 +23,12 @@ import { cn } from "@/lib/utils";
 
 export const Navbar: React.FC = () => {
   const { session, signOut } = useSession();
-  const { profile, loading: profileLoading } = useProfile();
+  const { profile } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
 
+  // Check if user is admin
   const { data: isAdmin } = useQuery({
     queryKey: ["isAdmin", session?.user?.id],
     queryFn: async () => {
@@ -51,6 +53,7 @@ export const Navbar: React.FC = () => {
     setLanguage(newLanguage);
   };
 
+  // Function to determine if a link is active
   const isActiveLink = (path: string) => {
     return location.pathname === path;
   };
@@ -69,7 +72,7 @@ export const Navbar: React.FC = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8 ml-auto">
-            {!profileLoading && session && (
+            {session && (
               <>
                 {isAdmin && (
                   <Link 
@@ -140,7 +143,7 @@ export const Navbar: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
               <ThemeToggle />
-              {!profileLoading && session ? (
+              {session ? (
                 <>
                   <NotificationsDropdown />
                   <DropdownMenu>
@@ -151,7 +154,7 @@ export const Navbar: React.FC = () => {
                             src={profile?.avatar_url || ""} 
                             alt={profile?.full_name || ""}
                             className="object-cover"
-                            key={profile?.avatar_url}
+                            key={profile?.avatar_url} // Add key to force re-render when avatar changes
                           />
                           <AvatarFallback>
                             {profile?.full_name ? getInitials(profile.full_name) : '?'}

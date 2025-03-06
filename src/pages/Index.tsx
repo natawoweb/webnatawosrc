@@ -1,62 +1,71 @@
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedWriters } from "@/components/home/FeaturedWriters";
 import { FeaturedBlogs } from "@/components/home/FeaturedBlogs";
 import { UpcomingEvents } from "@/components/home/UpcomingEvents";
-import { UnderConstruction } from "@/components/shared/UnderConstruction";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { profile, loading } = useProfile();
-  const isProduction = import.meta.env.PROD;
+
+  console.log("Index page rendered with:", {
+    profile,
+    loading,
+    locationState: location.state,
+    pathname: location.pathname
+  });
 
   useEffect(() => {
     const checkUserRole = async () => {
-      // Check if we have a redirect flag from auth
-      const shouldRedirect = localStorage.getItem('auth_redirect');
-      
-      if (shouldRedirect) {
-        // Remove the flag immediately
-        localStorage.removeItem('auth_redirect');
-        
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          // Check if user is admin
-          const { data: isAdmin } = await supabase.rpc('has_role', {
-            user_id: session.user.id,
-            required_role: 'admin'
-          });
-          
-          if (isAdmin) {
-            navigate("/admin", { replace: true });
-            return;
-          }
+      console.log("Checking user role...");
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("Session status:", session ? "Active" : "No session");
 
-          // Check if user is a writer
-          if (profile?.user_type === 'writer') {
-            navigate("/dashboard", { replace: true });
-            return;
-          }
+      // Only redirect if coming from the auth page
+      if (session && !loading && location.state?.from === '/auth') {
+        console.log("User authenticated from auth page, checking roles...");
+        
+        // Check if user is admin
+        const { data: isAdmin } = await supabase.rpc('has_role', {
+          user_id: session.user.id,
+          required_role: 'admin'
+        });
+
+        console.log("Admin check result:", isAdmin);
+
+        if (isAdmin) {
+          console.log("Admin user detected, redirecting to admin dashboard");
+          navigate("/admin");
+          return;
         }
+
+        // Check if user is a writer
+        console.log("Writer check - user type:", profile?.user_type);
+        if (profile?.user_type === 'writer') {
+          console.log("Writer detected, redirecting to dashboard");
+          navigate("/dashboard");
+          return;
+        }
+      } else {
+        console.log("Regular page load or navigation, not redirecting", {
+          hasSession: !!session,
+          isLoading: loading,
+          from: location.state?.from
+        });
       }
     };
 
-    if (!loading) {
-      checkUserRole();
-    }
-  }, [navigate, profile, loading]);
+    checkUserRole();
+  }, [navigate, profile, loading, location]);
 
-  if (isProduction) {
-    return <UnderConstruction />;
-  }
-
+  console.log("Rendering Index page components");
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="flex flex-col min-h-screen">
       <HeroSection />
       <FeaturedBlogs />
       <FeaturedWriters />

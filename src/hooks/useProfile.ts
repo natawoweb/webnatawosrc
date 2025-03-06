@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/integrations/supabase/types/models";
@@ -7,42 +7,42 @@ import { useProfileData } from "./useProfileData";
 import { useProfileUpdates } from "./useProfileUpdates";
 import { isPublicRoute } from "@/utils/routeUtils";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
 
 export const useProfile = () => {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(true);
-  const fetchedRef = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const queryClient = useQueryClient();
   const { toast } = useToast();
   
   const { profile, setProfile, fetchProfile } = useProfileData(mounted);
-  const profileUpdates = useProfileUpdates(profile, setProfile);
+  const {
+    isEditing,
+    editedProfile,
+    setIsEditing,
+    updateProfile,
+    handleProfileChange,
+    handleSocialLinkChange,
+    handleCancel,
+  } = useProfileUpdates(profile, setProfile);
 
   useEffect(() => {
-    let isMounted = true;
-    
     const getProfile = async () => {
-      if (fetchedRef.current) {
-        setLoading(false);
-        return;
-      }
-
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (!isMounted) return;
+        if (!mounted) return;
 
+        // If there's no session and we're on a public route, just set loading to false
         if (!session && isPublicRoute(location.pathname)) {
           setLoading(false);
           return;
         }
 
+        // Only redirect to auth if not on a public route and user needs to be authenticated
         if (!session && !isPublicRoute(location.pathname)) {
           setLoading(false);
-          navigate('/auth', { replace: true });
+          navigate('/auth');
           return;
         }
 
@@ -50,13 +50,10 @@ export const useProfile = () => {
           await fetchProfile(session);
         }
 
-        if (isMounted) {
-          setLoading(false);
-          fetchedRef.current = true;
-        }
+        setLoading(false);
       } catch (error: any) {
         console.error('Error in getProfile:', error);
-        if (isMounted) {
+        if (mounted) {
           toast({
             variant: "destructive",
             title: "Error loading profile",
@@ -69,36 +66,34 @@ export const useProfile = () => {
 
     getProfile();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session);
+    // Set up auth state listener for profile changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
       
-      if (!isMounted) return;
-      
-      if (event === 'SIGNED_IN') {
-        queryClient.removeQueries({ queryKey: ["profile"] });
-        fetchedRef.current = false;
-        await getProfile();
-      } else if (event === 'SIGNED_OUT') {
+      if (session) {
+        getProfile();
+      } else {
         setProfile(null);
-        fetchedRef.current = false;
         setLoading(false);
-        if (!isPublicRoute(location.pathname)) {
-          navigate('/auth', { replace: true });
-        }
       }
     });
 
     return () => {
-      isMounted = false;
       setMounted(false);
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname, fetchProfile, queryClient, toast]);
+  }, [navigate, toast, location.pathname, fetchProfile, mounted]);
 
   return {
     loading,
     profile,
-    setProfile,
-    ...profileUpdates
+    isEditing,
+    editedProfile,
+    setIsEditing,
+    updateProfile,
+    setProfile, // Add setProfile to the returned object
+    handleProfileChange,
+    handleSocialLinkChange,
+    handleCancel,
   };
 };

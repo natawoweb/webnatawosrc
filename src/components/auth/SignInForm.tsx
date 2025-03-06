@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
 interface SignInFormProps {
   onSuccess: () => void;
@@ -17,7 +16,6 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handlePasswordReset = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -62,7 +60,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -83,39 +81,16 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
             duration: 5000,
           });
         }
-        setLoading(false);
         return;
       }
-
-      if (data.session) {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-          duration: 3000,
-        });
-
-        // Check user role and redirect accordingly
-        const { data: isAdmin } = await supabase.rpc('has_role', {
-          user_id: data.session.user.id,
-          required_role: 'admin'
-        });
-
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('user_type')
-          .eq('id', data.session.user.id)
-          .single();
-
-        if (isAdmin) {
-          navigate('/admin');
-        } else if (profile?.user_type === 'writer') {
-          navigate('/dashboard');
-        } else {
-          navigate('/');
-        }
-        
-        onSuccess();
-      }
+      
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+        duration: 3000,
+      });
+      
+      onSuccess();
     } catch (error: any) {
       console.error('Signin error:', error);
       toast({
