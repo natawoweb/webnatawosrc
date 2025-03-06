@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,65 +23,39 @@ export default function SearchWriters() {
     queryFn: async () => {
       console.log("Starting writers search query...");
       try {
-        if (!searchTerm) {
-          const { data, error } = await supabase
-            .from("writers")
-            .select("*");
-          
-          if (error) {
-            console.error("Error fetching writers:", error);
-            toast({
-              variant: "destructive",
-              title: t("Error", "பிழை"),
-              description: t(
-                "Failed to fetch writers. Please try again.",
-                "எழுத்தாளர்களை பெற முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
-              ),
-            });
-            throw error;
+        let query = supabase
+          .from('writers')
+          .select(`
+            *,
+            profiles:id (
+              level
+            )
+          `);
+
+        if (searchTerm) {
+          switch (searchType) {
+            case "name":
+              query = query.ilike("name", `%${searchTerm}%`);
+              break;
+            case "genre":
+              query = query.ilike("genre", `%${searchTerm}%`);
+              break;
+            case "title":
+              query = query.contains("published_works", [{ title: searchTerm }]);
+              break;
           }
-
-          const transformedData = data.map((writer) => ({
-            id: writer.id,
-            name: writer.name,
-            bio: writer.bio,
-            genre: writer.genre,
-            image_url: writer.image_url,
-            published_works: writer.published_works ? JSON.parse(writer.published_works as string) : null,
-            accomplishments: writer.accomplishments ? JSON.parse(writer.accomplishments as string) : null,
-            social_links: writer.social_links ? JSON.parse(writer.social_links as string) : null,
-            created_at: writer.created_at,
-            featured: writer.featured || false,
-            featured_month: writer.featured_month || ""
-          }));
-
-          console.log("Writers data:", transformedData);
-          return transformedData;
-        }
-
-        let query = supabase.from("writers").select("*");
-
-        switch (searchType) {
-          case "name":
-            query = query.ilike("name", `%${searchTerm}%`);
-            break;
-          case "genre":
-            query = query.ilike("genre", `%${searchTerm}%`);
-            break;
-          case "title":
-            query = query.contains("published_works", [{ title: searchTerm }]);
-            break;
         }
 
         const { data, error } = await query;
+        
         if (error) {
-          console.error("Error searching writers:", error);
+          console.error("Error fetching writers:", error);
           toast({
             variant: "destructive",
             title: t("Error", "பிழை"),
             description: t(
-              "Failed to search writers. Please try again.",
-              "எழுத்தாளர்களை தேட முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+              "Failed to fetch writers. Please try again.",
+              "எழுத்தாளர்களை பெற முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
             ),
           });
           throw error;
@@ -93,6 +66,7 @@ export default function SearchWriters() {
           name: writer.name,
           bio: writer.bio,
           genre: writer.genre,
+          level: writer.profiles?.level || 'General',
           image_url: writer.image_url,
           published_works: writer.published_works ? JSON.parse(writer.published_works as string) : null,
           accomplishments: writer.accomplishments ? JSON.parse(writer.accomplishments as string) : null,
@@ -102,7 +76,7 @@ export default function SearchWriters() {
           featured_month: writer.featured_month || ""
         }));
 
-        console.log("Search results:", transformedData);
+        console.log("Writers data:", transformedData);
         return transformedData;
       } catch (error) {
         console.error("Error in writers query:", error);
@@ -119,7 +93,6 @@ export default function SearchWriters() {
     },
   });
 
-  // Calculate pagination values
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedWriters = writers?.slice(startIndex, endIndex);

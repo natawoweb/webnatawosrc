@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Writer } from "@/types/writer";
+import { Badge } from "@/components/ui/badge";
 
 interface WriterCardProps {
   writer: Writer;
@@ -27,7 +28,9 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
           )}
           <div>
             <h3 className="font-semibold">{writer.name}</h3>
-            <p className="text-sm text-muted-foreground">{writer.genre}</p>
+            <Badge variant="outline" className="mt-1">
+              {writer.level}
+            </Badge>
           </div>
         </div>
         <p className="text-sm text-muted-foreground line-clamp-3 mb-4">

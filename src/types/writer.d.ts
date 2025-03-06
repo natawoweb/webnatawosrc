@@ -4,6 +4,7 @@ export interface Writer {
   name: string;
   bio: string;
   genre: string;
+  level: string;
   image_url?: string;
   published_works?: Array<{
     title: string;
