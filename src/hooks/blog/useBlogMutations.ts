@@ -120,25 +120,44 @@ export function useBlogMutations(
           .eq('id', currentBlogId);
 
         if (error) throw error;
+        return currentBlogId;
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("blogs")
           .insert({
             ...updateData,
             author_id: user.id,
-          });
+          })
+          .select()
+          .single();
 
         if (error) throw error;
+        return data.id;
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      queryClient.invalidateQueries({ queryKey: ["writer-blogs"] });
+    onSuccess: async (blogId) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) {
+        // Immediately update the cache with the new blog
+        queryClient.invalidateQueries({ 
+          queryKey: ["writer-blogs", user.id],
+          exact: true,
+          refetchType: 'all'
+        });
+        
+        // Also invalidate the general blogs list
+        queryClient.invalidateQueries({ 
+          queryKey: ["blogs"],
+          refetchType: 'all'
+        });
+      }
+      
       toast({
         title: "Success",
         description: "Blog submitted for approval",
       });
-      navigate("/dashboard");
+      
+      navigate("/dashboard", { replace: true });
     },
     onError: (error) => {
       toast({

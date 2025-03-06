@@ -1,11 +1,12 @@
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SignInFormProps {
   onSuccess: () => void;
@@ -16,6 +17,8 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handlePasswordReset = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -55,40 +58,61 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: "Invalid email or password. Please try again.",
-            duration: 5000,
-          });
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: error.message,
-            duration: 5000,
-          });
-        }
+      if (authError) throw authError;
+
+      // Invalidate queries to refresh data
+      await queryClient.invalidateQueries();
+
+      // First check if user is admin
+      const { data: isAdmin } = await supabase.rpc('has_role', {
+        user_id: authData.user.id,
+        required_role: 'admin'
+      });
+
+      if (isAdmin) {
+        toast({
+          title: "Welcome back, Admin!",
+          description: "You have successfully signed in.",
+          duration: 3000,
+        });
+        navigate("/admin", { replace: true, state: { from: '/auth' } });
         return;
       }
-      
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
-        duration: 3000,
-      });
+
+      // Then check profile type if not admin
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_type')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (profile?.user_type === 'writer') {
+        toast({
+          title: "Welcome back, Writer!",
+          description: "You have successfully signed in.",
+          duration: 3000,
+        });
+        navigate("/dashboard", { replace: true, state: { from: '/auth' } });
+      } else {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+          duration: 3000,
+        });
+        navigate("/", { replace: true, state: { from: '/auth' } });
+      }
       
       onSuccess();
     } catch (error: any) {
@@ -96,7 +120,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: error.message || "Invalid email or password. Please try again.",
         duration: 5000,
       });
     } finally {
@@ -105,7 +129,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSignIn} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <div className="relative">

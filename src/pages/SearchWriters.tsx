@@ -14,7 +14,7 @@ export default function SearchWriters() {
   const [searchType, setSearchType] = useState("name");
   const [selectedWriter, setSelectedWriter] = useState<Writer | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(9); // Show 9 writers per page
+  const [pageSize, setPageSize] = useState(9);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -25,12 +25,7 @@ export default function SearchWriters() {
       try {
         let query = supabase
           .from('writers')
-          .select(`
-            *,
-            profiles:id (
-              level
-            )
-          `);
+          .select('*, profiles(level)');
 
         if (searchTerm) {
           switch (searchType) {
@@ -61,7 +56,7 @@ export default function SearchWriters() {
           throw error;
         }
 
-        const transformedData = data.map((writer) => ({
+        return data.map(writer => ({
           id: writer.id,
           name: writer.name,
           bio: writer.bio,
@@ -75,9 +70,6 @@ export default function SearchWriters() {
           featured: writer.featured || false,
           featured_month: writer.featured_month || ""
         }));
-
-        console.log("Writers data:", transformedData);
-        return transformedData;
       } catch (error) {
         console.error("Error in writers query:", error);
         toast({
@@ -139,7 +131,7 @@ export default function SearchWriters() {
           <DataTablePagination
             currentPage={currentPage}
             pageSize={pageSize}
-            totalItems={totalWriters}
+            totalItems={writers.length}
             onPageChange={setCurrentPage}
             onPageSizeChange={setPageSize}
           />
