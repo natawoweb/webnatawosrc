@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -131,9 +130,8 @@ export function useBlogMutations(
         if (error) throw error;
       }
     },
-    onSuccess: () => {
-      // Invalidate both the writer-blogs query and the general blogs query
-      const { data: { user } } = supabase.auth.getUser();
+    onSuccess: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       if (user?.id) {
         queryClient.invalidateQueries({ 
           queryKey: ["writer-blogs", user.id],
