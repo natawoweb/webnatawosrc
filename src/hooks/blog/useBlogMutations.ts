@@ -132,8 +132,15 @@ export function useBlogMutations(
       }
     },
     onSuccess: () => {
+      // Invalidate both the writer-blogs query and the general blogs query
+      const { data: { user } } = supabase.auth.getUser();
+      if (user?.id) {
+        queryClient.invalidateQueries({ 
+          queryKey: ["writer-blogs", user.id],
+          exact: true 
+        });
+      }
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      queryClient.invalidateQueries({ queryKey: ["writer-blogs"] });
       toast({
         title: "Success",
         description: "Blog submitted for approval",
