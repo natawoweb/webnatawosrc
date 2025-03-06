@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,30 +20,25 @@ interface UserMenuProps {
 
 export const UserMenu = ({ profile, onSignOut }: UserMenuProps) => {
   const { t } = useLanguage();
-  const [initials, setInitials] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
-
-  useEffect(() => {
-    if (profile) {
-      setInitials(profile.full_name ? getInitials(profile.full_name) : '');
-      setAvatarUrl(profile.avatar_url || '');
-    }
-  }, [profile]);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const initials = profile?.full_name ? getInitials(profile.full_name) : '';
+  const avatarUrl = profile?.avatar_url || '';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            {avatarUrl ? (
+            <AvatarFallback className="bg-primary/10 text-primary">
+              {initials}
+            </AvatarFallback>
+            {avatarUrl && (
               <AvatarImage 
                 src={avatarUrl} 
                 alt={profile?.full_name || ""}
+                onLoad={() => setIsImageLoaded(true)}
+                className={isImageLoaded ? 'opacity-100' : 'opacity-0'}
               />
-            ) : (
-              <AvatarFallback className="bg-primary/10 text-primary">
-                {initials}
-              </AvatarFallback>
             )}
           </Avatar>
         </Button>
