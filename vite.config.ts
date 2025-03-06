@@ -2,15 +2,17 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { componentTagger } from "lovable-tagger";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   server: {
+    host: "::",
     port: 8080,
-    host: true,
-    open: true
   },
-  base: "./", // Change base URL to relative path
-  plugins: [react()],
+  plugins: [
+    react(),
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -27,7 +29,7 @@ export default defineConfig({
     assetsDir: "assets",
     rollupOptions: {
       output: {
-        manualChunks: undefined, // Disable code splitting for simpler asset loading
+        manualChunks: undefined,
         assetFileNames: "assets/[name]-[hash][extname]",
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js"
@@ -35,10 +37,9 @@ export default defineConfig({
     }
   },
   css: {
-    // Add specific CSS handling configuration
     devSourcemap: true,
     modules: {
       generateScopedName: "[name]__[local]__[hash:base64:5]"
     }
   }
-});
+}));
