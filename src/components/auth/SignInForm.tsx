@@ -65,24 +65,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         password,
       });
 
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: "Invalid email or password. Please try again.",
-            duration: 5000,
-          });
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: error.message,
-            duration: 5000,
-          });
-        }
-        return;
-      }
+      if (error) throw error;
       
       toast({
         title: "Welcome back!",
@@ -96,7 +79,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: error.message || "An unexpected error occurred. Please try again.",
         duration: 5000,
       });
     } finally {

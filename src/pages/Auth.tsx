@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,11 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
+import { useSession } from "@/hooks/useSession";
 import { useProfile } from "@/hooks/useProfile";
 import { Toaster } from "@/components/ui/toaster";
 
 export default function Auth() {
   const navigate = useNavigate();
+  const { session } = useSession();
   const { profile, loading } = useProfile();
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const [isResetPassword, setIsResetPassword] = useState(false);
@@ -26,76 +29,36 @@ export default function Auth() {
       return; // Exit early to prevent any other auth checks
     }
 
-    // Only proceed with session check if not in recovery mode
-    if (!isResetPassword) {
-      // Check if user is already logged in
-      const checkSessionAndRedirect = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
+    // Handle redirect based on session and profile
+    const handleRedirect = async () => {
+      if (session && !loading && profile) {
+        console.log("Session and profile loaded, checking roles...");
         
-        // Only proceed with redirects if we have both session and profile loaded
-        if (session && !loading && profile) {
-          console.log("Session and profile loaded, checking roles...");
-          
-          const { data: isAdmin } = await supabase.rpc('has_role', {
-            user_id: session.user.id,
-            required_role: 'admin'
-          });
-          
-          if (isAdmin) {
-            console.log("Admin user detected, redirecting to admin dashboard");
-            navigate("/admin", { state: { from: '/auth' } });
-            return;
-          }
+        const { data: isAdmin } = await supabase.rpc('has_role', {
+          user_id: session.user.id,
+          required_role: 'admin'
+        });
 
-          // Check if user is a writer
-          if (profile.user_type === 'writer') {
-            console.log("Writer detected, redirecting to dashboard");
-            navigate("/dashboard", { state: { from: '/auth' } });
-            return;
-          }
-
-          // Default navigation for other users
-          console.log("Regular user detected, redirecting to home");
-          navigate("/", { state: { from: '/auth' } });
+        if (isAdmin) {
+          console.log("Admin user detected, redirecting to admin dashboard");
+          navigate("/admin");
+          return;
         }
-      };
 
-      checkSessionAndRedirect();
-
-      // Set up auth state listener
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        // Wait for profile to be loaded before redirecting
-        if (session && !loading && profile) {
-          console.log("Auth state changed, checking roles...");
-          const { data: isAdmin } = await supabase.rpc('has_role', {
-            user_id: session.user.id,
-            required_role: 'admin'
-          });
-          
-          if (isAdmin) {
-            console.log("Admin user detected, redirecting to admin dashboard");
-            navigate("/admin", { state: { from: '/auth' } });
-            return;
-          }
-
-          // Check if user is a writer
-          if (profile.user_type === 'writer') {
-            console.log("Writer detected, redirecting to dashboard");
-            navigate("/dashboard", { state: { from: '/auth' } });
-            return;
-          }
-
-          // Default navigation for other users
-          console.log("Regular user detected, redirecting to home");
-          navigate("/", { state: { from: '/auth' } });
+        if (profile.user_type === 'writer') {
+          console.log("Writer detected, redirecting to dashboard");
+          navigate("/dashboard");
+          return;
         }
-      });
 
-      return () => subscription.unsubscribe();
-    }
-  }, [navigate, profile, isResetPassword, loading]);
+        // Default navigation for other users
+        console.log("Regular user detected, redirecting to home");
+        navigate("/");
+      }
+    };
+
+    handleRedirect();
+  }, [session, profile, loading, navigate]);
 
   if (isResetPassword) {
     return (
@@ -103,9 +66,7 @@ export default function Auth() {
         <Card className="max-w-md mx-auto">
           <CardHeader>
             <CardTitle>Reset Your Password</CardTitle>
-            <CardDescription>
-              Please enter your new password below
-            </CardDescription>
+            <CardDescription>Please enter your new password below</CardDescription>
           </CardHeader>
           <CardContent>
             <ResetPasswordForm />
@@ -121,9 +82,7 @@ export default function Auth() {
       <Card className="max-w-md mx-auto">
         <CardHeader>
           <CardTitle>Welcome to NATAWO</CardTitle>
-          <CardDescription>
-            Join our community of Tamil writers and readers
-          </CardDescription>
+          <CardDescription>Join our community of Tamil writers and readers</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(value: 'signin' | 'signup') => setActiveTab(value)} className="w-full">
