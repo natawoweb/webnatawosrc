@@ -34,19 +34,19 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
   });
 
   return (
-    <Card className="h-[400px] hover:shadow-lg transition-shadow">
+    <Card className="h-[300px] hover:shadow-lg transition-shadow">
       <CardContent className="p-6 flex flex-col h-full">
         {/* Header Section - Fixed height */}
-        <div className="h-[100px] flex items-start gap-4">
+        <div className="h-[80px] flex items-start gap-4">
           {writer.image_url ? (
             <img
               src={writer.image_url}
               alt={writer.name}
-              className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+              className="w-14 h-14 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl font-semibold text-muted-foreground">
+            <div className="w-14 h-14 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+              <span className="text-xl font-semibold text-muted-foreground">
                 {writer.name.charAt(0)}
               </span>
             </div>
@@ -67,14 +67,14 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
         </div>
 
         {/* Bio Section - Flexible height with line clamp */}
-        <div className="flex-1 min-h-[200px] overflow-hidden">
-          <p className="text-sm text-muted-foreground line-clamp-6">
+        <div className="flex-1 min-h-[140px] overflow-hidden">
+          <p className="text-sm text-muted-foreground line-clamp-4">
             {writer.bio}
           </p>
         </div>
 
         {/* Action Button Section - Fixed height */}
-        <div className="h-[60px] pt-4">
+        <div className="h-[40px]">
           <Button
             variant="secondary"
             className="w-full"
