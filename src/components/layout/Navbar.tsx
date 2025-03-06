@@ -1,6 +1,5 @@
-
 import * as React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useSession } from "@/hooks/useSession";
@@ -11,22 +10,12 @@ import { UserMenu } from "./nav/UserMenu";
 import { LanguageSelector } from "./nav/LanguageSelector";
 
 export const Navbar: React.FC = () => {
-  const { session, isSessionLoading, signOut } = useSession();
+  const { session, signOut } = useSession();
   const { profile } = useProfile();
-  const navigate = useNavigate();
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate("/");
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      navigate("/", { replace: true });
-    } catch (error) {
-      console.error("Failed to sign out:", error);
-    }
+    window.location.href = '/';
   };
 
   return (
@@ -43,16 +32,14 @@ export const Navbar: React.FC = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8 ml-auto">
-            {/* NavLinks now handles its own state */}
             <NavLinks />
-
             <div className="flex items-center gap-4">
               <LanguageSelector />
               <ThemeToggle />
               {session ? (
                 <>
                   <NotificationsDropdown />
-                  <UserMenu profile={profile} onSignOut={handleSignOut} />
+                  <UserMenu profile={profile} onSignOut={signOut} />
                 </>
               ) : (
                 <Button asChild variant="default">

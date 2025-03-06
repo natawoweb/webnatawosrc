@@ -1,22 +1,16 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSession } from "@/hooks/useSession";
-import { useProfile } from "@/hooks/useProfile";
 
 export const NavLinks = () => {
   const location = useLocation();
   const { t } = useLanguage();
-  const { session } = useSession();
-  const { profile } = useProfile();
+  const { isAdmin, isWriter } = useSession();
 
   const isActiveLink = (path: string) => {
     return location.pathname === path;
   };
-
-  const isAdmin = profile?.user_type === 'admin';
-  const isWriter = profile?.user_type === 'writer';
 
   return (
     <>
