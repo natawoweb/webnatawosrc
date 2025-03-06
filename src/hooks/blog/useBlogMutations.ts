@@ -1,3 +1,4 @@
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -119,31 +120,44 @@ export function useBlogMutations(
           .eq('id', currentBlogId);
 
         if (error) throw error;
+        return currentBlogId;
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("blogs")
           .insert({
             ...updateData,
             author_id: user.id,
-          });
+          })
+          .select()
+          .single();
 
         if (error) throw error;
+        return data.id;
       }
     },
-    onSuccess: async () => {
+    onSuccess: async (blogId) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user?.id) {
+        // Immediately update the cache with the new blog
         queryClient.invalidateQueries({ 
           queryKey: ["writer-blogs", user.id],
-          exact: true 
+          exact: true,
+          refetchType: 'all'
+        });
+        
+        // Also invalidate the general blogs list
+        queryClient.invalidateQueries({ 
+          queryKey: ["blogs"],
+          refetchType: 'all'
         });
       }
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      
       toast({
         title: "Success",
         description: "Blog submitted for approval",
       });
-      navigate("/dashboard");
+      
+      navigate("/dashboard", { replace: true });
     },
     onError: (error) => {
       toast({
