@@ -35,18 +35,18 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
 
   return (
     <Card className="h-[300px] hover:shadow-lg transition-shadow">
-      <CardContent className="p-6 flex flex-col h-full">
+      <CardContent className="p-4 flex flex-col h-full">
         {/* Header Section - Fixed height */}
-        <div className="h-[80px] flex items-start gap-4">
+        <div className="h-[70px] flex items-start gap-3">
           {writer.image_url ? (
             <img
               src={writer.image_url}
               alt={writer.name}
-              className="w-14 h-14 rounded-full object-cover flex-shrink-0"
+              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="w-14 h-14 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-              <span className="text-xl font-semibold text-muted-foreground">
+            <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+              <span className="text-lg font-semibold text-muted-foreground">
                 {writer.name.charAt(0)}
               </span>
             </div>
@@ -67,7 +67,7 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
         </div>
 
         {/* Bio Section - Flexible height with line clamp */}
-        <div className="flex-1 min-h-[140px] overflow-hidden">
+        <div className="flex-1 min-h-[120px] overflow-hidden my-2">
           <p className="text-sm text-muted-foreground line-clamp-4">
             {writer.bio}
           </p>
