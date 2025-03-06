@@ -34,20 +34,25 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
   });
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardContent className="p-6">
-        <div className="flex items-center gap-4 mb-4">
+    <Card className="h-[400px] hover:shadow-lg transition-shadow">
+      <CardContent className="p-6 flex flex-col h-full">
+        {/* Header Section - Fixed height */}
+        <div className="h-[100px] flex items-start gap-4">
           {writer.image_url ? (
             <img
               src={writer.image_url}
               alt={writer.name}
-              className="w-16 h-16 rounded-full object-cover"
+              className="w-16 h-16 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-accent" />
+            <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl font-semibold text-muted-foreground">
+                {writer.name.charAt(0)}
+              </span>
+            </div>
           )}
-          <div>
-            <h3 className="font-semibold">{writer.name}</h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-wrap break-words">{writer.name}</h3>
             <div className="flex gap-2 mt-1">
               <Badge variant="outline">
                 {writer.level}
@@ -60,16 +65,24 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
             </div>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-          {writer.bio}
-        </p>
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => onSelect(writer)}
-        >
-          {t("View Profile", "சுயவிவரத்தைக் காண")}
-        </Button>
+
+        {/* Bio Section - Flexible height with line clamp */}
+        <div className="flex-1 min-h-[200px] overflow-hidden">
+          <p className="text-sm text-muted-foreground line-clamp-6">
+            {writer.bio}
+          </p>
+        </div>
+
+        {/* Action Button Section - Fixed height */}
+        <div className="h-[60px] pt-4">
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={() => onSelect(writer)}
+          >
+            {t("View Profile", "சுயவிவரத்தைக் காண")}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
