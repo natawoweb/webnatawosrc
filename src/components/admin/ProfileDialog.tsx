@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,9 +23,11 @@ const USER_LEVELS: UserLevel[] = [
   'Literary Experts',
   'Aspiring Writers',
   'NATAWO Volunteers',
-  'NATAWO Students Writers',
+  'NATAWO Student Writers',
   'Subscriber',
-  'Technical'
+  'Technical',
+  'General',
+  'Global Ambassador'
 ];
 
 const APP_ROLES: AppRole[] = ['admin', 'writer', 'reader'];
