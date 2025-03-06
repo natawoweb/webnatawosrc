@@ -1,31 +1,21 @@
+
 import * as React from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useSession } from "@/hooks/useSession";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getInitials } from "@/utils/adminUtils";
 import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
-import { Globe } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { NavLinks } from "./nav/NavLinks";
+import { UserMenu } from "./nav/UserMenu";
+import { LanguageSelector } from "./nav/LanguageSelector";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
 
 export const Navbar: React.FC = () => {
   const { session, isSessionLoading, signOut } = useSession();
   const { profile } = useProfile();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { language, setLanguage, t } = useLanguage();
 
   const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
     queryKey: ["isAdmin", session?.user?.id],
@@ -45,14 +35,6 @@ export const Navbar: React.FC = () => {
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate("/", { replace: true });
-  };
-
-  const handleLanguageChange = (newLanguage: 'english' | 'tamil') => {
-    setLanguage(newLanguage);
-  };
-
-  const isActiveLink = (path: string) => {
-    return location.pathname === path;
   };
 
   const handleSignOut = async () => {
@@ -97,113 +79,20 @@ export const Navbar: React.FC = () => {
 
           <div className="hidden md:flex items-center gap-8 ml-auto">
             {session && (
-              <>
-                {isAdmin && (
-                  <Link 
-                    to="/admin"
-                    className={cn(
-                      "px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors",
-                      isActiveLink("/admin") && "bg-accent"
-                    )}
-                  >
-                    {t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")}
-                  </Link>
-                )}
-                {isWriter && !isAdmin && (
-                  <Link 
-                    to="/dashboard"
-                    className={cn(
-                      "px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors",
-                      isActiveLink("/dashboard") && "bg-accent"
-                    )}
-                  >
-                    {t("Writer Dashboard", "எழுத்தாளர் டாஷ்போர்டு")}
-                  </Link>
-                )}
-              </>
+              <NavLinks isAdmin={!!isAdmin} isWriter={isWriter} />
             )}
-            <Link 
-              to="/search-writers"
-              className={cn(
-                "px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors",
-                isActiveLink("/search-writers") && "bg-accent"
-              )}
-            >
-              {t("Writers", "எழுத்தாளர்கள்")}
-            </Link>
-            <Link 
-              to="/blogs"
-              className={cn(
-                "px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors",
-                isActiveLink("/blogs") && "bg-accent"
-              )}
-            >
-              {t("Blogs", "வலைப்பதிவுகள்")}
-            </Link>
-            <Link 
-              to="/events"
-              className={cn(
-                "px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors",
-                isActiveLink("/events") && "bg-accent"
-              )}
-            >
-              {t("Events", "நிகழ்வுகள்")}
-            </Link>
 
             <div className="flex items-center gap-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-9 h-9">
-                    <Globe className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleLanguageChange("english")}>
-                    {t("English", "ஆங்கிலம்")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange("tamil")}>
-                    {t("Tamil", "தமிழ்")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <LanguageSelector />
               <ThemeToggle />
               {session ? (
                 <>
                   <NotificationsDropdown />
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage 
-                            src={profile?.avatar_url || ""} 
-                            alt={profile?.full_name || ""}
-                            className="object-cover"
-                            key={profile?.avatar_url} // Add key to force re-render when avatar changes
-                          />
-                          <AvatarFallback>
-                            {profile?.full_name ? getInitials(profile.full_name) : '?'}
-                          </AvatarFallback>
-                        </Avatar>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end" forceMount>
-                      <DropdownMenuItem asChild>
-                        <Link to="/profile">
-                          {t("Profile", "சுயவிவரம்")}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleSignOut}>
-                        {t("Sign Out", "வெளியேறு")}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <UserMenu profile={profile} onSignOut={handleSignOut} />
                 </>
               ) : (
                 <Button asChild>
-                  <Link to="/auth">
-                    {t("Sign In", "உள்நுழைய")}
-                  </Link>
+                  <Link to="/auth">Sign In</Link>
                 </Button>
               )}
             </div>
@@ -212,4 +101,4 @@ export const Navbar: React.FC = () => {
       </div>
     </nav>
   );
-}
+};
