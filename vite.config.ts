@@ -9,7 +9,11 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+<<<<<<< development
   base: "/",
+=======
+>>>>>>> 
+  main
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
@@ -30,7 +34,7 @@ export default defineConfig(({ mode }) => ({
     assetsDir: "assets",
     rollupOptions: {
       output: {
-        manualChunks: undefined, // Disable code splitting for simpler asset loading
+        manualChunks: undefined,
         assetFileNames: "assets/[name]-[hash][extname]",
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js"
@@ -38,7 +42,6 @@ export default defineConfig(({ mode }) => ({
     }
   },
   css: {
-    // Add specific CSS handling configuration
     devSourcemap: true,
     modules: {
       generateScopedName: "[name]__[local]__[hash:base64:5]"
