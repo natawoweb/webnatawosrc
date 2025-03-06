@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Writer } from "@/types/writer";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 interface WriterCardProps {
   writer: Writer;
@@ -14,24 +12,6 @@ interface WriterCardProps {
 
 export function WriterCard({ writer, onSelect }: WriterCardProps) {
   const { t } = useLanguage();
-
-  // Fetch the writer's role from user_roles table
-  const { data: writerRole } = useQuery({
-    queryKey: ["writer-role", writer.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", writer.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching writer role:", error);
-        return null;
-      }
-      return data?.role;
-    },
-  });
 
   return (
     <Card className="h-[300px] hover:shadow-lg transition-shadow">
@@ -57,11 +37,6 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
               <Badge variant="outline">
                 {writer.level}
               </Badge>
-              {writerRole && (
-                <Badge variant="secondary" className="capitalize">
-                  {writerRole}
-                </Badge>
-              )}
             </div>
           </div>
         </div>
