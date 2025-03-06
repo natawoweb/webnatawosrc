@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -79,7 +78,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "An unexpected error occurred. Please try again.",
+        description: error.message || "Invalid email or password. Please try again.",
         duration: 5000,
       });
     } finally {

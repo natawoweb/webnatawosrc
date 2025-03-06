@@ -9,6 +9,7 @@ import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { useSession } from "@/hooks/useSession";
 import { useProfile } from "@/hooks/useProfile";
 import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function Auth() {
   const { profile, loading } = useProfile();
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const [isResetPassword, setIsResetPassword] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Always check for recovery mode first
@@ -31,34 +33,63 @@ export default function Auth() {
 
     // Handle redirect based on session and profile
     const handleRedirect = async () => {
-      if (session && !loading && profile) {
-        console.log("Session and profile loaded, checking roles...");
-        
-        const { data: isAdmin } = await supabase.rpc('has_role', {
-          user_id: session.user.id,
-          required_role: 'admin'
+      try {
+        if (session && !loading && profile) {
+          console.log("Session and profile loaded, checking roles...");
+          
+          const { data: isAdmin, error: roleError } = await supabase.rpc('has_role', {
+            user_id: session.user.id,
+            required_role: 'admin'
+          });
+
+          if (roleError) {
+            console.error("Error checking admin role:", roleError);
+            return;
+          }
+
+          if (isAdmin) {
+            console.log("Admin user detected, redirecting to admin dashboard");
+            navigate("/admin");
+            return;
+          }
+
+          if (profile.user_type === 'writer') {
+            console.log("Writer detected, redirecting to dashboard");
+            navigate("/dashboard");
+            return;
+          }
+
+          // Default navigation for other users
+          console.log("Regular user detected, redirecting to home");
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Error in redirect handling:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "There was a problem processing your login. Please try again.",
         });
-
-        if (isAdmin) {
-          console.log("Admin user detected, redirecting to admin dashboard");
-          navigate("/admin");
-          return;
-        }
-
-        if (profile.user_type === 'writer') {
-          console.log("Writer detected, redirecting to dashboard");
-          navigate("/dashboard");
-          return;
-        }
-
-        // Default navigation for other users
-        console.log("Regular user detected, redirecting to home");
-        navigate("/");
       }
     };
 
     handleRedirect();
-  }, [session, profile, loading, navigate]);
+  }, [session, profile, loading, navigate, toast]);
+
+  // Show loading state while profile is being fetched
+  if (loading) {
+    return (
+      <div className="container mx-auto py-10">
+        <Card className="max-w-md mx-auto">
+          <CardContent className="pt-6">
+            <div className="flex justify-center items-center h-32">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (isResetPassword) {
     return (
@@ -77,6 +108,11 @@ export default function Auth() {
     );
   }
 
+  const handleAuthSuccess = () => {
+    console.log("Auth success callback triggered");
+    // Success handling is now managed in the useEffect hook
+  };
+
   return (
     <div className="container mx-auto py-10">
       <Card className="max-w-md mx-auto">
@@ -92,11 +128,11 @@ export default function Auth() {
             </TabsList>
             
             <TabsContent value="signin">
-              <AuthForm type="signin" onSuccess={() => {}} />
+              <AuthForm type="signin" onSuccess={handleAuthSuccess} />
             </TabsContent>
             
             <TabsContent value="signup">
-              <AuthForm type="signup" onSuccess={() => {}} onExistingAccount={() => setActiveTab('signin')} />
+              <AuthForm type="signup" onSuccess={handleAuthSuccess} onExistingAccount={() => setActiveTab('signin')} />
             </TabsContent>
           </Tabs>
         </CardContent>
