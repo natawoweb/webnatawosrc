@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handlePasswordReset = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -54,23 +56,38 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
       
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('user_type')
+        .eq('id', data.user.id)
+        .single();
+
+      let redirectPath = '/';
+      if (profile?.user_type === 'writer') {
+        redirectPath = '/dashboard';
+      } else if (profile?.user_type === 'admin') {
+        redirectPath = '/admin';
+      }
+
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
         duration: 3000,
       });
+
+      navigate(redirectPath, { replace: true });
       
       onSuccess();
     } catch (error: any) {
@@ -87,7 +104,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSignIn} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <div className="relative">
