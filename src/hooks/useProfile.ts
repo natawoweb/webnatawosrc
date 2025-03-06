@@ -48,11 +48,11 @@ export const useProfile = () => {
 
         if (session) {
           await fetchProfile(session);
-          fetchedRef.current = true;
         }
 
         if (isMounted) {
           setLoading(false);
+          fetchedRef.current = true;
         }
       } catch (error: any) {
         console.error('Error in getProfile:', error);
@@ -70,6 +70,8 @@ export const useProfile = () => {
     getProfile();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session);
+      
       if (!isMounted) return;
       
       if (event === 'SIGNED_IN') {
@@ -80,11 +82,15 @@ export const useProfile = () => {
         setProfile(null);
         fetchedRef.current = false;
         setLoading(false);
+        if (!isPublicRoute(location.pathname)) {
+          navigate('/auth', { replace: true });
+        }
       }
     });
 
     return () => {
       isMounted = false;
+      setMounted(false);
       subscription.unsubscribe();
     };
   }, [navigate, location.pathname, fetchProfile, queryClient, toast]);

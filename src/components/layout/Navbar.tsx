@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
@@ -23,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 export const Navbar: React.FC = () => {
   const { session, signOut } = useSession();
-  const { profile } = useProfile();
+  const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
@@ -72,7 +71,7 @@ export const Navbar: React.FC = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8 ml-auto">
-            {session && (
+            {!profileLoading && session && (
               <>
                 {isAdmin && (
                   <Link 
@@ -143,7 +142,7 @@ export const Navbar: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
               <ThemeToggle />
-              {session ? (
+              {!profileLoading && (session ? (
                 <>
                   <NotificationsDropdown />
                   <DropdownMenu>
@@ -154,7 +153,7 @@ export const Navbar: React.FC = () => {
                             src={profile?.avatar_url || ""} 
                             alt={profile?.full_name || ""}
                             className="object-cover"
-                            key={profile?.avatar_url} // Add key to force re-render when avatar changes
+                            key={profile?.avatar_url}
                           />
                           <AvatarFallback>
                             {profile?.full_name ? getInitials(profile.full_name) : '?'}
@@ -181,7 +180,7 @@ export const Navbar: React.FC = () => {
                     {t("Sign In", "உள்நுழைய")}
                   </Link>
                 </Button>
-              )}
+              ))}
             </div>
           </div>
         </div>
