@@ -27,7 +27,6 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
 
-  // Check if user is admin
   const { data: isAdmin } = useQuery({
     queryKey: ["isAdmin", session?.user?.id],
     queryFn: async () => {
@@ -52,7 +51,6 @@ export const Navbar: React.FC = () => {
     setLanguage(newLanguage);
   };
 
-  // Function to determine if a link is active
   const isActiveLink = (path: string) => {
     return location.pathname === path;
   };
@@ -142,7 +140,7 @@ export const Navbar: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
               <ThemeToggle />
-              {!profileLoading && (session ? (
+              {!profileLoading && session ? (
                 <>
                   <NotificationsDropdown />
                   <DropdownMenu>
@@ -180,7 +178,7 @@ export const Navbar: React.FC = () => {
                     {t("Sign In", "உள்நுழைய")}
                   </Link>
                 </Button>
-              ))}
+              )}
             </div>
           </div>
         </div>
