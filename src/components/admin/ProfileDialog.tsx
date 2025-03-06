@@ -67,7 +67,7 @@ export function ProfileDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-4">
@@ -92,9 +92,9 @@ export function ProfileDialog({
           </div>
         </DialogHeader>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           <div className="flex flex-col items-center gap-4">
-            <Avatar className="h-32 w-32">
+            <Avatar className="h-24 w-24">
               <AvatarImage src={profile?.avatar_url || ''} />
               <AvatarFallback>{profile?.full_name?.[0] || '?'}</AvatarFallback>
             </Avatar>
@@ -105,7 +105,7 @@ export function ProfileDialog({
             )}
           </div>
 
-          <div className="grid gap-6">
+          <div className="grid gap-4">
             {isEditing ? (
               <>
                 <div className="space-y-1.5">
@@ -114,7 +114,7 @@ export function ProfileDialog({
                     value={selectedRole}
                     onValueChange={(value) => setSelectedRole(value as AppRole)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
@@ -132,7 +132,7 @@ export function ProfileDialog({
                     value={selectedLevel}
                     onValueChange={(value) => setSelectedLevel(value as UserLevel)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -146,7 +146,7 @@ export function ProfileDialog({
                 </div>
               </>
             ) : (
-              <>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <ProfileField label="Email" value={profile?.email} />
                 <ProfileField label="Full Name" value={profile?.full_name} />
                 <ProfileField label="Country" value={profile?.county} />
@@ -161,11 +161,11 @@ export function ProfileDialog({
                     profile?.level
                   } 
                 />
-                <div className="space-y-1.5">
+                <div className="sm:col-span-2">
                   <h3 className="text-sm font-medium text-muted-foreground">Bio</h3>
-                  <p className="text-sm whitespace-pre-wrap">{profile?.bio || 'No bio available'}</p>
+                  <p className="mt-1 text-sm whitespace-pre-wrap">{profile?.bio || 'No bio available'}</p>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
