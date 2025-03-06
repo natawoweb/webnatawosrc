@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Profile } from "@/integrations/supabase/types/models";
+import { useEffect, useState } from "react";
 
 interface UserMenuProps {
   profile: Profile | null;
@@ -20,8 +21,15 @@ interface UserMenuProps {
 
 export const UserMenu = ({ profile, onSignOut }: UserMenuProps) => {
   const { t } = useLanguage();
-  const initials = profile?.full_name ? getInitials(profile.full_name) : '';
-  const avatarUrl = profile?.avatar_url || '';
+  const [initials, setInitials] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+
+  useEffect(() => {
+    if (profile) {
+      setInitials(profile.full_name ? getInitials(profile.full_name) : '');
+      setAvatarUrl(profile.avatar_url || '');
+    }
+  }, [profile]);
 
   return (
     <DropdownMenu>
