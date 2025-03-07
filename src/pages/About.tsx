@@ -29,13 +29,13 @@ export default function About() {
       name: 'Ms. Manimegalai Ramamourty',
       role: 'Vice Coordinator',
       bio: 'தமிழ்க் கல்வியாளர், தமிழார்வலர், பேச்சாளர், எழுத்தாளர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க ஆட்சிக்குழு உறுப்பினர், வல்லமை மின்னிதழ் ஆசிரியர்குழு, மதிப்பாய்வுக்குழு உறுப்பினர், Florida, USA',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/Megala.jpg',
     },
     {
       name: 'Mr. Manikandan Meenakshi Sundaram',
       role: 'Content Coordinator',
       bio: 'மீ.மணிகண்டன் (புனைப் பெயர்: மணிமீ), தமிழ் ஆர்வலர், எழுத்தாளர், பத்திரிகை மற்றும் ஊடகங்களில் சிறுகதைகள், சந்தக் கவிதைகள், புதுக்கவிதைகள் எழுதுபவர் மற்றும் பாடல்கள் புனைபவர், Texas, USA',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/MeeManikanda.jpg',
     },
   ];
 
@@ -44,7 +44,7 @@ export default function About() {
       name: 'Mr. Mourougavelou Vaithianathan',
       role: 'Founder',
       bio: 'எழுத்தாளர், செய்தியாளர், நிறுவனர் Fun Cycle Riders Non-profit Organization, Maryland, USA',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/Mouroug.jpg',
     },
     {
       name: 'Dr. Balamurugan Kuppusamy',
@@ -98,7 +98,7 @@ export default function About() {
       name: 'Dr. Pushpa Christry',
       role: 'Global Ambassador - Canada',
       bio: 'பாவலர் மணி, இலக்கியவாதி, தமிழ் கல்வியாளர், எழுத்தாளர், உலகத் திருக்குறள் மையம் (கனடாப் பொறுப்பாளர்), உலகத் திருக்குறள் சமுதாய மையம் (அயலகப் பொறுப்பாளர்), Toronto, Canada',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/Dr_Pushpa.jpg',
     },
   ];
 
@@ -122,13 +122,13 @@ export default function About() {
       name: 'Prof. Dr. K. Thilagavathi',
       role: 'Global Ambassador - India',
       bio: 'Former Director / Head Tamil Cultural Center, சங்க இலக்கிய ஆராய்ச்சியாளர், உரையாளர், சங்க இலக்கியப் பொருட் களஞ்சியத்தை உருவாக்கியவர், தமிழகப் புலவர்குழு உறுப்பினர், தமிழ் வளர்ச்சிக்கழக உறுப்பினர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க இணைச்செயலாளர், Tamil University, Thanjavur, Tamil Nadu, India',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/Dr_K_Thilagavathi.jpg',
     },
     {
       name: 'Dr. Murugesan Elangovan',
       role: 'Global Ambassador - India',
       bio: 'Associate Professor, K.M. Government Institute for PG Studies and Research, Puducherry, India',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/Murugesan_Elangova.jpg',
     },
     {
       name: 'Dr. Ka. Selvaradjou',
@@ -140,7 +140,7 @@ export default function About() {
       name: 'கவிஞர் விஜயகிருஷ்ணன்',
       role: 'Global Ambassador - India',
       bio: 'நெறியாளர், தூர்தர்ஷன் தமிழ் சென்னை, Tamil Nadu, India',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/கவிஞர்_விஜயகிருஷ்ணன்.jpg',
     },
     {
       name: 'முனைவர் ஆ. அழகுசெல்வம்',
@@ -534,7 +534,8 @@ export default function About() {
               ))}
             </div>
           </CardContent>
-
+        </Card>
+        <Card>
           <CardHeader>
             <CardTitle>
               {t('Founding Members', 'நிறுவனர் உறுப்பினர்கள்')}
@@ -562,7 +563,8 @@ export default function About() {
               ))}
             </div>
           </CardContent>
-
+        </Card>
+        <Card>
           <CardHeader>
             <CardTitle>
               {t('Global Ambassadors - USA', 'உலகத் தூதர்கள் - USA')}
@@ -590,7 +592,8 @@ export default function About() {
               ))}
             </div>
           </CardContent>
-
+        </Card>
+        <Card>
           <CardHeader>
             <CardTitle>
               {t('Global Ambassadors - Canada', 'உலகத் தூதர்கள் - Canada')}
@@ -618,7 +621,8 @@ export default function About() {
               ))}
             </div>
           </CardContent>
-
+        </Card>
+        <Card>
           <CardHeader>
             <CardTitle>
               {t('Global Ambassadors - Mexico', 'உலகத் தூதர்கள் - Mexico')}
@@ -646,7 +650,8 @@ export default function About() {
               ))}
             </div>
           </CardContent>
-
+        </Card>
+        <Card>
           <CardHeader>
             <CardTitle>
               {t(
@@ -662,7 +667,7 @@ export default function About() {
                   <img
                     src={member.image}
                     alt={t(member.name, member.name)}
-                    className="w-full h-64 object-cover object-center"
+                    className="w-full h-64 object-cover  object-center"
                   />
                   <div className="p-4">
                     <h3 className="font-semibold text-xl">
