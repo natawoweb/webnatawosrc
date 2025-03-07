@@ -31,16 +31,16 @@ export const Navbar: React.FC = () => {
             <img
               src="/lovable-uploads/header.png"
               alt="NATAWO Logo"
-              className="h-10 w-full object-contain"
+              className="h-12 w-full object-contain"
             />
             {/* <span className="text-xl font-semibold">NATAWO</span> */}
           </Link>
 
-          <div className="ml-4">
+          <div className="ml-[150px]">
             <img
               src="/lovable-uploads/middle.png"
               alt="NATAWO Logo"
-              className="h-10 w-[340px]"
+              className="h-12 w-full"
             />
           </div>
 
