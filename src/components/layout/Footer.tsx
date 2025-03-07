@@ -211,7 +211,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* <div className="mt-8 pt-8 border-t">
+        <div className="mt-8 pt-8 border-t">
           <div className="flex flex-col items-center space-y-2 text-sm text-muted-foreground text-center">
             <p>
               © {new Date().getFullYear()} NATAWO.{' '}
@@ -220,7 +220,7 @@ export function Footer() {
                 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.'
               )}
             </p>
-            <p className="text-xs">
+            {/* <p className="text-xs">
               {t('Built with ♥ by ', '♥ உடன் உருவாக்கப்பட்டது ')}
               <a
                 href="https://mahayugam.com"
@@ -230,9 +230,9 @@ export function Footer() {
               >
                 Mahayugam Inc
               </a>
-            </p>
+            </p> */}
           </div>
-        </div> */}
+        </div>
       </div>
     </footer>
   );
