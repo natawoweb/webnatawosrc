@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Check, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function About() {
   const { t } = useLanguage();
@@ -209,10 +211,21 @@ export default function About() {
     window.open(pdfUrl, '_blank');
   };
 
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, [location]);
+
   return (
     <div className="container mx-auto py-12 space-y-12">
       {/* Mission Section */}
-      <section className="space-y-4">
+      <section className="space-y-4" id="our-mission">
         <h1 className="text-4xl font-bold">
           {t('About Us', 'எங்களைப் பற்றி')}
         </h1>
@@ -282,7 +295,7 @@ export default function About() {
       </section>
 
       {/* Organization Section */}
-      <section className="space-y-4">
+      <section className="space-y-4" id="about-organization">
         <Card>
           <CardHeader>
             <CardTitle>
@@ -400,7 +413,7 @@ export default function About() {
       </section>
 
       {/* History Section */}
-      <section className="space-y-4">
+      <section className="space-y-4" id="history">
         <Card>
           <CardHeader>
             <CardTitle>{t('History', 'வரலாறு')}</CardTitle>
@@ -478,7 +491,7 @@ export default function About() {
 
       {/* Leadership Section */}
       <section className="space-y-4">
-        <Card>
+        <Card id="executive-board">
           <CardHeader>
             <CardTitle>{t('Executive Board', 'நிறைவேற்று குழு')}</CardTitle>
           </CardHeader>
@@ -535,7 +548,7 @@ export default function About() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card id="founding-members">
           <CardHeader>
             <CardTitle>
               {t('Founding Members', 'நிறுவனர் உறுப்பினர்கள்')}
@@ -564,7 +577,7 @@ export default function About() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card id="global-ambassadors">
           <CardHeader>
             <CardTitle>
               {t('Global Ambassadors - USA', 'உலகத் தூதர்கள் - USA')}
@@ -686,7 +699,7 @@ export default function About() {
       </section>
 
       {/* Membership Section */}
-      <section className="space-y-4">
+      <section className="space-y-4" id="membership">
         <Card>
           <CardHeader>
             <CardTitle>{t('Membership', 'உறுப்பினர்')}</CardTitle>
@@ -825,7 +838,7 @@ export default function About() {
       </section>
 
       {/* Bylaws Section */}
-      <section className="space-y-4">
+      <section className="space-y-4" id="bylaws">
         <Card>
           <CardHeader>
             <CardTitle>{t('Bylaws', 'விதிமுறைகள்')}</CardTitle>
