@@ -16,6 +16,18 @@ export default function About() {
       image: '/lovable-uploads/dc133d31-ff53-48f8-9c21-f2aa21c91bc7.png',
     },
     {
+      name: 'Ms. Manimegalai Ramamourty',
+      role: 'Vice Coordinator',
+      bio: 'தமிழ்க் கல்வியாளர், தமிழார்வலர், பேச்சாளர், எழுத்தாளர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க ஆட்சிக்குழு உறுப்பினர், வல்லமை மின்னிதழ் ஆசிரியர்குழு, மதிப்பாய்வுக்குழு உறுப்பினர், Florida, USA',
+      image: '/lovable-uploads/Megala.jpg',
+    },
+    {
+      name: 'Mr. Manikandan Meenakshi Sundaram',
+      role: 'Content Coordinator',
+      bio: 'மீ.மணிகண்டன் (புனைப் பெயர்: மணிமீ), தமிழ் ஆர்வலர், எழுத்தாளர், பத்திரிகை மற்றும் ஊடகங்களில் சிறுகதைகள், சந்தக் கவிதைகள், புதுக்கவிதைகள் எழுதுபவர் மற்றும் பாடல்கள் புனைபவர், Texas, USA',
+      image: '/lovable-uploads/MeeManikanda.jpg',
+    },
+    {
       name: 'Manikanda Prabu',
       role: 'Networking Coordinator',
       bio: 'A renowned professional and community organizer, Mani focuses on building connections between writers and readers across North America.',
@@ -33,12 +45,6 @@ export default function About() {
       bio: 'தமிழ்க் கல்வியாளர், தமிழார்வலர், பேச்சாளர், எழுத்தாளர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க ஆட்சிக்குழு உறுப்பினர், வல்லமை மின்னிதழ் ஆசிரியர்குழு, மதிப்பாய்வுக்குழு உறுப்பினர், Florida, USA',
       image: '/lovable-uploads/Megala.jpg',
     },
-    {
-      name: 'Mr. Manikandan Meenakshi Sundaram',
-      role: 'Content Coordinator',
-      bio: 'மீ.மணிகண்டன் (புனைப் பெயர்: மணிமீ), தமிழ் ஆர்வலர், எழுத்தாளர், பத்திரிகை மற்றும் ஊடகங்களில் சிறுகதைகள், சந்தக் கவிதைகள், புதுக்கவிதைகள் எழுதுபவர் மற்றும் பாடல்கள் புனைபவர், Texas, USA',
-      image: '/lovable-uploads/MeeManikanda.jpg',
-    },
   ];
 
   const foundingMembers = [
@@ -52,13 +58,13 @@ export default function About() {
       name: 'Dr. Balamurugan Kuppusamy',
       role: 'Co-founder',
       bio: 'நிறுவனர் பிரடெரிக் தமிழ்ப்பள்ளி, தமிழ்க் கல்வியாளர், பேச்சாளர், எழுத்தாளர், Maryland, USA',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/dc133d31-ff53-48f8-9c21-f2aa21c91bc7.png',
     },
     {
       name: 'Mr. Manikanda P Lakshmanan',
       role: 'Co-founder',
       bio: 'தமிழார்வலர், தமிழார்வ எழுத்தாளர், இணை-நிறுவனர் வளர்விதை Non-profit Organization, Social Entrepreneur, Pennsylvania, USA',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/168cf684-5521-4c4e-b13c-c5ab1e534803.png',
     },
     {
       name: 'Mr. Ramprasath Rengasamy',
@@ -85,7 +91,7 @@ export default function About() {
       name: 'Mr. Mourougavelou Vaithianathan',
       role: 'Global Ambassador - USA',
       bio: 'புதுவை முருகு, தமிழார்வலர், தமிழ்க் கல்வியாளர், எழுத்தாளர், செய்தியாளர், மொழியியல் ஆர்வலர், மனிதவள சிந்தனையாளர், Social Entrepreneur, World Traveler, Maryland, USA',
-      image: '/lovable-uploads/fav.png',
+      image: '/lovable-uploads/Mouroug.jpg',
     },
   ];
 
@@ -212,12 +218,15 @@ export default function About() {
   };
 
   const location = useLocation();
+  const offset = 100; // Adjust this value to add space above the section
 
   useEffect(() => {
     if (location.hash) {
       const element = document.getElementById(location.hash.substring(1));
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const yOffset =
+          element.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: yOffset, behavior: 'smooth' });
       }
     }
   }, [location]);
