@@ -18,7 +18,7 @@ export const NavLinks = () => {
         <Link
           to="/admin"
           className={cn(
-            'px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors',
+            'px-2 py-2 text-sm font-medium rounded-md hover:bg-accent transition-colors',
             isActiveLink('/admin') && 'bg-accent'
           )}
         >
@@ -29,7 +29,7 @@ export const NavLinks = () => {
         <Link
           to="/dashboard"
           className={cn(
-            'px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors',
+            'px-2 py-2 text-sm font-medium rounded-md hover:bg-accent transition-colors',
             isActiveLink('/dashboard') && 'bg-accent'
           )}
         >
@@ -39,7 +39,7 @@ export const NavLinks = () => {
       <Link
         to="/search-writers"
         className={cn(
-          'px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors',
+          'px-2 py-2 text-sm font-medium rounded-md hover:bg-accent transition-colors',
           isActiveLink('/search-writers') && 'bg-accent'
         )}
       >
@@ -47,19 +47,9 @@ export const NavLinks = () => {
       </Link>
 
       <Link
-        to="/contact"
-        className={cn(
-          'px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors',
-          isActiveLink('/contact') && 'bg-accent'
-        )}
-      >
-        {t('Contact Us', 'எங்களை தொடர்பு கொள்ள')}
-      </Link>
-
-      <Link
         to="/about"
         className={cn(
-          'px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors',
+          'px-2 py-2 text-sm font-medium rounded-md hover:bg-accent transition-colors',
           isActiveLink('/about') && 'bg-accent'
         )}
       >
@@ -69,7 +59,7 @@ export const NavLinks = () => {
       <Link
         to="/blogs"
         className={cn(
-          'px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors',
+          'px-2 py-2 text-sm font-medium rounded-md hover:bg-accent transition-colors',
           isActiveLink('/blogs') && 'bg-accent'
         )}
       >
@@ -78,7 +68,7 @@ export const NavLinks = () => {
       <Link
         to="/events"
         className={cn(
-          'px-4 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors',
+          'px-2 py-2 text-sm font-medium rounded-md hover:bg-accent transition-colors',
           isActiveLink('/events') && 'bg-accent'
         )}
       >

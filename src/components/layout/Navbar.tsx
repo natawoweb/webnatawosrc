@@ -36,7 +36,7 @@ export const Navbar: React.FC = () => {
             {/* <span className="text-xl font-semibold">NATAWO</span> */}
           </Link>
 
-          <div className="ml-8">
+          <div className="ml-4">
             <img
               src="/lovable-uploads/middle.png"
               alt="NATAWO Logo"
@@ -44,7 +44,7 @@ export const Navbar: React.FC = () => {
             />
           </div>
 
-          <div className="hidden md:flex items-center gap-4 ml-auto">
+          <div className="hidden md:flex items-center gap-2 ml-auto">
             <NavLinks />
             <div className="flex items-center gap-4">
               <LanguageSelector />
