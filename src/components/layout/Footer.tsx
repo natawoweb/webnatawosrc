@@ -58,7 +58,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  to="/writers"
+                  to="/search-writers"
                   className="text-sm text-muted-foreground hover:text-foreground"
                 >
                   {t('Writers Directory', 'எழுத்தாளர்கள் அடைவு')}

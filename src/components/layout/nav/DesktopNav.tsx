@@ -1,25 +1,24 @@
-
-import * as React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Globe, LogOut } from "lucide-react";
+import * as React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Globe, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import { useProfile } from "@/hooks/useProfile";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { useLanguage } from "@/contexts/LanguageContext";
+} from '@/components/ui/dropdown-menu';
+import { NotificationsDropdown } from '@/components/notifications/NotificationsDropdown';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
+import { useProfile } from '@/hooks/useProfile';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DesktopNavProps {
-  session: any;
+  session: { user: { id: string } } | null;
   handleSignOut: () => Promise<void>;
   navigate: (path: string) => void;
 }
@@ -32,15 +31,15 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
   const location = useLocation();
   const { profile } = useProfile();
   const { language, setLanguage, t } = useLanguage();
-  const isWriter = profile?.user_type === "writer";
+  const isWriter = profile?.user_type === 'writer';
 
   const { data: isAdmin } = useQuery({
-    queryKey: ["isAdmin", session?.user?.id],
+    queryKey: ['isAdmin', session?.user?.id],
     queryFn: async () => {
       if (!session?.user?.id) return false;
       const { data } = await supabase.rpc('has_role', {
         user_id: session.user.id,
-        required_role: 'admin'
+        required_role: 'admin',
       });
       return data;
     },
@@ -54,65 +53,65 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
   return (
     <div className="hidden md:flex md:items-center md:space-x-4">
       {isAdmin && (
-        <Link 
-          to="/admin" 
+        <Link
+          to="/admin"
           className={cn(
-            "px-3 py-2 rounded-md transition-colors",
-            isActiveRoute("/admin")
-              ? "text-foreground font-medium bg-accent"
-              : "text-foreground/80 hover:text-foreground"
+            'px-3 py-2 rounded-md transition-colors',
+            isActiveRoute('/admin')
+              ? 'text-foreground font-medium bg-accent'
+              : 'text-foreground/80 hover:text-foreground'
           )}
         >
-          {t("Admin Dashboard", "நிர்வாக டாஷ்போர்டு")}
+          {t('Admin Dashboard', 'நிர்வாக டாஷ்போர்டு')}
         </Link>
       )}
       {isWriter && (
-        <Link 
-          to="/dashboard" 
+        <Link
+          to="/dashboard"
           className={cn(
-            "px-3 py-2 rounded-md transition-colors",
-            isActiveRoute("/dashboard")
-              ? "text-foreground font-medium bg-accent"
-              : "text-foreground/80 hover:text-foreground"
+            'px-3 py-2 rounded-md transition-colors',
+            isActiveRoute('/dashboard')
+              ? 'text-foreground font-medium bg-accent'
+              : 'text-foreground/80 hover:text-foreground'
           )}
         >
-          {t("Dashboard", "டாஷ்போர்டு")}
+          {t('Dashboard', 'டாஷ்போர்டு')}
         </Link>
       )}
-      <Link 
-        to="/search" 
+      <Link
+        to="/search"
         className={cn(
-          "px-3 py-2 rounded-md transition-colors",
-          isActiveRoute("/search")
-            ? "text-foreground font-medium bg-accent"
-            : "text-foreground/80 hover:text-foreground"
+          'px-3 py-2 rounded-md transition-colors',
+          isActiveRoute('/search')
+            ? 'text-foreground font-medium bg-accent'
+            : 'text-foreground/80 hover:text-foreground'
         )}
       >
-        {t("Writers", "எழுத்தாளர்கள்")}
+        {t('Writers', 'எழுத்தாளர்கள்')}
       </Link>
-      <Link 
-        to="/blogs" 
+      <Link
+        to="/blogs"
         className={cn(
-          "px-3 py-2 rounded-md transition-colors",
-          isActiveRoute("/blogs")
-            ? "text-foreground font-medium bg-accent"
-            : "text-foreground/80 hover:text-foreground"
+          'px-3 py-2 rounded-md transition-colors',
+          isActiveRoute('/blogs')
+            ? 'text-foreground font-medium bg-accent'
+            : 'text-foreground/80 hover:text-foreground'
         )}
       >
-        {t("Blogs", "வலைப்பதிவுகள்")}
+        {t('Blogs', 'வலைப்பதிவுகள்')}
       </Link>
-      <Link 
-        to="/events" 
+      <Link
+        to="/events"
         className={cn(
-          "px-3 py-2 rounded-md transition-colors",
-          isActiveRoute("/events")
-            ? "text-foreground font-medium bg-accent"
-            : "text-foreground/80 hover:text-foreground"
+          'px-3 py-2 rounded-md transition-colors',
+          isActiveRoute('/events')
+            ? 'text-foreground font-medium bg-accent'
+            : 'text-foreground/80 hover:text-foreground'
         )}
       >
-        {t("Events", "நிகழ்வுகள்")}
+        {t('Events', 'நிகழ்வுகள்')}
       </Link>
-      
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="w-auto px-3 gap-2">
@@ -121,10 +120,10 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setLanguage("english")}>
+          <DropdownMenuItem onClick={() => setLanguage('english')}>
             English
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setLanguage("tamil")}>
+          <DropdownMenuItem onClick={() => setLanguage('tamil')}>
             தமிழ் (Tamil)
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -140,19 +139,21 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
             <Avatar className="h-8 w-8 cursor-pointer">
               <AvatarImage src={profile?.avatar_url} />
               <AvatarFallback>
-                {profile?.pseudonym ? profile.pseudonym[0].toUpperCase() : profile?.email?.[0].toUpperCase() || '?'}
+                {profile?.pseudonym
+                  ? profile.pseudonym[0].toUpperCase()
+                  : profile?.email?.[0].toUpperCase() || '?'}
               </AvatarFallback>
             </Avatar>
           </Link>
           <Button variant="outline" onClick={handleSignOut}>
             <LogOut className="h-4 w-4 mr-2" />
-            {t("Sign Out", "வெளியேறு")}
+            {t('Sign Out', 'வெளியேறு')}
           </Button>
         </div>
       ) : (
         <Link to="/auth">
           <Button variant="outline" className="ml-4">
-            {t("Sign In", "உள்நுழைக")}
+            {t('Sign In', 'உள்நுழைக')}
           </Button>
         </Link>
       )}
