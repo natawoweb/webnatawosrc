@@ -68,12 +68,12 @@ export const NavLinks = () => {
         </button>
 
         {open && (
-          <div className="absolute left-0 mt-2 w-48 transition-colors shadow-lg rounded-md">
+          <div className="absolute left-0 mt-2 w-48 bg-accent shadow-lg rounded-md">
             {sections.map((section) => (
               <Link
                 key={section.id}
                 to={`/about#${section.id}`}
-                className="block px-4 py-2 text-sm hover:bg-gray-400"
+                className="block px-4 py-2 text-sm hover:bg-accent"
                 onClick={() => setOpen(false)}
               >
                 {section.name}
