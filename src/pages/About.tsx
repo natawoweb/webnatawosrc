@@ -153,7 +153,7 @@ export default function About() {
     {
       name: 'கவிஞர் விஜயகிருஷ்ணன்',
       role: 'Global Ambassador - India',
-      bio: 'நெறியாளர், தூர்தர்ஷன் தமிழ், கம்பன் கழக துணைச்செயலாளர், வங்கியாளர், கிராமவளர் பணியாளர், சென்னை, <strong>Tamil Nadu, India </strong>',
+      bio: 'நெறியாளர், தூர்தர்ஷன் தமிழ்; துணைச்செயலாளர், சென்னை கம்பன் கழகம்; வங்கியாளர்; கிராமவளர் பணியாளர், <strong>Tamil Nadu,  India</strong>',
       image: '/lovable-uploads/17.jpg',
     },
     {
