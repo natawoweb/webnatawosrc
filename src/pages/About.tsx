@@ -12,7 +12,7 @@ export default function About() {
     {
       name: 'Dr. Balamurugan Kuppusamy',
       role: 'Chief Coordinator',
-      bio: "With over 20 years of experience in Tamil literature and education, Dr. Kuppusamy leads our organization's mission to promote Tamil literary writing.",
+      bio: "With over 20 years of experience in Tamil literature and education, Dr. Kuppusamy leads our organization's mission to promote Tamil literary writing.  <strong>Maryland, USA</strong>",
       image: '/lovable-uploads/1.jpg',
     },
     {
@@ -30,13 +30,13 @@ export default function About() {
     {
       name: 'Manikanda Prabu',
       role: 'Networking Coordinator',
-      bio: 'A renowned professional and community organizer, Mani focuses on building connections between writers and readers across <strong>North America</strong>.',
+      bio: 'A renowned professional and community organizer, Mani focuses on building connections between writers and readers across <strong>Pennsylvania, USA</strong>.',
       image: '/lovable-uploads/4.jpg',
     },
     {
       name: 'Ravi Kumar Potu',
       role: 'Technology Coordinator',
-      bio: "An accomplished information technology professional, Ravi manages our organization's day-to-day Technology operations and System improvement initiatives.",
+      bio: "An accomplished information technology professional, Ravi manages our organization's day-to-day Technology operations and System improvement initiatives. <strong>Maryland, USA</strong>",
       image: '/lovable-uploads/5.jpg',
     },
   ];
@@ -63,7 +63,7 @@ export default function About() {
     {
       name: 'Mr. Ramprasath Rengasamy',
       role: 'Co-founder',
-      bio: 'தமிழ்நாடு அரசின் விருது பெற்ற அறிவியல் புனைவெழுத்தாளர், பல்-மொழி எழுத்தாளர், கதாசிரியர், சிறார் அறிபுனை எழுத்தாளர் பதிப்பாளர், கவிஞர், நாவலாசிரியர், சிறப்புரையாளர், Gym Enthusiast, <strong> Georgia, USA </strong>',
+      bio: 'தமிழ்நாடு அரசின் விருது பெற்ற அறிவியல் புனைவெழுத்தாளர், பல்-மொழி எழுத்தாளர், கதாசிரியர், சிறார் அறிபுனை எழுத்தாளர், பதிப்பாளர், கவிஞர், நாவலாசிரியர், சிறப்புரையாளர், Gym Enthusiast, <strong> Georgia, USA </strong>',
       image: '/lovable-uploads/7.jpg',
     },
     {
@@ -93,7 +93,7 @@ export default function About() {
     {
       name: 'Dr. Selvanayaki Sridas',
       role: 'Global Ambassador - Canada',
-      bio: 'Senior Lecturer, Former Administrator of Annamalai Canada Campus, இலக்கியவாதி, தமிழ் கல்வியாளர், எழுத்தாளர், <strong> Toronto, Canada </strong> ',
+      bio: 'தலைவர், தொல்காப்பியமன்றம்-கனடா, பேராசிரியர், நிருவாகப் பொறுப்பாளர், அண்ணாமலைக் கனடா வளாகம், சிரேஷ்ட வரிமதிப்பாளர், உள்நாட்டு இறைவரித் திணைக்களம், ஸ்ரீ லங்கா, இலக்கியவாதி, எழுத்தாளர்,<strong> Toronto, Canada</strong>',
       image: '/lovable-uploads/11.jpg',
     },
     {
@@ -114,7 +114,7 @@ export default function About() {
     {
       name: 'Mr. Purushothaman Alagia Manavalan',
       role: 'Global Ambassador - Mexico',
-      bio: 'தமிழார்வலர், தமிழார்வ எழுத்தாளர், Social Entrepreneur, Guadalajara, <strong>Mexico </strong>',
+      bio: 'தமிழார்வலர், தமிழார்வ எழுத்தாளர், Social Entrepreneur, <strong>Guadalajara, Mexico </strong>',
       image: '/lovable-uploads/12.jpg',
     },
   ];
@@ -123,43 +123,43 @@ export default function About() {
     {
       name: 'Dr. S. Mohan',
       role: 'Global Ambassador - India',
-      bio: 'Vice Chancellor, Puducherry Technological University, Puducherry,<strong> India </strong>',
+      bio: 'Vice Chancellor, Puducherry Technological University, <strong>Puducherry, India </strong>',
       image: '/lovable-uploads/13.jpg',
     },
     {
       name: 'Kalaimamani Dr. Cheyon I.B.S.',
       role: 'Global Ambassador - India',
-      bio: 'Former Director, All India Radio, MTS Academy, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், Tamil Nadu, <strong> India </strong>',
+      bio: 'Former Director, All India Radio, MTS Academy, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், <strong>Tamil Nadu, India </strong>',
       image: '/lovable-uploads/22.jpg',
     },
     {
       name: 'Prof. Dr. K. Thilagavathi',
       role: 'Global Ambassador - India',
-      bio: 'Former Director / Head Tamil Cultural Center, சங்க இலக்கிய ஆராய்ச்சியாளர், உரையாளர், சங்க இலக்கியப் பொருட் களஞ்சியத்தை உருவாக்கியவர், தமிழகப் புலவர்குழு உறுப்பினர், தமிழ் வளர்ச்சிக்கழக உறுப்பினர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க இணைச்செயலாளர், Tamil University, Thanjavur, Tamil Nadu, <strong>India </strong>',
+      bio: 'Former Director / Head Tamil Cultural Center, சங்க இலக்கிய ஆராய்ச்சியாளர், உரையாளர், சங்க இலக்கியப் பொருட் களஞ்சியத்தை உருவாக்கியவர், தமிழகப் புலவர்குழு உறுப்பினர், தமிழ் வளர்ச்சிக்கழக உறுப்பினர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க இணைச்செயலாளர், Tamil University, Thanjavur, <strong>Tamil Nadu, India </strong>',
       image: '/lovable-uploads/14.jpg',
     },
     {
       name: 'Dr. Murugesan Elangovan',
       role: 'Global Ambassador - India',
-      bio: 'Associate Professor, K.M. Government Institute for PG Studies and Research, Puducherry, <strong>India</strong>',
+      bio: 'Associate Professor, K.M. Government Institute for PG Studies and Research, <strong>Puducherry, India</strong>',
       image: '/lovable-uploads/15.jpg',
     },
     {
       name: 'Dr. Ka. Selvaradjou',
       role: 'Global Ambassador - India',
-      bio: 'Professor & Director (Planning and Development), Puducherry Technological University, Puducherry, <strong>India </strong>',
+      bio: 'Professor & Director (Planning and Development), Puducherry Technological University, <strong>Puducherry, India </strong>',
       image: '/lovable-uploads/16.jpg',
     },
     {
       name: 'கவிஞர் விஜயகிருஷ்ணன்',
       role: 'Global Ambassador - India',
-      bio: 'நெறியாளர் சென்னை கம்பன் கழக துணைச்செயலாளர், வங்கியாளர், கிராமவளர் பணியாளர், தூர்தர்ஷன் தமிழ் சென்னை, Tamil Nadu, <strong>India </strong>',
+      bio: 'நெறியாளர், தூர்தர்ஷன் தமிழ், கம்பன் கழக துணைச்செயலாளர், வங்கியாளர், கிராமவளர் பணியாளர், சென்னை, <strong>Tamil Nadu, India </strong>',
       image: '/lovable-uploads/17.jpg',
     },
     {
       name: 'முனைவர் ஆ. அழகுசெல்வம்',
       role: 'Global Ambassador - India',
-      bio: 'தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், அருப்புக்கோட்டை அரசு கலை மற்றும் அறிவியல் கல்லூரி, Tamil Nadu,<strong> India </strong>',
+      bio: 'தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், அருப்புக்கோட்டை அரசு கலை மற்றும் அறிவியல் கல்லூரி, <strong>Tamil Nadu, India </strong>',
       image: '/lovable-uploads/18.jpg',
     },
     {
@@ -171,7 +171,7 @@ export default function About() {
     {
       name: 'Dr. Gurusamy Asogan',
       role: 'Global Ambassador - Indonesia',
-      bio: 'தமிழ் ஆர்வலர், எழுத்தாளர், Jakarta Java, <strong> Indonesia </strong>',
+      bio: 'தமிழ் ஆர்வலர், எழுத்தாளர், <strong>Jakarta Java, Indonesia </strong>',
       image: '/lovable-uploads/20.jpg',
     },
     {
@@ -183,7 +183,7 @@ export default function About() {
     {
       name: 'பேராசிரியர் மருத்துவர் ஜெயபாலன் வள்ளியப்பன்',
       role: 'Global Ambassador - Malaysia',
-      bio: 'இலக்கியவாதி, தமிழறிஞர், மகப்பேறு சோதனைக்குழாய் மருத்துவ நிபுணர், Eppo, <strong>Malaysia</strong>',
+      bio: 'இலக்கியவாதி, தமிழறிஞர், மகப்பேறு சோதனைக்குழாய் மருத்துவ நிபுணர், <strong>Eppo, Malaysia</strong>',
       image: '/lovable-uploads/23.jpg',
     },
   ];
