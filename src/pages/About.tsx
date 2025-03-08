@@ -18,19 +18,19 @@ export default function About() {
     {
       name: 'Ms. Manimegalai Ramamourty',
       role: 'Vice Coordinator',
-      bio: 'தமிழ்க் கல்வியாளர், தமிழார்வலர், பேச்சாளர், எழுத்தாளர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க ஆட்சிக்குழு உறுப்பினர், வல்லமை மின்னிதழ் ஆசிரியர்குழு, மதிப்பாய்வுக்குழு உறுப்பினர், Florida, USA',
+      bio: 'தமிழ்க் கல்வியாளர், தமிழார்வலர், பேச்சாளர், எழுத்தாளர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க ஆட்சிக்குழு உறுப்பினர், வல்லமை மின்னிதழ் ஆசிரியர்குழு, மதிப்பாய்வுக்குழு உறுப்பினர், <strong>Florida, USA</strong>',
       image: '/lovable-uploads/2.jpg',
     },
     {
       name: 'Mr. Manikandan Meenakshi Sundaram',
       role: 'Content Coordinator',
-      bio: 'மீ.மணிகண்டன் (புனைப் பெயர்: மணிமீ), தமிழ் ஆர்வலர், எழுத்தாளர், பத்திரிகை மற்றும் ஊடகங்களில் சிறுகதைகள், சந்தக் கவிதைகள், புதுக்கவிதைகள் எழுதுபவர் மற்றும் பாடல்கள் புனைபவர், Texas, USA',
+      bio: 'மீ.மணிகண்டன் (புனைப் பெயர்: மணிமீ), தமிழ் ஆர்வலர், எழுத்தாளர், பத்திரிகை மற்றும் ஊடகங்களில் சிறுகதைகள், சந்தக் கவிதைகள், புதுக்கவிதைகள் எழுதுபவர் மற்றும் பாடல்கள் புனைபவர், <strong>Texas, USA</strong>',
       image: '/lovable-uploads/3.jpg',
     },
     {
       name: 'Manikanda Prabu',
       role: 'Networking Coordinator',
-      bio: 'A renowned professional and community organizer, Mani focuses on building connections between writers and readers across North America.',
+      bio: 'A renowned professional and community organizer, Mani focuses on building connections between writers and readers across <strong>North America</strong>.',
       image: '/lovable-uploads/4.jpg',
     },
     {
@@ -39,43 +39,37 @@ export default function About() {
       bio: "An accomplished information technology professional, Ravi manages our organization's day-to-day Technology operations and System improvement initiatives.",
       image: '/lovable-uploads/5.jpg',
     },
-    {
-      name: 'Ms. Manimegalai Ramamourty',
-      role: 'Vice Coordinator',
-      bio: 'தமிழ்க் கல்வியாளர், தமிழார்வலர், பேச்சாளர், எழுத்தாளர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க ஆட்சிக்குழு உறுப்பினர், வல்லமை மின்னிதழ் ஆசிரியர்குழு, மதிப்பாய்வுக்குழு உறுப்பினர், Florida, USA',
-      image: '/lovable-uploads/2.jpg',
-    },
   ];
 
   const foundingMembers = [
     {
       name: 'Mr. Mourougavelou Vaithianathan',
       role: 'Founder',
-      bio: 'எழுத்தாளர், செய்தியாளர், நிறுவனர் Fun Cycle Riders Non-profit Organization, Maryland, USA',
+      bio: 'எழுத்தாளர், செய்தியாளர், நிறுவனர் Fun Cycle Riders Non-profit Organization, <strong> Maryland, USA </strong>',
       image: '/lovable-uploads/6.jpg',
     },
     {
       name: 'Dr. Balamurugan Kuppusamy',
       role: 'Co-founder',
-      bio: 'நிறுவனர் பிரடெரிக் தமிழ்ப்பள்ளி, தமிழ்க் கல்வியாளர், பேச்சாளர், எழுத்தாளர், Maryland, USA',
+      bio: 'நிறுவனர் பிரடெரிக் தமிழ்ப்பள்ளி, தமிழ்க் கல்வியாளர், பேச்சாளர், எழுத்தாளர், <strong> Maryland, USA </strong>',
       image: '/lovable-uploads/1.jpg',
     },
     {
       name: 'Mr. Manikanda P Lakshmanan',
       role: 'Co-founder',
-      bio: 'தமிழார்வலர், தமிழார்வ எழுத்தாளர், இணை-நிறுவனர் வளர்விதை Non-profit Organization, Social Entrepreneur, Pennsylvania, USA',
+      bio: 'தமிழார்வலர், தமிழார்வ எழுத்தாளர், இணை-நிறுவனர் வளர்விதை Non-profit Organization, Social Entrepreneur, <strong> Pennsylvania, USA </strong>',
       image: '/lovable-uploads/4.jpg',
     },
     {
       name: 'Mr. Ramprasath Rengasamy',
       role: 'Co-founder',
-      bio: 'தமிழ்நாடு அரசின் விருது பெற்ற அறிவியல் புனைவெழுத்தாளர், பல்-மொழி எழுத்தாளர், கதாசிரியர், சிறார் அறிபுனை எழுத்தாளர், கவிஞர், நாவலாசிரியர், சிறப்புரையாளர், Gym Enthusiast, Georgia, USA',
+      bio: 'தமிழ்நாடு அரசின் விருது பெற்ற அறிவியல் புனைவெழுத்தாளர், பல்-மொழி எழுத்தாளர், கதாசிரியர், சிறார் அறிபுனை எழுத்தாளர் பதிப்பாளர், கவிஞர், நாவலாசிரியர், சிறப்புரையாளர், Gym Enthusiast, <strong> Georgia, USA </strong>',
       image: '/lovable-uploads/7.jpg',
     },
     {
       name: 'Mr. Siddaarth Shanmugam',
       role: 'Co-founder',
-      bio: 'நூலாசிரியர், தமிழாசிரியர், பாவலர், தமிழ் இலக்கணத்திலும், பா எழுதும் யாப்பிலும் தேர்ந்த அறிவும் பயிற்சியும் உடையவர், எழுத்தாளர், California, USA',
+      bio: 'நூலாசிரியர், தமிழாசிரியர், பாவலர், தமிழ் இலக்கணத்திலும், பா எழுதும் யாப்பிலும் தேர்ந்த அறிவும் பயிற்சியும் உடையவர், எழுத்தாளர்,<strong> California, USA </strong>',
       image: '/lovable-uploads/8.jpg',
     },
   ];
@@ -84,13 +78,13 @@ export default function About() {
     {
       name: 'Ms. Vaidhehi Herbert',
       role: 'Global Ambassador - USA',
-      bio: 'சங்க இலக்கிய அறிஞர், உரையாசிரியர், சங்க இலக்கியப் பதினெட்டு நூல்களை ஆங்கிலத்தில் மொழி பெயர்த்து உரை எழுதியவர், ஹார்வார்டு தமிழ் இருக்கைக்கு வித்திட்டவர், தமிழ்க் கல்வியாளர், Hawaii, USA',
+      bio: 'சங்க இலக்கிய அறிஞர், உரையாசிரியர், சங்க இலக்கியப் பதினெட்டு நூல்களை ஆங்கிலத்தில் மொழி பெயர்த்து உரை எழுதியவர், ஹார்வார்டு தமிழ் இருக்கைக்கு வித்திட்டவர், தமிழ்க் கல்வியாளர், <strong>Hawaii, USA </strong>',
       image: '/lovable-uploads/9.jpg',
     },
     {
       name: 'Mr. Mourougavelou Vaithianathan',
       role: 'Global Ambassador - USA',
-      bio: 'புதுவை முருகு, தமிழார்வலர், தமிழ்க் கல்வியாளர், எழுத்தாளர், செய்தியாளர், மொழியியல் ஆர்வலர், மனிதவள சிந்தனையாளர், Social Entrepreneur, World Traveler, Maryland, USA',
+      bio: 'புதுவை முருகு, தமிழார்வலர், தமிழ்க் கல்வியாளர், எழுத்தாளர், செய்தியாளர், மொழியியல் ஆர்வலர், மனிதவள சிந்தனையாளர், Social Entrepreneur, World Traveler, <strong>Maryland, USA </strong>',
       image: '/lovable-uploads/6.jpg',
     },
   ];
@@ -99,19 +93,19 @@ export default function About() {
     {
       name: 'Dr. Selvanayaki Sridas',
       role: 'Global Ambassador - Canada',
-      bio: 'Senior Lecturer, Former Administrator of Annamalai Canada Campus, இலக்கியவாதி, தமிழ் கல்வியாளர், எழுத்தாளர், Toronto, Canada',
+      bio: 'Senior Lecturer, Former Administrator of Annamalai Canada Campus, இலக்கியவாதி, தமிழ் கல்வியாளர், எழுத்தாளர், <strong> Toronto, Canada </strong> ',
       image: '/lovable-uploads/11.jpg',
     },
     {
       name: 'Dr. Pushpa Christry',
       role: 'Global Ambassador - Canada',
-      bio: 'பாவலர் மணி, இலக்கியவாதி, தமிழ் கல்வியாளர், எழுத்தாளர், உலகத் திருக்குறள் மையம் (கனடாப் பொறுப்பாளர்), உலகத் திருக்குறள் சமுதாய மையம் (அயலகப் பொறுப்பாளர்), Toronto, Canada',
+      bio: 'பாவலர் மணி, இலக்கியவாதி, தமிழ் கல்வியாளர், எழுத்தாளர், உலகத் திருக்குறள் மையம் (கனடாப் பொறுப்பாளர்), உலகத் திருக்குறள் சமுதாய மையம் (அயலகப் பொறுப்பாளர்), <strong>Toronto, Canada </strong>',
       image: '/lovable-uploads/10.jpg',
     },
     {
       name: 'சொல்லாக்கியன் சு. தீனதயாளன்',
       role: 'Global Ambassador - Canada',
-      bio: 'இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், உலகத் தமிழ் சங்க 2022 ஆம் ஆண்டு இலக்கண விருதாளர், உலகத் தொல்காப்பிய மன்றமும் தமிழ் காப்புக் கழகமும் இணைந்து 2024 இல் அவருக்கு வழங்கிய விருது “தொல்காப்பிய மணி”, Alberta, Canada',
+      bio: 'இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், உலகத் தமிழ் சங்க 2022 ஆம் ஆண்டு இலக்கண விருதாளர், உலகத் தொல்காப்பிய மன்றமும் தமிழ் காப்புக் கழகமும் இணைந்து 2024 இல் அவருக்கு வழங்கிய விருது “தொல்காப்பிய மணி”,<strong> Alberta, Canada </strong>',
       image: '/lovable-uploads/24.jpg',
     },
   ];
@@ -120,7 +114,7 @@ export default function About() {
     {
       name: 'Mr. Purushothaman Alagia Manavalan',
       role: 'Global Ambassador - Mexico',
-      bio: 'தமிழார்வலர், தமிழார்வ எழுத்தாளர், Social Entrepreneur, Guadalajara, Mexico',
+      bio: 'தமிழார்வலர், தமிழார்வ எழுத்தாளர், Social Entrepreneur, Guadalajara, <strong>Mexico </strong>',
       image: '/lovable-uploads/12.jpg',
     },
   ];
@@ -129,67 +123,67 @@ export default function About() {
     {
       name: 'Dr. S. Mohan',
       role: 'Global Ambassador - India',
-      bio: 'Vice Chancellor, Puducherry Technological University, Puducherry, India',
+      bio: 'Vice Chancellor, Puducherry Technological University, Puducherry,<strong> India </strong>',
       image: '/lovable-uploads/13.jpg',
     },
     {
       name: 'Kalaimamani Dr. Cheyon I.B.S.',
       role: 'Global Ambassador - India',
-      bio: 'Former Director, All India Radio, MTS Academy, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், Tamil Nadu, India',
+      bio: 'Former Director, All India Radio, MTS Academy, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், Tamil Nadu, <strong> India </strong>',
       image: '/lovable-uploads/22.jpg',
     },
     {
       name: 'Prof. Dr. K. Thilagavathi',
       role: 'Global Ambassador - India',
-      bio: 'Former Director / Head Tamil Cultural Center, சங்க இலக்கிய ஆராய்ச்சியாளர், உரையாளர், சங்க இலக்கியப் பொருட் களஞ்சியத்தை உருவாக்கியவர், தமிழகப் புலவர்குழு உறுப்பினர், தமிழ் வளர்ச்சிக்கழக உறுப்பினர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க இணைச்செயலாளர், Tamil University, Thanjavur, Tamil Nadu, India',
+      bio: 'Former Director / Head Tamil Cultural Center, சங்க இலக்கிய ஆராய்ச்சியாளர், உரையாளர், சங்க இலக்கியப் பொருட் களஞ்சியத்தை உருவாக்கியவர், தமிழகப் புலவர்குழு உறுப்பினர், தமிழ் வளர்ச்சிக்கழக உறுப்பினர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க இணைச்செயலாளர், Tamil University, Thanjavur, Tamil Nadu, <strong>India </strong>',
       image: '/lovable-uploads/14.jpg',
     },
     {
       name: 'Dr. Murugesan Elangovan',
       role: 'Global Ambassador - India',
-      bio: 'Associate Professor, K.M. Government Institute for PG Studies and Research, Puducherry, India',
+      bio: 'Associate Professor, K.M. Government Institute for PG Studies and Research, Puducherry, <strong>India</strong>',
       image: '/lovable-uploads/15.jpg',
     },
     {
       name: 'Dr. Ka. Selvaradjou',
       role: 'Global Ambassador - India',
-      bio: 'Director (Planning & Development), Puducherry Technological University, Puducherry, India',
+      bio: 'Professor & Director (Planning and Development), Puducherry Technological University, Puducherry, <strong>India </strong>',
       image: '/lovable-uploads/16.jpg',
     },
     {
       name: 'கவிஞர் விஜயகிருஷ்ணன்',
       role: 'Global Ambassador - India',
-      bio: 'நெறியாளர், தூர்தர்ஷன் தமிழ் சென்னை, Tamil Nadu, India',
+      bio: 'நெறியாளர் சென்னை கம்பன் கழக துணைச்செயலாளர், வங்கியாளர், கிராமவளர் பணியாளர், தூர்தர்ஷன் தமிழ் சென்னை, Tamil Nadu, <strong>India </strong>',
       image: '/lovable-uploads/17.jpg',
     },
     {
       name: 'முனைவர் ஆ. அழகுசெல்வம்',
       role: 'Global Ambassador - India',
-      bio: 'தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், அருப்புக்கோட்டை அரசு கலை மற்றும் அறிவியல் கல்லூரி, Tamil Nadu, India',
+      bio: 'தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், அருப்புக்கோட்டை அரசு கலை மற்றும் அறிவியல் கல்லூரி, Tamil Nadu,<strong> India </strong>',
       image: '/lovable-uploads/18.jpg',
     },
     {
       name: 'கவிஞர் பிச்சினிக்காடு இளங்கோ',
       role: 'Global Ambassador - Singapore',
-      bio: 'சிங்கப்பூர் கவிமாலை நிறுவுநர், மக்கள் மனம் திங்களிதழ் ஆசிரியர், சிங்கப்பூர் வானொலி முன்னாள் ஒலிபரப்பாளர்- படைப்பாளர், கவிதை, கட்டுரை, சிறுகதை, நாடகம்  படைப்பாளர், பாடலாசிரியர், Singapore',
+      bio: 'சிங்கப்பூர் கவிமாலை நிறுவுநர், மக்கள் மனம் திங்களிதழ் ஆசிரியர், சிங்கப்பூர் வானொலி முன்னாள் ஒலிபரப்பாளர்- படைப்பாளர், கவிதை, கட்டுரை, சிறுகதை, நாடகம்  படைப்பாளர், பாடலாசிரியர், <strong> Singapore </strong>',
       image: '/lovable-uploads/19.jpeg',
     },
     {
       name: 'Dr. Gurusamy Asogan',
       role: 'Global Ambassador - Indonesia',
-      bio: 'தமிழ் ஆர்வலர், எழுத்தாளர், Jakarta Java, Indonesia',
+      bio: 'தமிழ் ஆர்வலர், எழுத்தாளர், Jakarta Java, <strong> Indonesia </strong>',
       image: '/lovable-uploads/20.jpg',
     },
     {
       name: 'Dr. A. Mohamed Mohideen',
       role: 'Global Ambassador - UAE',
-      bio: 'தமிழ்க் கல்வியாளர், எழுத்தாளர், National Educational Trust, Dubai - UAE',
+      bio: 'தமிழ்க் கல்வியாளர், எழுத்தாளர், National Educational Trust,<strong> Dubai - UAE </strong>',
       image: '/lovable-uploads/21.jpg',
     },
     {
       name: 'பேராசிரியர் மருத்துவர் ஜெயபாலன் வள்ளியப்பன்',
       role: 'Global Ambassador - Malaysia',
-      bio: 'இலக்கியவாதி, தமிழறிஞர், மகப்பேறு சோதனைக்குழாய் மருத்துவ நிபுணர், Eppo, Malaysia',
+      bio: 'இலக்கியவாதி, தமிழறிஞர், மகப்பேறு சோதனைக்குழாய் மருத்துவ நிபுணர், Eppo, <strong>Malaysia</strong>',
       image: '/lovable-uploads/23.jpg',
     },
   ];
@@ -547,16 +541,19 @@ export default function About() {
                           : 'முதன்மை ஒருங்கிணைப்பாளர்'
                       )}
                     </p>
-                    <p className="mt-2 text-sm">
-                      {t(
-                        leader.bio,
-                        leader.name === 'Manikanda Prabu'
-                          ? 'புகழ்பெற்ற தொழில்முறை மற்றும் சமூக அமைப்பாளரான மணி, வட அமெரிக்கா முழுவதும் எழுத்தாளர்களுக்கும் வாசகர்களுக்கும் இடையே இணைப்புகளை உருவாக்குவதில் கவனம் செலுத்துகிறார்.'
-                          : leader.name === 'Ravi Kumar Potu'
-                          ? 'சிறந்த தகவல் தொழில்நுட்ப நிபுணரான ரவி, எங்கள் அமைப்பின் அன்றாட தொழில்நுட்ப செயல்பாடுகள் மற்றும் அமைப்பு மேம்பாட்டு முயற்சிகளை நிர்வகிக்கிறார்.'
-                          : 'தமிழ் இலக்கியம் மற்றும் கல்வியில் 20 ஆண்டுகளுக்கும் மேலான அனுபவம் கொண்ட டாக்டர் குப்புசாமி, தமிழ் இலக்கிய எழுத்துக்களை மேம்படுத்துவதற்கான எங்கள் அமைப்பின் நோக்கத்தை வழிநடத்துகிறார்.'
-                      )}
-                    </p>
+                    <p
+                      className="mt-2 text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: t(
+                          leader.bio,
+                          leader.name === 'Manikanda Prabu'
+                            ? 'புகழ்பெற்ற தொழில்முறை மற்றும் சமூக அமைப்பாளரான மணி, வட அமெரிக்கா முழுவதும் எழுத்தாளர்களுக்கும் வாசகர்களுக்கும் இடையே இணைப்புகளை உருவாக்குவதில் கவனம் செலுத்துகிறார்.'
+                            : leader.name === 'Ravi Kumar Potu'
+                            ? 'சிறந்த தகவல் தொழில்நுட்ப நிபுணரான ரவி, எங்கள் அமைப்பின் அன்றாட தொழில்நுட்ப செயல்பாடுகள் மற்றும் அமைப்பு மேம்பாட்டு முயற்சிகளை நிர்வகிக்கிறார்.'
+                            : 'தமிழ் இலக்கியம் மற்றும் கல்வியில் 20 ஆண்டுகளுக்கும் மேலான அனுபவம் கொண்ட டாக்டர் குப்புசாமி, தமிழ் இலக்கிய எழுத்துக்களை மேம்படுத்துவதற்கான எங்கள் அமைப்பின் நோக்கத்தை வழிநடத்துகிறார்.'
+                        ),
+                      }}
+                    />
                   </div>
                 </Card>
               ))}
@@ -585,7 +582,12 @@ export default function About() {
                     <p className="text-muted-foreground">
                       {t(member.role, member.role)}
                     </p>
-                    <p className="mt-2 text-sm">{t(member.bio, member.bio)}</p>
+                    <p
+                      className="mt-2 text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: t(member.bio, member.bio),
+                      }}
+                    />
                   </div>
                 </Card>
               ))}
@@ -614,7 +616,12 @@ export default function About() {
                     <p className="text-muted-foreground">
                       {t(member.role, member.role)}
                     </p>
-                    <p className="mt-2 text-sm">{t(member.bio, member.bio)}</p>
+                    <p
+                      className="mt-2 text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: t(member.bio, member.bio),
+                      }}
+                    />
                   </div>
                 </Card>
               ))}
@@ -643,7 +650,12 @@ export default function About() {
                     <p className="text-muted-foreground">
                       {t(member.role, member.role)}
                     </p>
-                    <p className="mt-2 text-sm">{t(member.bio, member.bio)}</p>
+                    <p
+                      className="mt-2 text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: t(member.bio, member.bio),
+                      }}
+                    />
                   </div>
                 </Card>
               ))}
@@ -672,7 +684,12 @@ export default function About() {
                     <p className="text-muted-foreground">
                       {t(member.role, member.role)}
                     </p>
-                    <p className="mt-2 text-sm">{t(member.bio, member.bio)}</p>
+                    <p
+                      className="mt-2 text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: t(member.bio, member.bio),
+                      }}
+                    />
                   </div>
                 </Card>
               ))}
@@ -704,7 +721,12 @@ export default function About() {
                     <p className="text-muted-foreground">
                       {t(member.role, member.role)}
                     </p>
-                    <p className="mt-2 text-sm">{t(member.bio, member.bio)}</p>
+                    <p
+                      className="mt-2 text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: t(member.bio, member.bio),
+                      }}
+                    />
                   </div>
                 </Card>
               ))}
