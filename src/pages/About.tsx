@@ -186,6 +186,12 @@ export default function About() {
       bio: 'இலக்கியவாதி, தமிழறிஞர், மகப்பேறு சோதனைக்குழாய் மருத்துவ நிபுணர், <strong>Eppo, Malaysia</strong>',
       image: '/lovable-uploads/23.jpg',
     },
+    {
+      name: 'பைந்தமிழ்ச் செம்மல் நிர்மலா சிவராசசிங்கம்',
+      role: 'Global Ambassador - Switzerland',
+      bio: ' தமிழ்மணிப் புலவர், தமிழ் ஆசிரியர், மரபு கவிஞர், எழுத்தாளர், <strong>Langenthal, Switzerland</strong>',
+      image: '/lovable-uploads/25.jpg',
+    },
   ];
 
   const milestones = [
