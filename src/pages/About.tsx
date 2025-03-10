@@ -99,7 +99,7 @@ export default function About() {
     {
       name: 'Dr. Pushpa Christry',
       role: 'Global Ambassador - Canada',
-      bio: 'பாவலர் மணி, இலக்கியவாதி, தமிழ் கல்வியாளர், எழுத்தாளர், உலகத் திருக்குறள் மையம் (கனடாப் பொறுப்பாளர்), உலகத் திருக்குறள் சமுதாய மையம் (அயலகப் பொறுப்பாளர்), <strong>Toronto, Canada </strong>',
+      bio: 'பாவலர் மணி, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், உலகத் திருக்குறள் மையம் (கனடாப் பொறுப்பாளர்), உலகத் திருக்குறள் சமுதாய மையம் (அயலகப் பொறுப்பாளர்), <strong>Toronto, Canada </strong>',
       image: '/lovable-uploads/10.jpg',
     },
     {
@@ -220,6 +220,7 @@ export default function About() {
   const handleDownloadBylaws = () => {
     const pdfUrl =
       'https://yqqfxpvptgcczumqowpc.supabase.co/storage/v1/object/public/Common/NATAWO_ByLaws.pdf';
+      
     window.open(pdfUrl, '_blank');
   };
 
