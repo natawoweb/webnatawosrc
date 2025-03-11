@@ -157,9 +157,9 @@ export default function About() {
       image: '/lovable-uploads/17.jpg',
     },
     {
-      name: 'முனைவர் ஆ. அழகுசெல்வம்',
+      name: 'Dr. A. Alaguselvam (Alaguannavi)',
       role: 'Global Ambassador - India',
-      bio: 'தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், அருப்புக்கோட்டை அரசு கலை மற்றும் அறிவியல் கல்லூரி, <strong>Tamil Nadu, India </strong>',
+      bio: 'Head, Department of Tamil, Government Arts and science college, தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், Government Arts and science college, அருப்புக்கோட்டை, <strong>Tamil Nadu, India </strong>',
       image: '/lovable-uploads/18.jpg',
     },
     {
