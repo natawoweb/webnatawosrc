@@ -229,7 +229,7 @@ export default function Terms() {
               <Mail className="h-5 w-5" />
               <span>{t("Email:", "மின்னஞ்சல்:")}</span>
               <a href="mailto:natawomail@gmail.com" className="text-primary hover:underline">
-                natawomail@gmail.com
+                contact@natawo.org
               </a>
             </p>
           </section>
@@ -243,25 +243,6 @@ export default function Terms() {
                 "Any disputes arising from these Terms of Use shall be resolved through arbitration in accordance with the rules of the American Arbitration Association.",
                 "NATAWO இந்த சேவைகளைப் பயன்படுத்த நீங்கள் குறைந்தபட்சம் 13 வயது நிரம்பியவராக இருக்க வேண்டும்."
               )}
-            </p>
-          </section>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold">
-              {t("13. Contact Information", "13. தொடர்பு தகவல்")}
-            </h2>
-            <p className="mb-4">
-              {t(
-                "For any questions or concerns regarding these Terms of Use, please contact:",
-                "இந்த பயன்பாட்டு விதிமுறைகள் தொடர்பான கேள்விகள் அல்லது கவலைகள் இருந்தால், தயவுசெய்து தொடர்பு கொள்ளவும்:"
-              )}
-            </p>
-            <p className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              <span>{t("Email:", "மின்னஞ்சல்:")}</span>
-              <a href="mailto:natawomail@gmail.com" className="text-primary hover:underline">
-                natawomail@gmail.com
-              </a>
             </p>
           </section>
         </div>

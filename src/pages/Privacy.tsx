@@ -129,7 +129,7 @@ export default function Privacy() {
               <Mail className="h-5 w-5" />
               <span>{t("Email:", "மின்னஞ்சல்:")}</span>
               <a href="mailto:natawomail@gmail.com" className="text-primary hover:underline">
-                natawomail@gmail.com
+                 contact@natawo.org
               </a>
             </p>
           </div>
