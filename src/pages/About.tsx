@@ -159,7 +159,7 @@ export default function About() {
     {
       name: 'Dr. A. Alaguselvam (Alaguannavi)',
       role: 'Global Ambassador - India',
-      bio: 'Head, Department of Tamil, Government Arts and science college, தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், Government Arts and science college, அருப்புக்கோட்டை, <strong>Tamil Nadu, India </strong>',
+      bio: 'Head, Department of Tamil, Government Arts and science college, Aruppukottai, தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், <strong>Tamil Nadu, India </strong>',
       image: '/lovable-uploads/18.jpg',
     },
     {
