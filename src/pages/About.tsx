@@ -10,9 +10,9 @@ export default function About() {
 
   const leadershipTeam = [
     {
-      name: 'Dr. Balamurugan Kuppusamy',
+      name: 'கவிஞர் Dr. Balamurugan Kuppusamy',
       role: 'Chief Coordinator',
-      bio: "With over 20 years of experience in Tamil literature and education, Dr. Kuppusamy leads our organization's mission to promote Tamil literary writing.  <strong>Maryland, USA</strong>",
+      bio: "நிறுவனத் தலைவர் பிரடெரிக் தமிழ்ப்பள்ளி, அமெரிக்கத் தமிழ்க் கல்விக்கழகத்தின் நெடுநாள் ஆசிரியர் விருது பெற்றவர், தமிழ்க் கல்வியாளர், பேச்சாளர், எழுத்தாளர், தென்றல் முல்லை இதழின் முதன்மை ஆசிரியர், இளம் எழுத்தாளர்களை அறிமுகப் படுத்துபவர், <strong>Maryland, USA</strong>",
       image: '/lovable-uploads/1.jpg',
     },
     {
