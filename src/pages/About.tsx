@@ -192,6 +192,12 @@ export default function About() {
       bio: ' தமிழ்மணிப் புலவர், தமிழ் ஆசிரியர், மரபு கவிஞர், எழுத்தாளர், <strong>Langenthal, Switzerland</strong>',
       image: '/lovable-uploads/25.jpg',
     },
+    {
+      name: 'முனைவர் மு. இராசேந்திரன் M.A., Ph.D., AMK &AMN',
+      role: 'Global Ambassador - Malaysia',
+      bio: 'மதிப்புறு பேராசிரியர் (மலாயாப் பல்கலைக்கழகம், மலேசியா), இயக்குநர் (ஏய்ம்ஸ்ட் பல்கலைக்கழகத் தமிழ் மற்றும் இந்திய நாகரிக ஆய்வியல் நடுவம் மலேசியா). ஆய்வியலுக்கு, (மலேசிய) விவேகனந்தர்  நினைவு தங்கப் பதக்கம் பெற்றவர், <strong>Kedah, Malaysia</strong>',
+      image: '/lovable-uploads/26.jpg',
+    },
   ];
 
   const milestones = [
