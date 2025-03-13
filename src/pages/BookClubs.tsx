@@ -1,4 +1,3 @@
-
 import { ComingSoon } from "@/components/shared/ComingSoon";
 
 const BookClubs = () => {

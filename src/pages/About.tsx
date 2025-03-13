@@ -10,9 +10,9 @@ export default function About() {
 
   const leadershipTeam = [
     {
-      name: 'Dr. Balamurugan Kuppusamy',
+      name: 'கவிஞர் Dr. Balamurugan Kuppusamy',
       role: 'Chief Coordinator',
-      bio: "With over 20 years of experience in Tamil literature and education, Dr. Kuppusamy leads our organization's mission to promote Tamil literary writing.  <strong>Maryland, USA</strong>",
+      bio: "நிறுவனத் தலைவர் பிரடெரிக் தமிழ்ப்பள்ளி, அமெரிக்கத் தமிழ்க் கல்விக்கழகத்தின் நெடுநாள் ஆசிரியர் விருது பெற்றவர், தமிழ்க் கல்வியாளர், பேச்சாளர், எழுத்தாளர், தென்றல் முல்லை இதழின் முதன்மை ஆசிரியர், இளம் எழுத்தாளர்களை அறிமுகப் படுத்துபவர், <strong>Maryland, USA</strong>",
       image: '/lovable-uploads/1.jpg',
     },
     {
@@ -99,7 +99,7 @@ export default function About() {
     {
       name: 'Dr. Pushpa Christry',
       role: 'Global Ambassador - Canada',
-      bio: 'பாவலர் மணி, இலக்கியவாதி, தமிழ் கல்வியாளர், எழுத்தாளர், உலகத் திருக்குறள் மையம் (கனடாப் பொறுப்பாளர்), உலகத் திருக்குறள் சமுதாய மையம் (அயலகப் பொறுப்பாளர்), <strong>Toronto, Canada </strong>',
+      bio: 'பாவலர் மணி, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், உலகத் திருக்குறள் மையம் (கனடாப் பொறுப்பாளர்), உலகத் திருக்குறள் சமுதாய மையம் (அயலகப் பொறுப்பாளர்), <strong>Toronto, Canada </strong>',
       image: '/lovable-uploads/10.jpg',
     },
     {
@@ -157,9 +157,9 @@ export default function About() {
       image: '/lovable-uploads/17.jpg',
     },
     {
-      name: 'முனைவர் ஆ. அழகுசெல்வம்',
+      name: 'Dr. A. Alaguselvam (Alaguannavi)',
       role: 'Global Ambassador - India',
-      bio: 'தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், அருப்புக்கோட்டை அரசு கலை மற்றும் அறிவியல் கல்லூரி, <strong>Tamil Nadu, India </strong>',
+      bio: 'Head, Department of Tamil, Government Arts and science college, Aruppukottai, தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், <strong>Tamil Nadu, India </strong>',
       image: '/lovable-uploads/18.jpg',
     },
     {
@@ -192,6 +192,12 @@ export default function About() {
       bio: ' தமிழ்மணிப் புலவர், தமிழ் ஆசிரியர், மரபு கவிஞர், எழுத்தாளர், <strong>Langenthal, Switzerland</strong>',
       image: '/lovable-uploads/25.jpg',
     },
+    {
+      name: 'முனைவர் மு. இராசேந்திரன் M.A., Ph.D., AMK & AMN',
+      role: 'Global Ambassador - Malaysia',
+      bio: 'மதிப்புறு பேராசிரியர் (மலாயாப் பல்கலைக்கழகம், மலேசியா), இயக்குநர் (ஏய்ம்ஸ்ட் பல்கலைக்கழகத் தமிழ் மற்றும் இந்திய நாகரிக ஆய்வியல் நடுவம் மலேசியா). ஆய்வியலுக்கு, (மலேசிய) விவேகனந்தர்  நினைவு தங்கப் பதக்கம் பெற்றவர், <strong>Kedah, Malaysia</strong>',
+      image: '/lovable-uploads/26.jpg',
+    },
   ];
 
   const milestones = [
@@ -220,6 +226,7 @@ export default function About() {
   const handleDownloadBylaws = () => {
     const pdfUrl =
       'https://yqqfxpvptgcczumqowpc.supabase.co/storage/v1/object/public/Common/NATAWO_ByLaws.pdf';
+      
     window.open(pdfUrl, '_blank');
   };
 
