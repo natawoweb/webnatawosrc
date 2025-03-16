@@ -15,11 +15,10 @@ import { WriterFormFields } from './form-fields/WriterFormFields';
 import { handleSignupNotifications } from './utils/signupNotifications';
 
 interface SignUpFormProps {
-  onSuccess: () => void;
   onExistingAccount: () => void;
 }
 
-export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
+export function SignUpForm({ onExistingAccount }: SignUpFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -29,10 +28,24 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
   const [county, setCounty] = useState('');
   const [state, setState] = useState('');
   const [loading, setLoading] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!acceptedTerms) {
+      toast({
+        variant: 'destructive',
+        title: 'Warning',
+        description:
+          "You must accept the NATAWO Bylaws and the website's legal terms, including the Privacy Policy, Terms of Use, and Guidelines, to proceed. Please check the required box to continue.",
+        duration: 5000,
+      });
+      return;
+    }
+
     if (!county) {
       toast({
         variant: 'destructive',
@@ -93,8 +106,6 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
       if (!data.user) {
         throw new Error('Signup failed - no user returned');
       }
-
-      console.log('Sign up successful, sending notifications...');
 
       await handleSignupNotifications(role, email, fullName);
 
@@ -180,6 +191,24 @@ export function SignUpForm({ onSuccess, onExistingAccount }: SignUpFormProps) {
           setBio={setBio}
         />
       )}
+
+      <div className="flex items-start space-x-2">
+        <input
+          type="checkbox"
+          id="terms"
+          checked={acceptedTerms}
+          onChange={(e) => setAcceptedTerms(e.target.checked)}
+          className="w-4 h-4 mt-1 border-gray-300 rounded focus:ring focus:ring-blue-500"
+        />
+        <Label htmlFor="terms" className="text-sm text-gray-700">
+          You must accept <span className="font-medium">NATAWO Bylaws</span> and
+          website legal terms such as{' '}
+          <span className="font-medium">
+            NATAWO Privacy Policies, Terms of Use, and Guidelines
+          </span>{' '}
+          in order to create login credentials and leverage our systems.
+        </Label>
+      </div>
 
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? 'Signing up...' : 'Sign Up'}

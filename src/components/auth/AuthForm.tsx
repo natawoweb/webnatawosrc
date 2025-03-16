@@ -1,6 +1,5 @@
-
-import { SignInForm } from "./SignInForm";
-import { SignUpForm } from "./SignUpForm";
+import { SignInForm } from './SignInForm';
+import { SignUpForm } from './SignUpForm';
 
 interface AuthFormProps {
   type: 'signin' | 'signup';
@@ -8,10 +7,14 @@ interface AuthFormProps {
   onExistingAccount?: () => void;
 }
 
-export function AuthForm({ type, onSuccess, onExistingAccount }: AuthFormProps) {
+export function AuthForm({
+  type,
+  onSuccess,
+  onExistingAccount,
+}: AuthFormProps) {
   return type === 'signin' ? (
     <SignInForm onSuccess={onSuccess} />
   ) : (
-    <SignUpForm onSuccess={onSuccess} onExistingAccount={onExistingAccount || (() => {})} />
+    <SignUpForm onExistingAccount={onExistingAccount || (() => {})} />
   );
 }

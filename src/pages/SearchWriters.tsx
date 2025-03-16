@@ -81,6 +81,8 @@ export default function SearchWriters() {
           created_at: writer.created_at,
           featured: writer.featured || false,
           featured_month: writer.featured_month || '',
+          country: writer?.profiles?.county,
+          state: writer?.profiles?.state,
         }));
       } catch (error) {
         console.error('Error in writers query:', error);
@@ -100,7 +102,6 @@ export default function SearchWriters() {
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedWriters = writers?.slice(startIndex, endIndex);
-  const totalWriters = writers?.length || 0;
 
   return (
     <div className="container mx-auto py-8">

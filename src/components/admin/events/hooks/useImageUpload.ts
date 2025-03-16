@@ -1,25 +1,25 @@
-
-import { supabase } from "@/integrations/supabase/client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { supabase } from '@/integrations/supabase/client';
 
 export async function uploadImages(files: File[]): Promise<string[]> {
-  console.log("Starting image upload process", { numberOfFiles: files.length });
-  
   try {
     // Check user role
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
     // Check if user has admin or manager role
     const { data: hasAdminRole } = await supabase.rpc('has_role', {
       user_id: user.id,
-      required_role: 'admin'
+      required_role: 'admin',
     });
 
     const { data: hasManagerRole } = await supabase.rpc('has_role', {
       user_id: user.id,
-      required_role: 'manager'
+      required_role: 'manager',
     });
 
     if (!hasAdminRole && !hasManagerRole) {
@@ -28,47 +28,40 @@ export async function uploadImages(files: File[]): Promise<string[]> {
 
     const uploadPromises = files.map(async (file) => {
       if (!(file instanceof File)) {
-        console.error("Invalid file object:", file);
-        throw new Error("Invalid file object provided");
+        console.error('Invalid file object:', file);
+        throw new Error('Invalid file object provided');
       }
 
       // Create a unique filename with timestamp and random string
       const timestamp = new Date().getTime();
       const randomString = Math.random().toString(36).substring(2, 15);
-      const fileExt = file.name.split(".").pop();
+      const fileExt = file.name.split('.').pop();
       const fileName = `${timestamp}-${randomString}.${fileExt}`;
 
-      console.log("Uploading file", { fileName, fileType: file.type });
-
       const { error: uploadError } = await supabase.storage
-        .from("event-images")
+        .from('event-images')
         .upload(fileName, file, {
           cacheControl: '3600',
           upsert: false,
-          contentType: file.type || 'application/octet-stream'
+          contentType: file.type || 'application/octet-stream',
         });
 
       if (uploadError) {
-        console.error("Error uploading file:", uploadError);
+        console.error('Error uploading file:', uploadError);
         throw uploadError;
       }
 
-      console.log("File uploaded successfully", { fileName });
-
       const { data } = supabase.storage
-        .from("event-images")
+        .from('event-images')
         .getPublicUrl(fileName);
 
-      console.log("Generated public URL", { publicUrl: data.publicUrl });
-      
       return data.publicUrl;
     });
 
     const results = await Promise.all(uploadPromises);
-    console.log("All images uploaded successfully", { urls: results });
     return results;
   } catch (error: any) {
-    console.error("Error in uploadImages:", error);
+    console.error('Error in uploadImages:', error);
     throw error;
   }
 }

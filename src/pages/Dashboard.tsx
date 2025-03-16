@@ -1,14 +1,14 @@
-
-import { Link } from "react-router-dom";
-import { BookPlus, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { BlogTable } from "@/components/dashboard/BlogTable";
-import { useSession } from "@/hooks/useSession";
-import { useToast } from "@/hooks/use-toast";
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Link } from 'react-router-dom';
+import { BookPlus, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BlogTable } from '@/components/dashboard/BlogTable';
+import { useSession } from '@/hooks/useSession';
+import { useToast } from '@/hooks/use-toast';
+import { useDashboardData } from '@/hooks/useDashboardData';
+import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function Dashboard() {
   const { session } = useSession();
@@ -16,7 +16,11 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const { data: blogs, isLoading, isFetching } = useDashboardData(session?.user?.id);
+  const {
+    data: blogs,
+    isLoading,
+    isFetching,
+  } = useDashboardData(session?.user?.id);
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -29,12 +33,11 @@ export default function Dashboard() {
           event: '*',
           schema: 'public',
           table: 'blogs',
-          filter: `author_id=eq.${session.user.id}`
+          filter: `author_id=eq.${session.user.id}`,
         },
         (payload) => {
-          console.log('Blog change detected:', payload);
           queryClient.invalidateQueries({
-            queryKey: ["writer-blogs", session.user.id]
+            queryKey: ['writer-blogs', session.user.id],
           });
         }
       )
@@ -47,26 +50,23 @@ export default function Dashboard() {
 
   const handleDelete = async (blogId: string) => {
     try {
-      const { error } = await supabase
-        .from("blogs")
-        .delete()
-        .eq("id", blogId);
+      const { error } = await supabase.from('blogs').delete().eq('id', blogId);
 
       if (error) throw error;
 
       queryClient.setQueryData(
-        ["writer-blogs", session?.user?.id],
+        ['writer-blogs', session?.user?.id],
         (oldData: any) => oldData?.filter((blog: any) => blog.id !== blogId)
       );
 
       toast({
-        title: "Success",
-        description: "Blog deleted successfully",
+        title: 'Success',
+        description: 'Blog deleted successfully',
       });
     } catch (error: any) {
       toast({
-        variant: "destructive",
-        title: "Error",
+        variant: 'destructive',
+        title: 'Error',
         description: error.message,
       });
     }
@@ -76,13 +76,12 @@ export default function Dashboard() {
     try {
       // First show the "will be published" toast with longer duration
       toast({
-        title: "Blog Publishing Started",
-        description: "Your blog will be published in a few minutes.",
-        variant: "default",
+        title: 'Blog Publishing Started',
+        description: 'Your blog will be published in a few minutes.',
+        variant: 'default',
         duration: 1000000, // Keep it visible longer
       });
 
-      console.log("Publishing blog:", blogId);
       const now = new Date().toISOString();
 
       // Simulate a delay for the publishing process
@@ -90,42 +89,41 @@ export default function Dashboard() {
         try {
           // Update the blog to published status
           const { error: publishError } = await supabase
-            .from("blogs")
-            .update({ 
+            .from('blogs')
+            .update({
               status: 'published',
-              published_at: now
+              published_at: now,
             })
-            .eq("id", blogId);
+            .eq('id', blogId);
 
           if (publishError) throw publishError;
 
           // Show success toast after publishing is complete
           toast({
-            title: "Blog Published Successfully!",
-            description: "Your blog is now live and can be viewed by readers.",
-            variant: "default",
+            title: 'Blog Published Successfully!',
+            description: 'Your blog is now live and can be viewed by readers.',
+            variant: 'default',
             duration: 5000,
           });
 
           // Manually invalidate the query to update the UI
           queryClient.invalidateQueries({
-            queryKey: ["writer-blogs", session?.user?.id]
+            queryKey: ['writer-blogs', session?.user?.id],
           });
         } catch (error: any) {
-          console.error("Final publish error:", error);
+          console.error('Final publish error:', error);
           toast({
-            variant: "destructive",
-            title: "Publishing Failed",
+            variant: 'destructive',
+            title: 'Publishing Failed',
             description: error.message,
           });
         }
       }, 3000); // Simulate a 3-second publishing process
-
     } catch (error: any) {
-      console.error("Initial publish error:", error);
+      console.error('Initial publish error:', error);
       toast({
-        variant: "destructive",
-        title: "Error",
+        variant: 'destructive',
+        title: 'Error',
         description: error.message,
       });
     }
@@ -162,8 +160,8 @@ export default function Dashboard() {
             <Loader2 className="h-6 w-6 animate-spin" />
           </div>
         ) : (
-          <BlogTable 
-            blogs={paginatedBlogs || []} 
+          <BlogTable
+            blogs={paginatedBlogs || []}
             onDelete={handleDelete}
             onPublish={handlePublish}
             currentPage={currentPage}

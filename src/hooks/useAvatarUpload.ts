@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Profile } from '@/integrations/supabase/types/models';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { Profile } from "@/integrations/supabase/types/models";
-import { useQueryClient } from "@tanstack/react-query";
-
-export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string) => void) => {
+export const useAvatarUpload = (
+  profile: Profile | null,
+  onSuccess: (url: string) => void
+) => {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -15,7 +18,9 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
       setUploading(true);
 
       // First check if we have an authenticated user
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('You must be logged in to upload an avatar.');
       }
@@ -29,7 +34,9 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
       const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
 
       if (!fileExt || !allowedExtensions.includes(fileExt)) {
-        throw new Error('Please upload an image file (jpg, jpeg, png, or gif).');
+        throw new Error(
+          'Please upload an image file (jpg, jpeg, png, or gif).'
+        );
       }
 
       if (!profile?.id) {
@@ -41,19 +48,10 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
 
       // First remove any existing avatar for this user
       try {
-        await supabase.storage
-          .from('avatars')
-          .remove([fileName]);
+        await supabase.storage.from('avatars').remove([fileName]);
       } catch (error) {
-        console.log('No existing avatar to remove or error removing:', error);
+        console.error(error);
       }
-
-      console.log('Starting avatar upload:', {
-        fileName: fileName,
-        fileType: file.type,
-        fileSize: file.size,
-        bucketName: 'avatars'
-      });
 
       // Upload the file to Supabase storage with explicit content type
       const { data, error: uploadError } = await supabase.storage
@@ -61,7 +59,7 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         .upload(fileName, file, {
           cacheControl: '3600',
           contentType: file.type,
-          upsert: true
+          upsert: true,
         });
 
       if (uploadError) {
@@ -73,21 +71,17 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw new Error('Upload failed: No data returned');
       }
 
-      console.log('Upload successful, getting public URL');
-
       // Get the public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(fileName);
-
-      console.log('Generated public URL:', publicUrl);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('avatars').getPublicUrl(fileName);
 
       // Update the user's profile with the new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
           avatar_url: publicUrl,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', session.user.id); // Use session.user.id to ensure we're updating the current user's profile
 
@@ -96,22 +90,20 @@ export const useAvatarUpload = (profile: Profile | null, onSuccess: (url: string
         throw updateError;
       }
 
-      console.log('Profile updated successfully with new avatar URL');
-
       // Update local state and invalidate queries
       onSuccess(publicUrl);
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-      
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+
       toast({
-        title: "Success",
-        description: "Avatar updated successfully.",
+        title: 'Success',
+        description: 'Avatar updated successfully.',
       });
     } catch (error: any) {
       console.error('Error uploading avatar:', error);
       toast({
-        variant: "destructive",
-        title: "Error uploading avatar",
-        description: error.message || "Please try again later.",
+        variant: 'destructive',
+        title: 'Error uploading avatar',
+        description: error.message || 'Please try again later.',
       });
     } finally {
       setUploading(false);
