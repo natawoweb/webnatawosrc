@@ -37,11 +37,12 @@ export function SignUpForm({ onExistingAccount }: SignUpFormProps) {
 
     if (!acceptedTerms) {
       toast({
-        variant: 'destructive',
-        title: 'Warning',
+        variant: 'default',
+        title: '⚠ Warning',
         description:
           "You must accept the NATAWO Bylaws and the website's legal terms, including the Privacy Policy, Terms of Use, and Guidelines, to proceed. Please check the required box to continue.",
         duration: 5000,
+        className: 'bg-yellow-300 text-black',
       });
       return;
     }

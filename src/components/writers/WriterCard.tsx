@@ -38,14 +38,14 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
               <Badge variant="outline">{writer.level}</Badge>
             </div>
             <div className="flex gap-x-2 items-center">
-              {writer?.country && (
-                <div className="flex gap-2 mt-1">
-                  <Badge variant="outline">{writer?.country}</Badge>
-                </div>
-              )}
               {writer?.state && (
                 <div className="flex gap-2 mt-1">
                   <Badge variant="outline">{writer?.state}</Badge>
+                </div>
+              )}
+              {writer?.country && (
+                <div className="flex gap-2 mt-1">
+                  <Badge variant="outline">{writer?.country}</Badge>
                 </div>
               )}
             </div>
