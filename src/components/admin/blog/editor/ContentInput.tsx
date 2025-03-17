@@ -1,16 +1,18 @@
-
-import { Input } from "@/components/ui/input";
+import { Input } from '@/components/ui/input';
 
 interface ContentInputProps {
-  language: "english" | "tamil";
+  language: 'english' | 'tamil';
   title: string;
   onTitleChange: (value: string) => void;
   placeholder?: string;
 }
 
-export function ContentInput({ language, title, onTitleChange, placeholder }: ContentInputProps) {
-  console.log(`ContentInput rendering for ${language}:`, { title, placeholder });
-  
+export function ContentInput({
+  language,
+  title,
+  onTitleChange,
+  placeholder,
+}: ContentInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(`Title change in ${language}:`, e.target.value);
     onTitleChange(e.target.value);

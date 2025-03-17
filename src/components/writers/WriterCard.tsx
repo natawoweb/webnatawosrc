@@ -1,9 +1,8 @@
-
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useLanguage } from "@/contexts/LanguageContext";
-import type { Writer } from "@/types/writer";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
+import type { Writer } from '@/types/writer';
+import { Badge } from '@/components/ui/badge';
 
 interface WriterCardProps {
   writer: Writer;
@@ -32,11 +31,21 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-wrap break-words">{writer.name}</h3>
+            <h3 className="font-semibold text-wrap break-words">
+              {writer.name}
+            </h3>
             <div className="flex gap-2 mt-1">
-              <Badge variant="outline">
-                {writer.level}
-              </Badge>
+              <Badge variant="outline">{writer.level}</Badge>
+            </div>
+            <div className="flex gap-x-2 items-center">
+              <div className="flex gap-2 mt-1">
+                {(writer?.state || writer?.country) && (
+                  <Badge variant="outline">
+                    {writer?.state && `${writer?.state},`}{' '}
+                    {writer?.country && writer?.country}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -55,7 +64,7 @@ export function WriterCard({ writer, onSelect }: WriterCardProps) {
             className="w-full"
             onClick={() => onSelect(writer)}
           >
-            {t("View Profile", "சுயவிவரத்தைக் காண")}
+            {t('View Profile', 'சுயவிவரத்தைக் காண')}
           </Button>
         </div>
       </CardContent>

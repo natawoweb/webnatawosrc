@@ -1,17 +1,16 @@
-
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { X } from 'lucide-react';
 
 interface EventCategoriesProps {
   categoryId: string | null;
@@ -27,30 +26,29 @@ export function EventCategories({
   onTagsChange,
 }: EventCategoriesProps) {
   const { data: categories, isLoading } = useQuery({
-    queryKey: ["event-categories"],
+    queryKey: ['event-categories'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("event_categories")
-        .select("*")
-        .order("name");
+        .from('event_categories')
+        .select('*')
+        .order('name');
 
       if (error) {
-        console.error("Error fetching categories:", error);
+        console.error('Error fetching categories:', error);
         throw error;
       }
-      console.log("Fetched categories:", data);
       return data;
     },
   });
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && e.currentTarget.value) {
+    if (e.key === 'Enter' && e.currentTarget.value) {
       e.preventDefault();
       const newTag = e.currentTarget.value.trim();
       if (newTag && !tags.includes(newTag)) {
         onTagsChange([...tags, newTag]);
       }
-      e.currentTarget.value = "";
+      e.currentTarget.value = '';
     }
   };
 
@@ -62,7 +60,7 @@ export function EventCategories({
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="event-category">Category</Label>
-        <Select value={categoryId || ""} onValueChange={onCategoryChange}>
+        <Select value={categoryId || ''} onValueChange={onCategoryChange}>
           <SelectTrigger id="event-category">
             <SelectValue placeholder="Select a category (optional)" />
           </SelectTrigger>

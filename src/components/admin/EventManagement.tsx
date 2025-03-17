@@ -1,48 +1,46 @@
-
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Calendar, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import { Calendar, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { EventForm } from "./events/EventForm";
-import { EventList } from "./events/EventList";
-import { supabase } from "@/integrations/supabase/client";
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { EventForm } from './events/EventForm';
+import { EventList } from './events/EventList';
+import { supabase } from '@/integrations/supabase/client';
 
 export function EventManagement() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: userRole, isLoading } = useQuery({
-    queryKey: ["userRole"],
+    queryKey: ['userRole'],
     queryFn: async () => {
-      console.log("Fetching user role...");
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        console.log("No user found");
         return null;
       }
-      console.log("Current user:", user);
 
       const { data: hasAdminRole, error } = await supabase.rpc('has_role', {
         user_id: user.id,
-        required_role: 'admin'
+        required_role: 'admin',
       });
 
       if (error) {
-        console.error("Error checking admin role:", error);
+        console.error('Error checking admin role:', error);
         return null;
       }
 
-      console.log("Has admin role:", hasAdminRole);
       return hasAdminRole ? 'admin' : null;
     },
   });
@@ -101,7 +99,9 @@ export function EventManagement() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
             <DialogHeader>
-              <DialogTitle>{editingEvent ? 'Edit Event' : 'Create New Event'}</DialogTitle>
+              <DialogTitle>
+                {editingEvent ? 'Edit Event' : 'Create New Event'}
+              </DialogTitle>
             </DialogHeader>
             <ScrollArea className="h-[calc(90vh-120px)] pr-4">
               <EventForm

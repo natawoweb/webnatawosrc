@@ -1,23 +1,23 @@
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { useState } from "react";
-import { DeleteBlogDialog } from "./DeleteBlogDialog";
-import { RejectBlogDialog } from "./RejectBlogDialog";
-import { BlogListRow } from "./BlogListRow";
-import { useBlogListManagement } from "@/hooks/useBlogListManagement";
-import { Database } from "@/integrations/supabase/types";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useUserRoles } from "@/hooks/useUserRoles";
-import { useSession } from "@/hooks/useSession";
+} from '@/components/ui/table';
+import { useState } from 'react';
+import { DeleteBlogDialog } from './DeleteBlogDialog';
+import { RejectBlogDialog } from './RejectBlogDialog';
+import { BlogListRow } from './BlogListRow';
+import { useBlogListManagement } from '@/hooks/useBlogListManagement';
+import { Database } from '@/integrations/supabase/types';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserRoles } from '@/hooks/useUserRoles';
+import { useSession } from '@/hooks/useSession';
 
-type Blog = Database["public"]["Tables"]["blogs"]["Row"];
+type Blog = Database['public']['Tables']['blogs']['Row'];
 
 interface BlogListProps {
   blogs: Blog[];
@@ -30,19 +30,12 @@ export function BlogList({ blogs }: BlogListProps) {
   const { session } = useSession();
   const { data: userRoles } = useUserRoles(session?.user?.id);
 
-  const { 
-    deleteBlogMutation, 
-    canDeleteBlog, 
-    getAuthorName,
-    userProfile,
-  } = useBlogListManagement();
+  const { deleteBlogMutation, canDeleteBlog, getAuthorName, userProfile } =
+    useBlogListManagement();
 
-  const isAdmin = userRoles?.some(role => role.role === 'admin') || false;
-  console.log('BlogList - User Roles:', userRoles);
-  console.log('BlogList - Is Admin:', isAdmin);
+  const isAdmin = userRoles?.some((role) => role.role === 'admin') || false;
 
   const handleDelete = (blog: Blog) => {
-    console.log("Setting blog to delete:", blog);
     setBlogToDelete(blog);
   };
 
@@ -56,14 +49,14 @@ export function BlogList({ blogs }: BlogListProps) {
       if (error) throw error;
 
       toast({
-        title: "Blog Approved",
+        title: 'Blog Approved',
         description: `The blog "${blog.title}" has been approved successfully.`,
         duration: 3000,
       });
     } catch (error: any) {
       toast({
-        variant: "destructive",
-        title: "Error",
+        variant: 'destructive',
+        title: 'Error',
         description: error.message,
       });
     }
@@ -79,24 +72,24 @@ export function BlogList({ blogs }: BlogListProps) {
     try {
       const { error } = await supabase
         .from('blogs')
-        .update({ 
+        .update({
           status: 'rejected',
-          rejection_reason: reason 
+          rejection_reason: reason,
         })
         .eq('id', blogToReject.id);
 
       if (error) throw error;
 
       toast({
-        title: "Blog Rejected",
+        title: 'Blog Rejected',
         description: `The blog "${blogToReject.title}" has been rejected.`,
         duration: 3000,
       });
       setBlogToReject(null);
     } catch (error: any) {
       toast({
-        variant: "destructive",
-        title: "Error",
+        variant: 'destructive',
+        title: 'Error',
         description: error.message,
       });
     }
@@ -137,7 +130,6 @@ export function BlogList({ blogs }: BlogListProps) {
         }}
         onConfirm={() => {
           if (blogToDelete) {
-            console.log("Confirming delete for blog:", blogToDelete.id);
             deleteBlogMutation.mutate(blogToDelete.id);
             setBlogToDelete(null);
           }
@@ -151,7 +143,7 @@ export function BlogList({ blogs }: BlogListProps) {
           if (!open) setBlogToReject(null);
         }}
         onConfirm={handleRejectConfirm}
-        blogTitle={blogToReject?.title || ""}
+        blogTitle={blogToReject?.title || ''}
       />
     </>
   );

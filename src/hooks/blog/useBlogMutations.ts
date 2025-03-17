@@ -1,8 +1,7 @@
-
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface BlogData {
   title: string;
@@ -24,15 +23,14 @@ export function useBlogMutations(
 
   const saveBlog = useMutation({
     mutationFn: async (blogData: BlogData) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
 
       if (currentBlogId) {
-        console.log('Updating existing blog:', currentBlogId);
-        console.log('Blog data:', blogData);
-        
         const { error } = await supabase
-          .from("blogs")
+          .from('blogs')
           .update({
             title: blogData.title,
             content: blogData.content,
@@ -49,9 +47,8 @@ export function useBlogMutations(
         }
         return currentBlogId;
       } else {
-        console.log('Creating new blog');
         const { data, error } = await supabase
-          .from("blogs")
+          .from('blogs')
           .insert({
             title: blogData.title,
             content: blogData.content,
@@ -59,7 +56,7 @@ export function useBlogMutations(
             content_tamil: blogData.content_tamil || null,
             category_id: blogData.category_id || null,
             author_id: user.id,
-            status: "draft",
+            status: 'draft',
           })
           .select()
           .single();
@@ -69,42 +66,43 @@ export function useBlogMutations(
           throw error;
         }
 
-        console.log('New blog created with ID:', data.id);
         setCurrentBlogId(data.id);
         return data.id;
       }
     },
     onSuccess: () => {
       setLastSaved(new Date());
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      queryClient.invalidateQueries({ queryKey: ["writer-blogs"] });
-      queryClient.invalidateQueries({ queryKey: ["blog"] });
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      queryClient.invalidateQueries({ queryKey: ['writer-blogs'] });
+      queryClient.invalidateQueries({ queryKey: ['blog'] });
       toast({
-        title: "Changes saved",
-        description: "Your content has been automatically saved",
+        title: 'Changes saved',
+        description: 'Your content has been automatically saved',
         duration: 2000,
       });
     },
     onError: (error) => {
       console.error('Save error:', error);
       toast({
-        variant: "destructive",
-        title: "Save failed",
-        description: "Failed to save changes: " + error.message,
+        variant: 'destructive',
+        title: 'Save failed',
+        description: 'Failed to save changes: ' + error.message,
       });
     },
     onSettled: () => {
       setIsSaving(false);
-    }
+    },
   });
 
   const submitBlog = useMutation({
     mutationFn: async (blogData: BlogData) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
 
       const updateData = {
-        status: "pending_approval" as const,
+        status: 'pending_approval' as const,
         title: blogData.title,
         content: blogData.content,
         title_tamil: blogData.title_tamil || null,
@@ -115,7 +113,7 @@ export function useBlogMutations(
 
       if (currentBlogId) {
         const { error } = await supabase
-          .from("blogs")
+          .from('blogs')
           .update(updateData)
           .eq('id', currentBlogId);
 
@@ -123,7 +121,7 @@ export function useBlogMutations(
         return currentBlogId;
       } else {
         const { data, error } = await supabase
-          .from("blogs")
+          .from('blogs')
           .insert({
             ...updateData,
             author_id: user.id,
@@ -136,34 +134,36 @@ export function useBlogMutations(
       }
     },
     onSuccess: async (blogId) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user?.id) {
         // Immediately update the cache with the new blog
-        queryClient.invalidateQueries({ 
-          queryKey: ["writer-blogs", user.id],
+        queryClient.invalidateQueries({
+          queryKey: ['writer-blogs', user.id],
           exact: true,
-          refetchType: 'all'
+          refetchType: 'all',
         });
-        
+
         // Also invalidate the general blogs list
-        queryClient.invalidateQueries({ 
-          queryKey: ["blogs"],
-          refetchType: 'all'
+        queryClient.invalidateQueries({
+          queryKey: ['blogs'],
+          refetchType: 'all',
         });
       }
-      
+
       toast({
-        title: "Success",
-        description: "Blog submitted for approval",
+        title: 'Success',
+        description: 'Blog submitted for approval',
       });
-      
-      navigate("/dashboard", { replace: true });
+
+      navigate('/dashboard', { replace: true });
     },
     onError: (error) => {
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to submit blog: " + error.message,
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to submit blog: ' + error.message,
       });
     },
   });

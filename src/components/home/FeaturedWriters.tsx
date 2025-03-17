@@ -1,50 +1,55 @@
-
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
-import { format } from "date-fns";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
+import { format } from 'date-fns';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { useToast } from "@/hooks/use-toast";
+} from '@/components/ui/carousel';
+import { useToast } from '@/hooks/use-toast';
 
 export function FeaturedWriters() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
   const { t } = useLanguage();
-  
-  const { data: writers, isLoading, error } = useQuery({
-    queryKey: ["writers", searchQuery],
+
+  const {
+    data: writers,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['writers', searchQuery],
     queryFn: async () => {
-      let query = supabase
-        .from("writers")
-        .select("*");
+      let query = supabase.from('writers').select('*');
 
       if (searchQuery) {
-        query = query.ilike("name", `%${searchQuery}%`);
+        query = query.ilike('name', `%${searchQuery}%`);
       } else {
-        query = query.eq("featured", true)
-          .order("featured_month", { ascending: false });
+        query = query
+          .eq('featured', true)
+          .order('featured_month', { ascending: false });
       }
 
       const { data, error } = await query;
-      
+
       if (error) {
-        console.error("Error fetching writers:", error);
+        console.error('Error fetching writers:', error);
         toast({
-          variant: "destructive",
-          title: t("Error", "பிழை"),
-          description: t("Failed to fetch writers. Please try again later.", "எழுத்தாளர்களைப் பெற முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்."),
+          variant: 'destructive',
+          title: t('Error', 'பிழை'),
+          description: t(
+            'Failed to fetch writers. Please try again later.',
+            'எழுத்தாளர்களைப் பெற முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்.'
+          ),
         });
         throw error;
       }
@@ -56,18 +61,17 @@ export function FeaturedWriters() {
   });
 
   const formatFeaturedMonth = (dateString: string | null) => {
-    if (!dateString) return "";
+    if (!dateString) return '';
     try {
       const date = new Date(dateString);
-      return format(date, "MMMM yyyy");
+      return format(date, 'MMMM yyyy');
     } catch (error) {
-      console.error("Error formatting date:", error);
-      return "";
+      console.error('Error formatting date:', error);
+      return '';
     }
   };
 
   const handleViewProfile = (writerId: string) => {
-    console.log("Navigating to writer profile:", writerId);
     navigate(`/writer/${writerId}`);
   };
 
@@ -75,7 +79,10 @@ export function FeaturedWriters() {
     return (
       <div className="text-center py-20">
         <p className="text-muted-foreground">
-          {t("Failed to load featured writers.", "சிறப்பு எழுத்தாளர்களை ஏற்ற முடியவில்லை.")}
+          {t(
+            'Failed to load featured writers.',
+            'சிறப்பு எழுத்தாளர்களை ஏற்ற முடியவில்லை.'
+          )}
         </p>
       </div>
     );
@@ -85,15 +92,23 @@ export function FeaturedWriters() {
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold">{t("Featured Writers", "சிறப்பு எழுத்தாளர்கள்")}</h2>
+          <h2 className="text-3xl font-bold">
+            {t('Featured Writers', 'சிறப்பு எழுத்தாளர்கள்')}
+          </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            {t("Discover talented voices from our community", "எங்கள் சமூகத்தின் திறமையான குரல்களைக் கண்டறியுங்கள்")}
+            {t(
+              'Discover talented voices from our community',
+              'எங்கள் சமூகத்தின் திறமையான குரல்களைக் கண்டறியுங்கள்'
+            )}
           </p>
           <div className="max-w-md mx-auto mt-6">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={t("Search writers by name...", "பெயரால் எழுத்தாளர்களைத் தேடுங்கள்...")}
+                placeholder={t(
+                  'Search writers by name...',
+                  'பெயரால் எழுத்தாளர்களைத் தேடுங்கள்...'
+                )}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -103,18 +118,23 @@ export function FeaturedWriters() {
         </div>
 
         {isLoading ? (
-          <div className="text-center">{t("Loading writers...", "எழுத்தாளர்கள் ஏற்றப்படுகிறது...")}</div>
+          <div className="text-center">
+            {t('Loading writers...', 'எழுத்தாளர்கள் ஏற்றப்படுகிறது...')}
+          </div>
         ) : writers && writers.length > 0 ? (
           <Carousel
             opts={{
-              align: "start",
+              align: 'start',
               loop: true,
             }}
             className="w-full max-w-5xl mx-auto relative"
           >
             <CarouselContent>
               {writers.map((writer) => (
-                <CarouselItem key={writer.id} className="md:basis-1/3 lg:basis-1/3">
+                <CarouselItem
+                  key={writer.id}
+                  className="md:basis-1/3 lg:basis-1/3"
+                >
                   <div className="p-4 h-[400px]">
                     <div className="flex flex-col h-full rounded-lg border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300">
                       <div className="p-6 h-[100px] flex items-start gap-4">
@@ -141,7 +161,8 @@ export function FeaturedWriters() {
                       <div className="px-6 h-[40px]">
                         {writer.featured_month && (
                           <p className="text-xs text-muted-foreground">
-                            {t("Featured:", "சிறப்பிக்கப்பட்டது:")} {formatFeaturedMonth(writer.featured_month)}
+                            {t('Featured:', 'சிறப்பிக்கப்பட்டது:')}{' '}
+                            {formatFeaturedMonth(writer.featured_month)}
                           </p>
                         )}
                       </div>
@@ -158,7 +179,7 @@ export function FeaturedWriters() {
                           className="w-full"
                           onClick={() => handleViewProfile(writer.id)}
                         >
-                          {t("View Profile", "சுயவிவரத்தைக் காண")}
+                          {t('View Profile', 'சுயவிவரத்தைக் காண')}
                         </Button>
                       </div>
                     </div>
@@ -171,7 +192,7 @@ export function FeaturedWriters() {
           </Carousel>
         ) : (
           <div className="text-center text-muted-foreground">
-            {t("No writers found", "எழுத்தாளர்கள் எதுவும் கிடைக்கவில்லை")}
+            {t('No writers found', 'எழுத்தாளர்கள் எதுவும் கிடைக்கவில்லை')}
           </div>
         )}
       </div>

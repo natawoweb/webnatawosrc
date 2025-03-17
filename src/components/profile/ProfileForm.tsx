@@ -1,9 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useState } from 'react';
 
 interface ProfileFormProps {
   editedProfile: any;
@@ -13,13 +21,120 @@ interface ProfileFormProps {
   onCancel: () => void;
 }
 
-export function ProfileForm({ 
-  editedProfile, 
-  onProfileChange, 
-  onSocialLinkChange, 
-  onSubmit, 
-  onCancel 
+const countryStates = {
+  USA: [
+    'Alabama',
+    'Alaska',
+    'Arizona',
+    'Arkansas',
+    'California',
+    'Colorado',
+    'Connecticut',
+    'Delaware',
+    'Florida',
+    'Georgia',
+    'Hawaii',
+    'Idaho',
+    'Illinois',
+    'Indiana',
+    'Iowa',
+    'Kansas',
+    'Kentucky',
+    'Louisiana',
+    'Maine',
+    'Maryland',
+    'Massachusetts',
+    'Michigan',
+    'Minnesota',
+    'Mississippi',
+    'Missouri',
+    'Montana',
+    'Nebraska',
+    'Nevada',
+    'New Hampshire',
+    'New Jersey',
+    'New Mexico',
+    'New York',
+    'North Carolina',
+    'North Dakota',
+    'Ohio',
+    'Oklahoma',
+    'Oregon',
+    'Pennsylvania',
+    'Rhode Island',
+    'South Carolina',
+    'South Dakota',
+    'Tennessee',
+    'Texas',
+    'Utah',
+    'Vermont',
+    'Virginia',
+    'Washington',
+    'West Virginia',
+    'Wisconsin',
+    'Wyoming',
+  ],
+  Canada: [
+    'Alberta',
+    'British Columbia',
+    'Manitoba',
+    'New Brunswick',
+    'Newfoundland and Labrador',
+    'Northwest Territories',
+    'Nova Scotia',
+    'Nunavut',
+    'Ontario',
+    'Prince Edward Island',
+    'Quebec',
+    'Saskatchewan',
+    'Yukon',
+  ],
+  Mexico: [
+    'Aguascalientes',
+    'Baja California',
+    'Baja California Sur',
+    'Campeche',
+    'Chiapas',
+    'Chihuahua',
+    'Coahuila',
+    'Colima',
+    'Durango',
+    'Guanajuato',
+    'Guerrero',
+    'Hidalgo',
+    'Jalisco',
+    'Mexico City',
+    'Mexico State',
+    'Michoacán',
+    'Morelos',
+    'Nayarit',
+    'Nuevo Leon',
+    'Oaxaca',
+    'Puebla',
+    'Querétaro',
+    'Quintana Roo',
+    'San Luis Potosí',
+    'Sinaloa',
+    'Sonora',
+    'Tabasco',
+    'Tamaulipas',
+    'Tlaxcala',
+    'Veracruz',
+    'Yucatán',
+    'Zacatecas',
+  ],
+};
+
+export function ProfileForm({
+  editedProfile,
+  onProfileChange,
+  onSocialLinkChange,
+  onSubmit,
+  onCancel,
 }: ProfileFormProps) {
+  const [state, setState] = useState('');
+  const [county, setCounty] = useState('');
+
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <div className="space-y-2">
@@ -36,9 +151,12 @@ export function ProfileForm({
 
       <div className="space-y-2">
         <Label htmlFor="county">Country</Label>
-        <Select 
-          value={editedProfile?.county || ''} 
-          onValueChange={(value) => onProfileChange('county', value)}
+        <Select
+          value={editedProfile?.county || county}
+          onValueChange={(value) => {
+            onProfileChange('county', value);
+            setCounty(value);
+          }}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select your country" />
@@ -51,6 +169,31 @@ export function ProfileForm({
           </SelectContent>
         </Select>
       </div>
+
+      {(editedProfile?.county || county) in countryStates && (
+        <div className="space-y-2">
+          <Label htmlFor="state">State</Label>
+          <Select
+            value={editedProfile?.state || state}
+            onValueChange={(value) => {
+              onProfileChange('state', value);
+              setState(value);
+            }}
+            required
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select your state" />
+            </SelectTrigger>
+            <SelectContent>
+              {countryStates[editedProfile?.county].map((state: string) => (
+                <SelectItem key={state} value={state}>
+                  {state}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor="pseudonym">Pseudonym</Label>
@@ -154,7 +297,12 @@ export function ProfileForm({
         <Button type="submit" className="flex-1">
           Update Profile
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          className="flex-1"
+        >
           Cancel
         </Button>
       </div>

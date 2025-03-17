@@ -1,36 +1,32 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2, BookPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BlogFilters } from './blog/BlogFilters';
+import { BlogList } from './blog/BlogList';
+import { Database } from '@/integrations/supabase/types';
 
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Loader2, BookPlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { BlogFilters } from "./blog/BlogFilters";
-import { BlogList } from "./blog/BlogList";
-import { Database } from "@/integrations/supabase/types";
-
-type Blog = Database["public"]["Tables"]["blogs"]["Row"];
+type Blog = Database['public']['Tables']['blogs']['Row'];
 
 export function ContentManagement() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const queryClient = useQueryClient();
 
   const { data: blogs, isLoading } = useQuery({
-    queryKey: ["admin-blogs"],
+    queryKey: ['admin-blogs'],
     queryFn: async () => {
-      console.log("Fetching blogs...");
       const { data, error } = await supabase
-        .from("blogs")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .from('blogs')
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Error fetching blogs:", error);
+        console.error('Error fetching blogs:', error);
         throw error;
       }
-      
-      console.log("Fetched blogs:", data);
       return data as Blog[];
     },
   });
@@ -44,11 +40,11 @@ export function ContentManagement() {
         {
           event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
           schema: 'public',
-          table: 'blogs'
+          table: 'blogs',
         },
         () => {
           // Invalidate and refetch blogs when any change occurs
-          queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
+          queryClient.invalidateQueries({ queryKey: ['admin-blogs'] });
         }
       )
       .subscribe();
@@ -59,8 +55,11 @@ export function ContentManagement() {
   }, [queryClient]);
 
   const filteredBlogs = blogs?.filter((blog) => {
-    const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || blog.status === statusFilter;
+    const matchesSearch = blog.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === 'all' || blog.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 

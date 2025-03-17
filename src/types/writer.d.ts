@@ -1,4 +1,3 @@
-
 export interface Writer {
   id: string;
   name: string;
@@ -17,4 +16,6 @@ export interface Writer {
   created_at: string;
   featured: boolean;
   featured_month: string;
+  country?: string;
+  state?: string;
 }
