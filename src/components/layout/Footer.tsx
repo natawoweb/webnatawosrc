@@ -1,26 +1,75 @@
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Facebook, Instagram, X, Youtube } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export function Footer() {
   const { t } = useLanguage();
+  const { toast } = useToast();
 
-  const handleSubscribe = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
 
-    // Here you would typically handle the newsletter subscription
-    toast.success(
-      t(
-        'Thank you for subscribing to our newsletter!',
-        'எங்கள் செய்திமடலுக்கு பதிவு செய்தமைக்கு நன்றி!'
-      )
-    );
-    (e.target as HTMLFormElement).reset();
+    if (!email) {
+      toast({
+        title: 'error',
+        description: 'Please enter a valid email.',
+      });
+      return;
+    }
+
+    // 🔍 Check if the email already exists in the database
+    const { data: existingEmails, error: fetchError } = await supabase
+      .from('subscribe')
+      .select('email') // Selecting only email column
+      .eq('email', email) // Filtering by email
+      .limit(1); // We only need to check if one record exists
+
+    if (fetchError) {
+      toast({
+        title: 'error',
+        description: 'Error checking existing email: ' + fetchError.message,
+      });
+      return;
+    }
+
+    // 🚨 If email already exists, show an error
+    if (existingEmails.length > 0) {
+      toast({
+        title: '⚠ Warning:',
+        description:
+          'This email is already subscribed. If you’re not receiving our emails, check your spam folder or contact support.!',
+        className: 'bg-yellow-300 text-black',
+      });
+      return;
+    }
+
+    // ✅ If email does not exist, insert it into Supabase
+    const { error: insertError } = await supabase
+      .from('subscribe')
+      .insert([{ email }]);
+
+    if (insertError) {
+      toast({
+        title: 'error',
+        description: insertError.message,
+      });
+    } else {
+      toast({
+        title: 'success',
+        description: t(
+          'Thank you for subscribing to our newsletter!',
+          'எங்கள் செய்திமடலுக்கு பதிவு செய்தமைக்கு நன்றி!'
+        ),
+      });
+
+      e.currentTarget.reset(); // Reset the form after successful submission
+    }
   };
 
   return (
@@ -220,17 +269,6 @@ export function Footer() {
                 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.'
               )}
             </p>
-            {/* <p className="text-xs">
-              {t('Built with ♥ by ', '♥ உடன் உருவாக்கப்பட்டது ')}
-              <a
-                href="https://mahayugam.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-foreground transition-colors"
-              >
-                Mahayugam Inc
-              </a>
-            </p> */}
           </div>
         </div>
       </div>
