@@ -35,7 +35,7 @@ const Contact = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const response = await fetch('https://formspree.io/f/your-form-id', {
+    const response = await fetch('https://formspree.io/f/meoaezbw', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
