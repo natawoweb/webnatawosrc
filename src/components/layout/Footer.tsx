@@ -23,33 +23,6 @@ export function Footer() {
       return;
     }
 
-    // Send email via Resend
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer re_qvUxxJx4_1FToUypa3xj8FXCm9rmc4nZm',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'natawomail@gmail.com',
-        to: email,
-        subject: 'Thank you for subscribing!',
-        html: '<p>We appreciate your subscription. Stay tuned for updates!</p>',
-      }),
-    });
-
-    if (response.ok) {
-      toast({
-        title: 'success',
-        description: 'Subscription successful! Check your email',
-      });
-    } else {
-      toast({
-        title: 'error',
-        description: 'Subscription successful, but email sending failed.',
-      });
-    }
-
     // 🔍 Check if the email already exists in the database
     const { data: existingEmails, error: fetchError } = await supabase
       .from('subscribe')
@@ -87,6 +60,14 @@ export function Footer() {
         description: insertError.message,
       });
     } else {
+      await fetch('https://formspree.io/f/xeoaezww', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
       toast({
         title: 'success',
         description: t(
