@@ -87,6 +87,18 @@ export default function About() {
       bio: 'புதுவை முருகு, தமிழார்வலர், தமிழ்க் கல்வியாளர், எழுத்தாளர், செய்தியாளர், மொழியியல் ஆர்வலர், மனிதவள சிந்தனையாளர், Social Entrepreneur, World Traveler, <strong>Maryland, USA </strong>',
       image: '/lovable-uploads/6.jpg',
     },
+    {
+      name: 'Dr. R. Prabhakaran',
+      role: 'Global Ambassador - USA',
+      bio: 'முனைவர் இர.பிரபாகரன், திருக்குறளார், எழுத்தாளர், தமிழ்க் கல்வியாளர், NASA, US Army போன்ற அமெரிக்க அரசுத்துறைகளில் உயர்ந்த பதவிகளில் பணி புரிந்து ஓய்வு பெற்றவர், feTNA Life Member <strong>Maryland, USA </strong>',
+      image: '/lovable-uploads/27.jpg',
+    },
+    {
+      name: 'Dr. Arasu Chelliah',
+      role: 'Global Ambassador - USA',
+      bio: 'முனைவர் அரசு செல்லையா, எழுத்தாளர், தமிழ்க் கல்வியாளர், அமெரிக்க அதிபர் விருது பெற்றவர், American Tamil Academy, feTNA Life Member, <strong>Maryland, USA </strong>',
+      image: '/lovable-uploads/28.jpg',
+    },
   ];
 
   const globalAmbassadorsCanada = [
