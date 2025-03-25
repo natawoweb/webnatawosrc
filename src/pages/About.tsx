@@ -90,7 +90,7 @@ export default function About() {
     {
       name: 'Dr. R. Prabhakaran',
       role: 'Global Ambassador - USA',
-      bio: 'முனைவர் இர. பிரபாகரன், திருக்குறளார், எழுத்தாளர், தமிழ்க் கல்வியாளர், NASA, US Army போன்ற அமெரிக்க அரசுத்துறைகளில் உயர்ந்த பதவிகளில் பணி புரிந்து ஓய்வு பெற்றவர், Former Vice President of FeTNA <strong>Maryland, USA </strong>',
+      bio: 'முனைவர் இர. பிரபாகரன், திருக்குறளார், எழுத்தாளர், தமிழ்க் கல்வியாளர், NASA, US Army போன்ற அமெரிக்க அரசுத்துறைகளில் உயர்ந்த பதவிகளில் பணி புரிந்து ஓய்வு பெற்றவர், Former Vice President of FeTNA, <strong>Maryland, USA </strong>',
       image: '/lovable-uploads/27.jpg',
     },
     {
