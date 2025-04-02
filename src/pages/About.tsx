@@ -120,6 +120,12 @@ export default function About() {
       bio: 'இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், உலகத் தமிழ் சங்க 2022 ஆம் ஆண்டு இலக்கண விருதாளர், உலகத் தொல்காப்பிய மன்றமும் தமிழ் காப்புக் கழகமும் இணைந்து 2024 இல் அவருக்கு வழங்கிய விருது “தொல்காப்பிய மணி”,<strong> Alberta, Canada </strong>',
       image: '/lovable-uploads/24.jpg',
     },
+    {
+      name: 'Mr. Sudarshan Meenakshi Sundharam',
+      role: 'Global Ambassador - Canada',
+      bio: 'ஆற்றல் மறவன், தமிழார்வலர், தமிழ்க் கல்வியாளர், எழுத்தாளர், Social Entrepreneur,<strong> Toronto, Canada </strong>',
+      image: '/lovable-uploads/29.jpg',
+    },
   ];
 
   const globalAmbassadorsMexico = [
