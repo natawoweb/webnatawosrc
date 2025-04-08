@@ -129,7 +129,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 English
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setLanguage("tamil")}>
-                தமிழ் (Tamil)
+                தமிழ் (Thamiz)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

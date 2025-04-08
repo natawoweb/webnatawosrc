@@ -161,7 +161,7 @@ export function AdminUserProfileView({ profile }: AdminUserProfileViewProps) {
                         <SelectValue placeholder="Select level" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Literary Tamil Writers">Literary Tamil Writers</SelectItem>
+                        <SelectItem value="Literary Thamiz Writers">Literary Thamiz Writers</SelectItem>
                         <SelectItem value="Talented Experts">Talented Experts</SelectItem>
                         <SelectItem value="NATAWO Volunteers">NATAWO Volunteers</SelectItem>
                         <SelectItem value="NATAWO Students Writers">NATAWO Students Writers</SelectItem>
