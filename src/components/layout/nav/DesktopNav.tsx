@@ -124,7 +124,7 @@ export const DesktopNav: React.FC<DesktopNavProps> = ({
             English
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setLanguage('tamil')}>
-            தமிழ் (Thamiz)
+            தமிழ் (Thamizh)
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
