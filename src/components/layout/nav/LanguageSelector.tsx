@@ -24,7 +24,7 @@ export const LanguageSelector = () => {
           {t("English", "ஆங்கிலம்")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLanguage("tamil")}>
-          {t("Thamiz", "தமிழ்")}
+          {t("Thamizh", "தமிழ்")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
