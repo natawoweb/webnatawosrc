@@ -50,7 +50,7 @@ export function ProfileDialog({
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRole, setSelectedRole] = useState<AppRole | undefined>(profile?.role);
   const [selectedLevel, setSelectedLevel] = useState<UserLevel | undefined>(
-    profile?.level === 'Literary Tamil Writers' ? 'Literary Experts' :
+    profile?.level === 'Literary Thamiz Writers' ? 'Literary Experts' :
     profile?.level === 'Talented Experts' ? 'Aspiring Writers' :
     profile?.level as UserLevel
   );
@@ -161,7 +161,7 @@ export function ProfileDialog({
                   <ProfileField 
                     label="Level" 
                     value={
-                      profile?.level === 'Literary Tamil Writers' ? 'Literary Experts' :
+                      profile?.level === 'Literary Thamiz Writers' ? 'Literary Experts' :
                       profile?.level === 'Talented Experts' ? 'Aspiring Writers' :
                       profile?.level
                     } 

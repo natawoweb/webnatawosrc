@@ -43,13 +43,13 @@ export function HeroSection() {
           <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-8">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight animate-in fade-in slide-in duration-1000">
               {t(
-                'Celebrate Tamil Literature Across North America',
+                'Celebrate Thamiz Literature Across North America',
                 'வட அமெரிக்காவில் தமிழ் இலக்கியத்தைக் கொண்டாடுங்கள்'
               )}
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl animate-in fade-in slide-in duration-1000 delay-200">
               {t(
-                'Join our vibrant community of writers and readers celebrating Tamil literary excellence. By Writers, For Writers, Of Writers, A Tamil Platform! NATAWO',
+                'Join our vibrant community of writers and readers celebrating Thamiz literary excellence. By Writers, For Writers, Of Writers, A Thamiz Platform! NATAWO',
                 'தமிழ் இலக்கிய சிறப்பை கொண்டாடும் எழுத்தாளர்கள் மற்றும் வாசகர்களின் துடிப்பான சமூகத்தில் இணையுங்கள். எழுத்தாளர்களால், எழுத்தாளர்களுக்காக, எழுத்தாளர்களின், ஒரு தமிழ் தளம்! நடவு'
               )}
             </p>
