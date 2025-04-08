@@ -17,7 +17,7 @@ export default function Privacy() {
         <div className="mb-6">
           <p className="text-lg font-medium">
             {t(
-              "North America Tamil Writers Organization (NATAWO)",
+              "North America Thamizh Writers Organization (NATAWO)",
               "வட அமெரிக்க தமிழ் எழுத்தாளர்கள் அமைப்பு (NATAWO)"
             )}
           </p>
@@ -33,7 +33,7 @@ export default function Privacy() {
           <div className="space-y-4">
             <p>
               {t(
-                "North America Tamil Writers Organization (NATAWO) respects your privacy and is committed to protecting your personal information. This Privacy Policy outlines how we collect, use, disclose, and protect your data when you access our website, engage in forums, or participate in our programs.",
+                "North America Thamizh Writers Organization (NATAWO) respects your privacy and is committed to protecting your personal information. This Privacy Policy outlines how we collect, use, disclose, and protect your data when you access our website, engage in forums, or participate in our programs.",
                 "வட அமெரிக்க தமிழ் எழுத்தாளர்கள் அமைப்பு (NATAWO) உங்கள் தனியுரிமையை மதிக்கிறது மற்றும் உங்கள் தனிப்பட்ட தகவல்களைப் பாதுகாக்க உறுதிபூண்டுள்ளது. நீங்கள் எங்கள் வலைத்தளத்தை அணுகும்போது, மன்றங்களில் ஈடுபடும்போது அல்லது எங்கள் நிகழ்ச்சிகளில் பங்கேற்கும்போது உங்கள் தரவை எவ்வாறு சேகரிக்கிறோம், பயன்படுத்துகிறோம், வெளிப்படுத்துகிறோம் மற்றும் பாதுகாக்கிறோம் என்பதை இந்த தனியுரிமைக் கொள்கை விவரிக்கிறது."
               )}
             </p>

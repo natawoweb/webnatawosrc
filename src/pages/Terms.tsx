@@ -17,7 +17,7 @@ export default function Terms() {
         <div className="mb-6">
           <p className="text-lg font-medium">
             {t(
-              "North America Tamil Writers Organization (NATAWO)",
+              "North America Thamizh Writers Organization (NATAWO)",
               "வட அமெரிக்க தமிழ் எழுத்தாளர்கள் அமைப்பு (NATAWO)"
             )}
           </p>
@@ -33,7 +33,7 @@ export default function Terms() {
           {/* Introduction */}
           <p>
             {t(
-              "Welcome to the North America Tamil Writers Organization (NATAWO) website. These Terms of Use govern your access and use of our website, forums, and related services. By using our website, you agree to these terms. If you do not agree, please discontinue use of our services.",
+              "Welcome to the North America Thamizh Writers Organization (NATAWO) website. These Terms of Use govern your access and use of our website, forums, and related services. By using our website, you agree to these terms. If you do not agree, please discontinue use of our services.",
               "வட அமெரிக்க தமிழ் எழுத்தாளர்கள் அமைப்ப���ன் (NATAWO) வலைத்தளத்திற்கு வரவேற்கிறோம். இந்த பயன்பாட்டு விதிமுறைகள் எங்கள் வலைத்தளம், மன்றங்கள் மற்றும் தொடர்புடைய சேவைகளை அணுகுவதையும் பயன்படுத்துவதையும் நிர்வகிக்கின்றன. எங்கள் வலைத்தளத்தைப் பயன்படுத்துவதன் மூலம், இந்த விதிமுறைகளுக்கு நீங்கள் ஒப்புக்கொள்கிறீர்கள். நீங்கள் ஒப்புக்கொள்ளவில்லை என்றால், எங்கள் சேவைகளைப் பயன்படுத்துவதை நிறுத்தவும்."
             )}
           </p>
