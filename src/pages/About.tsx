@@ -141,13 +141,13 @@ export default function About() {
     {
       name: 'Dr. S. Mohan',
       role: 'Global Ambassador - India',
-      bio: 'Vice Chancellor, Puducherry Technological University, <strong>Puducherry, India </strong>',
+      bio: 'புதுச்சேரி தொழில்நுட்ப பல்கலைக்கழகத்தின் (Puducherry Technological University - PTU) முதல் துணைவேந்தராக டாக்டர் எஸ். மோகன் அவர்கள் பணியாற்றி வருகிறார். தமிழ் எழுத்தாளர், தமிழார்வலர், பேச்சாளர், <strong>Puducherry, India </strong>',
       image: '/lovable-uploads/13.jpg',
     },
     {
       name: 'Kalaimaamani Dr. Cheyon I.B.S.',
       role: 'Global Ambassador - India',
-      bio: 'Former Director, All India Radio, MTS Academy, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், <strong>Thamizh Nadu, India </strong>',
+      bio: 'கலைமாமணி சேயோன் (என். முருகன்), தமிழ் இலக்கியம், வானொலி மற்றும் ஊடகத் துறைகளில் முக்கிய பங்களிப்பு செய்தவர். அகில இந்திய வானொலியில் இயக்குநராக பணியாற்றிய இவர், 50-க்கும் மேற்பட்ட நூல்களை எழுதியுள்ளார். கலைமாமணி விருது, திருக்குறள் செம்மல் விருது எனப் பல விருதுகளைப் பெற்றவர், Former Director, All India Radio, MTS Academy, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், <strong>Thamizh Nadu, India </strong>',
       image: '/lovable-uploads/22.jpg',
     },
     {
