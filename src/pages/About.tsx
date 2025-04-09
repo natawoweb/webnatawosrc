@@ -145,16 +145,22 @@ export default function About() {
       image: '/lovable-uploads/13.jpg',
     },
     {
+      name: 'Kalaimaamani Ervadi S. Radhakrishnan',
+      role: 'Global Ambassador - India',
+      bio: 'நாடறிந்த எழுத்தாளர், கவிஞர், நாடகாசிரியர், நாவலாசிரியர், சமூக ஆர்வலர், பேச்சாளர், பத்திரிகை எழுத்தாளர் எனப் பல்வேறு பரிமாணங்களில் திகழும் கலைமாமணி ஏர்வாடி எஸ். இராதாகிருஷ்ணன் 130-க்கும் மேற்பட்ட நூல்களை எழுதியுள்ளார். தமிழ்நாடு அரசின் சிறந்த நூல்களுக்கான பரிசுகள் பெற்றவர், <strong>Thamizh Nadu, India </strong>',
+      image: '/lovable-uploads/30.jpg',
+    },
+    {
       name: 'Kalaimaamani Dr. Cheyon I.B.S.',
       role: 'Global Ambassador - India',
       bio: 'கலைமாமணி சேயோன் (என். முருகன்), தமிழ் இலக்கியம், வானொலி மற்றும் ஊடகத் துறைகளில் முக்கிய பங்களிப்பு செய்தவர். அகில இந்திய வானொலியில் இயக்குநராக பணியாற்றிய இவர், 50-க்கும் மேற்பட்ட நூல்களை எழுதியுள்ளார். கலைமாமணி விருது, திருக்குறள் செம்மல் விருது எனப் பல விருதுகளைப் பெற்றவர், Former Director, All India Radio, MTS Academy, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், <strong>Thamizh Nadu, India </strong>',
       image: '/lovable-uploads/22.jpg',
     },
     {
-      name: 'Kalaimaamani Ervadi S. Radhakrishnan',
+      name: 'கவிஞர் விஜயகிருஷ்ணன்',
       role: 'Global Ambassador - India',
-      bio: 'நாடறிந்த எழுத்தாளர், கவிஞர், நாடகாசிரியர், நாவலாசிரியர், சமூக ஆர்வலர், பேச்சாளர், பத்திரிகை எழுத்தாளர் எனப் பல்வேறு பரிமாணங்களில் திகழும் கலைமாமணி ஏர்வாடி எஸ். இராதாகிருஷ்ணன் 130-க்கும் மேற்பட்ட நூல்களை எழுதியுள்ளார். தமிழ்நாடு அரசின் சிறந்த நூல்களுக்கான பரிசுகள் பெற்றவர், <strong>Thamizh Nadu, India </strong>',
-      image: '/lovable-uploads/30.jpg',
+      bio: 'நெறியாளர், தூர்தர்ஷன் தமிழ்; துணைச்செயலாளர், சென்னை கம்பன் கழகம்; வங்கியாளர்; கிராமவளர் பணியாளர், <strong>Thamizh Nadu,  India</strong>',
+      image: '/lovable-uploads/17.jpg',
     },
     {
       name: 'Prof. Dr. K. Thilagavathi',
@@ -173,12 +179,6 @@ export default function About() {
       role: 'Global Ambassador - India',
       bio: 'Professor & Director (Planning and Development), Puducherry Technological University, <strong>Puducherry, India </strong>',
       image: '/lovable-uploads/16.jpg',
-    },
-    {
-      name: 'கவிஞர் விஜயகிருஷ்ணன்',
-      role: 'Global Ambassador - India',
-      bio: 'நெறியாளர், தூர்தர்ஷன் தமிழ்; துணைச்செயலாளர், சென்னை கம்பன் கழகம்; வங்கியாளர்; கிராமவளர் பணியாளர், <strong>Thamizh Nadu,  India</strong>',
-      image: '/lovable-uploads/17.jpg',
     },
     {
       name: 'Dr. A. Alaguselvam (Alaguannavi)',
