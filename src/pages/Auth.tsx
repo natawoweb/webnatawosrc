@@ -25,6 +25,8 @@ export default function Auth() {
 
     const type = hashParams.get("type") || searchParams.get("type");
 
+    window.alert(type);
+
     if (type === "recovery") {
       setIsResetPassword(true);
       return;
