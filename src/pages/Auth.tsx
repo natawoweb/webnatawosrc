@@ -25,14 +25,12 @@ export default function Auth() {
 
     const type = hashParams.get("type") || searchParams.get("type");
 
-    console.log("Type:", type);
-
     if (type === "recovery") {
       setIsResetPassword(true);
       return;
     }
 
-    if (session) {
+    if (session && type !== "recovery") {
       navigate("/", { replace: true });
     }
   }, [session, navigate]);
