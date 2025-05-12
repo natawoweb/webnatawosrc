@@ -1,32 +1,32 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { BaseFormFields } from './form-fields/BaseFormFields';
-import { WriterFormFields } from './form-fields/WriterFormFields';
-import { handleSignupNotifications } from './utils/signupNotifications';
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { BaseFormFields } from "./form-fields/BaseFormFields";
+import { WriterFormFields } from "./form-fields/WriterFormFields";
+import { handleSignupNotifications } from "./utils/signupNotifications";
 
 interface SignUpFormProps {
   onExistingAccount: () => void;
 }
 
 export function SignUpForm({ onExistingAccount }: SignUpFormProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState<'reader' | 'writer'>('reader');
-  const [pseudonym, setPseudonym] = useState('');
-  const [bio, setBio] = useState('');
-  const [county, setCounty] = useState('');
-  const [state, setState] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState<"reader" | "writer">("reader");
+  const [pseudonym, setPseudonym] = useState("");
+  const [bio, setBio] = useState("");
+  const [county, setCounty] = useState("");
+  const [state, setState] = useState("");
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
@@ -37,21 +37,21 @@ export function SignUpForm({ onExistingAccount }: SignUpFormProps) {
 
     if (!acceptedTerms) {
       toast({
-        variant: 'default',
-        title: '⚠ Warning',
+        variant: "default",
+        title: "⚠ Warning",
         description:
           "You must accept the NATAWO Bylaws and the website's legal terms, including the Privacy Policy, Terms of Use, and Guidelines, to proceed. Please check the required box to continue.",
         duration: 5000,
-        className: 'bg-yellow-300 text-black',
+        className: "bg-yellow-300 text-black",
       });
       return;
     }
 
     if (!county) {
       toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Please select your country',
+        variant: "destructive",
+        title: "Error",
+        description: "Please select your country",
       });
       return;
     }
@@ -75,19 +75,19 @@ export function SignUpForm({ onExistingAccount }: SignUpFormProps) {
       });
 
       if (error) {
-        console.error('Signup error details:', error);
+        console.error("Signup error details:", error);
 
         if (
           error.status === 422 ||
-          error.message?.toLowerCase().includes('already') ||
-          error.message?.toLowerCase().includes('registered') ||
-          error.message?.toLowerCase().includes('exists')
+          error.message?.toLowerCase().includes("already") ||
+          error.message?.toLowerCase().includes("registered") ||
+          error.message?.toLowerCase().includes("exists")
         ) {
           toast({
-            variant: 'destructive',
-            title: 'Account Already Exists',
+            variant: "destructive",
+            title: "Account Already Exists",
             description:
-              'An account with this email already exists. Please sign in instead.',
+              "An account with this email already exists. Please sign in instead.",
             duration: 5000,
           });
 
@@ -96,55 +96,55 @@ export function SignUpForm({ onExistingAccount }: SignUpFormProps) {
         }
 
         toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: error.message || 'Failed to sign up. Please try again.',
+          variant: "destructive",
+          title: "Error",
+          description: error.message || "Failed to sign up. Please try again.",
           duration: 5000,
         });
         return;
       }
 
       if (!data.user) {
-        throw new Error('Signup failed - no user returned');
+        throw new Error("Signup failed - no user returned");
       }
 
       await handleSignupNotifications(role, email, fullName);
 
       toast({
-        title: 'Success',
+        title: "Success",
         description:
-          role === 'writer'
-            ? 'Your writer application has been submitted. Please check your email for confirmation.'
-            : 'Welcome to NATAWO! Please check your email.',
+          role === "writer"
+            ? "Your writer application has been submitted. Please check your email for confirmation."
+            : "Welcome to NATAWO! Please check your email.",
         duration: 5000,
       });
 
       // Clear the form
-      setEmail('');
-      setPassword('');
-      setFullName('');
-      setRole('reader');
-      setPseudonym('');
-      setBio('');
-      setCounty('');
-      setState('');
+      setEmail("");
+      setPassword("");
+      setFullName("");
+      setRole("reader");
+      setPseudonym("");
+      setBio("");
+      setCounty("");
+      setState("");
 
       // Switch to sign in tab
       onExistingAccount();
     } catch (error: unknown) {
-      console.error('Signup error:', error);
+      console.error("Signup error:", error);
       if (error instanceof Error) {
         toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: error.message || 'Failed to sign up. Please try again.',
+          variant: "destructive",
+          title: "Error",
+          description: error.message || "Failed to sign up. Please try again.",
           duration: 5000,
         });
       } else {
         toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Failed to sign up. Please try again.',
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to sign up. Please try again.",
           duration: 5000,
         });
       }
@@ -172,7 +172,7 @@ export function SignUpForm({ onExistingAccount }: SignUpFormProps) {
         <Label htmlFor="role">Role</Label>
         <Select
           defaultValue="reader"
-          onValueChange={(value: 'reader' | 'writer') => setRole(value)}
+          onValueChange={(value: "reader" | "writer") => setRole(value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select your role" />
@@ -184,7 +184,7 @@ export function SignUpForm({ onExistingAccount }: SignUpFormProps) {
         </Select>
       </div>
 
-      {role === 'writer' && (
+      {role === "writer" && (
         <WriterFormFields
           pseudonym={pseudonym}
           setPseudonym={setPseudonym}
@@ -203,16 +203,16 @@ export function SignUpForm({ onExistingAccount }: SignUpFormProps) {
         />
         <Label htmlFor="terms" className="text-sm text-gray-700">
           You must accept <span className="font-medium">NATAWO Bylaws</span> and
-          website legal terms such as{' '}
+          website legal terms such as{" "}
           <span className="font-medium">
             NATAWO Privacy Policies, Terms of Use, and Guidelines
-          </span>{' '}
+          </span>{" "}
           in order to create login credentials and leverage our systems.
         </Label>
       </div>
 
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? 'Signing up...' : 'Sign Up'}
+        {loading ? "Signing up..." : "Sign Up"}
       </Button>
     </form>
   );

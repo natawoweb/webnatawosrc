@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
@@ -35,7 +36,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth?type=reset`,
+        redirectTo: `${window.location.origin}/auth?type=recovery`,
       });
 
       if (error) throw error;
@@ -46,7 +47,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         duration: 5000,
       });
     } catch (error: any) {
-      console.error('Password reset error:', error);
+      console.error("Password reset error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -61,12 +62,13 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
       if (authError) throw authError;
 
@@ -74,9 +76,9 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       await queryClient.invalidateQueries();
 
       // First check if user is admin
-      const { data: isAdmin } = await supabase.rpc('has_role', {
+      const { data: isAdmin } = await supabase.rpc("has_role", {
         user_id: authData.user.id,
-        required_role: 'admin'
+        required_role: "admin",
       });
 
       if (isAdmin) {
@@ -85,42 +87,43 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
           description: "You have successfully signed in.",
           duration: 3000,
         });
-        navigate("/admin", { replace: true, state: { from: '/auth' } });
+        navigate("/admin", { replace: true, state: { from: "/auth" } });
         return;
       }
 
       // Then check profile type if not admin
       const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_type')
-        .eq('id', authData.user.id)
+        .from("profiles")
+        .select("user_type")
+        .eq("id", authData.user.id)
         .single();
 
       if (profileError) throw profileError;
 
-      if (profile?.user_type === 'writer') {
+      if (profile?.user_type === "writer") {
         toast({
           title: "Welcome back, Writer!",
           description: "You have successfully signed in.",
           duration: 3000,
         });
-        navigate("/dashboard", { replace: true, state: { from: '/auth' } });
+        navigate("/dashboard", { replace: true, state: { from: "/auth" } });
       } else {
         toast({
           title: "Welcome back!",
           description: "You have successfully signed in.",
           duration: 3000,
         });
-        navigate("/", { replace: true, state: { from: '/auth' } });
+        navigate("/", { replace: true, state: { from: "/auth" } });
       }
-      
+
       onSuccess();
     } catch (error: any) {
-      console.error('Signin error:', error);
+      console.error("Signin error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Invalid email or password. Please try again.",
+        description:
+          error.message || "Invalid email or password. Please try again.",
         duration: 5000,
       });
     } finally {
@@ -167,7 +170,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
           <LogIn className="mr-2 h-4 w-4" />
           {loading ? "Signing in..." : "Sign In"}
         </Button>
-        
+
         <Button
           type="button"
           variant="link"
