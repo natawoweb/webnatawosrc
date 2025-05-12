@@ -20,17 +20,18 @@ export default function Auth() {
   const [isResetPassword, setIsResetPassword] = useState(false);
 
   useEffect(() => {
-    // Check for recovery mode first
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const type = hashParams.get("type");
-    const accessToken = hashParams.get("token");
+    const searchParams = new URLSearchParams(window.location.search);
 
-    if (type === "recovery" && accessToken) {
+    const type = hashParams.get("type") || searchParams.get("type");
+
+    console.log("Type:", type);
+
+    if (type === "recovery") {
       setIsResetPassword(true);
       return;
     }
 
-    // If user is already authenticated, redirect them away from auth page
     if (session) {
       navigate("/", { replace: true });
     }
