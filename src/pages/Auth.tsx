@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -15,7 +16,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { session } = useSession();
+  const { session, signOut } = useSession();
   const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
   const [isResetPassword, setIsResetPassword] = useState(false);
 
@@ -30,9 +31,9 @@ export default function Auth() {
       return;
     }
 
-    if (session && type !== "recovery") {
-      navigate("/", { replace: true });
-    }
+    // if (session && type !== "recovery") {
+    //   navigate("/", { replace: true });
+    // }
   }, [session, navigate]);
 
   if (isResetPassword) {

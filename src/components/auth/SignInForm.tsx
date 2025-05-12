@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSession } from "@/hooks/useSession";
 
 interface SignInFormProps {
   onSuccess: () => void;
@@ -17,6 +18,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { signOut } = useSession();
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -46,6 +48,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         description: "We've sent you a password reset link.",
         duration: 5000,
       });
+      signOut();
     } catch (error: any) {
       console.error("Password reset error:", error);
       toast({
