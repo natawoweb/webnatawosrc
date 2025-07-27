@@ -18,7 +18,7 @@ export default function Guidelines() {
         <div className="mb-8">
           <p>
             {t(
-              "The North America Tamil Writers Organization (NATAWO) website serves as a community platform for Tamil writers, literary enthusiasts, and scholars. To maintain a respectful and constructive environment, users must adhere to the following guidelines when engaging in discussions, forums, and contributions.",
+              "The North America Thamizh Writers Organization (NATAWO) website serves as a community platform for Thamizh writers, literary enthusiasts, and scholars. To maintain a respectful and constructive environment, users must adhere to the following guidelines when engaging in discussions, forums, and contributions.",
               "வட அமெரிக்க தமிழ் எழுத்தாளர்கள் அமைப்பின் (NATAWO) வலைத்தளம் தமிழ் எழுத்தாளர்கள், இலக்கிய ஆர்வலர்கள் மற்றும் அறிஞர்களுக்கான சமூக தளமாக செயல்படுகிறது. மரியாதையான மற்றும் ஆக்கபூர்வமான சூழலை பராமரிக்க, விவாதங்கள், மன்றங்கள் மற்றும் பங்களிப்புகளில் ஈடுபடும்போது பயனர்கள் பின்வரும் வழிகாட்டுதல்களைப் பின்பற்ற வேண்டும்."
             )}
           </p>
@@ -56,7 +56,7 @@ export default function Guidelines() {
             </li>
             <li>
               {t(
-                "Respect cultural diversity and Tamil literary heritage in discussions",
+                "Respect cultural diversity and Thamizh literary heritage in discussions",
                 "விவாதங்களில் கலாச்சார பன்முகத்தன்மையையும் தமிழ் இலக்கிய பாரம்பரியத்தையும் மதிக்கவும்"
               )}
             </li>
@@ -89,7 +89,7 @@ export default function Guidelines() {
             </li>
             <li>
               {t(
-                "Discussions must align with the mission of NATAWO (Tamil literature, writing, culture)",
+                "Discussions must align with the mission of NATAWO (Thamizh literature, writing, culture)",
                 "விவாதங்கள் NATAWO இன் நோக்கத்துடன் (தமிழ் இலக்கியம், எழுத்து, கலாச்சாரம்) ஒத்துப்போக வேண்டும்"
               )}
             </li>
@@ -134,7 +134,7 @@ export default function Guidelines() {
             </li>
             <li>
               {t(
-                "Respect Tamil Language: If posting in Tamil, ensure correct spelling and readability",
+                "Respect Thamizh Language: If posting in Thamizh, ensure correct spelling and readability",
                 "தமிழ் மொழியை மதிக்கவும்: தமிழில் பதிவிடும்போது, சரியான எழுத்து மற்றும் வாசிப்புத்திறனை உறுதிப்படுத்தவும்"
               )}
             </li>

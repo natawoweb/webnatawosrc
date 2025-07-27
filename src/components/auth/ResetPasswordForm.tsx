@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
@@ -18,7 +19,7 @@ export function ResetPasswordForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast({
         variant: "destructive",
@@ -42,35 +43,41 @@ export function ResetPasswordForm() {
     setLoading(true);
     try {
       const { error: updateError } = await supabase.auth.updateUser({
-        password: password
+        password: password,
       });
 
       if (updateError) throw updateError;
 
       // Get the user's email for the notification
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (user?.email) {
         // Call the edge function to send password change notification
-        const response = await fetch(`${window.location.origin}/functions/v1/send-password-changed`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            email: user.email,
-            name: user.user_metadata?.full_name || 'User'
-          })
-        });
+        const response = await fetch(
+          `${window.location.origin}/functions/v1/send-password-changed`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: user.email,
+              name: user.user_metadata?.full_name || "User",
+            }),
+          }
+        );
 
         if (!response.ok) {
-          console.error('Failed to send password change notification');
+          console.error("Failed to send password change notification");
         }
       }
 
       toast({
         title: "Password Updated",
-        description: "Your password has been successfully updated. You will be redirected to the home page.",
+        description:
+          "Your password has been successfully updated. You will be redirected to the home page.",
         duration: 5000,
       });
 
@@ -78,13 +85,13 @@ export function ResetPasswordForm() {
       setTimeout(() => {
         navigate("/");
       }, 2000);
-
     } catch (error: any) {
-      console.error('Password reset error:', error);
+      console.error("Password reset error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to update password. Please try again.",
+        description:
+          error.message || "Failed to update password. Please try again.",
         duration: 5000,
       });
     } finally {

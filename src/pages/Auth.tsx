@@ -103,7 +103,9 @@ export default function Auth() {
       <Card className="max-w-md mx-auto">
         <CardHeader>
           <CardTitle>Welcome to NATAWO</CardTitle>
-          <CardDescription>Join our community of Tamil writers and readers</CardDescription>
+          <CardDescription>
+            Join our community of Thamizh writers and readers
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs

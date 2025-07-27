@@ -87,6 +87,18 @@ export default function About() {
       bio: 'புதுவை முருகு, தமிழார்வலர், தமிழ்க் கல்வியாளர், எழுத்தாளர், செய்தியாளர், மொழியியல் ஆர்வலர், மனிதவள சிந்தனையாளர், Social Entrepreneur, World Traveler, <strong>Maryland, USA </strong>',
       image: '/lovable-uploads/6.jpg',
     },
+    {
+      name: 'Dr. R. Prabhakaran',
+      role: 'Global Ambassador - USA',
+      bio: 'முனைவர் இர. பிரபாகரன், திருக்குறளார், எழுத்தாளர், தமிழ்க் கல்வியாளர், NASA, US Army போன்ற அமெரிக்க அரசுத்துறைகளில் உயர்ந்த பதவிகளில் பணி புரிந்து ஓய்வு பெற்றவர், Former Vice President of FeTNA, <strong>Maryland, USA </strong>',
+      image: '/lovable-uploads/27.jpg',
+    },
+    {
+      name: 'Dr. Arasu Chelliah',
+      role: 'Global Ambassador - USA',
+      bio: 'முனைவர் அரசு செல்லையா, எழுத்தாளர், தமிழ்க் கல்வியாளர், அமெரிக்க அதிபர் விருது பெற்றவர், Founder President of American Thamizh Academy, Former President of FeTNA, <strong>Maryland, USA </strong>',
+      image: '/lovable-uploads/28.jpg',
+    },
   ];
 
   const globalAmbassadorsCanada = [
@@ -108,6 +120,12 @@ export default function About() {
       bio: 'இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், உலகத் தமிழ் சங்க 2022 ஆம் ஆண்டு இலக்கண விருதாளர், உலகத் தொல்காப்பிய மன்றமும் தமிழ் காப்புக் கழகமும் இணைந்து 2024 இல் அவருக்கு வழங்கிய விருது “தொல்காப்பிய மணி”,<strong> Alberta, Canada </strong>',
       image: '/lovable-uploads/24.jpg',
     },
+    {
+      name: 'Mr. Sudarshan Meenakshi Sundharam',
+      role: 'Global Ambassador - Canada',
+      bio: 'சுதர்சன் (ஆற்றல் மறவன்), சிறுநீரக மருத்துவ பொறியியலில் பணி (TGH-UHN), தமிழ்க் கல்வியாளர், எழுத்தாளர், தமிழ் நாடு கலாச்சாரச் சங்கத்தில் முத்தமிழ் பாட சாலையை நிறுவியவர். மருத்துவம் சார்ந்த இவரது பதிவுகள் டொரோண்டோ பொது மருத்துவமனை மூலமாகக் கனடா முழுக்க காட்சிப்படுத்தி  உள்ளார். ஒரு ரூபாய் அறிவியல் தமிழ் மன்றத்தில் உயர் மட்டக் குழுவிலும், தமிழ் நாடு கலாச்சாரச் சங்கத்தின் ஆலோசகராகவும், டோ அறக்கட்டளையின் நிர்வாகத் தலைவராகவும் உள்ளார்,<strong> Toronto, Canada </strong>',
+      image: '/lovable-uploads/29.jpg',
+    },
   ];
 
   const globalAmbassadorsMexico = [
@@ -123,19 +141,31 @@ export default function About() {
     {
       name: 'Dr. S. Mohan',
       role: 'Global Ambassador - India',
-      bio: 'Vice Chancellor, Puducherry Technological University, <strong>Puducherry, India </strong>',
+      bio: 'புதுச்சேரி தொழில்நுட்ப பல்கலைக்கழகத்தின் (Puducherry Technological University - PTU) முதல் துணைவேந்தராக டாக்டர் எஸ். மோகன் அவர்கள் பணியாற்றி வருகிறார். தமிழ் எழுத்தாளர், தமிழார்வலர், பேச்சாளர், <strong>Puducherry, India </strong>',
       image: '/lovable-uploads/13.jpg',
     },
     {
-      name: 'Kalaimamani Dr. Cheyon I.B.S.',
+      name: 'Kalaimaamani Ervadi S. Radhakrishnan',
       role: 'Global Ambassador - India',
-      bio: 'Former Director, All India Radio, MTS Academy, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், <strong>Tamil Nadu, India </strong>',
+      bio: 'நாடறிந்த எழுத்தாளர், கவிஞர், நாடகாசிரியர், நாவலாசிரியர், சமூக ஆர்வலர், பேச்சாளர், பத்திரிகை எழுத்தாளர் எனப் பல்வேறு பரிமாணங்களில் திகழும் கலைமாமணி ஏர்வாடி எஸ். இராதாகிருஷ்ணன் 130-க்கும் மேற்பட்ட நூல்களை எழுதியுள்ளார். தமிழ்நாடு அரசின் சிறந்த நூல்களுக்கான பரிசுகள் பெற்றவர், <strong>Thamizh Nadu, India </strong>',
+      image: '/lovable-uploads/30.jpg',
+    },
+    {
+      name: 'Kalaimaamani Dr. Cheyon I.B.S.',
+      role: 'Global Ambassador - India',
+      bio: 'கலைமாமணி சேயோன் (என். முருகன்), தமிழ் இலக்கியம், வானொலி மற்றும் ஊடகத் துறைகளில் முக்கிய பங்களிப்பு செய்தவர். அகில இந்திய வானொலியில் இயக்குநராக பணியாற்றிய இவர், 50-க்கும் மேற்பட்ட நூல்களை எழுதியுள்ளார். கலைமாமணி விருது, திருக்குறள் செம்மல் விருது எனப் பல விருதுகளைப் பெற்றவர், Former Director, All India Radio, MTS Academy, இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், <strong>Thamizh Nadu, India </strong>',
       image: '/lovable-uploads/22.jpg',
+    },
+    {
+      name: 'கவிஞர் விஜயகிருஷ்ணன்',
+      role: 'Global Ambassador - India',
+      bio: 'நெறியாளர், தூர்தர்ஷன் தமிழ்; துணைச்செயலாளர், சென்னை கம்பன் கழகம்; வங்கியாளர்; கிராமவளர் பணியாளர், <strong>Thamizh Nadu,  India</strong>',
+      image: '/lovable-uploads/17.jpg',
     },
     {
       name: 'Prof. Dr. K. Thilagavathi',
       role: 'Global Ambassador - India',
-      bio: 'Former Director / Head Tamil Cultural Center, சங்க இலக்கிய ஆராய்ச்சியாளர், உரையாளர், சங்க இலக்கியப் பொருட் களஞ்சியத்தை உருவாக்கியவர், தமிழகப் புலவர்குழு உறுப்பினர், தமிழ் வளர்ச்சிக்கழக உறுப்பினர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க இணைச்செயலாளர், Tamil University, Thanjavur, <strong>Tamil Nadu, India </strong>',
+      bio: 'Former Director / Head Thamizh Cultural Center, சங்க இலக்கிய ஆராய்ச்சியாளர், உரையாளர், சங்க இலக்கியப் பொருட் களஞ்சியத்தை உருவாக்கியவர், தமிழகப் புலவர்குழு உறுப்பினர், தமிழ் வளர்ச்சிக்கழக உறுப்பினர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க இணைச்செயலாளர், Thamizh University, Thanjavur, <strong>Thamizh Nadu, India </strong>',
       image: '/lovable-uploads/14.jpg',
     },
     {
@@ -151,15 +181,9 @@ export default function About() {
       image: '/lovable-uploads/16.jpg',
     },
     {
-      name: 'கவிஞர் விஜயகிருஷ்ணன்',
-      role: 'Global Ambassador - India',
-      bio: 'நெறியாளர், தூர்தர்ஷன் தமிழ்; துணைச்செயலாளர், சென்னை கம்பன் கழகம்; வங்கியாளர்; கிராமவளர் பணியாளர், <strong>Tamil Nadu,  India</strong>',
-      image: '/lovable-uploads/17.jpg',
-    },
-    {
       name: 'Dr. A. Alaguselvam (Alaguannavi)',
       role: 'Global Ambassador - India',
-      bio: 'Head, Department of Tamil, Government Arts and science college, Aruppukottai, தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், <strong>Tamil Nadu, India </strong>',
+      bio: 'Head, Department of Thamizh, Government Arts and science college, Aruppukottai, தமிழ் மரபுக்கலைகள் பயிற்றுநர்/பரப்புநர், <strong>Thamizh Nadu, India </strong>',
       image: '/lovable-uploads/18.jpg',
     },
     {
@@ -207,7 +231,7 @@ export default function About() {
     },
     {
       year: 2019,
-      event: 'First Annual Tamil Literary Festival',
+      event: 'First Annual Thamizh Literary Festival',
     },
     {
       year: 2020,
@@ -261,7 +285,7 @@ export default function About() {
             <div className="prose max-w-none">
               <p className="text-lg leading-relaxed">
                 {t(
-                  'Tamil literature is a bridge between the past and the future, a voice of identity, culture, and creative expression. North America Tamil Writers Organization (NATAWO) is committed to nurturing and celebrating Tamil literary traditions in North America by providing a dynamic platform for Tamil writers to express their creativity, refine their craft, and share their works with a wider audience.',
+                  'Thamizh literature is a bridge between the past and the future, a voice of identity, culture, and creative expression. North America Thamizh Writers Organization (NATAWO) is committed to nurturing and celebrating Thamizh literary traditions in North America by providing a dynamic platform for Thamizh writers to express their creativity, refine their craft, and share their works with a wider audience.',
                   'தமிழ் இலக்கியம் என்பது கடந்த காலத்திற்கும் எதிர்காலத்திற்கும் இடையேயான பாலம், அடையாளம், கலாச்சாரம் மற்றும் படைப்பாற்றல் வெளிப்பாட்டின் குரல். வட அமெரிக்க தமிழ் எழுத்தாளர்கள் அமைப்பு (நடவு) வட அமெரிக்காவில் தமிழ் இலக்கிய மரபுகளை வளர்த்து, கொண்டாடுவதற்காக அர்ப்பணிப்புடன் செயல்படுகிறது. தமிழ் எழுத்தாளர்கள் தங்கள் படைப்பாற்றலை வெளிப்படுத்தவும், தங்கள் திறமையை மெருகேற்றவும், தங்கள் படைப்புகளை பரந்த வாசகர்களுடன் பகிர்ந்து கொள்ளவும் ஒரு இயங்குமிக்க தளத்தை வழங்குகிறது.'
                 )}
               </p>
@@ -271,7 +295,7 @@ export default function About() {
               </h2>
               <p className="text-lg leading-relaxed">
                 {t(
-                  'To nurture and celebrate Tamil literature and culture in North America by inspiring a global community of Tamil writers, fostering creativity, and preserving the rich heritage of the Tamil language promotes cultural identity and literary enhancement for Tamil diaspora children.',
+                  'To nurture and celebrate Thamizh literature and culture in North America by inspiring a global community of Thamizh writers, fostering creativity, and preserving the rich heritage of the Thamizh language promotes cultural identity and literary enhancement for Thamizh diaspora children.',
                   'வட அமெரிக்காவில் தமிழ் இலக்கியம் மற்றும் கலாச்சாரத்தை வளர்த்து, கொண்டாட, உலகளாவிய தமிழ் எழுத்தாளர்கள் சமூகத்தை ஊக்குவித்து, படைப்பாற்றலை வளர்த்து, தமிழ் மொழியின் செழுமையான பாரம்பரியத்தைப் பாதுகாத்து, தமிழ் புலம்பெயர் குழந்தைகளுக்கான கலாச்சார அடையாளம் மற்றும் இலக்கிய மேம்பாட்டை ஊக்குவிப்பது.'
                 )}
               </p>
@@ -282,19 +306,19 @@ export default function About() {
               <ul className="space-y-4 list-disc pl-6">
                 <li>
                   {t(
-                    'Empower Tamil Writers: Provide a supportive platform for aspiring and established Tamil writers in North America to express their ideas, refine their craft, and achieve global recognition.',
+                    'Empower Thamizh Writers: Provide a supportive platform for aspiring and established Thamizh writers in North America to express their ideas, refine their craft, and achieve global recognition.',
                     'தமிழ் எழுத்தாளர்களை மேம்படுத்துதல்: வட அமெரிக்காவில் உள்ள ஆர்வமுள்ள மற்றும் நிலைபெற்ற தமிழ் எழுத்தாளர்கள் தங்கள் கருத்துக்களை வெளிப்படு, தங்கள் திறமையை மெருகேற்ற மற்றும் உலகளாவிய அங்கீகாரத்தைப் பெற ஆதரவான தளத்தை வழங்குதல்.'
                   )}
                 </li>
                 <li>
                   {t(
-                    'Promote Tamil Literature: Encourage the creation, dissemination, and appreciation of Tamil literary works across diverse genres and styles.',
+                    'Promote Thamizh Literature: Encourage the creation, dissemination, and appreciation of Thamizh literary works across diverse genres and styles.',
                     'தமிழ் இலக்கியத்தை ஊக்குவித்தல்: பல்வேறு வகைகள் மற்றும் பாணிகளில் தமிழ் இலக்கியப் படைப்புகளின் உருவாக்கம், பரவல் மற்றும் பாராட்டுதலை ஊக்குவித்தல்.'
                   )}
                 </li>
                 <li>
                   {t(
-                    'Preserve Heritage: Uphold the timeless traditions and values of Tamil language and culture while adapting to contemporary themes and expressions.',
+                    'Preserve Heritage: Uphold the timeless traditions and values of Thamizh language and culture while adapting to contemporary themes and expressions.',
                     'பாரம்பரியத்தைப் பாதுகாத்தல்: சமகால கருப்பொருள்கள் மற்றும் வெளிப்பாடுகளுக்கு ஏற்ப மாறும் அதே வேளையில் தமிழ் மொழி மற்றும் கலாச்சாரத்தின் காலத்தால் அழியாத மரபுகள் மற்றும் மதிப்புகளைப் பேணுதல்.'
                   )}
                 </li>
@@ -306,7 +330,7 @@ export default function About() {
                 </li>
                 <li>
                   {t(
-                    'Bridge Generations: Inspire younger generations to embrace Tamil as a medium of creativity, writing and cultural expression through innovative programs and mentorship opportunities. Be a bridge between Tamil Writers and North American literary publishers and libraries to bring the Tamil language into the mainstream in North America.',
+                    'Bridge Generations: Inspire younger generations to embrace Thamizh as a medium of creativity, writing and cultural expression through innovative programs and mentorship opportunities. Be a bridge between Thamizh Writers and North American literary publishers and libraries to bring the Thamizh language into the mainstream in North America.',
                     'தலைமுறைகளை இணைத்தல்: புத்தாக்க திட்டங்கள் மற்றும் வழிகாட்டல் வாய்ப்புகள் மூலம் இளைய தலைமுறையினர் தமிழை படைப்பாற்றல், எழுது மற்றும் கலாச்சார வெளிப்பாட்டின் ஊடகமாக ஏற்றுக்கொள்ள ஊக்குவித்தல். வட அமெரிக்காவில் தமிழ் மொழியை முக்கிய நீரோட்டத்திற்கு கொண்டு வர தமிழ் எழுத்தாளர்களுக்கும் வட அமெரிக்க இலக்கிய பதிப்பகங்கள் மற்றும் நூலகங்களுக்கும் இடையே பாலமாக இருத்தல்.'
                   )}
                 </li>
@@ -331,7 +355,7 @@ export default function About() {
               </h3>
               <p className="text-lg leading-relaxed">
                 {t(
-                  'NATAWO is a non-profit, non-partisan, and secular organization dedicated to promoting Tamil literary expression, education, and cultural identity in North America. We aim to provide Tamil writers with the resources, opportunities, and networks they need to thrive in a global literary environment.',
+                  'NATAWO is a non-profit, non-partisan, and secular organization dedicated to promoting Thamizh literary expression, education, and cultural identity in North America. We aim to provide Thamizh writers with the resources, opportunities, and networks they need to thrive in a global literary environment.',
                   'நடவு என்பது வட அமெரிக்காவில் தமிழ் இலக்கிய வெளிப்பாடு, கல்வி மற்றும் கலாச்சார அடையாளத்தை மேம்படுத்துவதற்காக அர்ப்பணிக்கப்பட்ட இலாப நோக்கற்ற, கட்சி சார்பற்ற மற்றும் மதச்சார்பற்ற அமைப்பாகும். உலகளாவிய இலக்கியச் சூழலில் செழிக்க தமிழ் எழுத்தாளர்கள் சமூகத்தை ஊக்குவித்து, படைப்பாற்றலை வளர்த்து, தமிழ் மொழியை மெருகேற்ற மற்றும் உலகளாவிய அங்கீகாரத்தைப் பெற ஆதரவான தளத்தை வழங்குதல்.'
                 )}
               </p>
@@ -343,7 +367,7 @@ export default function About() {
               </h3>
               <p className="text-lg leading-relaxed">
                 {t(
-                  "NATAWO is led by a dedicated Board of Coordinators, Bylaws Committee and Global Ambassadors composed of Tamil writers, scholars, educators, and community leaders. The leadership team is responsible for shaping the organization's strategic direction, ensuring financial transparency, and fostering a culture of inclusivity and innovation.",
+                  "NATAWO is led by a dedicated Board of Coordinators, Bylaws Committee and Global Ambassadors composed of Thamizh writers, scholars, educators, and community leaders. The leadership team is responsible for shaping the organization's strategic direction, ensuring financial transparency, and fostering a culture of inclusivity and innovation.",
                   'நடவு அமைப்பானது தமிழ் எழுத்தாளர்கள், அறிஞர்கள், கல்வியாளர்கள் மற்றும் சமூகத் தலைவர்களைக் கொண்ட அர்ப்பணிப்புள்ள ஒருங்கிணைப்பாளர்கள் குழு, விதிமுறைகள் குழு மற்றும் உலகளாவிய தூதுவர்களால் வழிநடத்தப்படுகிறது. அமைப்பின் மூலோபாய திசையை வடிவமைப்பது, நிதி வெளிப்படைத்தன்மையை உறுதி செய்வது மற்றும் உள்ளடக்கம் மற்றும் புத்தாக்கக் கலாச்சாரத்தை வளர்ப்பது தலைமைக் குழுவின் பொறுப்பாகும்.'
                 )}
               </p>
@@ -362,7 +386,7 @@ export default function About() {
                     </h4>
                     <p>
                       {t(
-                        'Encouraging diverse forms of Tamil literary expression.',
+                        'Encouraging diverse forms of Thamizh literary expression.',
                         'தமிழ் இலக்கிய வெளிப்பாட்டின் பல்வேறு வடிவங்களை ஊக்குவித்தல்.'
                       )}
                     </p>
@@ -377,7 +401,7 @@ export default function About() {
                     </h4>
                     <p>
                       {t(
-                        'Safeguarding and promoting Tamil literary heritage.',
+                        'Safeguarding and promoting Thamizh literary heritage.',
                         'தமிழ் இலக்கிய பாரம்பரியத்தைப் பாதுகாத்து மேம்படுத்துதல்.'
                       )}
                     </p>
@@ -407,7 +431,7 @@ export default function About() {
                     </h4>
                     <p>
                       {t(
-                        'Welcoming Tamil writers from all backgrounds and experiences.',
+                        'Welcoming Thamizh writers from all backgrounds and experiences.',
                         'அனைத்து பின்னணி மற்றும் அனுபவங்களைக் கொண்ட தமிழ் எழுத்தாளர்களை வரவேற்றல்.'
                       )}
                     </p>
@@ -422,7 +446,7 @@ export default function About() {
                     </h4>
                     <p>
                       {t(
-                        'Using modern platforms to enhance Tamil literary engagement.',
+                        'Using modern platforms to enhance Thamizh literary engagement.',
                         'தமிழ் இலக்கிய ஈடுபாட்டை மேம்படுத்த நவீன தளங்களைப் பயன்படுத்துதல்.'
                       )}
                     </p>
@@ -445,19 +469,19 @@ export default function About() {
               <div>
                 <h3 className="text-xl font-semibold mb-4">
                   {t(
-                    'A Legacy Rooted in Tamil Literary Passion',
+                    'A Legacy Rooted in Thamizh Literary Passion',
                     'தமிழ் இலக்கிய ஆர்வத்தில் வேரூன்றிய மரபு'
                   )}
                 </h3>
                 <p className="text-lg leading-relaxed">
                   {t(
-                    'Tamil literature has thrived for over 2,000 years, evolving through poetry, epics, short stories, and modern storytelling. As Tamil communities flourished in North America, writers sought a dedicated space to share their work, collaborate, and find publishing opportunities.',
+                    'Thamizh literature has thrived for over 2,000 years, evolving through poetry, epics, short stories, and modern storytelling. As Thamizh communities flourished in North America, writers sought a dedicated space to share their work, collaborate, and find publishing opportunities.',
                     'தமிழ் இலக்கியம் 2,000 ஆண்டுகளுக்கும் மேலாக கவிதை, காவியங்கள், சிறுகதைகள் மற்றும் நவீன கதை சொல்லல் வழியாக வளர்ந்து வந்துள்ளது. வட அமெரிக்காவில் தமிழ் சமூகங்கள் செழித்தோங்கியதால், எழுத்தாளர்கள் தங்கள் படைப்புகளைப் பகிர்ந்து கொள்ள, ஒத்துழைக்க மற்றும் பதிப்பிக்கும் வாய்ப்புகளைக் கண்டறிய ஒரு அர்ப்பணிக்கப்பட்ட இடத்தைத் தேடினர்.'
                   )}
                 </p>
                 <p className="text-lg leading-relaxed mt-4">
                   {t(
-                    'Recognizing this need, a group of passionate Tamil literary enthusiasts founded North America Tamil Writers Incorporated to provide a structured platform for Tamil writers. Since its inception, NATAWO has grown into a respected institution, hosting literary events, mentorship programs, and collaborations that celebrate Tamil storytelling.',
+                    'Recognizing this need, a group of passionate Thamizh literary enthusiasts founded North America Thamizh Writers Incorporated to provide a structured platform for Thamizh writers. Since its inception, NATAWO has grown into a respected institution, hosting literary events, mentorship programs, and collaborations that celebrate Thamizh storytelling.',
                     'இந்த தேவையை உணர்ந்து, ஆர்வமுள்ள தமிழ் இலக்கிய ஆர்வலர்கள் குழு தமிழ் எழுத்தாளர்களுக்கு ஒரு கட்டமைக்கப்பட்ட தளத்தை வழங்க வட அமெரிக்க தமிழ் எழுத்தாளர்கள் நிறுவனத்தை நிறுவினர். தொடக்கம் முதல், நடவு தமிழ் கதை சொல்லலைக் கொண்டாடும் இலக்கிய நிகழ்வுகள், வழிகாட்டல் திட்டங்கள் மற்றும் கூட்டு முயற்சிகளை நடத்தும் மதிப்புமிக்க நிறுவனமாக வளர்ந்துள்ளது.'
                   )}
                 </p>
@@ -469,7 +493,7 @@ export default function About() {
                 </h3>
                 <h4 className="text-xl font-medium mb-4">
                   {t(
-                    'The Birth of NATAWO: Uniting Tamil Writers Across North America',
+                    'The Birth of NATAWO: Uniting Thamizh Writers Across North America',
                     'நடவு-வின் பிறப்பு: வட அமெரிக்கா முழுவதும் தமிழ் எழுத்தாளர்களை ஒன்றிணைத்தல்'
                   )}
                 </h4>
@@ -482,26 +506,26 @@ export default function About() {
                 <blockquote className="border-l-4 border-primary pl-4 mb-6">
                   <p className="text-lg font-medium">
                     {t(
-                      '"How can we create a lasting impact on Tamil literature in North America?"',
+                      '"How can we create a lasting impact on Thamizh literature in North America?"',
                       '"வட அமெரிக்காவில் தமிழ் இலக்கியத்தில் நிலையான தாக்கத்தை எவ்வாறு உருவாக்க முடியும்?"'
                     )}
                   </p>
                 </blockquote>
                 <p className="text-lg leading-relaxed">
                   {t(
-                    'A group of dedicated Tamil writers, scholars, and educators came together to find the answer. They shared a common vision—to create a community-driven platform that nurtures Tamil literary talent while promoting the rich heritage of Tamil literature in a globalized world.',
+                    'A group of dedicated Thamizh writers, scholars, and educators came together to find the answer. They shared a common vision—to create a community-driven platform that nurtures Thamizh literary talent while promoting the rich heritage of Thamizh literature in a globalized world.',
                     'அர்ப்பணிப்புள்ள தமிழ் எழுத்தாளர்கள், அறிஞர்கள் மற்றும் கல்வியாளர்கள் குழு பதிலைக் கண்டறிய ஒன்றிணைந்தனர். உலகமயமாக்கப்பட்ட உலகில் தமிழ் இலக்கியத்தின் செழுமையான பாரம்பரியத்தை மேம்படுத்தும் அதே வேளையில் தமிழ் இலக்கியத் திறமையை வளர்க்கும் சமூகம் சார்ந்த தளத்தை உருவாக்குவது என்ற பொதுவான பார்வையை அவர்கள் பகிர்ந்து கொண்டனர்.'
                   )}
                 </p>
                 <p className="text-lg leading-relaxed mt-4">
                   {t(
-                    'Through countless discussions, planning sessions, and collaborations, North America Tamil Writers Incorporated was officially formed as a non-profit literary organization with a commitment to fostering Tamil creativity.',
+                    'Through countless discussions, planning sessions, and collaborations, North America Thamizh Writers Incorporated was officially formed as a non-profit literary organization with a commitment to fostering Thamizh creativity.',
                     'எண்ணற்ற விவாதங்கள், திட்டமிடல் அமர்வுகள் மற்றும் கூட்டு முயற்சிகள் மூலம், தமிழ் படைப்பாற்றலை வளர்ப்பதற்கான அர்ப்பணிப்புடன் வட அமெரிக்க தமிழ் எழுத்தாளர்கள் நிறுவனம் அதிகாரப்பூர்வமாக இலாப நோக்கற்ற இலக்கிய அமைப்பாக உருவாக்கப்பட்டது.'
                   )}
                 </p>
                 <p className="text-lg leading-relaxed mt-4">
                   {t(
-                    'Today, NATAWO stands as a pioneering force in Tamil literary development, bridging generations, cultures, and geographies through literature.',
+                    'Today, NATAWO stands as a pioneering force in Thamizh literary development, bridging generations, cultures, and geographies through literature.',
                     'இன்று, நடவு தமிழ் இலக்கிய வளர்ச்சியில் முன்னோடி சக்தியாக நின்று, இலக்கியம் வழியாக தலைமுறைகள், கலாச்சாரங்கள் மற்றும் புவியியல்களை இணைக்கிறது.'
                   )}
                 </p>
@@ -820,14 +844,14 @@ export default function About() {
                     <li className="flex gap-2">
                       <Check className="text-green-600 mt-1" />
                       {t(
-                        'Invitations to Tamil literary events, festivals, and competitions.',
+                        'Invitations to Thamizh literary events, festivals, and competitions.',
                         'தமிழ் இலக்கிய நிகழ்வுகள், விழாக்கள் மற்றும் போட்டிகளுக்கான அழைப்புகள்.'
                       )}
                     </li>
                     <li className="flex gap-2">
                       <Check className="text-green-600 mt-1" />
                       {t(
-                        'Networking with Tamil writers, publishers, and scholars.',
+                        'Networking with Thamizh writers, publishers, and scholars.',
                         'தமிழ் எழுத்தாளர்கள், பதிப்பகங்கள் மற்றும் அறிஞர்களுடன் நெட்வொர்க்கிங்.'
                       )}
                     </li>
