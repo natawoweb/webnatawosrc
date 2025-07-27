@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,13 +45,15 @@ export function ResetPasswordForm() {
 
       if (updateError) throw updateError;
 
-      // Get the user's email for the notification
+      // ✅ Clear the reset mode flag from localStorage
+      localStorage.removeItem("isResetPassword");
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
       if (user?.email) {
-        // Call the edge function to send password change notification
+        // Optional: Notify via your backend
         const response = await fetch(
           `${window.location.origin}/functions/v1/send-password-changed`,
           {
@@ -81,17 +80,18 @@ export function ResetPasswordForm() {
         duration: 5000,
       });
 
-      // Short delay before redirect
       setTimeout(() => {
         navigate("/");
       }, 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Password reset error:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description:
-          error.message || "Failed to update password. Please try again.",
+          error instanceof Error
+            ? error.message
+            : "Failed to update password. Please try again.",
         duration: 5000,
       });
     } finally {

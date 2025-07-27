@@ -7,12 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { Toaster } from "@/components/ui/toaster";
@@ -34,41 +29,36 @@ export default function Auth() {
       const accessToken = hashParams.get("access_token");
       const refreshToken = hashParams.get("refresh_token");
 
-      // ✅ If this is a password reset flow
+      // ✅ Check for recovery type and tokens
       if (type === "recovery" && accessToken && refreshToken) {
-        const { error } = await supabase.auth.setSession({
+        // ⚠️ Set a localStorage flag so we know we're in reset mode
+        localStorage.setItem("isResetPassword", "true");
+
+        await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
         });
 
-        if (error) {
-          console.error("❌ Error setting session:", error.message);
-          toast({
-            title: "Link expired or invalid",
-            description: "This reset link has already been used or is invalid. Please request a new one.",
-            variant: "destructive",
-          });
-          navigate("/auth", { replace: true });
-          setLoading(false);
-          return;
-        }
-
-        // ✅ Flag reset flow, clean up URL
+        // ✅ Clean URL
+        window.history.replaceState({}, document.title, "/auth");
         setIsResetPassword(true);
-        window.history.replaceState({}, document.title, "/auth?type=reset");
         setLoading(false);
         return;
       }
 
-      // ✅ Regular login check
+      // ✅ Check if flag exists even if user is now logged in
+      if (localStorage.getItem("isResetPassword") === "true") {
+        setIsResetPassword(true);
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Now check for logged in session
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
-      // ❌ Redirect only if NOT in reset mode
-      const isResetRoute = new URLSearchParams(location.search).get("type") === "reset";
-
-      if (session && !isResetRoute) {
+      if (session) {
         navigate("/", { replace: true });
         return;
       }
@@ -79,7 +69,7 @@ export default function Auth() {
     checkSession();
   }, [navigate, location]);
 
-  if (loading) return <Toaster />; // Allow toaster to show even on load
+  if (loading) return <Toaster />;
 
   if (isResetPassword) {
     return (
@@ -87,7 +77,9 @@ export default function Auth() {
         <Card className="max-w-md mx-auto">
           <CardHeader>
             <CardTitle>Reset Your Password</CardTitle>
-            <CardDescription>Please enter your new password below.</CardDescription>
+            <CardDescription>
+              Please enter your new password below.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResetPasswordForm />
