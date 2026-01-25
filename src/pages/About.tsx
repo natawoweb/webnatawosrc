@@ -63,7 +63,7 @@ export default function About() {
     {
       name: 'Mr. Ramprasath Rengasamy',
       role: 'Co-founder',
-      bio: 'தமிழ்நாடு அரசின் விருது பெற்ற அறிவியல் புனைவெழுத்தாளர், பல்-மொழி எழுத்தாளர், கதாசிரியர், சிறார் அறிபுனை எழுத்தாளர், பதிப்பாளர், கவிஞர், நாவலாசிரியர், சிறப்புரையாளர், Gym Enthusiast, <strong> Georgia, USA </strong>',
+      bio: 'தமிழ்நாடு அரசின் விருது பெற்ற அறிவியல் புனைவெழுத்தாளர், SFWA - Member (Science Fiction & Fantasy Writers Association), பல்-மொழி எழுத்தாளர், கதாசிரியர், சிறார் அறிபுனை எழுத்தாளர், பதிப்பாளர், கவிஞர், நாவலாசிரியர், சிறப்புரையாளர், Gym Enthusiast, <strong> Georgia, USA </strong>',
       image: '/lovable-uploads/7.jpg',
     },
     {
