@@ -41,8 +41,8 @@ export default function About() {
     },
         {
       name: 'Mr. Karthik Kaveriselvan',
-      role: 'Technology Coordinators',
-      bio: "தமிழ்க் கல்வியாளர், தமிழார்வலர், பேச்சாளர், எழுத்தாளர், Karthik manages our organization's day-to-day Technology operations and System improvement initiatives. <strong>New York, USA</strong>",
+      role: 'Content Coordinators',
+      bio: "கார்த்திக் காவேரிசெல்வன் (பறம்பு நாட்டான்) மரபுப் பாடல் இயற்றும் புலவர், பேச்சாளர், தமிழ் ஆர்வலர். Karthik Coordinates on promoting Thamizh writers and advising on content. <strong>New York, USA</strong>",
       image: '/lovable-uploads/32.jpeg',
     },
   ];
