@@ -16,7 +16,7 @@ export default function About() {
       image: '/lovable-uploads/1.jpg',
     },
     {
-      name: 'Ms. Manimegalai Ramamourty',
+      name: 'Prof. Manimegalai Ramamourty',
       role: 'Vice Coordinator',
       bio: 'தமிழ்க் கல்வியாளர், தமிழார்வலர், பேச்சாளர், எழுத்தாளர், மயிலைத் திருவள்ளுவர் தமிழ்ச்சங்க ஆட்சிக்குழு உறுப்பினர், வல்லமை மின்னிதழ் ஆசிரியர்குழு, மதிப்பாய்வுக்குழு உறுப்பினர், <strong>Florida, USA</strong>',
       image: '/lovable-uploads/2.jpg',
@@ -28,16 +28,22 @@ export default function About() {
       image: '/lovable-uploads/3.jpg',
     },
     {
-      name: 'Manikanda Prabu',
+      name: 'Mr. Manikanda Prabu Lakshmanan',
       role: 'Networking Coordinator',
       bio: 'A renowned professional and community organizer, Mani focuses on building connections between writers and readers across <strong>Pennsylvania, USA</strong>.',
       image: '/lovable-uploads/4.jpg',
     },
     {
-      name: 'Ravi Kumar Potu',
-      role: 'Technology Coordinator',
+      name: 'Mr.Ravi Kumar Potu',
+      role: 'Technology Coordinators',
       bio: "An accomplished information technology professional, Ravi manages our organization's day-to-day Technology operations and System improvement initiatives. <strong>Maryland, USA</strong>",
       image: '/lovable-uploads/5.jpg',
+    },
+        {
+      name: 'Mr. Karthik Kaveriselvan',
+      role: 'Technology Coordinators',
+      bio: "தமிழ்க் கல்வியாளர், தமிழார்வலர், பேச்சாளர், எழுத்தாளர், Karthik manages our organization's day-to-day Technology operations and System improvement initiatives. <strong>New York, USA</strong>",
+      image: '/lovable-uploads/32.jpeg',
     },
   ];
 
@@ -129,7 +135,7 @@ export default function About() {
       image: '/lovable-uploads/10.jpg',
     },
     {
-      name: 'சொல்லாக்கியன் சு. தீனதயாளன்',
+      name: 'சொல்லாக்கியன் திருமிகு சு. தீனதயாளன்',
       role: 'Global Ambassador - Canada',
       bio: 'இலக்கியவாதி, தமிழ்க் கல்வியாளர், எழுத்தாளர், உலகத் தமிழ் சங்க 2022 ஆம் ஆண்டு இலக்கண விருதாளர், உலகத் தொல்காப்பிய மன்றமும் தமிழ் காப்புக் கழகமும் இணைந்து 2024 இல் அவருக்கு வழங்கிய விருது “தொல்காப்பிய மணி”,<strong> Alberta, Canada </strong>',
       image: '/lovable-uploads/24.jpg',
