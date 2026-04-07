@@ -96,18 +96,6 @@ export default function About() {
 
   const globalAmbassadors = [
     {
-      name: 'Ms. Vaidhehi Herbert',
-      role: 'Global Ambassador - USA',
-      bio: 'சங்க இலக்கிய அறிஞர், உரையாசிரியர், சங்க இலக்கியப் பதினெட்டு நூல்களை ஆங்கிலத்தில் மொழி பெயர்த்து உரை எழுதியவர், ஹார்வார்டு தமிழ் இருக்கைக்கு வித்திட்டவர், தமிழ்க் கல்வியாளர், <strong>Hawaii, USA </strong>',
-      image: '/lovable-uploads/9.jpg',
-    },
-    {
-      name: 'Mr. Mourougavelou Vaithianathan',
-      role: 'Global Ambassador - USA',
-      bio: 'புதுவை முருகு, தமிழார்வலர், தமிழ்க் கல்வியாளர், எழுத்தாளர், செய்தியாளர், மொழியியல் ஆர்வலர், மனிதவள சிந்தனையாளர், Social Entrepreneur, World Traveler, <strong>Maryland, USA </strong>',
-      image: '/lovable-uploads/6.jpg',
-    },
-    {
       name: 'Dr. R. Prabhakaran',
       role: 'Global Ambassador - USA',
       bio: 'முனைவர் இர. பிரபாகரன், திருக்குறளார், எழுத்தாளர், தமிழ்க் கல்வியாளர், NASA, US Army போன்ற அமெரிக்க அரசுத்துறைகளில் உயர்ந்த பதவிகளில் பணி புரிந்து ஓய்வு பெற்றவர், Former Vice President of FeTNA, <strong>Maryland, USA </strong>',
@@ -119,6 +107,13 @@ export default function About() {
       bio: 'முனைவர் அரசு செல்லையா, எழுத்தாளர், தமிழ்க் கல்வியாளர், அமெரிக்க அதிபர் விருது பெற்றவர், Founder President of American Thamizh Academy, Former President of FeTNA, <strong>Maryland, USA </strong>',
       image: '/lovable-uploads/28.jpg',
     },
+    {
+      name: 'Mr. Mourougavelou Vaithianathan',
+      role: 'Global Ambassador - USA',
+      bio: 'புதுவை முருகு, தமிழார்வலர், தமிழ்க் கல்வியாளர், எழுத்தாளர், செய்தியாளர், மொழியியல் ஆர்வலர், மனிதவள சிந்தனையாளர், Social Entrepreneur, World Traveler, <strong>Maryland, USA </strong>',
+      image: '/lovable-uploads/6.jpg',
+    },
+
   ];
 
   const globalAmbassadorsCanada = [
