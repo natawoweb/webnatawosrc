@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
@@ -22,45 +21,6 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  const handlePasswordReset = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!email) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter your email address to reset your password.",
-        duration: 5000,
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth?type=recovery`,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Check your email",
-        description: "We've sent you a password reset link.",
-        duration: 5000,
-      });
-      signOut();
-    } catch (error: any) {
-      console.error("Password reset error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-        duration: 5000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,13 +80,15 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       }
 
       onSuccess();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Signin error:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description:
-          error.message || "Invalid email or password. Please try again.",
+          error instanceof Error
+            ? error.message
+            : "Invalid email or password. Please try again.",
         duration: 5000,
       });
     } finally {
@@ -178,7 +140,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
           type="button"
           variant="link"
           className="text-sm"
-          onClick={handlePasswordReset}
+          onClick={() => navigate("/forgot-password")}
           disabled={loading}
         >
           Forgot your password?

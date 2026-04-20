@@ -21,6 +21,7 @@ import Auth from "./pages/Auth";
 import WriterProfile from "./pages/WriterProfile";
 import CreateBlog from "./pages/CreateBlog";
 import EditBlog from "./pages/EditBlog";
+import ForgotPassword from "./pages/ForgotPassword";
 
 export default function App() {
   return (
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/mentorship" element={<ComingSoon />} />
           <Route path="/book-clubs" element={<ComingSoon />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Route>
       </Routes>
       <Toaster />

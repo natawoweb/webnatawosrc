@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -11,30 +10,66 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
-import { useSession } from "@/hooks/useSession";
 import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { session, signOut } = useSession();
+  const location = useLocation();
+
   const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
   const [isResetPassword, setIsResetPassword] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const searchParams = new URLSearchParams(window.location.search);
+    const checkSession = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get("type");
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
 
-    const type = hashParams.get("type") || searchParams.get("type");
+      // ✅ Check for recovery type and tokens
+      if (type === "recovery" && accessToken && refreshToken) {
+        // ⚠️ Set a localStorage flag so we know we're in reset mode
+        localStorage.setItem("isResetPassword", "true");
 
-    if (type === "recovery") {
-      setIsResetPassword(true);
-      return;
-    }
+        await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
 
-    // if (session && type !== "recovery") {
-    //   navigate("/", { replace: true });
-    // }
-  }, [session, navigate]);
+        // ✅ Clean URL
+        window.history.replaceState({}, document.title, "/auth");
+        setIsResetPassword(true);
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Check if flag exists even if user is now logged in
+      if (localStorage.getItem("isResetPassword") === "true") {
+        setIsResetPassword(true);
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Now check for logged in session
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        navigate("/", { replace: true });
+        return;
+      }
+
+      setLoading(false);
+    };
+
+    checkSession();
+  }, [navigate, location]);
+
+  if (loading) return <Toaster />;
 
   if (isResetPassword) {
     return (
@@ -43,7 +78,7 @@ export default function Auth() {
           <CardHeader>
             <CardTitle>Reset Your Password</CardTitle>
             <CardDescription>
-              Please enter your new password below
+              Please enter your new password below.
             </CardDescription>
           </CardHeader>
           <CardContent>
